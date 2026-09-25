@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0b1428" />
+    <meta name="description" content="Meet the TEKKTEAM crew in a real-time 3D voxel studio." />
+    <title>TEKKTEAM — 3D Agent Studio</title>
+  </head>
+  <body>
+    <div id="app">
+      <aside class="sidebar">
+        <a class="brand" href="#/" aria-label="TEKKTEAM home">
+          <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></span>
+          <span>TEKK<span class="brand-pill">TEAM</span></span>
+        </a>
+        <div class="side-label">THE STUDIO</div>
+        <nav aria-label="Primary navigation">
+          <a class="nav-link active" href="#/"><span class="nav-icon">▣</span> Home</a>
+          <a class="nav-link" href="#/agents"><span class="nav-icon">◫</span> Agents</a>
+          <a class="nav-link" href="#/tokens"><span class="nav-icon">◇</span> Tokens</a>
+          <a class="nav-link" href="#/launch"><span class="nav-icon">✦</span> Launch</a>
+          <a class="nav-link" href="#/skins"><span class="nav-icon">◈</span> Skins</a>
+          <a class="nav-link" href="#/post"><span class="nav-icon">✎</span> Social draft</a>
+          <a class="nav-link" href="#/how"><span class="nav-icon">?</span> How it works</a>
+        </nav>
+        <div class="side-spacer"></div>
+        <div class="side-card">
+          <span class="live-dot"></span><span>3D PROTOTYPE</span>
+          <p>Six tiny specialists. One studio with actual depth.</p>
+        </div>
+        <p class="side-note">Original voxel world for TEKKTEAM.<br />No wallet or token actions in this prototype.</p>
+      </aside>
+
+      <main class="main">
+        <div class="ticker" aria-label="Studio status">
+          <span>◈ TEKKTEAM STUDIO</span><span>REAL-TIME 3D</span><span>6 AGENTS ONLINE</span><span>DRAG TO ORBIT</span><span>CLICK A CHARACTER</span>
+        </div>
+        <div id="route-root" hidden></div>
+        <div id="home-page">
+        <section class="hero" aria-labelledby="hero-title">
+          <div class="scene-wrap">
+            <div class="scene-topline"><span class="eyebrow"><i></i> LIVE 3D WORLD</span><span>001 / THE STUDIO</span></div>
+            <div id="scene" class="scene" role="img" aria-label="Interactive 3D TEKKTEAM studio with six voxel agents"></div>
+            <div id="scene-loading" class="scene-loading">BUILDING THE STUDIO <span class="loading-cursor">▌</span></div>
+            <div id="hover-tip" class="hover-tip" hidden></div>
+            <div class="scene-instructions"><span>↔ DRAG TO ORBIT</span><span>＋ SCROLL TO ZOOM</span><span>◈ CLICK AN AGENT</span></div>
+          </div>
+          <div class="scene-side">
+            <div class="side-heading"><span class="eyebrow">ACTIVE CREW</span><span id="scene-clock">00:00</span></div>
+            <div id="agent-list" class="agent-list"></div>
+            <div class="scene-side-bottom"><span class="pulse-icon">✦</span> Every character is geometry in the world, not a painted sprite.</div>
+          </div>
+        </section>
+
+        <section class="intro" id="about">
+          <div>
+            <div class="eyebrow section-kicker">THE NEXT VERSION OF TEKKTEAM</div>
+            <h1 id="hero-title">The team has<br /><em>entered the room.</em></h1>
+            <p>Meet the specialists inside a real 3D studio. Orbit the space, find each agent, and watch them move around the furniture—not through it.</p>
+            <div class="intro-actions"><a class="button-primary" href="#/agents">MEET THE AGENTS <span>↗</span></a><button class="button-quiet" id="reset-view" type="button">RESET CAMERA ↺</button></div>
+          </div>
+          <div class="intro-stats" aria-label="Prototype highlights">
+            <div><strong>06</strong><span>UNIQUE VOXEL AGENTS</span></div>
+            <div><strong>3D</strong><span>REAL-TIME GEOMETRY</span></div>
+            <div><strong>∞</strong><span>ANGLES TO EXPLORE</span></div>
+          </div>
+        </section>
+
+        <section class="team-section" id="team">
+          <div class="section-head"><div><div class="eyebrow section-kicker">MEET THE CREW</div><h2>Six minds. One launch.</h2></div><p>Pick an agent to focus the 3D camera and see their station.</p></div>
+          <div id="team-grid" class="team-grid"></div>
+        </section>
+        </div>
+        <footer>TEKKTEAM <span>3D STUDIO PROTOTYPE · BUILT FROM SCRATCH</span></footer>
+      </main>
+      <div id="agent-panel" class="agent-panel" hidden aria-live="polite">
+        <button id="panel-close" class="panel-close" type="button" aria-label="Close agent panel">×</button>
+        <div class="eyebrow">AGENT PROFILE</div>
+        <div id="panel-avatar" class="panel-avatar"></div>
+        <h2 id="panel-name"></h2><p id="panel-role" class="panel-role"></p><p id="panel-description"></p>
+        <div class="panel-foot"><span class="live-dot"></span> ACTIVE IN STUDIO</div>
+      </div>
+    </div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
