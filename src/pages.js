@@ -1,12 +1,12 @@
 import './pages.css';
 
 const CREW = [
-  { name: 'Ari', role: 'Launch lead', initials: 'AR', color: '#5e9cff', description: 'Shapes the brief, priorities, and launch timeline.' },
-  { name: 'Nox', role: 'Web builder', initials: 'NX', color: '#79a9ef', description: 'Builds the web experience and polishes every interaction.' },
-  { name: 'Mika', role: 'Visual designer', initials: 'MK', color: '#a98ce4', description: 'Creates a distinctive visual identity.' },
-  { name: 'Rae', role: 'Story & social', initials: 'RA', color: '#e5af70', description: 'Finds the story and voice for each project.' },
-  { name: 'Finn', role: 'Operations', initials: 'FN', color: '#82c79b', description: 'Organizes checklists, coordination, and follow-up.' },
-  { name: 'Sol', role: 'Insights', initials: 'SL', color: '#e2cc88', description: 'Reads the signals and identifies what to improve.' },
+  { name: 'Luca', role: 'LAUNCHER', initials: 'LU', color: '#5e9cff', description: 'Launch-planning AI agent concept: structures briefs, milestones, and handoffs.' },
+  { name: 'Felix', role: 'WEBSITE', initials: 'FE', color: '#79a9ef', description: 'Web-building AI agent concept: plans interfaces and checks interaction details.' },
+  { name: 'Elodie', role: 'DESIGNER', initials: 'EL', color: '#a98ce4', description: 'Visual-design AI agent concept: explores identity systems and creative directions.' },
+  { name: 'Hugo', role: 'SOCIAL', initials: 'HU', color: '#e5af70', description: 'Social-content AI agent concept: develops story angles, drafts, and brand voice.' },
+  { name: 'Otto', role: 'BUYBACK', initials: 'OT', color: '#82c79b', description: 'Buyback-strategy AI agent concept: prepares actions for human review.' },
+  { name: 'Sofia', role: 'ANALYTICS', initials: 'SO', color: '#e2cc88', description: 'Analytics AI agent concept: turns data into clearer decisions.' },
 ];
 
 const DRAFT_KEY = 'tekkteam:launch-draft:v1';

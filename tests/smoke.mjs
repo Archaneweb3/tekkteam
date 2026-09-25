@@ -3,6 +3,7 @@ import { chromium } from 'playwright';
 const browser = await chromium.launch({ headless: true });
 const base = process.env.BASE_URL || 'http://127.0.0.1:5173';
 const routes = ['/', '/agents', '/tokens', '/launch', '/skins', '/post', '/how', '/agent/1'];
+const agentNames = ['Luca', 'Felix', 'Elodie', 'Hugo', 'Otto', 'Sofia'];
 const problems = [];
 
 try {
@@ -17,6 +18,10 @@ try {
       if (route === '/skins' && await page.locator('.tt-skin-card-viewer canvas').count() !== 3) problems.push(`${viewport.width} skins: card 3D previews missing`);
       if (route === '/tokens' && await page.locator('.token-laptop-viewer canvas').count() !== 1) problems.push(`${viewport.width} tokens: 3D laptop missing`);
       if (route === '/agent/1' && await page.locator('.agent-detail-viewer canvas').count() !== 1) problems.push(`${viewport.width} agent: 3D viewer missing`);
+      if (route === '/' || route === '/agents') {
+        const names = await page.locator(route === '/' ? '.agent-row strong' : '.tt-agent-card strong').allTextContents();
+        if (JSON.stringify(names) !== JSON.stringify(agentNames)) problems.push(`${viewport.width} ${route}: agent names do not match`);
+      }
       await page.close();
     }
   }

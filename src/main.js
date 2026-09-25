@@ -8,12 +8,12 @@ import './style.css';
 import './blue-theme.css';
 
 const AGENTS = [
-  { name: 'Ari', role: 'LAUNCHER', color: '#f1665e', hair: '#70432f', skin: '#dba276', accent: '#4576d5', icon: 'A', description: 'Launch-planning AI agent concept: structures briefs, milestones, and handoffs.', home: [-3.5, .55], stops: [[-4.5, 1.1], [-1.5, .8], [-3.8, -2.6]] },
-  { name: 'Nox', role: 'WEBSITE', color: '#5b9be0', hair: '#222b3d', skin: '#a96b4b', accent: '#51b7d2', icon: 'N', description: 'Web-building AI agent concept: plans interfaces and checks interaction details.', home: [1.4, .55], stops: [[1.1, .5], [3.0, -.5], [.2, 2.2]] },
-  { name: 'Mika', role: 'DESIGNER', color: '#a384e9', hair: '#4d2d50', skin: '#e0ac88', accent: '#d47dc9', icon: 'M', description: 'Visual-design AI agent concept: explores identity systems and creative directions.', home: [4.6, .6], stops: [[4.3, 1.1], [2.4, 2.6], [4.4, -2.5]] },
-  { name: 'Rae', role: 'SOCIAL', color: '#e6a95c', hair: '#a25938', skin: '#c88765', accent: '#e85c80', icon: 'R', description: 'Social-content AI agent concept: develops story angles, drafts, and brand voice.', home: [-2.7, 1.6], stops: [[-3.2, .4], [-.8, 2.7], [-5.1, 2.5]] },
-  { name: 'Finn', role: 'BUYBACK', color: '#77bf88', hair: '#3c4836', skin: '#e3b28c', accent: '#6bd6a1', icon: 'F', description: 'Buyback-strategy AI agent concept: monitors signals and prepares actions for human review.', home: [4.8, 2.3], stops: [[4.6, 3.1], [1.3, 3.5], [5.1, .4]] },
-  { name: 'Sol', role: 'ANALYTICS', color: '#dbb46f', hair: '#4b3728', skin: '#b57d59', accent: '#f4ca69', icon: 'S', description: 'Analytics AI agent concept: finds patterns and turns data into clearer decisions.', home: [0, 1.35], stops: [[-1.1, 3.8], [1.2, 1.9], [-1.6, -.3]] },
+  { name: 'Luca', role: 'LAUNCHER', color: '#f1665e', hair: '#70432f', skin: '#dba276', accent: '#4576d5', icon: 'L', description: 'Launch-planning AI agent concept: structures briefs, milestones, and handoffs.', home: [-3.5, .55], stops: [[-4.5, 1.1], [-1.5, .8], [-3.8, -2.6]] },
+  { name: 'Felix', role: 'WEBSITE', color: '#5b9be0', hair: '#222b3d', skin: '#a96b4b', accent: '#51b7d2', icon: 'F', description: 'Web-building AI agent concept: plans interfaces and checks interaction details.', home: [1.4, .55], stops: [[1.1, .5], [3.0, -.5], [.2, 2.2]] },
+  { name: 'Elodie', role: 'DESIGNER', color: '#a384e9', hair: '#4d2d50', skin: '#e0ac88', accent: '#d47dc9', icon: 'E', description: 'Visual-design AI agent concept: explores identity systems and creative directions.', home: [4.6, .6], stops: [[4.3, 1.1], [2.4, 2.6], [4.4, -2.5]] },
+  { name: 'Hugo', role: 'SOCIAL', color: '#e6a95c', hair: '#a25938', skin: '#c88765', accent: '#e85c80', icon: 'H', description: 'Social-content AI agent concept: develops story angles, drafts, and brand voice.', home: [-2.7, 1.6], stops: [[-3.2, .4], [-.8, 2.7], [-5.1, 2.5]] },
+  { name: 'Otto', role: 'BUYBACK', color: '#77bf88', hair: '#3c4836', skin: '#e3b28c', accent: '#6bd6a1', icon: 'O', description: 'Buyback-strategy AI agent concept: monitors signals and prepares actions for human review.', home: [4.8, 2.3], stops: [[4.6, 3.1], [1.3, 3.5], [5.1, .4]] },
+  { name: 'Sofia', role: 'ANALYTICS', color: '#dbb46f', hair: '#4b3728', skin: '#b57d59', accent: '#f4ca69', icon: 'S', description: 'Analytics AI agent concept: finds patterns and turns data into clearer decisions.', home: [0, 1.35], stops: [[-1.1, 3.8], [1.2, 1.9], [-1.6, -.3]] },
 ];
 
 const sceneHost = document.getElementById('scene');
