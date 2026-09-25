@@ -1,87 +1,20 @@
 <!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#0b1428" />
-    <meta name="description" content="Meet the TEKKTEAM AI agents through an interactive 3D studio preview." />
-    <title>TEKKTEAM — AI Agent Studio</title>
-  </head>
-  <body>
-    <div id="app">
-      <aside class="sidebar">
-        <a class="brand" href="#/" aria-label="TEKKTEAM home">
-          <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></span>
-          <span>TEKK<span class="brand-pill">TEAM</span></span>
-        </a>
-        <div class="side-label">THE STUDIO</div>
-        <nav aria-label="Primary navigation">
-          <a class="nav-link active" href="#/"><span class="nav-icon">▣</span> Home</a>
-          <a class="nav-link" href="#/agents"><span class="nav-icon">◫</span> Agents</a>
-          <a class="nav-link" href="#/tokens"><span class="nav-icon">◇</span> Tokens</a>
-          <a class="nav-link" href="#/launch"><span class="nav-icon">✦</span> Launch</a>
-          <a class="nav-link" href="#/skins"><span class="nav-icon">◈</span> Skins</a>
-          <a class="nav-link" href="#/post"><span class="nav-icon">✎</span> Social draft</a>
-          <a class="nav-link" href="#/how"><span class="nav-icon">?</span> How it works</a>
-        </nav>
-        <div class="side-spacer"></div>
-        <div class="side-card">
-          <span class="live-dot"></span><span>3D PROTOTYPE</span>
-          <p>Six AI agent roles. One interactive 3D preview.</p>
-        </div>
-        <p class="side-note">3D avatars represent TEKKTEAM AI agents.<br />Agent workflows are not connected in this preview.</p>
-      </aside>
-
-      <main class="main">
-        <div class="ticker" aria-label="Studio status">
-          <span>◈ TEKKTEAM AI AGENTS</span><span>INTERACTIVE 3D PREVIEW</span><span>6 AGENT ROLES</span><span>DRAG TO ORBIT</span><span>EXPLORE AN AVATAR</span>
-        </div>
-        <div id="route-root" hidden></div>
-        <div id="home-page">
-        <section class="hero" aria-labelledby="hero-title">
-          <div class="scene-wrap">
-            <div class="scene-topline"><span class="eyebrow"><i></i> LIVE 3D WORLD</span><span>001 / THE STUDIO</span></div>
-            <div id="scene" class="scene" role="img" aria-label="Interactive 3D TEKKTEAM studio with six voxel agents"></div>
-            <div id="scene-loading" class="scene-loading">BUILDING THE STUDIO <span class="loading-cursor">▌</span></div>
-            <div id="hover-tip" class="hover-tip" hidden></div>
-            <div class="scene-instructions"><span>↔ DRAG TO ORBIT</span><span>＋ SCROLL TO ZOOM</span><span>◈ CLICK AN AGENT</span></div>
-          </div>
-          <div class="scene-side">
-            <div class="side-heading"><span class="eyebrow">AGENT ROLES</span><span id="scene-clock">00:00</span></div>
-            <div id="agent-list" class="agent-list"></div>
-            <div class="scene-side-bottom"><span class="pulse-icon">✦</span> These 3D avatars visualize agent roles. Live AI workflows are not connected yet.</div>
-          </div>
-        </section>
-
-        <section class="intro" id="about">
-          <div>
-            <div class="eyebrow section-kicker">MEET THE TEKKTEAM AI AGENTS</div>
-            <h1 id="hero-title">AI agents.<br /><em>A world of their own.</em></h1>
-            <p>Explore six specialized AI agent roles through an interactive 3D studio. Each avatar represents a different job—from launch planning to analytics. This preview shows the concept; live agent workflows are still in development.</p>
-            <div class="intro-actions"><a class="button-primary" href="#/agents">MEET THE AGENTS <span>↗</span></a><button class="button-quiet" id="reset-view" type="button">RESET CAMERA ↺</button></div>
-          </div>
-          <div class="intro-stats" aria-label="Prototype highlights">
-            <div><strong>06</strong><span>SPECIALIZED AI AGENT ROLES</span></div>
-            <div><strong>3D</strong><span>REAL-TIME GEOMETRY</span></div>
-            <div><strong>∞</strong><span>ANGLES TO EXPLORE</span></div>
-          </div>
-        </section>
-
-        <section class="team-section" id="team">
-          <div class="section-head"><div><div class="eyebrow section-kicker">EXPLORE THE AGENTS</div><h2>Specialized by design.</h2></div><p>Select an AI agent role to see its avatar and planned responsibilities.</p></div>
-          <div id="team-grid" class="team-grid"></div>
-        </section>
-        </div>
-        <footer>TEKKTEAM <span>3D STUDIO PROTOTYPE · BUILT FROM SCRATCH</span></footer>
-      </main>
-      <div id="agent-panel" class="agent-panel" hidden aria-live="polite">
-        <button id="panel-close" class="panel-close" type="button" aria-label="Close agent panel">×</button>
-        <div class="eyebrow">AGENT PROFILE</div>
-        <div id="panel-avatar" class="panel-avatar"></div>
-        <h2 id="panel-name"></h2><p id="panel-role" class="panel-role"></p><p id="panel-description"></p>
-        <div class="panel-foot"><span class="live-dot"></span> 3D AGENT PREVIEW</div>
-      </div>
-    </div>
-    <script type="module" src="/src/main.js"></script>
-  </body>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0a1222">
+  <meta name="description" content="Explore TEKKTEAM's 3D AI-agent studio preview.">
+  <title>TEKKTEAM · AI agent studio</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bungee&family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/tekkteam.css">
+</head>
+<body>
+  <div id="app"></div>
+  <script type="module" src="/app/main.js"></script>
+</body>
 </html>

@@ -9,3 +9,4 @@ dist/
 *.jpg
 *.webp
 *.log
+!public/**
