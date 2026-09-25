@@ -1,6 +1,5 @@
-// TEKKTEAM office: a live, animated 3D voxel office drawn with plain WebGL2 (no libraries).
-// Three workers sit at their desks (LAUNCH, SHILL ON X, TRADE) and the boss walks the floor.
-// Speech bubbles above their heads are real buttons; clicking a worker does the same thing.
+// TEKKTEAM open studio: animated toy-brick work islands drawn with plain WebGL2.
+// Each zone has an interactive marker; the boss moves on a separate central hub.
 //
 //   const office = createOffice(el, { onAction(role) {} });
 //   office.setData({ trades, coins, tokens })   // live snapshot bits for screens + bubbles
@@ -8,7 +7,7 @@
 //   office.destroy()
 
 const V = 0.07;                       // one character voxel (world units)
-const ROOM = { w: 10, d: 7.6, h: 3.0 };
+const ROOM = { w: 11, d: 8.2, h: 2.5 };
 
 // ─────────────── tiny mat4 (column-major) ───────────────
 const m4 = () => new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
@@ -368,115 +367,74 @@ export function createOffice(host, { onAction } = {}) {
   gl.drawBuffers([gl.NONE]); gl.readBuffer(gl.NONE);
   gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 
-  // ── static room (casts shadows) + walls (don't) ──
+  // ── open-plan office floor and raised work islands ──
   const room = new Mesh();
   const walls = new Mesh();
   const { w: RW, d: RD, h: RH } = ROOM;
-  // Modular blue baseplate; shallow studs make the floor read as a construction toy.
-  room.box(-0.25, -0.3, -0.25, RW + 0.25, 0, RD + 0.25, 0xA5C9F5, 0.5);
-  for (let x = 0.28; x < RW; x += 0.46) for (let z = 0.28; z < RD; z += 0.46)
-    room.stud(x, 0, z, 0.055, 0xB5D5FB);
-  walls.box(-0.25, 0, -0.25, RW + 0.25, RH, 0, 0xDCEAFF, 0);                   // back wall
-  walls.box(RW, 0, -0.25, RW + 0.25, RH, RD + 0.25, 0xD2E4FD, 0);               // right wall
-  walls.box(-0.25, 0, 0, 0, 0.42, RD + 0.25, 0xE9E5DE, 0);                      // low cut-away rims
-  walls.box(0, 0, RD, RW, 0.42, RD + 0.25, 0xE9E5DE, 0);
-  walls.box(-0.25, 0.42, -0.25, 0, 0.46, RD + 0.25, 0x275CBD, 0);
-  walls.box(0, 0.42, RD, RW + 0.25, 0.46, RD + 0.25, 0x275CBD, 0);
-  walls.box(0, 0, -0.01, RW, 0.1, 0.02, 0xD9D4CB, 0);                          // skirting
-  walls.box(RW - 0.02, 0, 0, RW + 0.01, 0.1, RD, 0xD9D4CB, 0);
-
-  // door (back wall, left)
-  walls.box(0.3, 0, 0, 1.25, 2.1, 0.05, 0x2B2B30);
-  walls.box(0.37, 0, 0.05, 1.18, 2.03, 0.06, 0xE7E3DC);
-  walls.box(1.0, 1.0, 0.06, 1.1, 1.06, 0.13, 0x1B1B1E);
-
-  // TEKKTEAM letters in black voxels
-  const L = 0.095, lx0 = 1.45, ly0 = 2.27;
-  [...'TEKKTEAM'].forEach((ch, i) => {
-    GLYPHS[ch].forEach((row, r) => [...row].forEach((px, c) => {
-      if (px !== '#') return;
-      const x = lx0 + (i * 6 + c) * L, y = ly0 + (6 - r) * L;
-      room.box(x, y, 0, x + L, y + L, 0.16, 0x174C9D, L);
-    }));
-  });
-
-  // right wall: big windows
-  for (let k = 0; k < 4; k++) {
-    const z0 = 0.7 + k * 1.62, z1 = z0 + 1.42;
-    walls.box(RW - 0.03, 0.35, z0, RW, 2.4, z1, 0xDDE8EE, 0, 2);               // glass (glows)
-    walls.box(RW - 0.08, 0.3, z0 - 0.06, RW, 0.36, z1 + 0.06, 0x2B2B30);
-    walls.box(RW - 0.08, 2.4, z0 - 0.06, RW, 2.46, z1 + 0.06, 0x2B2B30);
-    walls.box(RW - 0.08, 0.3, z0 - 0.06, RW, 2.46, z0, 0x2B2B30);
-    walls.box(RW - 0.08, 0.3, z1, RW, 2.46, z1 + 0.06, 0x2B2B30);
-    walls.box(RW - 0.06, 1.34, z0, RW, 1.38, z1, 0x2B2B30);
+  const ZONES = {
+    launch: { x: 2.35, z: 5, y: 0, r: 2, base: 0x173B79, rim: 0x3985F7, top: 0xB9D7FF },
+    shill: { x: 5.45, z: 1.95, y: 0.22, r: 2, base: 0x15546F, rim: 0x3ABDBB, top: 0xC3E9EE },
+    trade: { x: 8.55, z: 5, y: 0.08, r: 2, base: 0x373D85, rim: 0x8585EE, top: 0xD1D7FF },
+    how: { x: 5.45, z: 5.03, y: 0.03, r: 1.05, base: 0x244E94, rim: 0xE7B959, top: 0xE3EEFF },
+  };
+  // A continuous tiled floor makes these stations read as a workplace,
+  // without restoring the reference's enclosing walls and desk-row layout.
+  room.box(0.55, -0.9, 0.25, 10.35, -0.56, 7.75, 0x18345E);
+  room.box(0.75, -0.56, 0.45, 10.15, -0.53, 7.55, 0xB9CCE6);
+  for (let x = 1.55; x < 10.1; x += 0.8) room.box(x, -0.529, 0.45, x + 0.018, -0.526, 7.55, 0x9FB7D7);
+  for (let z = 1.25; z < 7.55; z += 0.8) room.box(0.75, -0.529, z, 10.15, -0.526, z + 0.018, 0x9FB7D7);
+  for (const zone of Object.values(ZONES)) {
+    const { x, z, y, r, base, rim, top } = zone;
+    room.cylinder(x, y - 0.48, z, r + 0.08, y - 0.09, base, 12);
+    room.cylinder(x, y - 0.09, z, r + 0.14, y - 0.025, rim, 12);
+    room.cylinder(x, y - 0.025, z, r, y, top, 12);
+    for (let sx = x - r + 0.3; sx < x + r - 0.2; sx += 0.43)
+      for (let sz = z - r + 0.3; sz < z + r - 0.2; sz += 0.43)
+        if (Math.hypot(sx - x, sz - z) < r - 0.2) room.stud(sx, y, sz, 0.052, top);
   }
-  // framed green chart on the back wall
-  walls.box(7.1, 1.35, 0, 8.35, 2.5, 0.05, 0xFAFAF8);
-  walls.box(7.2, 1.45, 0.05, 8.25, 2.4, 0.06, 0x121316);
-  [0.25, 0.4, 0.55, 0.72].forEach((h, i) => room.box(7.38 + i * 0.22, 1.56, 0.06, 7.38 + i * 0.22 + 0.14, 1.56 + h, 0.1, 0x39C75A, 0.07, 1));
-
-  // bookshelf
-  const shelf = (x, z) => {
-    room.box(x, 0, z, x + 1.1, 1.3, z + 0.42, 0x2E2E33, 0.13);
-    [0.42, 0.85].forEach((y) => room.box(x + 0.05, y, z + 0.02, x + 1.05, y + 0.04, z + 0.44, 0x3A3A40));
-    const binders = [0x1F1F23, 0x1F1F23, 0xF1EFEA, 0x1F1F23, 0x39C75A, 0x1F1F23];
-    binders.forEach((c, i) => room.box(x + 0.1 + i * 0.13, 0.89, z + 0.1, x + 0.2 + i * 0.13, 1.2, z + 0.4, c, 0.05));
-    room.box(x + 0.12, 0.46, z + 0.1, x + 0.45, 0.62, z + 0.4, 0xE3C28F, 0.07);
-    room.box(x + 0.6, 0.46, z + 0.1, x + 0.95, 0.58, z + 0.4, 0xF1EFEA, 0.07);
-    room.box(x + 0.62, 0.58, z + 0.12, x + 0.93, 0.7, z + 0.38, 0xE3C28F, 0.07);
-  };
-  shelf(5.95, 0.02);
-
-  // plants
-  const plant = (x, z, s = 1, tall = false) => {
-    const p = 0.34 * s;
-    room.box(x - p / 2, 0, z - p / 2, x + p / 2, p * 1.05, z + p / 2, 0xF7F6F2, 0.07 * s);
-    room.box(x - p / 2 + 0.02, p * 1.05, z - p / 2 + 0.02, x + p / 2 - 0.02, p * 1.08, z + p / 2 - 0.02, 0x4A3120);
-    const g = [0x3DBE4E, 0x2FA43F, 0x55D060];
-    const k = 0.08 * s;
-    const levels = tall ? 9 : 5;
-    for (let l = 0; l < levels; l++) {
-      const r = (tall ? [2, 3, 3, 2, 3, 2, 2, 1, 1] : [2, 3, 2, 1, 1])[l];
-      for (let a = -r; a <= r; a++) for (let b = -r; b <= r; b++) {
-        if (Math.abs(a) + Math.abs(b) > r + (l % 2)) continue;
-        if ((a * 7 + b * 13 + l * 5) % 5 === 0 && Math.abs(a) + Math.abs(b) === r) continue;
-        const y = p * 1.08 + l * k;
-        room.box(x + a * k - k / 2, y, z + b * k - k / 2, x + a * k + k / 2, y + k, z + b * k + k / 2, g[(a + b + l + 9) % 3], k);
-      }
+  for (const zone of [ZONES.launch, ZONES.shill, ZONES.trade]) {
+    for (let i = 1; i <= 4; i++) {
+      const t = i / 5, x = ZONES.how.x + (zone.x - ZONES.how.x) * t;
+      const z = ZONES.how.z + (zone.z - ZONES.how.z) * t;
+      const y = ZONES.how.y + (zone.y - ZONES.how.y) * t;
+      room.box(x - 0.2, y - 0.12, z - 0.2, x + 0.2, y - 0.02, z + 0.2, 0x3161A5);
+      room.stud(x, y - 0.02, z, 0.055, 0x86C3FF);
     }
-  };
-  plant(0.4, 0.45, 1.1, true);
-  plant(9.55, 0.45, 1.25, true);
-  plant(5.55, 0.35, 0.9);
-  plant(0.45, 6.9, 1.15);
-  plant(9.5, 6.95, 1.0, true);
+  }
 
-  // rug
-  room.box(1.7, 0, 4.3, 4.5, 0.025, 6.5, 0x3A3B40, 0.1);
-
-  // desks
-  const desk = (x, z, w = 1.8, d = 0.86) => {
-    const x0 = x - w / 2, x1 = x + w / 2, z0 = z - d / 2, z1 = z + d / 2;
-    room.box(x0, 0.72, z0, x1, 0.79, z1, 0xF4F8FF, 0.09);                        // snap-on desk top
-    for (let sx = x0 + 0.19; sx < x1 - 0.1; sx += 0.28)
-      room.stud(sx, 0.79, z0 + 0.12, 0.052, 0xF8FAFF);
-    room.box(x0 + 0.04, 0, z0 + 0.05, x0 + 0.1, 0.72, z1 - 0.05, 0x2E2E33);      // side legs
-    room.box(x0 + 0.04, 0.02, z0 + 0.05, x0 + 0.1, 0.08, z1 - 0.05, 0x2E2E33);
-    room.box(x1 - 0.55, 0, z0 + 0.06, x1 - 0.04, 0.72, z1 - 0.06, 0x275CBD, 0.18); // drawer brick
-    room.box(x1 - 0.35, 0.55, z1 - 0.06, x1 - 0.24, 0.58, z1 - 0.03, 0x1B1B1E);
-    room.box(x1 - 0.35, 0.33, z1 - 0.06, x1 - 0.24, 0.36, z1 - 0.03, 0x1B1B1E);
-    return 0.79;
+  // The props belong to zones: no walls, windows, shared rug, or repeated desk rows.
+  const plinth = (x, y, z, radius, color) => {
+    room.cylinder(x, y, z, radius * 0.75, y + 0.56, 0x244C81, 10);
+    room.cylinder(x, y + 0.56, z, radius, y + 0.69, color, 10);
+    room.stud(x, y + 0.69, z, 0.1, 0xF6FAFF);
+    return y + 0.69;
   };
-  const chair = (x, z, face) => {
-    const s = face; // +1: back of the chair at lower z
-    room.box(x - 0.26, 0.4, z - 0.26, x + 0.26, 0.47, z + 0.26, 0x2462C6, 0.07);
-    room.box(x - 0.25, 0.47, z - s * 0.3, x + 0.25, 1.05, z - s * 0.22, 0x2462C6, 0.07);
-    room.stud(x, 0.47, z, 0.07, 0x3D82EC);
-    room.box(x - 0.03, 0.08, z - 0.03, x + 0.03, 0.4, z + 0.03, 0x4A4A50);
-    room.box(x - 0.3, 0.05, z - 0.03, x + 0.3, 0.09, z + 0.03, 0x2A2A2F);
-    room.box(x - 0.03, 0.05, z - 0.3, x + 0.03, 0.09, z + 0.3, 0x2A2A2F);
-    [[-0.3, 0], [0.3, 0], [0, -0.3], [0, 0.3]].forEach(([a, b]) => room.box(x + a - 0.035, 0, z + b - 0.035, x + a + 0.035, 0.05, z + b + 0.035, 0x151517));
+  const beacon = (x, y, z, color) => {
+    room.cylinder(x, y, z, 0.18, y + 0.22, 0x2C5A9B, 12);
+    room.cylinder(x, y + 0.22, z, 0.11, y + 0.66, color, 12, 1);
+    room.stud(x, y + 0.66, z, 0.12, 0xFFFFFF);
   };
+  beacon(ZONES.launch.x - 1.35, ZONES.launch.y, ZONES.launch.z - 0.3, 0xF1C557);
+  beacon(ZONES.shill.x + 1.35, ZONES.shill.y, ZONES.shill.z - 0.25, 0x5CE0DB);
+  beacon(ZONES.trade.x + 1.3, ZONES.trade.y, ZONES.trade.z - 0.25, 0xA2A2FF);
+  // Small office cues sit beside—not in front of—the agents.
+  const sideDesk = (x, y, z, color) => {
+    room.box(x - 0.47, y, z - 0.24, x - 0.39, y + 0.43, z + 0.24, 0x35557D);
+    room.box(x + 0.39, y, z - 0.24, x + 0.47, y + 0.43, z + 0.24, 0x35557D);
+    room.box(x - 0.54, y + 0.43, z - 0.3, x + 0.54, y + 0.53, z + 0.3, color);
+    room.box(x - 0.25, y + 0.53, z - 0.06, x + 0.25, y + 0.56, z + 0.09, 0x2A4268);
+  };
+  const chair = (x, y, z) => {
+    room.box(x - 0.22, y + 0.2, z - 0.22, x + 0.22, y + 0.3, z + 0.22, 0x29496D);
+    room.box(x - 0.22, y + 0.28, z - 0.25, x + 0.22, y + 0.73, z - 0.16, 0x29496D);
+    room.cylinder(x, y, z, 0.055, y + 0.21, 0x6384AB, 8);
+  };
+  sideDesk(3.45, ZONES.launch.y, 5.05, 0xD2E1F2);
+  chair(3.48, ZONES.launch.y, 5.72);
+  sideDesk(4.05, ZONES.shill.y, 2.05, 0xD3EEF2);
+  chair(4.02, ZONES.shill.y, 2.72);
+  sideDesk(9.55, ZONES.trade.y, 5.07, 0xDADDF7);
+  chair(9.55, ZONES.trade.y, 5.72);
 
   // screens (textured quads) collected here
   const quads = [];
@@ -497,46 +455,33 @@ export function createOffice(host, { onAction } = {}) {
   drawRocket(tex.rocket); tex.rocket.push();
   drawX(tex.x); tex.x.push();
 
-  // LAUNCH desk (back, under the letters): worker faces the camera, laptop lid shows the rocket
-  const LD = { x: 4.1, z: 1.75 };
-  let top = desk(LD.x, LD.z);
-  chair(LD.x - 0.1, LD.z - 0.85, 1);
-  room.box(LD.x - 0.34, top, LD.z - 0.05, LD.x + 0.26, top + 0.025, LD.z + 0.3, 0x2A2A2F);  // laptop base
-  room.box(LD.x - 0.34, top, LD.z + 0.3, LD.x + 0.26, top + 0.4, LD.z + 0.33, 0x1D1D21, 0.07); // lid
-  quad('rocket', LD.x - 0.04, top + 0.2, LD.z + 0.332, 0.54, 0.34, 1);
-  [[0.55, 0.12, 4], [0.66, 0.2, 3], [0.6, 0.28, 2]].forEach(([dx, dz, n]) => { for (let i = 0; i < n; i++) room.box(LD.x + dx - 0.05, top + i * 0.035, LD.z + dz - 0.05, LD.x + dx + 0.05, top + i * 0.035 + 0.03, LD.z + dz + 0.05, i % 2 ? 0xE8B32E : 0xF2C94C, 0.035); });
-  room.box(LD.x - 0.72, top, LD.z + 0.05, LD.x - 0.54, top + 0.1, LD.z + 0.2, 0x1B1B1E, 0.05); // mug
-  plantSmall(LD.x - 0.7, LD.z - 0.2);
+  // Launch: a circular fabrication table and gold token stack.
+  const LD = ZONES.launch;
+  let top = plinth(LD.x, LD.y, LD.z - 0.5, 0.72, 0xF3F8FF);
+  room.cylinder(LD.x, top, LD.z - 0.5, 0.32, top + 0.09, 0xF5C95E, 16);
+  room.stud(LD.x, top + 0.09, LD.z - 0.5, 0.21, 0xFFE49C);
+  for (const a of [-0.48, 0.48]) room.cylinder(LD.x + a, top, LD.z - 0.5, 0.11, top + 0.19, 0xEAAA3D, 12);
+  const launchM = monitor(LD.x, top + 0.02, LD.z - 0.9, 1, 0.58, 0.4);
+  quad('rocket', launchM.cx, launchM.cy, launchM.zFront, launchM.w, launchM.h, 1);
 
-  // SHILL desk (right, middle): worker faces the camera, big monitor with the X on its back
-  const SD = { x: 7.35, z: 3.35 };
-  top = desk(SD.x, SD.z);
-  chair(SD.x, SD.z - 0.85, 1);
-  const shM = monitor(SD.x - 0.05, top, SD.z + 0.18, -1, 0.92, 0.56);
-  quad('x', shM.cx, shM.cy, shM.zBack + 0.004, shM.w * 0.92, shM.h * 0.9, 1);
-  room.box(SD.x + 0.4, top, SD.z - 0.1, SD.x + 0.62, top + 0.14, SD.z + 0.15, 0x2FA84F, 0.035); // books
-  room.box(SD.x + 0.4, top + 0.14, SD.z - 0.1, SD.x + 0.62, top + 0.2, SD.z + 0.15, 0xF1EFEA, 0.035);
-  room.box(SD.x - 0.35, top, SD.z - 0.3, SD.x + 0.25, top + 0.02, SD.z - 0.1, 0x1B1B1E);          // keyboard
+  // Shill: a broadcast tower with one outward-facing display.
+  const SD = ZONES.shill;
+  top = plinth(SD.x, SD.y, SD.z - 0.5, 0.68, 0xD6F7F4);
+  room.cylinder(SD.x - 0.52, top, SD.z - 0.7, 0.07, top + 0.74, 0x2C6F8E, 12);
+  room.cylinder(SD.x - 0.52, top + 0.74, SD.z - 0.7, 0.2, top + 0.82, 0x69DFD5, 12, 1);
+  const shM = monitor(SD.x + 0.15, top, SD.z - 0.47, 1, 0.82, 0.56);
+  quad('x', shM.cx, shM.cy, shM.zFront, shM.w, shM.h, 1);
 
-  // TRADE desk (right, front): trader has his back to the camera, two chart screens face us
-  const TD = { x: 7.0, z: 5.55 };
-  top = desk(TD.x, TD.z, 2.0);
-  chair(TD.x - 0.05, TD.z + 0.85, -1);
-  const m1 = monitor(TD.x - 0.4, top, TD.z - 0.12, 1, 0.74, 0.46);
-  const m2 = monitor(TD.x + 0.42, top, TD.z - 0.16, 1, 0.66, 0.46);
+  // Trade: twin chart panels rise from a violet data podium.
+  const TD = ZONES.trade;
+  top = plinth(TD.x, TD.y, TD.z - 0.54, 0.76, 0xE5E7FF);
+  const m1 = monitor(TD.x - 0.4, top, TD.z - 0.59, 1, 0.72, 0.48);
+  const m2 = monitor(TD.x + 0.39, top, TD.z - 0.59, 1, 0.66, 0.46);
   quad('chart', m1.cx, m1.cy, m1.zFront, m1.w, m1.h, 1);
   quad('list', m2.cx, m2.cy, m2.zFront, m2.w, m2.h, 1);
-  room.box(TD.x - 0.38, top, TD.z + 0.12, TD.x + 0.2, top + 0.02, TD.z + 0.3, 0x1B1B1E);
-  plantSmall(TD.x - 0.9, TD.z - 0.2);
 
-  function plantSmall(x, z) {
-    room.box(x - 0.07, 0.79, z - 0.07, x + 0.07, 0.93, z + 0.07, 0xF7F6F2, 0.035);
-    const k = 0.045;
-    [[0, 0, 0], [1, 0, 0], [-1, 0, 0], [0, 0, 1], [0, 0, -1], [0, 1, 0], [1, 1, 0], [0, 1, -1], [0, 2, 0], [-1, 1, 1]].forEach(([a, l, b], i) => {
-      const y = 0.93 + l * k;
-      room.box(x + a * k - k / 2, y, z + b * k - k / 2, x + a * k + k / 2, y + k, z + b * k + k / 2, [0x3DBE4E, 0x2FA43F, 0x55D060][i % 3], k);
-    });
-  }
+  // The guide's own center platform uses a radial beacon, not an office desk.
+  room.cylinder(ZONES.how.x, ZONES.how.y, ZONES.how.z - 0.52, 0.21, ZONES.how.y + 0.18, 0xE8B957, 12);
 
   const roomGL = upload(gl, room);
   const wallsGL = upload(gl, walls);
@@ -574,34 +519,29 @@ export function createOffice(host, { onAction } = {}) {
 
   // ── characters ──
   const crew = {
-    launch: { role: 'launch', parts: buildCharacter(gl, { skin: 0xF2BD93, hair: 0x2E221C, style: 'messy', top: 0xF7C957, pants: 0x2255AD, kind: 'tee', cap: 0x2F5FD0, capBack: true }), x: LD.x - 0.1, z: LD.z - 0.72, yaw: 0, seated: true, phase: 0 },
-    shill: { role: 'shill', parts: buildCharacter(gl, { skin: 0xEFBE95, hair: 0x1D1916, style: 'messy', top: 0xB9E8ED, pants: 0x31427B, kind: 'sweater', headphones: true }), x: SD.x, z: SD.z - 0.72, yaw: 0, seated: true, phase: 1.7 },
-    trade: { role: 'trade', parts: buildCharacter(gl, { skin: 0xDFA777, hair: 0x6E3B1F, style: 'side', top: 0x4AC2AA, pants: 0x233E7B, kind: 'sweater', glasses: true }), x: TD.x - 0.05, z: TD.z + 0.72, yaw: Math.PI, seated: true, phase: 3.1 },
-    boss: { role: 'how', parts: buildCharacter(gl, { skin: 0xF3BA86, hair: 0x493424, style: 'side', top: 0x2357BE, pants: 0x163A83, kind: 'suit', tie: 0xF5C451, bag: true }), x: 3.1, z: 5.2, yaw: 0.5, seated: false, phase: 0 },
+    launch: { role: 'launch', parts: buildCharacter(gl, { skin: 0xF2BD93, hair: 0x2E221C, style: 'messy', top: 0xF7C957, pants: 0x2255AD, kind: 'tee', cap: 0x2F5FD0, capBack: true }), x: LD.x, y: LD.y, z: LD.z + 0.8, yaw: 0, seated: false, phase: 0 },
+    shill: { role: 'shill', parts: buildCharacter(gl, { skin: 0xEFBE95, hair: 0x1D1916, style: 'messy', top: 0xB9E8ED, pants: 0x31427B, kind: 'sweater', headphones: true }), x: SD.x, y: SD.y, z: SD.z + 0.8, yaw: 0.18, seated: false, phase: 1.7 },
+    trade: { role: 'trade', parts: buildCharacter(gl, { skin: 0xDFA777, hair: 0x6E3B1F, style: 'side', top: 0x4AC2AA, pants: 0x233E7B, kind: 'sweater', glasses: true }), x: TD.x, y: TD.y, z: TD.z + 0.8, yaw: -0.18, seated: false, phase: 3.1 },
+    boss: { role: 'how', parts: buildCharacter(gl, { skin: 0xF3BA86, hair: 0x493424, style: 'side', top: 0x2357BE, pants: 0x163A83, kind: 'suit', tie: 0xF5C451, bag: true }), x: ZONES.how.x, y: ZONES.how.y, z: ZONES.how.z, yaw: 0.5, seated: false, phase: 0 },
   };
-  const bossPath = [[3.1, 5.2], [2.2, 3.6], [4.4, 3.0], [5.4, 4.6], [4.6, 6.2], [2.6, 6.3]];
+  const bossPath = [[5.45, 5.03], [5.1, 4.72], [5.8, 4.72], [5.9, 5.26], [5.1, 5.32]];
   const boss = crew.boss;
   let bossLeg = 0, bossWait = 1.5, bossTarget = 1, bossStep = 0;
 
-  // ── speech bubbles (HTML) ──
-  const ICON = {
-    launch: ['....#....', '...###...', '..#####..', '..##.##..', '..#####..', '.#######.', '##.###.##', '...#.#...'],
-    shill: ['#.....#', '##...##', '.##.##.', '..###..', '.##.##.', '##...##', '#.....#'],
-    trade: ['......##', '.....###', '....##..', '#..##...', '##.#....', '.###....', '..#.....', '........'],
-    how: ['.####.', '##..##', '....##', '...##.', '..##..', '......', '..##..'],
-  };
-  const svgIcon = (rows) => {
-    let r = '';
-    rows.forEach((row, y) => [...row].forEach((c, x) => { if (c === '#') r += `<rect x="${x}" y="${y}" width="1" height="1"/>`; }));
-    return `<svg viewBox="0 0 ${rows[0].length} ${rows.length}" shape-rendering="crispEdges" fill="currentColor" aria-hidden="true">${r}</svg>`;
-  };
+  // Action buttons are projected to platform edges, not to character heads.
   const layer = document.createElement('div');
   layer.className = 'office-bubbles';
   const BUB = {
-    launch: { t: 'Launch a coin', s: 'it gets its own AI trader' },
-    shill: { t: 'Shill on X', s: 'ready-made post, one click' },
-    trade: { t: 'Trade', s: 'agents trade real SOL 24/7' },
-    how: { t: 'How it works', s: 'the boss explains' },
+    launch: { icon: '↗', t: 'Launch a coin', s: 'Explore the coin flow' },
+    shill: { icon: '✦', t: 'Shill on X', s: 'Compose a post' },
+    trade: { icon: '↔', t: 'Trade', s: 'View agent activity' },
+    how: { icon: '?', t: 'How it works', s: 'Explore the concept' },
+  };
+  const labelPoints = {
+    launch: [LD.x - 0.72, LD.y + 0.1, LD.z + 1.34],
+    shill: [SD.x - 0.55, SD.y + 0.1, SD.z + 1.32],
+    trade: [TD.x + 0.55, TD.y + 0.1, TD.z + 1.34],
+    how: [ZONES.how.x, ZONES.how.y + 0.1, ZONES.how.z + 0.84],
   };
   const bubbles = {};
   for (const role of ['launch', 'shill', 'trade', 'how']) {
@@ -609,7 +549,7 @@ export function createOffice(host, { onAction } = {}) {
     b.type = 'button';
     b.className = 'ob ob-' + role;
     b.dataset.role = role;
-    b.innerHTML = `<span class="ob-ic">${svgIcon(ICON[role])}</span><span class="ob-t"><b>${BUB[role].t}</b><small>${BUB[role].s}</small></span>`;
+    b.innerHTML = `<span class="ob-no" aria-hidden="true">${BUB[role].icon}</span><span class="ob-t"><b>${BUB[role].t}</b><small>${BUB[role].s}</small></span>`;
     b.addEventListener('click', () => onAction && onAction(role));
     b.addEventListener('pointerenter', () => { hover = role; });
     b.addEventListener('pointerleave', () => { if (hover === role) hover = null; });
@@ -625,19 +565,19 @@ export function createOffice(host, { onAction } = {}) {
   let cssW = 1, cssH = 1, dpr = 1;
   let VP = m4(), view = m4(), proj = m4();
   let yaw = -0.62, yawTarget = -0.62, pitch = 0.58;
-  const center = [5.0, 0.9, 3.6];
+  const center = [5.45, 0.72, 4.1];
   function fit() {
     const eye = [center[0] + Math.sin(yaw) * Math.cos(pitch) * 30, center[1] + Math.sin(pitch) * 30, center[2] + Math.cos(yaw) * Math.cos(pitch) * 30];
     view = lookAt(eye, center);
     const pts = [];
-    for (const x of [-0.25, RW + 0.25]) for (const y of [-0.3, RH]) for (const z of [-0.25, RD + 0.25]) pts.push(xf(view, [x, y, z]));
+    for (const x of [0, RW]) for (const y of [-0.55, RH]) for (const z of [0, RD]) pts.push(xf(view, [x, y, z]));
     let l = Infinity, r = -Infinity, b = Infinity, t = -Infinity;
     for (const p of pts) { l = Math.min(l, p[0]); r = Math.max(r, p[0]); b = Math.min(b, p[1]); t = Math.max(t, p[1]); }
     const aspect = cssW / cssH;
     const cw = (r - l), ch = (t - b);
-    // On narrow screens the complete room must remain inside the canvas.
+    // The detached islands need a closer mobile crop than the former tall-walled room.
     const narrow = cssW < 640;
-    let zoom = narrow ? 1.08 : 0.9;
+    let zoom = narrow ? 0.82 : 0.9;
     let hw = cw / 2 * zoom, hh = ch / 2 * zoom;
     if (hw / hh > aspect) hh = hw / aspect; else hw = hh * aspect;
     const mx = (l + r) / 2 + (narrow ? 0 : 0.1), my = (b + t) / 2 + (narrow ? 0 : 0.05);
@@ -789,12 +729,12 @@ export function createOffice(host, { onAction } = {}) {
       const active = hover === k || hoverCanvas === k;
       const ph = t * 13 + c.phase;
       const pose = {
-        armL: -1.28 + Math.sin(ph) * 0.07, armR: -1.28 + Math.sin(ph + 1.9) * 0.07,
-        legL: -1.45, legR: -1.45,
-        headYaw: Math.sin(t * 0.6 + c.phase) * 0.18, headPitch: 0.08 + Math.sin(t * 1.7 + c.phase) * 0.03,
+        armL: -0.22 + Math.sin(ph) * 0.08, armR: -0.28 + Math.sin(ph + 1.9) * 0.08,
+        legL: 0.03, legR: -0.03,
+        headYaw: Math.sin(t * 0.6 + c.phase) * 0.18, headPitch: 0.02 + Math.sin(t * 1.7 + c.phase) * 0.03,
       };
       if (active) { pose.armR = -2.9 + Math.sin(t * 9) * 0.25; pose.armRZ = 0.25; pose.headYaw = c.yaw === 0 ? -0.35 : 0.5; pose.headPitch = -0.05; pose.bounce = Math.abs(Math.sin(t * 6)) * 0.02; }
-      const root = chain(T(c.x, 0.47 - 7 * V, c.z), RY(c.yaw));
+      const root = chain(T(c.x, c.y, c.z), RY(c.yaw));
       const r = posed(c.parts, root, pose);
       draws.push(...r.draws);
       anchors[k] = r.headTop;
@@ -826,7 +766,7 @@ export function createOffice(host, { onAction } = {}) {
       headYaw: moving ? 0 : Math.sin(t * 0.8) * 0.3, headPitch: 0,
     };
     if (bActive) { bpose.armL = -2.9 + Math.sin(t * 9) * 0.25; bpose.armLZ = 0.25; bpose.bounce = Math.abs(Math.sin(t * 6)) * 0.02; }
-    const br = posed(boss.parts, chain(T(boss.x, 0, boss.z), RY(boss.yaw)), bpose);
+    const br = posed(boss.parts, chain(T(boss.x, boss.y, boss.z), RY(boss.yaw)), bpose);
     draws.push(...br.draws);
     anchors.how = br.headTop;
 
@@ -897,18 +837,20 @@ export function createOffice(host, { onAction } = {}) {
     }
     gl.bindVertexArray(null);
 
-    // ── bubbles follow the heads ──
-    const scale = Math.max(0.72, Math.min(1.12, cssW / 1100));
+    // ── markers follow island coordinates while hit tests follow characters ──
+    const scale = Math.max(0.8, Math.min(1, cssW / 1100));
     for (const [role, p] of Object.entries(anchors)) {
       const c = xf(VP, p);
       const x = (c[0] / c[3] * 0.5 + 0.5) * cssW;
       const y = (1 - (c[1] / c[3] * 0.5 + 0.5)) * cssH;
-      const foot = xf(VP, role === 'how' ? [boss.x, 0, boss.z] : [crew[role].x, 0.3, crew[role].z]);
+      const foot = xf(VP, role === 'how' ? [boss.x, boss.y, boss.z] : [crew[role].x, crew[role].y, crew[role].z]);
       const fy = (1 - (foot[1] / foot[3] * 0.5 + 0.5)) * cssH;
       anchors[role] = { x, y, h: Math.max(30, fy - y) };
-      const bob = reduce ? 0 : Math.sin(t * 2.2 + (role.length * 1.3)) * 3;
+      const marker = xf(VP, labelPoints[role]);
+      const mx = (marker[0] / marker[3] * 0.5 + 0.5) * cssW;
+      const my = (1 - (marker[1] / marker[3] * 0.5 + 0.5)) * cssH;
       const b = bubbles[role];
-      b.style.transform = `translate3d(${x.toFixed(1)}px, ${(y - 8 + bob).toFixed(1)}px, 0) translate(-50%, -100%) scale(${scale.toFixed(3)})`;
+      b.style.transform = `translate3d(${mx.toFixed(1)}px, ${my.toFixed(1)}px, 0) translate(-50%, -50%) scale(${scale.toFixed(3)})`;
       b.classList.toggle('hot', hover === role || hoverCanvas === role);
     }
     dirty = false;

@@ -57,7 +57,7 @@
 .side-card { background: linear-gradient(150deg, #20324e, #14243b); }
 :root[data-theme="light"] .side-card { background: linear-gradient(150deg, #e2efff, #f3f8ff); }
 .mode-pill { background: #17385f; color: #a9ceff; }
-.office.fallback .fb-bub { opacity: 0; }
+.office.fallback .fb-bub { opacity: 1; }
 
 @media (max-width: 1100px) {
   .hero-top { grid-template-columns: minmax(0, 1fr); }
@@ -110,27 +110,6 @@
   }
 }
 
-@media (max-width: 359px) {
-  .office-bubbles {
-    inset: auto 8px 8px;
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 7px;
-  }
-  .office-bubbles .ob {
-    position: relative;
-    inset: auto;
-    width: 100%;
-    min-width: 0;
-    justify-content: center;
-    transform: none !important;
-    animation: none;
-    padding: 6px;
-  }
-  .office-bubbles .ob::after { display: none; }
-  .office-bubbles .ob-ic { width: 21px; height: 21px; }
-  .office-bubbles .ob-t b { font-size: 10px; }
-}
 .av-26 { width: 26px; height: 26px; }
 .av-84 { width: 84px; height: 84px; }
 
@@ -309,7 +288,7 @@ body::before { content: ''; position: fixed; inset: 0; z-index: -1; pointer-even
 .studio-visual { height: clamp(560px, 53vw, 780px); min-height: 0; border-radius: 32px; background: radial-gradient(circle at 52% 40%, rgba(58,126,236,.2), transparent 62%), rgba(12,30,65,.45); }
 .studio-visual .office { height: 100% !important; min-height: 0 !important; }
 .studio-visual-head { inset: 24px 32px auto; }
-.workspace-rail { position: absolute; z-index: 3; left: 24px; right: 24px; bottom: 20px; display: flex; justify-content: center; gap: clamp(16px, 4vw, 70px); width: max-content; max-width: calc(100% - 48px); margin: auto; padding: 12px 18px; border: 1px solid rgba(201,228,255,.22); border-radius: 999px; background: rgba(13,34,70,.54); box-shadow: inset 0 1px rgba(255,255,255,.12); backdrop-filter: blur(18px); color: #c8e1ff; font: 600 10px/1.25 'JetBrains Mono', monospace; letter-spacing: .04em; }
+.workspace-rail { position: absolute; z-index: 3; left: 24px; right: 24px; bottom: 20px; display: flex; justify-content: center; gap: clamp(16px, 4vw, 70px); width: max-content; max-width: calc(100% - 48px); margin: auto; padding: 12px 18px; border: 1px solid rgba(201,228,255,.22); border-radius: 999px; background: rgba(13,34,70,.54); box-shadow: inset 0 1px rgba(255,255,255,.12); backdrop-filter: blur(18px); color: #c8e1ff; font: 600 10px/1.25 'JetBrains Mono', monospace; letter-spacing: .04em; pointer-events: none; }
 .workspace-rail span + span::before { content: '•'; margin-right: clamp(16px, 4vw, 70px); opacity: .55; }
 .signal-strip { min-width: 0; display: grid; grid-template-columns: minmax(0, 1fr) minmax(260px, 320px) minmax(0, .62fr); align-items: center; gap: clamp(18px, 3vw, 50px); padding: clamp(26px, 3vw, 48px); border: 1px solid rgba(197,224,255,.23); border-radius: 30px; background: linear-gradient(110deg, rgba(25,70,137,.42), rgba(43,112,180,.12) 55%, rgba(31,63,121,.35)); box-shadow: inset 0 1px rgba(255,255,255,.19), 0 18px 40px rgba(0,15,42,.15); backdrop-filter: blur(18px); }
 .signal-label { min-width: 0; }
@@ -364,4 +343,38 @@ body::before { content: ''; position: fixed; inset: 0; z-index: -1; pointer-even
   .signal-label a { margin-top: 14px; }
   .signal-strip .phone-wrap { width: 100%; height: 340px; margin: 0; }
   .signal-strip .phone-stage { height: 305px; }
+}
+
+/* Familiar action bubbles, restyled for the open office studio. */
+.office-bubbles .ob, .office.fallback .fb-bub {
+  --zone: #75b8ff;
+  gap: 8px; padding: 6px 12px 6px 6px; border: 1px solid color-mix(in srgb, var(--zone) 55%, transparent);
+  border-radius: 999px; background: rgba(9, 28, 59, .88); color: #eef7ff;
+  box-shadow: inset 0 1px rgba(255,255,255,.18), 0 9px 18px rgba(0,13,39,.28);
+  backdrop-filter: blur(14px); filter: none; animation: none; transform-origin: center;
+  font-family: 'Outfit', sans-serif;
+}
+.office-bubbles .ob-shill, .office.fallback .ob-shill { --zone: #6addcf; }
+.office-bubbles .ob-trade, .office.fallback .ob-trade { --zone: #aaa9ff; }
+.office-bubbles .ob-how, .office.fallback .ob-how { --zone: #f0c66c; }
+.office-bubbles .ob::after, .office.fallback .fb-bub::after { display: none; }
+.office-bubbles .ob:hover, .office-bubbles .ob.hot, .office-bubbles .ob:focus-visible, .office.fallback .fb-bub:hover, .office.fallback .fb-bub:focus-visible { background: rgba(28, 64, 111, .96); border-color: var(--zone); box-shadow: 0 0 0 3px color-mix(in srgb, var(--zone) 25%, transparent), 0 12px 22px rgba(0,13,39,.3); }
+.office-bubbles .ob:focus-visible { outline: 2px solid white; outline-offset: 3px; }
+.office-bubbles .ob-no, .office.fallback .ob-no { display: grid; place-items: center; width: 28px; height: 28px; flex: none; border-radius: 50%; background: var(--zone); color: #0b254c; font: 800 15px/1 'Outfit', sans-serif; }
+.office-bubbles .ob-t { gap: 1px; }
+.office-bubbles .ob-t b { font: 700 13px/1.1 'Outfit', sans-serif; letter-spacing: 0; }
+.office-bubbles .ob-t small { display: block; max-width: 18ch; color: #b9cde9; font: 500 9px/1.15 'Outfit', sans-serif; }
+.office-bubbles .ob-go { margin-left: 2px; color: var(--zone); font-size: 15px; }
+:root[data-theme="light"] .office-bubbles .ob, :root[data-theme="light"] .office.fallback .fb-bub { background: rgba(238,247,255,.92); color: #143052; }
+:root[data-theme="light"] .office-bubbles .ob-t small { color: #486783; }
+@media (max-width: 600px) {
+  .office-bubbles .ob, .office.fallback .fb-bub { gap: 5px; padding: 4px 8px 4px 4px; border-radius: 999px; }
+  .office-bubbles .ob-no, .office.fallback .ob-no { width: 19px; height: 19px; font-size: 11px; }
+  .office-bubbles .ob-t b { font-size: 11px; }
+  .office-bubbles .ob-t small, .office-bubbles .ob-go { display: none; }
+}
+@media (max-width: 359px) {
+  .studio-visual .office-bubbles { inset: 0; display: block; }
+  .studio-visual .office-bubbles .ob { position: absolute; left: 0; top: 0; width: max-content; min-width: 0; justify-content: flex-start; }
+  .studio-visual .office-bubbles .ob-go { display: none; }
 }

@@ -19,12 +19,12 @@ export function HomePage(app) {
     lastFeedKey = key;
     office.setData({ trades: snap.feed || [], tokens: snap.tokens || [], coins: snap.coins || [] });
   };
-  // no WebGL: the office picture with the same bubbles on top
-  const fallbackHTML = () => `<img class="office-img" src="brand/office-fallback.png" alt="The TEKKTEAM office">
-    <button type="button" class="fb-bub ob" data-role="launch" style="left:49%;top:12%"><span class="ob-t"><b>Launch a coin</b><small>it gets its own AI trader</small></span></button>
-    <button type="button" class="fb-bub ob" data-role="shill" style="left:66%;top:30%"><span class="ob-t"><b>Shill on X</b><small>ready-made post</small></span></button>
-    <button type="button" class="fb-bub ob" data-role="trade" style="left:86%;top:52%"><span class="ob-t"><b>Trade</b><small>real SOL, 24/7</small></span></button>
-    <button type="button" class="fb-bub ob" data-role="how" style="left:50%;top:40%"><span class="ob-t"><b>How it works</b><small>the boss explains</small></span></button>`;
+  // no WebGL: the new open-studio render keeps all four zone actions available.
+  const fallbackHTML = () => `<img class="office-img" src="brand/office-fallback.png" alt="TEKKTEAM's open-plan 3D office studio">
+    <button type="button" class="fb-bub ob ob-launch" data-role="launch" style="left:35%;top:78%"><span class="ob-no" aria-hidden="true">↗</span><span class="ob-t"><b>Launch a coin</b></span></button>
+    <button type="button" class="fb-bub ob ob-shill" data-role="shill" style="left:41%;top:48%"><span class="ob-no" aria-hidden="true">✦</span><span class="ob-t"><b>Shill on X</b></span></button>
+    <button type="button" class="fb-bub ob ob-trade" data-role="trade" style="left:74%;top:50%"><span class="ob-no" aria-hidden="true">↔</span><span class="ob-t"><b>Trade</b></span></button>
+    <button type="button" class="fb-bub ob ob-how" data-role="how" style="left:56%;top:62%"><span class="ob-no" aria-hidden="true">?</span><span class="ob-t"><b>How it works</b></span></button>`;
 
   const statsHTML = (s, agents) => {
     const deposited = s.aumSol - s.pnlSol;

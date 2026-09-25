@@ -64,6 +64,8 @@ try {
     if (sizing.office < minOfficeWidth) problems.push(`${width} responsive: office collapsed to ${sizing.office}px`);
     if (sizing.page > sizing.viewport + 2) problems.push(`${width} responsive: horizontal overflow`);
     if (width === 320 && sizing.header > 125) problems.push('320 responsive: header consumes too much height');
+    const markers = await mobile.locator('#h-office .office-bubbles .ob').count();
+    if (markers !== 4) problems.push(`${width} responsive: expected four workspace zone markers, got ${markers}`);
     if (width === 320) {
       await mobile.locator('#h-office .ob-launch').click();
       if (!mobile.url().endsWith('#/launch')) problems.push('320 responsive: office action did not navigate');
@@ -78,6 +80,16 @@ try {
       if (!activeVisible) problems.push('390 responsive: active navigation hidden offscreen');
     }
     await mobile.close();
+  }
+
+  for (const [role, expected] of [['launch', '#/launch'], ['shill', 'dialog'], ['trade', 'home'], ['how', '#/how']]) {
+    const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+    await page.goto(`${base}/#/`, { waitUntil: 'domcontentloaded' });
+    await page.locator(`#h-office .ob-${role}`).click();
+    if (expected.startsWith('#/') && !page.url().endsWith(expected)) problems.push(`workspace ${role}: navigation failed`);
+    if (expected === 'dialog' && !await page.locator('[role="dialog"]').count()) problems.push('workspace shill: dialog did not open');
+    if (expected === 'home' && !page.url().endsWith('#/')) problems.push('workspace trade: action changed route unexpectedly');
+    await page.close();
   }
 } finally {
   await browser.close();
