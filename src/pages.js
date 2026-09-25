@@ -23,8 +23,8 @@ function shell(title, kicker, description) {
 }
 
 function agentsPage(context) {
-  const root = shell('Meet the crew.', '01 / PEOPLE', 'Six original 3D characters with distinct roles. Select one to learn more. This is an interactive studio prototype, not a team of AI agents running on a server.');
-  root.innerHTML += '<div class="tt-tools"><label class="tt-search">Search agents <input type="search" placeholder="Name or role…" aria-label="Search agents"></label><span class="tt-muted">6 characters · interactive demo</span></div><div class="tt-agent-grid"></div><div class="tt-empty" hidden>No matching agents.</div>';
+  const root = shell('Meet the AI agents.', '01 / AGENT ROLES', 'Each TEKKTEAM AI agent is envisioned for a specialized workflow. The 3D avatars let you explore their roles; live AI execution is not connected in this preview.');
+  root.innerHTML += '<div class="tt-tools"><label class="tt-search">Search agents <input type="search" placeholder="Name or role…" aria-label="Search agents"></label><span class="tt-muted">6 AI agent roles · 3D preview</span></div><div class="tt-agent-grid"></div><div class="tt-empty" hidden>No matching agents.</div>';
   const grid = root.querySelector('.tt-agent-grid');
   const items = Array.isArray(context.agents) && context.agents.length ? context.agents : CREW;
   const draw = (query = '') => {
@@ -51,7 +51,7 @@ function agentsPage(context) {
     root.querySelector('.tt-empty').hidden = matches.length > 0;
   };
   root.querySelector('input').addEventListener('input', (event) => draw(event.target.value));
-  root.append(el('p', 'tt-agent-note', 'Select a card to view a profile. On the home page, you can also select characters directly in the 3D scene.'));
+  root.append(el('p', 'tt-agent-note', 'Select a card to view an AI agent profile. On the home page, you can also select its avatar directly in the 3D scene.'));
   draw();
   return root;
 }
@@ -63,7 +63,7 @@ function tokensPage() {
 }
 
 function launchPage() {
-  const root = shell('Shape your launch.', '03 / BRIEF BUILDER', 'Develop an idea for the crew. This form only saves a draft in your browser; it does not create a coin, wallet, or transaction.');
+  const root = shell('Shape your launch.', '03 / AGENT BRIEF', 'Prepare a brief for the planned Launch AI agent. This form only saves a draft in your browser; no agent workflow, coin, wallet, or transaction starts yet.');
   root.innerHTML += `<div class="tt-launch-layout"><form class="tt-form"><div class="tt-form-section"><span class="tt-step">01</span><div><h2>Project identity</h2><p>Start with a clear name and a one-line direction.</p></div></div><label>Project name <input name="project" maxlength="60" required placeholder="For example: Orbit Club"></label><label>Tagline <input name="tagline" maxlength="100" placeholder="One sentence about your idea"></label><label>Description <textarea name="description" maxlength="500" rows="5" placeholder="What would you like to build?"></textarea></label><div class="tt-form-section"><span class="tt-step">02</span><div><h2>Team priorities</h2><p>Choose a first focus. You can change it later.</p></div></div><label>Primary focus <select name="focus"><option value="website">Website & digital experience</option><option value="visual">Visual identity</option><option value="social">Story & social content</option><option value="launch">Launch plan</option></select></label><div class="tt-form-actions"><button class="tt-primary" type="submit">Save local draft</button><button class="tt-secondary" type="button" data-action="clear">Clear</button></div><p class="tt-form-status" role="status" aria-live="polite">Not saved yet.</p></form><aside class="tt-summary"><span class="tt-kicker">DRAFT / NO TRANSACTION</span><h2>Project brief</h2><dl><div><dt>Name</dt><dd data-preview="project">Not entered</dd></div><div><dt>Tagline</dt><dd data-preview="tagline">Not entered</dd></div><div><dt>Focus</dt><dd data-preview="focus">Website & digital experience</dd></div></dl><p>Saved only in this browser's localStorage. Nothing is sent to a server or used to create an agent.</p></aside></div>`;
   const form = root.querySelector('form');
   const status = root.querySelector('.tt-form-status');
@@ -98,7 +98,7 @@ function launchPage() {
 }
 
 function skinsPage() {
-  const root = shell('Find your look.', '04 / CHARACTER STUDIO', 'Explore outfit directions for the TEKKTEAM characters. This is a concept gallery, not a store; there are no payments or owned skins.');
+  const root = shell('Find your look.', '04 / AGENT AVATARS', 'Explore visual styles for the TEKKTEAM AI agent avatars. This is a concept gallery, not a store; there are no payments or owned skins.');
   root.innerHTML += `<div class="tt-skin-grid"><button type="button" class="tt-skin-card selected" data-skin="Studio Classic" data-variant="circuit"><span class="tt-skin-card-viewer" aria-label="Studio Classic 3D character preview"></span><strong>Studio Classic</strong><small>Creative uniform · drag to turn</small></button><button type="button" class="tt-skin-card" data-skin="Night Shift" data-variant="ember"><span class="tt-skin-card-viewer" aria-label="Night Shift 3D character preview"></span><strong>Night Shift</strong><small>After-hours operations · drag to turn</small></button><button type="button" class="tt-skin-card" data-skin="Field Notes" data-variant="field"><span class="tt-skin-card-viewer" aria-label="Field Notes 3D character preview"></span><strong>Field Notes</strong><small>On-site exploration · drag to turn</small></button></div><p class="tt-skin-choice" role="status">Selected concept: Studio Classic. Preview only.</p>`;
   root.querySelectorAll('.tt-skin-card').forEach((button) => button.addEventListener('click', () => {
     root.querySelectorAll('.tt-skin-card').forEach((item) => item.classList.remove('selected'));
@@ -109,8 +109,8 @@ function skinsPage() {
 }
 
 function howPage() {
-  const root = shell('How TEKKTEAM works.', '05 / THE PROCESS', 'Explore the 3D studio and put together a project brief. Automated services and transactions are not active in this prototype.');
-  root.innerHTML += `<div class="tt-process"><article><span>01</span><h2>Explore the studio</h2><p>Orbit the camera, inspect the workstations, and select a character. The room and crew are real 3D geometry in your browser.</p></article><article><span>02</span><h2>Meet the roles</h2><p>Visit Agents to meet the crew behind launch planning, web, design, content, operations, and insights.</p></article><article><span>03</span><h2>Shape a brief</h2><p>Use Launch to save your first ideas locally. Nothing is submitted and no fee is charged.</p></article><article><span>04</span><h2>Build the next version</h2><p>Live data, accounts, and agent workflows require separate product decisions and a security review.</p></article></div><div class="tt-data-empty compact"><div><span class="tt-kicker">PROTOTYPE BOUNDARY</span><h2>What works today?</h2><p>The 3D scene, character selection, page navigation, and local draft storage. Live token prices, wallets, coin launches, and trading are not available in this prototype.</p></div></div>`;
+  const root = shell('How TEKKTEAM works.', '05 / THE AGENT CONCEPT', 'TEKKTEAM is designed around specialized AI agents. This preview lets you explore their roles in 3D and draft a brief; automated workflows are not active yet.');
+  root.innerHTML += `<div class="tt-process"><article><span>01</span><h2>Explore the agent world</h2><p>Orbit the camera and select an avatar. The 3D studio represents where each specialized AI agent would work.</p></article><article><span>02</span><h2>Understand the roles</h2><p>Visit Agents to explore planned workflows for launch, web, design, social content, buyback strategy, and analytics.</p></article><article><span>03</span><h2>Shape a brief</h2><p>Use Launch to save initial instructions locally. It does not submit a task to an AI agent yet.</p></article><article><span>04</span><h2>Connect real workflows</h2><p>AI execution, accounts, live data, and approval controls require backend integration and a security review.</p></article></div><div class="tt-data-empty compact"><div><span class="tt-kicker">PROTOTYPE BOUNDARY</span><h2>What works today?</h2><p>3D agent avatars, role profiles, navigation, and local draft storage. AI task execution, live token prices, wallets, coin launches, and trading are not available in this preview.</p></div></div>`;
   return root;
 }
 

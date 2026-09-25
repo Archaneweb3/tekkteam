@@ -47,7 +47,7 @@ export function renderAgentDetail(agent) {
   copy.append(element('p', 'tk-agent-lead', data.description || `${name} is part of the TEKKTEAM studio crew.`));
   const tags = element('div', 'tk-agent-tags');
   tags.append(element('span', '', detail.specialty));
-  tags.append(element('span', '', 'Voxel studio prototype'));
+  tags.append(element('span', '', 'AI agent role preview'));
   copy.append(tags);
   hero.append(copy);
 
@@ -86,7 +86,7 @@ export function renderAgentDetail(agent) {
   const status = element('aside', 'tk-agent-status');
   status.append(element('span', 'tk-agent-status-light'));
   const statusCopy = element('div', '');
-  statusCopy.append(element('strong', '', 'Studio prototype'), element('p', '', 'The interactive 3D crew is being built. Live operations and performance data are not connected.'));
+  statusCopy.append(element('strong', '', 'AI agent concept preview'), element('p', '', 'This 3D avatar represents a planned AI agent role. Task execution, external tools, and performance data are not connected yet.'));
   status.append(statusCopy);
   root.append(status);
   return root;

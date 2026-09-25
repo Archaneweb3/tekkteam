@@ -4,8 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#0b1428" />
-    <meta name="description" content="Meet the TEKKTEAM crew in a real-time 3D voxel studio." />
-    <title>TEKKTEAM — 3D Agent Studio</title>
+    <meta name="description" content="Meet the TEKKTEAM AI agents through an interactive 3D studio preview." />
+    <title>TEKKTEAM — AI Agent Studio</title>
   </head>
   <body>
     <div id="app">
@@ -27,14 +27,14 @@
         <div class="side-spacer"></div>
         <div class="side-card">
           <span class="live-dot"></span><span>3D PROTOTYPE</span>
-          <p>Six tiny specialists. One studio with actual depth.</p>
+          <p>Six AI agent roles. One interactive 3D preview.</p>
         </div>
-        <p class="side-note">Original voxel world for TEKKTEAM.<br />No wallet or token actions in this prototype.</p>
+        <p class="side-note">3D avatars represent TEKKTEAM AI agents.<br />Agent workflows are not connected in this preview.</p>
       </aside>
 
       <main class="main">
         <div class="ticker" aria-label="Studio status">
-          <span>◈ TEKKTEAM STUDIO</span><span>REAL-TIME 3D</span><span>6 AGENTS ONLINE</span><span>DRAG TO ORBIT</span><span>CLICK A CHARACTER</span>
+          <span>◈ TEKKTEAM AI AGENTS</span><span>INTERACTIVE 3D PREVIEW</span><span>6 AGENT ROLES</span><span>DRAG TO ORBIT</span><span>EXPLORE AN AVATAR</span>
         </div>
         <div id="route-root" hidden></div>
         <div id="home-page">
@@ -47,28 +47,28 @@
             <div class="scene-instructions"><span>↔ DRAG TO ORBIT</span><span>＋ SCROLL TO ZOOM</span><span>◈ CLICK AN AGENT</span></div>
           </div>
           <div class="scene-side">
-            <div class="side-heading"><span class="eyebrow">ACTIVE CREW</span><span id="scene-clock">00:00</span></div>
+            <div class="side-heading"><span class="eyebrow">AGENT ROLES</span><span id="scene-clock">00:00</span></div>
             <div id="agent-list" class="agent-list"></div>
-            <div class="scene-side-bottom"><span class="pulse-icon">✦</span> Every character is geometry in the world, not a painted sprite.</div>
+            <div class="scene-side-bottom"><span class="pulse-icon">✦</span> These 3D avatars visualize agent roles. Live AI workflows are not connected yet.</div>
           </div>
         </section>
 
         <section class="intro" id="about">
           <div>
-            <div class="eyebrow section-kicker">THE NEXT VERSION OF TEKKTEAM</div>
-            <h1 id="hero-title">The team has<br /><em>entered the room.</em></h1>
-            <p>Meet the specialists inside a real 3D studio. Orbit the space, find each agent, and watch them move around the furniture—not through it.</p>
+            <div class="eyebrow section-kicker">MEET THE TEKKTEAM AI AGENTS</div>
+            <h1 id="hero-title">AI agents.<br /><em>A world of their own.</em></h1>
+            <p>Explore six specialized AI agent roles through an interactive 3D studio. Each avatar represents a different job—from launch planning to analytics. This preview shows the concept; live agent workflows are still in development.</p>
             <div class="intro-actions"><a class="button-primary" href="#/agents">MEET THE AGENTS <span>↗</span></a><button class="button-quiet" id="reset-view" type="button">RESET CAMERA ↺</button></div>
           </div>
           <div class="intro-stats" aria-label="Prototype highlights">
-            <div><strong>06</strong><span>UNIQUE VOXEL AGENTS</span></div>
+            <div><strong>06</strong><span>SPECIALIZED AI AGENT ROLES</span></div>
             <div><strong>3D</strong><span>REAL-TIME GEOMETRY</span></div>
             <div><strong>∞</strong><span>ANGLES TO EXPLORE</span></div>
           </div>
         </section>
 
         <section class="team-section" id="team">
-          <div class="section-head"><div><div class="eyebrow section-kicker">MEET THE CREW</div><h2>Six minds. One launch.</h2></div><p>Pick an agent to focus the 3D camera and see their station.</p></div>
+          <div class="section-head"><div><div class="eyebrow section-kicker">EXPLORE THE AGENTS</div><h2>Specialized by design.</h2></div><p>Select an AI agent role to see its avatar and planned responsibilities.</p></div>
           <div id="team-grid" class="team-grid"></div>
         </section>
         </div>
@@ -79,7 +79,7 @@
         <div class="eyebrow">AGENT PROFILE</div>
         <div id="panel-avatar" class="panel-avatar"></div>
         <h2 id="panel-name"></h2><p id="panel-role" class="panel-role"></p><p id="panel-description"></p>
-        <div class="panel-foot"><span class="live-dot"></span> ACTIVE IN STUDIO</div>
+        <div class="panel-foot"><span class="live-dot"></span> 3D AGENT PREVIEW</div>
       </div>
     </div>
     <script type="module" src="/src/main.js"></script>
