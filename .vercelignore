@@ -1,0 +1,6 @@
+.reference/
+tests/
+scripts/
+server/data/
+.env
+.env.*

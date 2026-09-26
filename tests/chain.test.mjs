@@ -1,0 +1,28 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { Keypair, Transaction } from '@solana/web3.js';
+import { devnetChain } from '../server/chain.js';
+test('devnet transaction binds owner, mint and full instruction message',async()=>{
+  const owner=Keypair.generate(), mint=Keypair.generate(); let sent=false;
+  const rpc={getGenesisHash:async()=> 'EtWTRABZaYq6iMfeYKouRu166VU2xqa1',getMinimumBalanceForRentExemption:async()=>1461600,getLatestBlockhash:async()=>({blockhash:Keypair.generate().publicKey.toBase58(),lastValidBlockHeight:999}),sendRawTransaction:async()=>{sent=true;return 'ok';},getSignatureStatuses:async()=>({value:[{confirmationStatus:'confirmed',err:null}]})};
+  rpc.getGenesisHash=async()=> 'EtWTRABZaYq6iMfeYKouRu166VU2xqa1wcaWoxPkrZBG';
+  rpc.getFeeForMessage=async()=>({value:10000});
+  rpc.getBalance=async()=>1e9;
+  const chain=devnetChain('http://localhost',rpc);
+  const prepared=await chain.prepare({creator:owner.publicKey.toBase58()},mint.secretKey);
+  const tx=Transaction.from(Buffer.from(prepared.transaction,'base64'));
+  assert.equal(tx.feePayer.toBase58(),owner.publicKey.toBase58()); assert.equal(tx.instructions.length,5);
+  tx.partialSign(owner); assert.equal(tx.verifySignatures(),true);
+  const submission=await chain.submit(tx.serialize().toString('base64'),prepared.message); assert.equal(sent,false); await submission.send(); assert.equal(sent,true);
+  assert.equal(await chain.status(submission.signature),'confirmed');
+  assert.ok(prepared.estimatedCostSol > 0);
+  rpc.getBalance=async()=>0;
+  await assert.rejects(()=>chain.prepare({creator:owner.publicKey.toBase58()},mint.secretKey),/Not enough devnet SOL/);
+  rpc.getSignatureStatuses=async()=>({value:[null]});
+  rpc.getBlockHeight=async()=>1000;
+  assert.equal(await chain.status(submission.signature,999),'expired');
+  tx.instructions.pop(); tx.partialSign(owner,mint);
+  await assert.rejects(()=>chain.submit(tx.serialize().toString('base64'),prepared.message),/differs/);
+  rpc.getGenesisHash=async()=> 'mainnet';
+  await assert.rejects(()=>chain.prepare({creator:owner.publicKey.toBase58()},mint.secretKey),/not Solana devnet/);
+});

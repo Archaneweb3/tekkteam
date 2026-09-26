@@ -13,4 +13,4 @@ export const connectWallet = unavailable;
 export const signAction = unavailable;
 export const signMessage = unavailable;
 export const sendSol = unavailable;
-export const actionMessage = () => 'TEKKTEAM frontend preview';
+export const actionMessage = () => 'TEKKWORK frontend preview';

@@ -1,5 +1,5 @@
 import { robotSVG, robotPNG, robotTraits } from '../robot.js';
-import { esc, sol, pct, short, pixIcon, STRAT_ICONS, strategyById, strategyRules, stratIcon, stratKey } from '../ui.js';
+import { esc, sol, pct, short, pixIcon, STRAT_ICONS, strategyById, strategyRules, stratIcon, stratKey, riskTag, riskWarning } from '../ui.js';
 import { wallet, sendSol } from '../wallet.js';
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -40,7 +40,7 @@ export function LaunchPage(app) {
     const on = st.id === f.strategy;
     return `<button type="button" role="radio" aria-checked="${on}" class="strat-opt strat-${esc(stratKey(st))}${on ? ' on' : ''}" data-s="${esc(st.id)}">
       <span class="so-ic">${stratIcon(st)}</span>
-      <span class="so-t"><b>${esc(st.name)}</b><small>${esc(st.custom ? 'Your custom strategy' : st.tagline)}</small></span>
+      <span class="so-t"><b>${esc(st.name)}${riskTag(st)}</b><small>${esc(st.custom ? 'Your custom strategy' : st.tagline)}</small></span>
       <span class="so-nums"><span>${Math.round(st.sizePct * 100)}%<i>size</i></span><span class="up">${pct(st.takeProfitPct, 0)}<i>TP</i></span><span class="down">${pct(st.stopLossPct, 0)}<i>SL</i></span><span>${st.maxHoldMin ? st.maxHoldMin + 'm' : '∞'}<i>hold</i></span></span>
     </button>`;
   };
@@ -51,7 +51,8 @@ export function LaunchPage(app) {
         <span class="so-t"><b>Build your own</b><small>Sliders + your own name</small></span>
         <span class="cust-plus">+</span>
       </button>`);
-  const stratInfoHTML = () => { const st = strategyById(cfg, f.strategy, [mine]); return st ? `<b>${esc(st.name)}:</b> ${esc(st.goal)}` : ''; };
+  const stratInfoHTML = () => { const st = strategyById(cfg, f.strategy, [mine]); return st ? `<b>${esc(st.name)}:</b> ${esc(st.goal)}${riskWarning(st, { checkbox: true, checked: f.riskAck })}` : ''; };
+  const needsAck = () => strategyById(cfg, f.strategy, [mine])?.risk === 'extreme';
   const infoHTML = () => { const t = robotTraits(f.botSeed); return `<b>Worker ${pick + 1} of ${DESK_SIZE}</b><span>${t.outfit}</span><span>${t.hair}</span>${t.gear ? `<span>${t.gear}</span>` : ''}<span class="dp-hint">It becomes your agent and, unless you upload one, your coin logo.</span>`; };
   const logoHTML = () => (f.image ? `<img src="${f.image}" alt="Coin logo">` : previewBot());
   const total = () => Math.round(((Number(f.capital) || 0) + cfg.launch.launchReserveSol) * 10000) / 10000;
@@ -84,8 +85,8 @@ export function LaunchPage(app) {
   function html() {
     const off = !cfg.launchEnabled;
     return `<div class="wrap">
-      <div class="page-head"><div><h1>Launch coin + agent</h1><p>Explore the reference launch flow and agent creator. This frontend preview does not create coins or accept SOL.</p></div></div>
-      ${off ? `<div class="card" style="padding:14px 18px;border-color:var(--line-strong)"><b>Preview only.</b> <span class="muted">Launch and wallet actions are unavailable until the authorized backend is connected.</span></div>` : ''}
+      <div class="page-head"><div><h1>Launch coin + agent</h1><p>Your coin launches on pump.fun and gets its own AI trading agent with a separate Solana wallet. You fund it with real SOL, it trades in public.</p></div></div>
+      ${off ? `<div class="card" style="padding:14px 18px"><b>Live launch — coming soon.</b> <span class="muted">You can explore characters, coin details and strategies below. No SOL is transferred in this preview.</span></div>` : ''}
       <div class="launch">
         <form class="card form" id="l-form" novalidate>
           <div class="fieldset">
@@ -185,6 +186,11 @@ export function LaunchPage(app) {
     const c = Number(f.capital);
     const max = cfg.launch.maxStartingCapital;
     need('l-cap', c >= cfg.launch.minStartingCapital && (!max || c <= max), `Enter at least ${cfg.launch.minStartingCapital} SOL${max ? ` and at most ${max} SOL` : ''}.`);
+    if (needsAck() && !f.riskAck) {
+      ok = false;
+      const box = el.querySelector('#l-strat-info .risk-warn');
+      if (box) { box.classList.add('shake'); setTimeout(() => box.classList.remove('shake'), 600); box.querySelector('.risk-ok')?.classList.add('need'); }
+    }
     return ok;
   }
 
@@ -209,7 +215,7 @@ export function LaunchPage(app) {
 
   async function submit(e) {
     e.preventDefault();
-    if (!validate()) { el.querySelector('.err:not([hidden])')?.scrollIntoView({ block: 'center', behavior: 'smooth' }); return; }
+    if (!validate()) { el.querySelector('.err:not([hidden]), .risk-ok.need')?.scrollIntoView({ block: 'center', behavior: 'smooth' }); return; }
     const capital = Number(f.capital);
     const steps = ['Connect wallet', 'Create agent + agent wallet', `Send ${sol(total(), 4)} SOL to the agent`, 'Confirm the transfer on-chain', 'Upload coin image + metadata', 'Create the coin on pump.fun', 'Agent is live'];
     const prog = app.progressModal('Launching $' + f.ticker, steps);
@@ -229,6 +235,7 @@ export function LaunchPage(app) {
         image: f.image || robotPNG(f.botSeed),
         avatarSeed: f.botSeed,
         strategy: f.strategy,
+        riskAck: needsAck() ? f.riskAck === true : undefined,
       });
 
       prog.step(2);
@@ -335,10 +342,16 @@ export function LaunchPage(app) {
           app.strategyBuilder({ existing: mine || undefined, onSaved: (st) => { mine = st; f.strategy = st.id; paintStrat(); } });
           return;
         }
+        if (f.strategy !== b.dataset.s) f.riskAck = false;
         f.strategy = b.dataset.s;
         q('#l-strat').innerHTML = stratHTML();
         q('#l-strat-info').innerHTML = stratInfoHTML();
         refresh();
+      });
+      q('#l-strat-info').addEventListener('change', (e) => {
+        if (!e.target.matches('[data-risk-ok]')) return;
+        f.riskAck = e.target.checked;
+        e.target.closest('.risk-ok')?.classList.remove('need');
       });
       q('#l-desk-new').addEventListener('click', () => { pastDesks.push({ desk, pick }); desk = newDesk(); deskNo += 1; f.botSeed = desk[pick]; paintBot('desk'); });
       q('#l-desk-back').addEventListener('click', () => { const p = pastDesks.pop(); if (!p) return; ({ desk, pick } = p); deskNo = Math.max(1, deskNo - 1); f.botSeed = desk[pick]; paintBot('desk'); });

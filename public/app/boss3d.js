@@ -1,7 +1,7 @@
-// The TEKKTEAM toy-brick boss shares the office character rig and spins on a studded plinth.
+// The TEKKWORK toy-brick boss shares the office character rig and spins on a studded plinth.
 //
 //   const boss = createBoss(el, { onClick() {} });  boss.wave();  boss.destroy();
-import { V, Mesh, compile, upload, buildCharacter, posed, mul, T, RY, S, chain, lookAt, ortho, norm } from './office3d.js';
+import { V, Mesh, compile, upload, buildCharacter, posed, mul, T, RX, RY, S, chain, lookAt, ortho, norm } from './office3d.js';
 import { SKIN_MODELS } from './skins3d.js';
 
 const VS = `#version 300 es
@@ -45,7 +45,7 @@ export function createBoss(host, { onClick, skin = null, label } = {}) {
   const canvas = document.createElement('canvas');
   canvas.className = 'boss-gl';
   canvas.setAttribute('role', 'img');
-  canvas.setAttribute('aria-label', label || 'The TEKKTEAM boss. Drag to spin him around.');
+  canvas.setAttribute('aria-label', label || 'The TEKKWORK boss. Drag to spin him around.');
   host.appendChild(canvas);
   const gl = canvas.getContext('webgl2', { antialias: true, alpha: true, premultipliedAlpha: true });
   if (!gl) { canvas.remove(); throw new Error('no webgl2'); }
@@ -63,10 +63,16 @@ export function createBoss(host, { onClick, skin = null, label } = {}) {
     plat.stud(x * 0.23, 0, z * 0.23, 0.074, 0x377BE8);
   const platGL = upload(gl, plat);
 
-  // coins orbiting him
+  // Thin minted discs; rotate the cylinder axis onto Z so they spin upright.
   const coin = new Mesh();
-  coin.cylinder(0, -0.18, 0, 0.19, 0.18, 0xF3C550, 16);
-  coin.box(-0.025, -0.12, 0.185, 0.025, 0.12, 0.205, 0xFFF2B5);
+  coin.cylinder(0, -0.025, 0, 0.19, 0.025, 0xDCA329, 32);
+  coin.cylinder(0, 0.025, 0, 0.155, 0.029, 0xF3C550, 32);
+  coin.cylinder(0, -0.029, 0, 0.155, -0.025, 0xF3C550, 32);
+  for (const side of [-1, 1]) {
+    const lo = side > 0 ? 0.029 : -0.036, hi = side > 0 ? 0.036 : -0.029;
+    coin.box(-0.018, lo, -0.095, 0.018, hi, 0.085, 0xFFF2B5);
+    coin.box(-0.078, lo, -0.095, 0.078, hi, -0.06, 0xFFF2B5);
+  }
   const coinGL = upload(gl, coin);
 
   // ── state ──
@@ -190,7 +196,7 @@ export function createBoss(host, { onClick, skin = null, label } = {}) {
     for (let i = 0; i < 3; i++) {
       const a = t * 0.9 + i * (Math.PI * 2 / 3);
       const y = 0.35 + i * 0.45 + Math.sin(t * 1.6 + i * 2) * 0.08;
-      drawMesh(coinGL, chain(T(Math.cos(a) * 0.82, y, Math.sin(a) * 0.82), RY(t * 3 + i), S(0.75)));
+      drawMesh(coinGL, chain(T(Math.cos(a) * 0.82, y, Math.sin(a) * 0.82), RY(t * 3 + i), RX(Math.PI / 2), S(0.75)));
     }
 
     const animating = !reduce || dragging || waving || Math.abs(vel) > 0.01;

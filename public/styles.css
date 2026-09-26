@@ -1,5 +1,5 @@
 /* ─────────────────────────────────────────────────────────────
-   TEKKTEAM: a voxel office. White walls, tiled floor, black suits,
+   TEKKWORK: a voxel office. White walls, tiled floor, black suits,
    a red tie for the main button, green charts on dark screens.
    Dark theme = the office after hours.
    ───────────────────────────────────────────────────────────── */
@@ -402,7 +402,7 @@ p { margin: 0; }
 .chip-sl { background: var(--down-soft); box-shadow: none; color: var(--down); }
 .agent-tag { font-family: var(--f-mono); font-size: 11px; font-weight: 600; letter-spacing: 0.06em; color: var(--muted); }
 
-/* ── Home: hero (office styles live in the TEKKTEAM layer at the end) ── */
+/* ── Home: hero (office styles live in the TEKKWORK layer at the end) ── */
 .stats { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 16px; }
 .stat { padding: 14px 16px; display: flex; flex-direction: column; gap: 2px; }
 .stat > .v { margin-top: auto !important; padding-top: 6px; overflow-wrap: anywhere; min-width: 0; }
@@ -865,7 +865,7 @@ p { margin: 0; }
 
 
 /* ═════════════════════════════════════════════════════════════
-   TEKKTEAM layer: the 3D office hero, speech bubbles, crew, and
+   TEKKWORK layer: the 3D office hero, speech bubbles, crew, and
    the pieces that used to be CRT screens.
    ═════════════════════════════════════════════════════════════ */
 
@@ -1058,7 +1058,7 @@ select.input { appearance: none; background-image: linear-gradient(45deg, transp
 }
 
 /* ═════════════════════════════════════════════════════════════
-   TEKKTEAM v2: toy-brick look (rounded voxel blocks with a thick
+   TEKKWORK v2: toy-brick look (rounded voxel blocks with a thick
    bottom edge, like the mascot's plastic cubes). Replaces the
    pixel-notch / CRT feel that AgentDesk uses.
    ═════════════════════════════════════════════════════════════ */
@@ -1279,7 +1279,33 @@ body { font-size: 15.5px; background-size: 56px 56px; }
 @media (max-width: 460px) { .dp-stage { min-height: 150px; } .dp-carousel { grid-template-columns: 38px minmax(0, 1fr) 38px; } .dp-arrow { width: 38px; height: 38px; font-size: 24px; } }
 
 /* ═════════ strategies ═════════ */
-.strat-classic { --sc: #6B6E75; } .strat-scalper { --sc: #E8A32E; } .strat-trend { --sc: #1E9C47; } .strat-dip { --sc: #2F5FD0; } .strat-sniper { --sc: #E4282E; }
+.strat-classic { --sc: #6B6E75; } .strat-scalper { --sc: #E8A32E; } .strat-trend { --sc: #1E9C47; } .strat-dip { --sc: #2F5FD0; } .strat-sniper { --sc: #E4282E; } .strat-newpairs { --sc: #FF4D1A; }
+/* ⚠ extreme-risk strategies (New Pairs) */
+.risk-tag, .so-t b em.risk-tag, .sc-head b em.risk-tag, .strat-chip em.risk-tag {
+  display: inline-flex; align-items: center; gap: 4px; margin: 3px 0 0 6px; padding: 3px 8px; border-radius: 7px;
+  background: #FF2A2A; color: #fff !important; font-style: normal; font-size: 11px; font-weight: 900; letter-spacing: 0.06em; line-height: 14px;
+  text-transform: uppercase; vertical-align: middle; white-space: nowrap;
+  box-shadow: 0 0 0 2px #FFD23F, 0 0 14px rgba(255, 42, 42, 0.75); text-shadow: 0 1px 0 rgba(0, 0, 0, 0.35);
+  animation: riskPulse 1.6s ease-in-out infinite;
+}
+.risk-tag::before { content: '⚠'; font-size: 12px; }
+@keyframes riskPulse { 50% { box-shadow: 0 0 0 2px #FFD23F, 0 0 22px rgba(255, 42, 42, 1); } }
+@media (prefers-reduced-motion: reduce) { .risk-tag { animation: none; } }
+.strat-grid .strat-opt.strat-newpairs:not(.on), .strat-list .strat-opt.strat-newpairs:not(.on) { box-shadow: 0 0 0 2px #FF4D1A, 0 4px 0 0 #FF4D1A; }
+.risk-warn { margin-top: 10px; padding: 12px 14px; border-radius: 12px; background: color-mix(in srgb, #E4282E 9%, var(--surface)); box-shadow: 0 0 0 2px #E4282E; color: var(--ink); font-size: 13px; line-height: 1.45; text-align: left; }
+.risk-warn > b { color: #E4282E; font-size: 14px; }
+.risk-warn p { margin: 6px 0 0; }
+.risk-warn .risk-prot { color: var(--muted, #6B6E75); font-size: 12px; }
+.risk-ok { display: flex; gap: 8px; align-items: flex-start; margin-top: 10px; padding: 8px 10px; border-radius: 10px; background: var(--surface); cursor: pointer; font-weight: 700; }
+.risk-ok input { width: 18px; height: 18px; margin: 1px 0 0; accent-color: #E4282E; flex: none; }
+.risk-ok.need { box-shadow: 0 0 0 2px #E4282E; }
+.risk-warn.shake { animation: riskShake 0.5s; }
+@keyframes riskShake { 20%, 60% { transform: translateX(-5px); } 40%, 80% { transform: translateX(5px); } }
+@media (prefers-reduced-motion: reduce) { .risk-warn.shake { animation: none; } }
+.risk-filters { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; font-size: 12.5px; }
+.risk-filters li { display: grid; gap: 1px; }
+.risk-filters b { font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); }
+.strat-card .sc-sub { margin: 10px 0 4px; font-weight: 700; font-size: 13px; }
 .so-ic { width: 38px; height: 38px; flex: none; display: grid; place-items: center; border-radius: 11px; background: var(--sc); color: #fff; box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.22); }
 .so-ic svg { width: 20px; height: 20px; }
 .strat-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
@@ -1522,7 +1548,7 @@ h1 .lvl { font-size: 13px; vertical-align: 6px; margin-left: 6px; }
 .laptop-flat { width: 100%; height: auto; border-radius: 18px; border: 10px solid #1E1E22; cursor: pointer; }
 @media (max-width: 760px) { .laptop-stage { height: 420px; } }
 
-/* ═════════ X badge (links to the TEKKTEAM X account) ═════════ */
+/* ═════════ X badge (links to the TEKKWORK X account) ═════════ */
 .x-link {
   position: relative; width: 38px; height: 38px; flex: none;
   display: grid; place-items: center; text-decoration: none;
@@ -1674,3 +1700,24 @@ h1 .lvl { font-size: 13px; vertical-align: 6px; margin-left: 6px; }
 .tok-logo { position: relative; width: 36px; height: 36px; flex: none; display: grid; place-items: center; border-radius: 10px; overflow: hidden; background: var(--surface-3); box-shadow: inset 0 0 0 2px var(--line); }
 .tok-logo b { font: 800 15px/1 var(--f-mono); color: var(--ink-2); }
 .tok-logo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; background: var(--surface); }
+/* epic skins: diamond blue */
+.rarity-tag.epic { color: #04223F; background: linear-gradient(135deg, #E6FAFF, #6FD0FF 50%, #1E88E5); box-shadow: 0 2px 0 #0D4F9A, 0 0 14px rgba(111, 208, 255, .6); }
+.skin-shop.epic { background: linear-gradient(160deg, color-mix(in srgb, #6FD0FF 16%, var(--surface-2)), var(--surface-2) 60%); box-shadow: inset 0 0 0 2px #4FB6F2, 0 0 26px rgba(111, 208, 255, .32); }
+.skin-shop.epic .skin-shop-stage { background: radial-gradient(ellipse at 50% 80%, rgba(111, 208, 255, .5), var(--surface) 72%); }
+.skin-shop.epic .skin-price { background: linear-gradient(135deg, #BFF0FF, #4FB6F2 55%, #1E7FD8); color: #04223F; }
+.skin-shop.epic .skin-supply b, .skin-card.epic .skin-left { color: #1E88E5 !important; }
+.skin-shop.epic .skin-supply-bar span { background: linear-gradient(90deg, #BFF0FF, #4FB6F2, #1E7FD8); }
+.skin-card.epic { box-shadow: 0 0 0 2px #4FB6F2, 0 4px 0 0 #1E7FD8; }
+.skin-card.epic.on { box-shadow: 0 0 0 3px #4FB6F2, 0 5px 0 0 #1E7FD8, 0 0 18px rgba(111, 208, 255, .55); background: color-mix(in srgb, #6FD0FF 10%, var(--surface)); }
+.so-t b em.risk-tag { display: flex; width: max-content; margin: 5px 0 3px; }
+/* extreme-risk strategy on How it works: one wide card under the others */
+.strat-card.strat-wide { grid-column: 1 / -1; grid-template-columns: minmax(230px, 1fr) minmax(240px, 1.1fr) minmax(300px, 1.5fr); gap: 18px; align-items: start; padding: 18px; box-shadow: inset 0 3px 0 0 var(--sc), inset 0 0 0 2px color-mix(in srgb, var(--sc) 55%, var(--line)); background: linear-gradient(180deg, color-mix(in srgb, var(--sc) 7%, var(--surface-2)), var(--surface-2) 60%); }
+.strat-wide .sw-main { display: grid; gap: 10px; }
+.strat-wide .sc-head .risk-tag { display: flex; width: max-content; margin: 5px 0 3px; }
+.strat-wide .sw-warn .risk-warn { margin-top: 0; }
+.strat-wide .sw-filters .sc-sub { margin: 0 0 10px; font-size: 13px; }
+.strat-wide .risk-filters { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.strat-wide .risk-filters li { align-content: start; padding: 8px 10px; border-radius: 10px; background: var(--surface); box-shadow: inset 0 0 0 1px var(--line); }
+.strat-wide .risk-filters li:last-child { grid-column: 1 / -1; box-shadow: inset 0 0 0 1px color-mix(in srgb, #E4282E 50%, var(--line)); }
+@media (max-width: 1000px) { .strat-card.strat-wide { grid-template-columns: 1fr 1fr; } .strat-wide .sw-filters { grid-column: 1 / -1; } }
+@media (max-width: 640px) { .strat-card.strat-wide { grid-template-columns: 1fr; } .strat-wide .risk-filters { grid-template-columns: 1fr; } }

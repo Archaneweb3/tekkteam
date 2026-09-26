@@ -1,5 +1,4 @@
 import { createBoss } from '../boss3d.js';
-import { robotSVG } from '../robot.js';
 import { levelBadge, levelBar, strategyById, strategyChip, strategyRules, STRAT_ICONS, stratIcon, avatar, statusPill, sidePill, sourceChip, tokIcon, coinThumb, copyBtn, txLink, addrLink, esc, sol, signedSol, pct, tone, ago, agentNo, usd, short, age } from '../ui.js';
 import { price, clockSec, dur } from '../format.js';
 import { equityChart } from '../charts.js';
@@ -169,7 +168,7 @@ export function AgentPage(app, id) {
     if (skinView && skinView.id === d.skin) { if (skinView.host !== slot) slot.replaceWith(skinView.host); return; }
     skinView?.v.destroy();
     try { skinView = { id: d.skin, host: slot, v: createBoss(slot, { skin: d.skin, label: d.name + ' in its skin. Drag to spin.' }) }; }
-    catch { slot.innerHTML = robotSVG(`skin:${d.skin}`, { stand: true }); skinView = null; }
+    catch { slot.innerHTML = `<img class="skin-flat" src="brand/skins/${esc(d.skin)}-stand.png" alt="">`; skinView = null; }
   }
   const heroHTML = () => `<section class="card agent-hero${d.skin ? ' has-skin' : ''}">
       ${d.skin ? `<div class="hero-skin" id="ag-skin3d" title="Drag to spin"></div>` : avatar(d.avatarSeed, 120, { stand: true })}
@@ -277,7 +276,7 @@ export function AgentPage(app, id) {
         ${c.website ? `<dt>Website</dt><dd><a class="ext" href="${esc(link(c.website))}" target="_blank" rel="noopener">${esc(c.website.replace(/^https?:\/\//, ''))}</a></dd>` : ''}
       </dl>
       ${c.mint ? `<a class="btn btn-sm" href="https://pump.fun/coin/${esc(c.mint)}" target="_blank" rel="noopener">View on pump.fun ↗</a>` : ''}
-      <p class="note">The agent wallet is this coin's creator on pump.fun. Agents never trade TEKKTEAM coins.</p>
+      <p class="note">The agent wallet is this coin's creator on pump.fun. Agents never trade TEKKWORK coins.</p>
     </section>`;
   };
 

@@ -18,6 +18,7 @@ try {
       try { await page.locator('#page h1, #page h2').first().waitFor({ timeout: 5000 }); }
       catch { problems.push(`${viewport.width} ${route}: missing page heading`); }
       const overflow = await page.evaluate(() => document.documentElement.scrollWidth - innerWidth);
+      if (/BAGWORK|TEKKTEAM/i.test(await page.locator('body').innerText())) problems.push(`${viewport.width} ${route}: old branding visible`);
       if (overflow > 2) problems.push(`${viewport.width} ${route}: horizontal overflow ${overflow}px`);
       if (route === '/') {
         if (!await page.locator('#h-office canvas').count()) problems.push(`${viewport.width} home: 3D office missing`);
@@ -28,8 +29,8 @@ try {
           const phone = document.querySelector('#h-phone')?.getBoundingClientRect();
           return office && phone ? { officeWidth: office.width, phoneBelow: phone.top >= office.bottom - 2 } : null;
         });
-        if (stageOrder && (!stageOrder.phoneBelow || stageOrder.officeWidth < viewport.width * .88))
-          problems.push(`${viewport.width} home: map-led layout regressed`);
+        if (stageOrder && viewport.width < 600 && !stageOrder.phoneBelow)
+          problems.push(`${viewport.width} home: mobile phone overlaps office`);
       }
       if (route === '/agent/4' && !await page.locator('#page canvas').count()) problems.push(`${viewport.width} detail: 3D avatar missing`);
       if (route === '/launch' && !await page.locator('#l-submit').isDisabled()) problems.push(`${viewport.width} launch: transaction action enabled`);

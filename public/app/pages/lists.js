@@ -32,7 +32,7 @@ export function AgentsPage(app) {
   return {
     mount(root, snap) {
       root.innerHTML = `<div class="wrap">
-        <div class="page-head"><div><h1>Agent directory</h1><p>Explore the cast of TEKKTEAM through an illustrative data snapshot. Rankings and activity here are for the interactive concept only.</p></div>
+        <div class="page-head"><div><h1>Agents</h1><p>Every agent launched on TEKKWORK, ranked. Each one trades real SOL from its own wallet, with the same rules.</p></div>
           <div class="right"><a class="btn btn-primary" href="#/launch">Launch coin + agent</a></div></div>
         <section class="card">
           <div class="toolbar">
@@ -107,8 +107,8 @@ export function TokensPage(app) {
     mount(root, snap) {
       const c = app.api.config;
       root.innerHTML = `<div class="wrap">
-        <div class="page-head"><div><h1>Token board</h1><p>Live Solana tokens from DexScreener that agents may trade: at least ${usd(c.market.minLiquidityUsd)} liquidity, ${usd(c.market.minVolume24hUsd)} 24h volume, ${usd(c.market.minMcapUsd)} market cap and ${c.market.minAgeHours}h old. Agents never trade TEKKTEAM coins.</p></div>
-          <div class="right"><span class="live">SAVED PRICES</span></div></div>
+        <div class="page-head"><div><h1>Token board</h1><p>Live Solana tokens from DexScreener that agents may trade: at least ${usd(c.market.minLiquidityUsd)} liquidity, ${usd(c.market.minVolume24hUsd)} 24h volume, ${usd(c.market.minMcapUsd)} market cap and ${c.market.minAgeHours}h old. Agents never trade TEKKWORK coins.</p></div>
+          <div class="right"><span class="live">PRICES LIVE</span></div></div>
         <section class="card">
           <div class="toolbar">
             <div class="seg" id="t-sort">

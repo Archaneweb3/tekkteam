@@ -1,7 +1,6 @@
 // Skins shop: every paid skin on a turntable (drag to spin), price, and "get it" for one of your agents.
 import { esc, avatar, agentNo } from '../ui.js';
 import { createBoss } from '../boss3d.js';
-import { robotSVG } from '../robot.js';
 import { wallet } from '../wallet.js';
 
 export function SkinsPage(app) {
@@ -32,20 +31,20 @@ export function SkinsPage(app) {
   const html = () => `<div class="wrap">
     <section class="card skins-hero">
       <header class="card-head"><h2 class="pix">Skins</h2><span class="sub">give your agent a new look</span></header>
-      <p class="skins-intro">Explore the original 3D skin collection. The supply and price figures below are saved reference data; purchases, NFTs, and wallet actions are not available in this frontend preview.</p>
+      <p class="skins-intro">A skin changes how your agent looks everywhere on TEKKWORK: its page, the agent list, the live feed and the toasts. ${(S.items || []).some((x) => x.nft) ? 'Every skin is a limited <b>NFT</b>: it goes to your wallet, you can resell it, and whoever holds it can dress one of their agents.' : 'It is bought once per agent with SOL from the creator wallet.'} <b>The SOL goes to the TEKKWORK rewards wallet</b>, which pays the promotion rewards to creators whose agents level up.</p>
       <div class="skins-grid">${(S.items || []).map((x) => `
-        <article class="skin-shop${x.rarity === 'legendary' ? ' legendary' : ''}">
-          ${x.rarity === 'legendary' ? '<span class="rarity-tag">LEGENDARY</span>' : ''}
+        <article class="skin-shop${x.rarity === 'legendary' || x.rarity === 'epic' ? ' ' + x.rarity : ''}">
+          ${x.rarity === 'legendary' ? '<span class="rarity-tag">LEGENDARY</span>' : x.rarity === 'epic' ? '<span class="rarity-tag epic">EPIC</span>' : ''}
           <div class="skin-shop-stage" data-skin="${esc(x.id)}" title="Drag to spin"></div>
           <div class="skin-shop-info">
-            <div><b>${esc(x.name)}${x.nft ? ' <span class="nft-tag">NFT</span>' : ''}</b><small>${x.rarity === 'legendary' ? 'Legendary skin for the TEKKTEAMER · drag to spin' : '3D voxel skin · drag to spin'}</small></div>
+            <div><b>${esc(x.name)}${x.nft ? ' <span class="nft-tag">NFT</span>' : ''}</b><small>${x.rarity === 'legendary' ? 'Legendary skin for the TEKKWORKER · drag to spin' : x.rarity === 'epic' ? 'Epic skin · drag to spin' : '3D voxel skin · drag to spin'}</small></div>
             <span class="skin-price">${x.priceSol} SOL</span>
           </div>
           ${x.stock ? `<div class="skin-supply"><div class="skin-supply-bar"><span style="width:${Math.round((x.stock.sold / x.stock.max) * 100)}%"></span></div><span>${x.stock.sold >= x.stock.max ? 'SOLD OUT' : `Only ${x.stock.max} ever · <b>${x.stock.max - x.stock.sold} left</b>`}${x.maxPerWallet ? ' · 1 per wallet' : ''}</span></div>` : ''}
           ${x.nft ? `<a class="skin-nft-link" href="https://solscan.io/account/${esc(x.nft.collection)}${x.nft.network === 'devnet' ? '?cluster=devnet' : ''}" target="_blank" rel="noopener">NFT collection ↗</a>` : ''}
-          <button class="btn btn-primary btn-block" type="button" data-get="${esc(x.id)}" disabled title="Purchase unavailable in frontend preview">Preview only</button>
+          <button class="btn btn-primary btn-block" type="button" data-get="${esc(x.id)}" ${cfg.preview || (x.stock && x.stock.sold >= x.stock.max) ? 'disabled' : ''}>${cfg.preview ? 'Coming soon' : x.stock && x.stock.sold >= x.stock.max ? 'Sold out' : 'Get it for my agent'}</button>
         </article>`).join('')}</div>
-      <p class="hint skins-pay">Reference collection preview · no payments are accepted here.</p>
+      <p class="hint skins-pay">Payments go to <code class="mono">${esc(S.payTo || '')}</code> (rewards wallet).</p>
     </section>
   </div>`;
 
@@ -55,7 +54,7 @@ export function SkinsPage(app) {
       el.innerHTML = html();
       el.querySelectorAll('.skin-shop-stage').forEach((host) => {
         try { viewers.push(createBoss(host, { skin: host.dataset.skin, label: 'Skin preview. Drag to spin.' })); }
-        catch { host.innerHTML = robotSVG(`skin:${host.dataset.skin}`, { stand: true }); }
+        catch { host.innerHTML = `<img class="skin-flat" src="brand/skins/${esc(host.dataset.skin)}-stand.png" alt="">`; }
       });
       el.addEventListener('click', async (e) => {
         const b = e.target.closest('[data-get]'); if (!b) return;

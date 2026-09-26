@@ -1,5 +1,5 @@
-// Local, read-only snapshot adapter for the TEKKTEAM frontend preview.
-// The original TEKKTEAM API executes real Solana actions and must never be
+// Local, read-only snapshot adapter for the TEKKWORK frontend preview.
+// The original TEKKWORK API executes real Solana actions and must never be
 // called from this separately branded demo without its owner's backend setup.
 const read = async (url) => {
   const response = await fetch(url);
@@ -26,10 +26,13 @@ function rebrandDemo(value, key = '') {
 
 export async function createApi() {
   const snapshot = rebrandDemo(await read('/demo-state.json'));
+  const latestConfig = rebrandDemo(await read('/preview-config.json'));
   const noop = () => () => {};
   return {
     config: {
       ...snapshot.config,
+      ...latestConfig,
+      preview: true,
       tradingEnabled: false,
       launchEnabled: false,
       contractAddress: '',

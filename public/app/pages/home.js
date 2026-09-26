@@ -1,7 +1,6 @@
 import { createOffice } from '../office3d.js';
 import { createBoss } from '../boss3d.js';
 import { createPhone } from '../phone3d.js';
-import { robotSVG } from '../robot.js';
 import { levelBadge, STRAT_ICONS, stratIcon, stratKey, strategyById, avatar, feedItem, agentCard, coinThumb, esc, sol, signedSol, pct, tone, ago, agentNo, usd, age, sparkline } from '../ui.js';
 
 export function HomePage(app) {
@@ -19,12 +18,12 @@ export function HomePage(app) {
     lastFeedKey = key;
     office.setData({ trades: snap.feed || [], tokens: snap.tokens || [], coins: snap.coins || [] });
   };
-  // no WebGL: the new open-studio render keeps all four zone actions available.
-  const fallbackHTML = () => `<img class="office-img" src="brand/office-fallback.png" alt="TEKKTEAM's open-plan 3D office studio">
-    <button type="button" class="fb-bub ob ob-launch" data-role="launch" style="left:35%;top:78%"><span class="ob-no" aria-hidden="true">↗</span><span class="ob-t"><b>Launch a coin</b></span></button>
-    <button type="button" class="fb-bub ob ob-shill" data-role="shill" style="left:41%;top:48%"><span class="ob-no" aria-hidden="true">✦</span><span class="ob-t"><b>Shill on X</b></span></button>
-    <button type="button" class="fb-bub ob ob-trade" data-role="trade" style="left:74%;top:50%"><span class="ob-no" aria-hidden="true">↔</span><span class="ob-t"><b>Trade</b></span></button>
-    <button type="button" class="fb-bub ob ob-how" data-role="how" style="left:56%;top:62%"><span class="ob-no" aria-hidden="true">?</span><span class="ob-t"><b>How it works</b></span></button>`;
+  // no WebGL: the office picture with the same bubbles on top
+  const fallbackHTML = () => `<div class="office-fallback-scene"><img class="office-img" src="brand/office-fallback.png" alt="The TEKKWORK office">
+    <button type="button" class="fb-bub ob" data-role="launch" style="left:26.3%;top:67.5%"><span class="ob-t"><b>Launch a coin</b></span></button>
+    <button type="button" class="fb-bub ob" data-role="shill" style="left:56.3%;top:52%"><span class="ob-t"><b>Shill on X</b></span></button>
+    <button type="button" class="fb-bub ob" data-role="trade" style="left:78.9%;top:60.3%"><span class="ob-t"><b>Trade</b></span></button>
+    <button type="button" class="fb-bub ob" data-role="how" style="left:54.7%;top:68%"><span class="ob-t"><b>How it works</b></span></button></div>`;
 
   const statsHTML = (s, agents) => {
     const deposited = s.aumSol - s.pnlSol;
@@ -115,17 +114,28 @@ export function HomePage(app) {
 
   function html(snap) {
     return `<div class="wrap">
-      <section class="studio-hero" aria-label="TEKKTEAM AI agent studio">
-        <div class="studio-intro">
-          <div class="studio-kicker"><span class="studio-orb"></span> TEKKTEAM / AI AGENT STUDIO <span>01 — 03</span></div>
+      <section class="hero">
+        <div class="hero-top">
+          <div class="office" id="h-office">
+            <div class="office-sky" aria-hidden="true"></div>
+          </div>
+          <div class="phone-wrap">
+            <div class="phone-stage" id="h-phone" title="Drag to turn the phone, tap a coin to open it"></div>
+            <div class="phone-cap"><span class="live">LIVE</span> Just bonded on pump.fun · drag to turn</div>
+          </div>
+        </div>
+      </section>
+
+      <div class="home-layout">
+        <div class="home-main">
           <section class="intro">
             <div class="hero-copy">
-              <div class="eyebrow">A new workspace for autonomous teams</div>
-              <h1>Meet the team <em>behind your next big idea.</em></h1>
-              <p class="lede">Explore a playful 3D workspace where every AI agent has a role. This is a concept with saved demo data; wallets and trades are not connected.</p>
+              <div class="eyebrow">TEKKWORK preview · one coin, one AI agent</div>
+              <h1>Launch a coin. <em>Your agent does the team work.</em></h1>
+              <p class="lede">Meet your TEKKWORK agent: its own identity, a strategy you choose, and a dedicated trading dashboard. Explore the launch form and team in this preview. Live wallet funding, coin creation and trading are coming soon.</p>
               <div class="hero-cta">
-                <a class="btn btn-primary btn-lg" href="#/agents">Meet the agents <span aria-hidden="true">↗</span></a>
-                <a class="btn btn-lg" href="#/how">Explore the concept</a>
+                <a class="btn btn-primary btn-lg" href="#/launch">Launch coin + agent</a>
+                <button class="btn btn-lg" type="button" data-shill>Shill on X</button>
               </div>
             </div>
             <ol class="crew">
@@ -134,26 +144,6 @@ export function HomePage(app) {
               <li><button type="button" data-role="trade"><span class="crew-av">${avatar('crew-trade', 56)}</span><span><b>Trader</b><span>Real SOL 24/7, your strategy</span></span></button></li>
             </ol>
           </section>
-          <div class="studio-note"><span class="studio-note-mark">✳</span><span>Built for curious builders.<br><b>Every agent has a part to play.</b></span></div>
-        </div>
-        <div class="studio-visual">
-          <div class="studio-visual-head"><span>THE DIGITAL WORKSPACE</span><span>INTERACTIVE 3D · DRAG & EXPLORE</span></div>
-          <div class="office" id="h-office"><div class="office-sky" aria-hidden="true"></div></div>
-          <div class="workspace-rail" aria-hidden="true"><span>01 / Discover the team</span><span>02 / Explore their roles</span><span>03 / Build your idea</span></div>
-        </div>
-      </section>
-
-      <section class="signal-strip" aria-label="Signals and activity">
-        <div class="signal-label"><span class="signal-no">02 / SIGNALS</span><h2>Ideas move.<br><em>Agents respond.</em></h2><p>The activity feed is a saved concept snapshot. Rotate the device to explore the interface, then browse the agents and tokens behind the scene.</p><a href="#/tokens">Browse token signals <span aria-hidden="true">↗</span></a></div>
-        <div class="phone-wrap">
-          <div class="phone-stage" id="h-phone" title="Drag to turn the phone, tap a coin to open it"></div>
-          <div class="phone-cap"><span class="live">DEMO</span> Saved bonded feed · drag to turn</div>
-        </div>
-        <div class="signal-aside"><span>NOT A LIVE PRODUCT</span><b>One idea.<br>Many ways to work.</b><span>Explore · Experiment · Imagine</span></div>
-      </section>
-
-      <div class="home-layout">
-        <div class="home-main">
 
           <div class="stats" id="h-stats">${statsHTML(snap.stats, snap.agents)}</div>
 
@@ -174,7 +164,7 @@ export function HomePage(app) {
           <section class="card feed-card" id="h-feed-card">
             <header class="card-head">
               <h2 class="pix">Trading desk</h2>
-              <span class="live">SNAPSHOT</span>
+              <span class="live">LIVE</span>
               <div class="right"><div class="seg" id="h-feed-seg">
                 <button class="on" data-f="all">All</button><button data-f="BUY">Buys</button><button data-f="SELL">Sells</button>
               </div></div>
@@ -192,7 +182,7 @@ export function HomePage(app) {
         <aside class="boss-col" aria-label="The boss">
           <div class="boss-say" id="h-boss-say" aria-live="polite"></div>
           <div class="boss-stage" id="h-boss" tabindex="0" title="Drag to spin, click to say hi">
-            <span class="boss-fallback av av-84" hidden>${robotSVG('tekkteam-boss', { stand: true })}</span>
+            <img class="boss-fallback" src="brand/boss.png" alt="The TEKKWORK boss" hidden>
           </div>
           <div class="boss-hint">Drag to spin him · click to say hi</div>
           <div class="boss-memo">
@@ -222,13 +212,13 @@ export function HomePage(app) {
       };
       const host = el.querySelector('#h-office');
       try { office = createOffice(host, { onAction: act }); host.classList.add('is-3d'); }
-      catch (e) { console.error('Office 3D failed:', e); office = null; host.classList.add('fallback'); host.insertAdjacentHTML('beforeend', fallbackHTML()); }
+      catch (e) { office = null; host.classList.add('fallback'); host.insertAdjacentHTML('beforeend', fallbackHTML()); }
       host.addEventListener('click', (e) => { const b = e.target.closest('.fb-bub'); if (b) act(b.dataset.role); });
       el.querySelector('.crew').addEventListener('click', (e) => { const b = e.target.closest('[data-role]'); if (b) act(b.dataset.role); });
       el.querySelectorAll('[data-shill]').forEach((b) => b.addEventListener('click', () => app.shill()));
       const bh = el.querySelector('#h-boss');
       try { boss = createBoss(bh, { onClick: () => paintSay(app.api.snapshot, true) }); }
-      catch (e) { console.error('Boss 3D failed:', e); bh.querySelector('.boss-fallback').hidden = false; bh.classList.add('flat'); bh.addEventListener('click', () => paintSay(app.api.snapshot, true)); }
+      catch { bh.querySelector('.boss-fallback').hidden = false; bh.classList.add('flat'); bh.addEventListener('click', () => paintSay(app.api.snapshot, true)); }
       paintSay(snap, false);
       phone = createPhone(el.querySelector('#h-phone'), {
         items: snap.bonded || [],

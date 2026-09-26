@@ -49,4 +49,10 @@ const satoshi = () => toySkin({
   pose: { armL: -0.04, armR: -0.06, headYaw: 0.04 },
 });
 
-export const SKIN_MODELS = { frank, cupsey, fomy, alon, satoshi };
+const diamond = () => toySkin({
+  skin: 0xBDE5EF, top: 0xD2F1F8, pants: 0x427693, kind: 'sweater',
+  cap: 0x90CEDD, trim: 0x56E9EB, badge: 0xFFFFFF, pack: 0x4683A0,
+  pose: { armL: -0.2, armR: -0.35, headYaw: 0.12 },
+});
+
+export const SKIN_MODELS = { frank, cupsey, fomy, alon, satoshi, diamond };

@@ -1,4 +1,5 @@
-// The TEKKTEAM phone: a cobalt toy-brick handset you can turn any way you like. Its screen shows
+// The TEKKWORK phone: a voxel smartphone (dressed like the boss: black suit, white shirt,
+// red tie on the back) that you can turn any way you like. Its screen shows live
 // "Just bonded" notifications: pump.fun coins that finished the bonding curve.
 //
 //   const phone = createPhone(el, { items, onOpen(item) {} });
@@ -56,22 +57,25 @@ function buildPhone() {
   const cut = (y) => (y === 0 || y === H - 1 ? 2 : y === 1 || y === H - 2 ? 1 : 0); // rounded corners
   for (let y = 0; y < H; y++) {
     const c = cut(y);
-    m.box((x0 + c) * K, (y0 + y) * K, z0 * K, (x0 + W - c) * K, (y0 + y + 1) * K, (z0 + D) * K, 0x19458F, K);
+    m.box((x0 + c) * K, (y0 + y) * K, z0 * K, (x0 + W - c) * K, (y0 + y + 1) * K, (z0 + D) * K, 0x1E1E22, K);
   }
   // front bezel frame (slightly raised ring around the screen)
   m.box(x0 * K + K, y0 * K + K, (z0 + D) * K, (x0 + W) * K - K, y0 * K + 2 * K, (z0 + D + 0.25) * K, 0x121215, K);
   m.box(x0 * K + K, (y0 + H) * K - 2 * K, (z0 + D) * K, (x0 + W) * K - K, (y0 + H) * K - K, (z0 + D + 0.25) * K, 0x121215, K);
   // side buttons: red power (right), grey volume (left)
-  m.box((x0 + W) * K, 7 * K, -0.6 * K, (x0 + W + 0.5) * K, 11 * K, 0.6 * K, 0x3985F7, K);
+  m.box((x0 + W) * K, 7 * K, -0.6 * K, (x0 + W + 0.5) * K, 11 * K, 0.6 * K, 0xE4282E, K);
   m.box((x0 - 0.5) * K, 9 * K, -0.6 * K, x0 * K, 12 * K, 0.6 * K, 0x3A3A40, K);
   m.box((x0 - 0.5) * K, 4 * K, -0.6 * K, x0 * K, 7 * K, 0.6 * K, 0x3A3A40, K);
-  // Back: a raised geometric T mark and connecting studs, replacing the old suit graphic.
+  // back: the boss's suit — white shirt V, red tie, lapels, gold briefcase clasp as the logo
   const bz = z0 * K - 0.3 * K;
   const back = (xa, ya, xb, yb, col, emit = 0) => m.box(xa * K, ya * K, bz, xb * K, yb * K, z0 * K, col, K, emit);
-  back(-6, 5, 6, 8, 0x93CAFF);
-  back(-1.5, -9, 1.5, 5, 0x93CAFF);
-  for (const x of [-6, -2, 2, 6]) for (const y of [-14, 0, 13])
-    m.cylinder(x * K, y * K, bz - 0.018, 0.052, bz, 0x3477D7, 12);
+  back(-4, 6, 4, 11, 0xF4F2EE);
+  back(-3, 4, 3, 6, 0xF4F2EE);
+  back(-2, 2, 2, 4, 0xF4F2EE);
+  back(-1, -9, 1, 10, 0xE4282E);
+  back(-2, 8, 2, 11, 0xE4282E);
+  back(-6, 5, -4, 11, 0x2B2B31); back(4, 5, 6, 11, 0x2B2B31);
+  back(-2, -15, 2, -12, 0xE8B32E);
   // camera block (top corner of the back)
   back(4, 13, 9, 19, 0x2A2A30);
   m.box(5 * K, 16 * K, bz - 0.6 * K, 8 * K, 18.5 * K, bz, 0x0B0B0D, K);
@@ -97,7 +101,7 @@ function coinImg(url, redraw) {
   }
   return e.ok ? e.img : null;
 }
-const COLORS = ['#3985F7', '#2F5FD0', '#1E9C47', '#E8A32E', '#8B5CF6', '#0EA5A4'];
+const COLORS = ['#E4282E', '#2F5FD0', '#1E9C47', '#E8A32E', '#8B5CF6', '#0EA5A4'];
 const usd = (x) => (x >= 1e6 ? '$' + (x / 1e6).toFixed(2) + 'M' : x >= 1e3 ? '$' + (x / 1e3).toFixed(1) + 'K' : x > 0 ? '$' + Math.round(x) : '');
 const ago = (ts, now) => { const s = Math.max(0, Math.round((now - ts) / 1000)); return s < 60 ? s + 's' : s < 3600 ? Math.floor(s / 60) + 'm' : Math.floor(s / 3600) + 'h'; };
 function rr(ctx, x, y, w, h, r) { ctx.beginPath(); ctx.roundRect ? ctx.roundRect(x, y, w, h, r) : ctx.rect(x, y, w, h); }
@@ -134,7 +138,7 @@ function drawBonded(ctx, items, now, redraw) {
   const pulse = 0.5 + 0.5 * Math.sin(now / 300);
   ctx.fillStyle = `rgba(91,227,138,${0.35 + pulse * 0.65})`; ctx.beginPath(); ctx.arc(30, 132, 6, 0, Math.PI * 2); ctx.fill();
   ctx.fillStyle = '#9AA3B2'; ctx.font = F(600, 15);
-  ctx.fillText('live · pump.fun → PumpSwap', 44, 137);
+  ctx.fillText('sample · pump.fun → PumpSwap', 44, 137);
   ctx.fillStyle = 'rgba(255,255,255,0.08)'; ctx.fillRect(24, 160, SW - 48, 2);
 
   if (!items.length) {

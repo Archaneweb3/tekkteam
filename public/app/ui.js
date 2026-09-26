@@ -22,7 +22,7 @@ export function pixIcon(rows) {
   return `<svg viewBox="0 0 ${rows[0].length} ${rows.length}" shape-rendering="crispEdges" fill="currentColor" aria-hidden="true">${rects}</svg>`;
 }
 
-// Pixel icons for the TEKKTEAM crew: LAUNCH → SHILL → TRADE → FEES
+// Pixel icons for the TEKKWORK crew: LAUNCH → SHILL → TRADE → FEES
 export const ICONS = {
   launch: pixIcon(['.....#.....', '....###....', '...#####...', '...##.##...', '...##.##...', '...#####...', '...#####...', '..#######..', '.##.###.##.', '.#..###..#.', '....#.#....']),
   shill: pixIcon(['#.......#', '##.....##', '.##...##.', '..##.##..', '...###...', '..##.##..', '.##...##.', '##.....##', '#.......#']),
@@ -79,6 +79,7 @@ export function sourceChip(source) {
   if (source === 'time-exit') return `<span class="chip">Time exit</span>`;
   if (source === 'stop-loss') return `<span class="chip chip-sl">Stop loss</span>`;
   if (source === 'withdraw') return `<span class="chip">Withdrawal</span>`;
+  if (source === 'rugged') return `<span class="chip chip-sl">Rugged · written off</span>`;
   return '';
 }
 
@@ -158,6 +159,7 @@ export const STRAT_ICONS = {
   trend: sic('<path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/>'),
   dip: sic('<path d="M3 5l6 9 3-3 3 4 6-9"/><path d="M17 6h4v4"/>'),
   sniper: sic('<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="2.5"/><path d="M12 1v5M12 18v5M1 12h5M18 12h5"/>'),
+  newpairs: sic('<path d="M12 22c4.4 0 7-3 7-6.8 0-3.6-2.6-5.6-3.8-8.7-1 2-2.2 3-3.7 3.1.2-2.6-.8-5-2.9-6.6-.6 4.4-4.6 6.6-4.6 12.2C4 19 7.6 22 12 22z"/><path d="M12 18.5c1.5 0 2.6-1 2.6-2.5 0-1.3-.9-2.1-1.4-3.2-.5 1-1.6 1.6-2.6 1.6-.8.6-1.2 1.2-1.2 1.9 0 1.2 1.1 2.2 2.6 2.2z"/>'),
   custom: sic('<path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1"/><circle cx="15" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="17" cy="18" r="2"/>'),
 };
 export const isCustomStrat = (id) => typeof id === 'string' && id.startsWith('custom-');
@@ -170,7 +172,7 @@ export const strategyById = (cfg, id, extra = []) => (cfg.strategies || []).find
   || (cfg.strategies || []).find((x) => x.id === cfg.defaultStrategy) || null;
 export function strategyChip(cfg, id, extra = []) {
   const st = strategyById(cfg, id, extra);
-  return st ? `<span class="chip strat-chip strat-${esc(stratKey(st))}">${stratIcon(st)}${esc(st.name)}${st.custom ? '<em class="cust-tag">custom</em>' : ''}</span>` : '';
+  return st ? `<span class="chip strat-chip strat-${esc(stratKey(st))}">${stratIcon(st)}${esc(st.name)}${st.custom ? '<em class="cust-tag">custom</em>' : ''}${riskTag(st)}</span>` : '';
 }
 const p0 = (x) => (x >= 0 ? '+' : '−') + Math.round(Math.abs(x) * 1000) / 10 + '%';
 // short rule lines for a strategy card / table
@@ -183,5 +185,17 @@ export function strategyRules(st) {
     ['Max hold', st.maxHoldMin ? st.maxHoldMin + ' min' : 'no limit'],
     ['Open positions', 'up to ' + st.maxOpen],
     ['Cooldown', st.cooldownMin ? st.cooldownMin + ' min' : 'none'],
+    ...(st.maxTradeSol ? [['Max per trade', st.maxTradeSol + ' SOL']] : []),
   ];
+}
+// red "EXTREME RISK" tag + the warning shown before anyone can pick such a strategy
+export const riskTag = (st) => (st && st.risk === 'extreme' ? '<em class="risk-tag">EXTREME RISK</em>' : '');
+export function riskWarning(st, { checkbox = false, checked = false } = {}) {
+  if (!st || st.risk !== 'extreme') return '';
+  return `<div class="risk-warn" role="alert">
+    <b>⚠ Extreme risk</b>
+    <p>${esc(st.name)} buys pump.fun coins that are only minutes old. Most of them go to zero, rugs and bundled launches are common, and prices can drop 50% in seconds, faster than any stop loss can sell. <b>This agent can lose all of its SOL.</b></p>
+    <p class="risk-prot">Protections: max ${Math.round(st.sizePct * 100)}% of SOL per trade${st.maxTradeSol ? ` (never more than ${st.maxTradeSol} SOL)` : ''}, ${st.maxOpen} coin${st.maxOpen > 1 ? 's' : ''} at once, take profit ${p0(st.takeProfitPct)}, stop loss ${p0(st.stopLossPct)}, sold after ${st.maxHoldMin} min at most, and it only buys coins that pass every safety filter (volume, buyers, dev holding, dev not selling, no bundles, no whales).</p>
+    ${checkbox ? `<label class="risk-ok"><input type="checkbox" data-risk-ok ${checked ? 'checked' : ''}> <span>I understand the risk and that my agent can lose all of its SOL.</span></label>` : ''}
+  </div>`;
 }

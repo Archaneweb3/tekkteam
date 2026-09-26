@@ -1,4 +1,22 @@
-import { pct, usd, agentLoop, sol, esc, STRAT_ICONS, strategyRules } from '../ui.js';
+import { pct, usd, agentLoop, sol, esc, STRAT_ICONS, strategyRules, riskTag, riskWarning } from '../ui.js';
+
+const P = (x) => Math.round(x * 1000) / 10 + '%';
+// the New Pairs safety filters in plain words
+function safetyRules(f) {
+  const r = [];
+  if (f.minAgeSec != null) r.push(['Coin age', `${Math.round(f.minAgeSec / 60)}–${Math.round(f.maxAgeSec / 60)} min`]);
+  if (f.minMcapSol != null) r.push(['Market cap', `${f.minMcapSol}–${f.maxMcapSol} SOL`]);
+  if (f.minVolSol != null) r.push(['Volume so far', `at least ${f.minVolSol} SOL`]);
+  if (f.minBuys != null) r.push(['Buyers', `${f.minBuys}+ buys from ${f.minUniqueBuyers}+ different wallets`]);
+  if (f.minBuySellRatio != null) r.push(['Buy pressure', `${f.minBuySellRatio}x more SOL buying than selling (2 min)`]);
+  if (f.minChange60s != null) r.push(['Momentum', `up ${P(f.minChange60s)}+ in 60 s, but not more than ${P(f.maxSpike60s)} (no chasing)`]);
+  if (f.maxDevPct != null) r.push(['Dev', `holds at most ${P(f.maxDevPct)} and has not sold anything`]);
+  if (f.maxEarlyBuyers != null) r.push(['Bundles', `max ${f.maxEarlyBuyers} buyers in the first 3 s, max ${P(f.maxUnseenPct || 0)} bought in the launch block`]);
+  if (f.maxTopHolderPct != null) r.push(['Whales', `top holder ≤ ${P(f.maxTopHolderPct)}, top 10 ≤ ${P(f.maxTop10Pct)}`]);
+  if (f.maxAgentsPerCoin != null) r.push(['Crowding', `max ${f.maxAgentsPerCoin} TEKKWORK agents in the same coin`]);
+  r.push(['Early exit', 'sells at once if the dev sells, sellers take over or trading stops']);
+  return r;
+}
 
 export function HowPage(app) {
   const c = app.api.config;
@@ -7,7 +25,7 @@ export function HowPage(app) {
   return {
     mount(root) {
       root.innerHTML = `<div class="wrap">
-        <div class="page-head"><div><h1>Inside the studio</h1><p>Discover the proposed relationship between a coin, its AI agent, and its strategy. This interactive preview uses saved example data, not live on-chain activity.</p></div>
+        <div class="page-head"><div><h1>How it works</h1><p>One coin, one trading agent, one wallet. Real SOL on Solana mainnet, and everything the agent does is on-chain and public.</p></div>
           <div class="right"><a class="btn btn-primary" href="#/launch">Launch coin + agent</a></div></div>
 
         <section class="card">
@@ -48,7 +66,7 @@ export function HowPage(app) {
 
         <section class="card">
           <header class="card-head"><h2 class="pix">Strategies</h2><span class="sub">the creator picks one per agent, and can switch later</span></header>
-          <div class="strat-cards">${(c.strategies || []).map((st) => `<article class="strat-card strat-${esc(st.id)}">
+          <div class="strat-cards">${(c.strategies || []).filter((st) => !st.safety).map((st) => `<article class="strat-card strat-${esc(st.id)}">
             <div class="sc-head"><span class="so-ic">${STRAT_ICONS[st.id] || ''}</span><div><b>${esc(st.name)}</b><small>${esc(st.tagline)}</small></div></div>
             <p>${esc(st.goal)}</p>
             <dl class="kv">${strategyRules(st).map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl>
@@ -56,7 +74,15 @@ export function HowPage(app) {
             <div class="sc-head"><span class="so-ic">${STRAT_ICONS.custom}</span><div><b>Your own</b><small>Custom · one per wallet</small></div></div>
             <p>Build your own strategy with sliders and give it a name. Pick an entry style above, then set trade size, open positions, take profit, stop loss, trailing stop, max hold time, cooldown and the entry filters.</p>
             <dl class="kv"><dt>Per trade</dt><dd>1–50% of SOL</dd><dt>Take profit</dt><dd>+2% to +300%</dd><dt>Stop loss</dt><dd>−1% to −50%</dd><dt>Max hold</dt><dd>off or up to 24h</dd></dl>
-          </article>`}</div>
+          </article>`}${(c.strategies || []).filter((st) => st.safety).map((st) => `<article class="strat-card strat-wide strat-${esc(st.id)}">
+            <div class="sw-main">
+              <div class="sc-head"><span class="so-ic">${STRAT_ICONS[st.id] || ''}</span><div><b>${esc(st.name)}</b>${riskTag(st)}<small>${esc(st.tagline)}</small></div></div>
+              <p>${esc(st.goal)}</p>
+              <dl class="kv">${strategyRules(st).map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl>
+            </div>
+            <div class="sw-warn">${riskWarning(st)}</div>
+            <div class="sw-filters"><p class="sc-sub">Buys only when every filter passes</p><ul class="risk-filters">${safetyRules(st.safety).map(([k, v]) => `<li><b>${k}</b><span>${v}</span></li>`).join('')}</ul></div>
+          </article>`).join('')}</div>
         </section>
 
         <section class="card">

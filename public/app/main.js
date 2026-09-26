@@ -1,7 +1,8 @@
-// TEKKTEAM frontend entry (live, Solana mainnet)
+// TEKKWORK frontend entry (live, Solana mainnet)
 import { createApi } from './api.js';
 import { robotSVG } from './robot.js';
-import { ICONS, avatar, STRAT_ICONS, strategyRules, stratIcon, stratKey } from './ui.js';
+import { ICONS, avatar, STRAT_ICONS, strategyRules, stratIcon, stratKey, riskTag, riskWarning } from './ui.js';
+import { RISK_ACK } from '../shared/risk-ack.js';
 import { FIELDS, CUSTOM_BASES, NAME_MAX, fieldsFor, defaultsFor, sanitize as sanitizeCustom, cleanName, settingsLine } from '../shared/custom-strategy.js';
 import { wallet, onWallet, onWalletList, listWallets, connectWallet, disconnect, restoreWallet, signAction, sendSol, actionMessage } from './wallet.js';
 import { esc, ago, pct, tone, sol, agentNo, short, price } from './format.js';
@@ -33,7 +34,7 @@ const NAV_IC = {
   how: nic('<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1 .8-1 1.5v.7"/><path d="M12 17.5v.01"/>'),
 };
 
-// X badge: the official X mark on a black suit with a red tie peeking out (TEKKTEAM style)
+// X badge: the official X mark on a black suit with a red tie peeking out (TEKKWORK style)
 const X_BADGE = `<span class="xb-suit" aria-hidden="true"><svg class="xb-logo" viewBox="0 0 24 24"><path fill="currentColor" d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg><i class="xb-tie"></i></span>`;
 
 function shell(cfg) {
@@ -41,7 +42,7 @@ function shell(cfg) {
   return `
   <header class="topbar">
     <div class="topbar-in">
-      <a class="brand" href="#/" aria-label="TEKKTEAM home"><span class="brand-logo av av-42">${robotSVG('tekkteam-boss', { stand: true })}</span><span class="brand-name">TEKK<span class="brand-desk">TEAM</span></span></a>
+      <a class="brand" href="#/" aria-label="TEKKWORK home"><img class="brand-logo" src="brand/boss-96.png" alt="" width="40" height="40"><span class="brand-name">TEKK<span class="brand-desk">WORK</span></span></a>
       <nav class="nav" id="nav">
         <a href="#/" data-r="home">${NAV_IC.home}<span>Home</span></a>
         <a href="#/agents" data-r="agents">${NAV_IC.agents}<span>Agents</span></a>
@@ -51,19 +52,19 @@ function shell(cfg) {
         <button type="button" class="nav-shill" id="nav-shill">${NAV_IC.shill}<span>Shill on X</span></button>
         <a href="#/how" data-r="how">${NAV_IC.how}<span>How it works</span></a>
       </nav>
-      <div class="side-card"><span class="av av-84">${robotSVG('tekkteam-boss', { stand: true })}</span><span><b>TEKKTEAM frontend preview.</b> Data snapshot: 26 Sep 2026. Wallet and trading are not connected.</span></div>
+      <div class="side-card" aria-hidden="true"><img src="brand/boss.png" alt="" width="84" height="84"><span><b>Your agent does the team work.</b> Launch a coin and it gets its own trader.</span></div>
       <div class="top-right">
         <span class="mode-pill live-pill" id="mode-pill">MAINNET</span>
         ${x ? `<a class="x-link" href="${esc(x)}" target="_blank" rel="noopener" aria-label="Follow ${esc(xHandle(x))} on X" title="Follow ${esc(xHandle(x))} on X">${X_BADGE}</a>` : ''}
         <button class="icon-btn" id="theme-btn" type="button" aria-label="Toggle light / dark theme"></button>
-        <button class="btn btn-wallet" id="wallet-btn" type="button" disabled title="Wallet connection is not available in this frontend preview">Connect <span class="long">wallet</span></button>
+        <button class="btn btn-wallet" id="wallet-btn" type="button">Connect <span class="long">wallet</span></button>
       </div>
+      <button class="ca-chip soon" id="ca-chip" type="button" title="Contract address: coming soon"><span class="ca-tag">CA</span><span class="ca-val">Coming soon</span></button>
     </div>
   </header>
   <div class="tape" aria-label="Token prices"><div class="tape-track" id="tape"></div></div>
-  <div class="demo-notice" role="note"><span class="demo-notice-dot"></span><strong>TEKKTEAM Concept Studio</strong><span>Independent AI-agent interface · saved demo data · no live wallet or trading</span></div>
   <main id="page"></main>
-  <footer class="foot"><span class="foot-brand"><span class="av av-26">${robotSVG('tekkteam-boss')}</span><b>TEKKTEAM</b> · AI agent studio</span>${x ? `<a class="foot-x" href="${esc(x)}" target="_blank" rel="noopener">${X_BADGE}${esc(xHandle(x))}</a>` : ''}<span>Saved frontend demo · no live transactions</span><span>Historical market data is illustrative, not financial advice.</span></footer>
+  <footer class="foot"><span class="foot-brand"><img src="brand/boss-96.png" alt="" width="26" height="26"><b>TEKKWORK</b> · your agents do the team work</span>${x ? `<a class="foot-x" href="${esc(x)}" target="_blank" rel="noopener">${X_BADGE}${esc(xHandle(x))}</a>` : ''}<span>TEKKWORK preview · Sample data</span><span>Not financial advice. Memecoins are extremely risky.</span></footer>
   <div class="toasts" id="toasts" aria-live="polite"></div>`;
 }
 
@@ -99,18 +100,19 @@ function modal(title, body, { onClose } = {}) {
 function toast(html, seed) {
   const t = document.createElement('div');
   t.className = 'toast';
-  t.innerHTML = `<span class="av av-42">${robotSVG(seed || 'tekkteam-boss')}</span><div>${html}</div>`;
+  t.innerHTML = `${seed ? `<span class="av av-42">${robotSVG(seed)}</span>` : `<img src="brand/boss-96.png" alt="" width="36" height="36">`}<div>${html}</div>`;
   $('#toasts').appendChild(t);
   setTimeout(() => t.remove(), 6000);
 }
 
 async function boot() {
   const app = document.getElementById('app');
-  app.innerHTML = `<div class="wrap"><div class="card"><div class="feed-empty boot"><span class="av av-84">${robotSVG('tekkteam-boss', { stand: true })}</span><span>clocking in at TEKKTEAM<span class="cursor"></span></span></div></div></div>`;
+  app.innerHTML = `<div class="wrap"><div class="card"><div class="feed-empty boot"><img src="brand/boss.png" alt="TEKKWORK" width="130" height="130"><span>clocking in at TEKKWORK<span class="cursor"></span></span></div></div></div>`;
   const api = await createApi();
   app.innerHTML = shell(api.config || {});
   paintThemeBtn();
-  $('#mode-pill').textContent = 'FRONTEND DEMO';
+  if (!api.config.tradingEnabled) $('#mode-pill').textContent = api.config.preview ? 'PREVIEW' : 'TRADING PAUSED';
+  if (api.config.preview) document.querySelector('#page').insertAdjacentHTML('beforebegin', '<div class="preview-note">Preview · Sample data. Wallet funding, launch and trading are not connected.</div>');
 
   let page = null;
   const ctx = {
@@ -142,6 +144,10 @@ async function boot() {
   });
 
   function openConnect() {
+    if (api.config.preview) {
+      modal('Wallet connection — coming soon', '<p>Explore the launch form, agent profiles and strategies in this preview. A TEKKWORK backend is required before wallet funding and live trading become available.</p>');
+      return Promise.resolve(null);
+    }
     return new Promise((resolve) => {
       let done = false;
       const m = modal('Connect wallet', `
@@ -290,7 +296,7 @@ async function boot() {
     const optHTML = (st) => `
         <button type="button" class="strat-opt strat-${esc(stratKey(st))}${st.id === chosen ? ' on' : ''}" data-s="${esc(st.id)}">
           <span class="so-ic">${stratIcon(st)}</span>
-          <span class="so-t"><b>${esc(st.name)}${st.custom ? ' <em class="cust-tag">custom</em>' : ''}${st.id === agent.strategy ? ' <em>current</em>' : ''}</b><small>${esc(st.custom ? st.tagline : st.goal)}</small></span>
+          <span class="so-t"><b>${esc(st.name)}${riskTag(st)}${st.custom ? ' <em class="cust-tag">custom</em>' : ''}${st.id === agent.strategy ? ' <em>current</em>' : ''}</b><small>${esc(st.custom ? st.tagline : st.goal)}</small></span>
           <span class="so-rules">${strategyRules(st).slice(st.custom ? 1 : 0, (st.custom ? 1 : 0) + 4).map(([k, v]) => `<span><i>${k}</i>${v}</span>`).join('')}</span>
         </button>`;
     const customHTML = () => api.config.customEnabled === false ? '' : mine
@@ -300,22 +306,37 @@ async function boot() {
       <p>Pick how ${esc(agent.name)} trades from now on. Open positions switch to the new exit rules right away. You sign a message with your wallet, no SOL is sent.</p>
       <div id="st-custom" class="st-custom"><div class="cust-load">Loading your custom strategy…</div></div>
       <div class="strat-list" id="st-list">${list.map(optHTML).join('')}</div>
+      <div id="st-risk"></div>
       <div class="err" id="st-err" hidden></div>
       <button class="btn btn-primary btn-block btn-lg" id="st-go" type="button">Sign and switch</button>`);
-    const paint = () => m.body.querySelectorAll('.strat-opt').forEach((b) => b.classList.toggle('on', b.dataset.s === chosen));
+    let riskOk = false;
+    const risky = () => list.find((x) => x.id === chosen)?.risk === 'extreme';
+    const paint = () => {
+      m.body.querySelectorAll('.strat-opt').forEach((b) => b.classList.toggle('on', b.dataset.s === chosen));
+      const st = list.find((x) => x.id === chosen);
+      m.body.querySelector('#st-risk').innerHTML = chosen !== agent.strategy ? riskWarning(st, { checkbox: true, checked: riskOk }) : '';
+    };
+    m.body.addEventListener('change', (e) => { if (e.target.matches('[data-risk-ok]')) { riskOk = e.target.checked; e.target.closest('.risk-ok')?.classList.remove('need'); } });
     const paintCustom = () => {
       const box = m.body.querySelector('#st-custom');
       box.innerHTML = customHTML();
       box.querySelector('#st-edit, #st-build')?.addEventListener('click', () => { m.close(); strategyBuilder({ agent, existing: mine, after }); });
     };
     api.getCustom(agent.creator).then((c) => { mine = c; paintCustom(); }).catch(() => { mine = null; paintCustom(); });
-    m.body.addEventListener('click', (e) => { const b = e.target.closest('.strat-opt'); if (b) { chosen = b.dataset.s; paint(); } });
+    m.body.addEventListener('click', (e) => { const b = e.target.closest('.strat-opt'); if (b) { if (chosen !== b.dataset.s) riskOk = false; chosen = b.dataset.s; paint(); if (risky()) m.body.querySelector('#st-risk .risk-warn')?.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } });
     m.body.querySelector('#st-go').addEventListener('click', async () => {
       const err = m.body.querySelector('#st-err'), btn = m.body.querySelector('#st-go');
       if (chosen === agent.strategy) { m.close(); return; }
+      if (risky() && !riskOk) {
+        const lab = m.body.querySelector('#st-risk .risk-ok');
+        lab?.classList.add('need'); lab?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+        err.hidden = false; err.textContent = 'Tick the box first: this strategy can lose all of the agent\'s SOL.';
+        return;
+      }
+      err.hidden = true;
       btn.disabled = true; btn.textContent = `Sign in ${wallet.name || 'your wallet'}…`;
       try {
-        const auth = await signAction(actionMessage('strategy', agent.wallet, [`Strategy: ${chosen}`]));
+        const auth = await signAction(actionMessage('strategy', agent.wallet, [`Strategy: ${chosen}`, ...(risky() ? [RISK_ACK] : [])]));
         await api.setStrategy(agent.id, { strategy: chosen, ...auth });
         m.close();
         const st = list.find((x) => x.id === chosen) || (mine && mine.id === chosen ? mine : null);
@@ -336,7 +357,7 @@ async function boot() {
     let sel = pick || agent.skin || items[0]?.id || 'default';
     let viewer = null;
     const m = modal(`Skins for ${agent.name}`, `
-      <p>Give ${esc(agent.name)} a new look everywhere on TEKKTEAM. Paid with SOL from your creator wallet. <b>The SOL goes to the TEKKTEAM rewards wallet</b>, which pays the promotion rewards.${items.some((x) => x.nft) ? ' NFT skins go to your wallet: one NFT dresses one agent, and if you sell the NFT the skin goes with it.' : ''}</p>
+      <p>Give ${esc(agent.name)} a new look everywhere on TEKKWORK. Paid with SOL from your creator wallet. <b>The SOL goes to the TEKKWORK rewards wallet</b>, which pays the promotion rewards.${items.some((x) => x.nft) ? ' NFT skins go to your wallet: one NFT dresses one agent, and if you sell the NFT the skin goes with it.' : ''}</p>
       <div class="skin-stage" id="sk-stage"></div>
       <div class="skin-list" id="sk-list"></div>
       <div class="err" id="sk-err" hidden></div>
@@ -348,15 +369,15 @@ async function boot() {
       const host = q('#sk-stage');
       host.innerHTML = '';
       if (sel === 'default') { host.innerHTML = `<div class="skin-default">${robotSVG(agent.baseSeed || agent.wallet, { stand: true })}</div>`; return; }
-      try { viewer = createBoss(host, { skin: sel, label: 'Skin preview. Drag to spin.' }); } catch { host.innerHTML = robotSVG(`skin:${sel}`, { stand: true }); }
+      try { viewer = createBoss(host, { skin: sel, label: 'Skin preview. Drag to spin.' }); } catch { host.innerHTML = `<img class="skin-flat" src="brand/skins/${esc(sel)}-stand.png" alt="">`; }
     };
     const paint = () => {
       const cards = [{ id: 'default', name: 'Original worker', priceSol: 0 }, ...items];
       q('#sk-list').innerHTML = cards.map((x) => {
         const wearing = (agent.skin || 'default') === x.id;
         const has = x.id === 'default' || owned.has(x.id);
-        return `<button type="button" class="skin-card${x.id === sel ? ' on' : ''}${x.rarity === 'legendary' ? ' legendary' : ''}" data-id="${esc(x.id)}">${x.rarity === 'legendary' ? '<span class="rarity-tag">LEGENDARY</span>' : ''}
-          <span class="skin-thumb">${robotSVG(x.id === 'default' ? agent.baseSeed || agent.wallet : `skin:${x.id}`)}</span>
+        return `<button type="button" class="skin-card${x.id === sel ? ' on' : ''}${x.rarity === 'legendary' || x.rarity === 'epic' ? ' ' + x.rarity : ''}" data-id="${esc(x.id)}">${x.rarity === 'legendary' ? '<span class="rarity-tag">LEGENDARY</span>' : x.rarity === 'epic' ? '<span class="rarity-tag epic">EPIC</span>' : ''}
+          <span class="skin-thumb">${x.id === 'default' ? robotSVG(agent.baseSeed || agent.wallet) : `<img src="brand/skins/${esc(x.id)}-bust.png" alt="">`}</span>
           <b>${esc(x.name)}${x.nft ? ' <span class="nft-tag">NFT</span>' : ''}</b>
           <small>${wearing ? '<span class="skin-tag on">wearing</span>' : has ? '<span class="skin-tag">owned</span>' : x.stock && x.stock.sold >= x.stock.max ? '<span class="skin-tag out">sold out</span>' : `${x.priceSol} SOL`}</small>
           ${x.stock && !has ? `<small class="skin-left">${Math.max(0, x.stock.max - x.stock.sold)} / ${x.stock.max} left</small>` : ''}
@@ -562,8 +583,8 @@ async function boot() {
     const lines = (a) => {
       if (!a) {
         const L = [
-          `Launch a coin on TEKKTEAM and it gets its own AI agent with its own Solana wallet. It trades real SOL 24/7 and keeps all the creator fees.\n\nYour agent does the team work.${ca ? `\n\nCA: ${ca}` : ''}\n${site}`,
-          `Every coin on TEKKTEAM hires its own trader: own wallet, fixed rules, every trade public on-chain.\n\nLaunch one, let it work.${ca ? `\n\nCA: ${ca}` : ''}\n${site}`,
+          `Launch a coin on TEKKWORK and it gets its own AI agent with its own Solana wallet. It trades real SOL 24/7 and keeps all the creator fees.\n\nYour agent does the team work.${ca ? `\n\nCA: ${ca}` : ''}\n${site}`,
+          `Every coin on TEKKWORK hires its own trader: own wallet, fixed rules, every trade public on-chain.\n\nLaunch one, let it work.${ca ? `\n\nCA: ${ca}` : ''}\n${site}`,
         ];
         return L[variant % L.length];
       }
@@ -579,7 +600,7 @@ async function boot() {
     const m = modal('Shill on X', `
       <div class="shill-head">${avatar('crew-shill', 56)}<p>The shiller writes the post, you hit send. Nothing is posted until you confirm it on X.</p></div>
       <div class="field"><label for="s-coin">Coin</label>
-        <select class="input" id="s-coin">${opts}<option value="">TEKKTEAM itself</option></select></div>
+        <select class="input" id="s-coin">${opts}<option value="">TEKKWORK itself</option></select></div>
       <div class="field"><label for="s-text">Post</label><textarea class="textarea" id="s-text" rows="7" maxlength="560"></textarea>
         <div class="hint"><span id="s-count"></span> · <button type="button" class="copy" id="s-new">Write another</button></div></div>
       <button class="btn btn-primary btn-block btn-lg" id="s-go" type="button">${ICONS.x}<span>Post on X</span></button>`);
@@ -634,15 +655,10 @@ async function boot() {
     const r = parse();
     page = r.name === 'agent' ? AgentPage(ctx, r.id) : r.name === 'agents' ? AgentsPage(ctx) : r.name === 'tokens' ? TokensPage(ctx) : r.name === 'launch' ? LaunchPage(ctx) : r.name === 'how' ? HowPage(ctx) : r.name === 'skins' ? SkinsPage(ctx) : HomePage(ctx);
     page.mount($('#page'), api.snapshot);
+    if (api.config.preview) document.querySelectorAll('#page .live').forEach(el => { el.textContent = 'SAMPLE'; });
     document.querySelectorAll('#nav a').forEach((a) => a.classList.toggle('on', a.dataset.r === (r.name === 'agent' ? 'agents' : r.name)));
-    const nav = $('#nav');
-    const activeNav = nav.querySelector('a.on');
-    if (activeNav && nav.scrollWidth > nav.clientWidth) {
-      const navRect = nav.getBoundingClientRect();
-      const linkRect = activeNav.getBoundingClientRect();
-      nav.scrollTo({ left: nav.scrollLeft + linkRect.left - navRect.left - (navRect.width - linkRect.width) / 2, behavior: 'instant' });
-    }
-    document.title = r.name === 'home' ? 'TEKKTEAM · your agents do the team work' : 'TEKKTEAM · ' + ({ agent: 'Agent', agents: 'Agents', tokens: 'Tokens', launch: 'Launch', how: 'How it works', skins: 'Skins' })[r.name];
+    if (innerWidth < 900) document.querySelector('#nav a.on')?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+    document.title = r.name === 'home' ? 'TEKKWORK · your agents do the team work' : 'TEKKWORK · ' + ({ agent: 'Agent', agents: 'Agents', tokens: 'Tokens', launch: 'Launch', how: 'How it works', skins: 'Skins' })[r.name];
     window.scrollTo(0, 0);
   }
   addEventListener('hashchange', route);
@@ -698,8 +714,32 @@ async function boot() {
   $('#theme-btn').addEventListener('click', () => {
     const next = currentTheme() === 'dark' ? 'light' : 'dark';
     document.documentElement.setAttribute('data-theme', next);
-    store.set('bw_theme', next);
+    store.set('tw_theme', next);
     paintThemeBtn();
+  });
+
+  // ── contract address chip (set in config.js → site.contractAddress) ──
+  const COPY_ICON = '<svg class="ca-copy" viewBox="0 0 8 8" shape-rendering="crispEdges" fill="currentColor" aria-hidden="true"><rect x="0" y="0" width="5" height="1"/><rect x="0" y="0" width="1" height="5"/><rect x="2" y="2" width="6" height="1"/><rect x="2" y="7" width="6" height="1"/><rect x="2" y="2" width="1" height="6"/><rect x="7" y="2" width="1" height="6"/></svg>';
+  function paintCA() {
+    const ca = api.config?.contractAddress || '';
+    const b = $('#ca-chip');
+    b.classList.toggle('soon', !ca);
+    b.dataset.ca = ca;
+    b.title = ca ? `Contract address ${ca} · click to copy` : 'Contract address: coming soon';
+    b.setAttribute('aria-label', ca ? `Copy contract address ${ca}` : 'Contract address coming soon');
+    b.innerHTML = `<span class="ca-tag">CA</span><span class="ca-val">${ca ? esc(short(ca, 5)) : 'Coming soon'}</span>${ca ? COPY_ICON : ''}`;
+  }
+  paintCA();
+  api.onUpdate(paintCA);
+  $('#ca-chip').addEventListener('click', async () => {
+    const ca = $('#ca-chip').dataset.ca;
+    if (!ca) return;
+    try {
+      await navigator.clipboard.writeText(ca);
+      toast(`<b>Contract address copied</b><span class="mono">${esc(ca)}</span>`);
+    } catch {
+      window.prompt('Copy the contract address:', ca);
+    }
   });
 
   $('#nav-shill').addEventListener('click', () => shillModal());
@@ -710,5 +750,5 @@ async function boot() {
 
 boot().catch((e) => {
   console.error(e);
-  document.getElementById('app').innerHTML = `<div class="wrap"><div class="card"><div class="feed-empty">TEKKTEAM could not start: ${esc(e.message)}</div></div></div>`;
+  document.getElementById('app').innerHTML = `<div class="wrap"><div class="card"><div class="feed-empty">TEKKWORK could not start: ${esc(e.message)}</div></div></div>`;
 });

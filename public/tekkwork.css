@@ -1,0 +1,61 @@
+/* TEKKWORK identity; the recovered page layouts and feature controls stay intact. */
+:root, :root[data-theme="dark"] {
+  --red: #3684ef; --red-hi: #65a8ff; --red-lo: #1655af; --red-soft: #deecff;
+}
+:root[data-theme="dark"] {
+  --bg: #0c1524; --surface: #142135; --surface-2: #18283f; --surface-3: #1d304b;
+  --line: #2a3e58; --line-strong: #3d5776; --card-bd: #354963;
+  --edge: #08111f; --drop: #08111f; --ink: #edf5ff; --ink-2: #c1d4e9; --muted: #96acc5;
+}
+.brand-desk { background: #3684ef; }
+.preview-note { padding: 9px 24px; background: #163657; color: #c7e5ff; text-align: center; font: 500 11px/1.4 var(--f-mono); }
+.office { border-radius: 18px; background: radial-gradient(ellipse at 50% 40%, rgba(88,149,204,.12), transparent 75%); }
+.ob { --bb: #162b46; --bo: #071625; color: #eff8ff; border-radius: 12px; }
+.office-bubbles .ob { gap: 6px; padding: 6px 9px; filter: drop-shadow(0 3px 0 #071625); animation: none; transform-origin: center; }
+.ob-no { display: grid; place-items: center; width: 25px; height: 25px; border-radius: 7px; background: #3684ef; color: white; font: 700 16px/1 sans-serif; }
+.ob-shill .ob-no { background: #257f88; }
+.ob-trade .ob-no { background: #7460b3; }
+.ob-how .ob-no { background: #b98a30; }
+.office-bubbles .ob-t b { font-size: 13px; }
+.office-bubbles .ob-t small { max-width: 19ch; font-size: 9px; }
+.office-bubbles .ob::after { display: none; }
+.office-bubbles .ob:hover, .office-bubbles .ob.hot { background: #285687; }
+.office-bubbles .ob:focus-visible { outline: 3px solid #83c6ff; outline-offset: 3px; }
+.fb-bub { background: #163454; color: white; border-radius: 9px; padding: 6px 9px; }
+.fb-bub::after { display: none; }
+.fb-bub b { font-size: 11px; }
+.fb-bub small { display: none; }
+.office.fallback { min-height: 320px; }
+.office-fallback-scene { position: absolute; left: 0; top: 50%; width: 100%; transform: translateY(-50%); }
+.office-fallback-scene .office-img { width: 100%; height: auto; }
+.office-fallback-scene .fb-bub { transform: translate(-50%, -50%); }
+.office-img { width: 100%; height: 100%; object-fit: contain; }
+.voxel-bot { shape-rendering: crispEdges; }
+.brand-logo { object-fit: contain; }
+@media (max-width: 900px) {
+  .hero-top { grid-template-columns: minmax(0,1fr); }
+  .hero-top .office { width: 100%; margin-inline: 0; }
+  .topbar-in { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 6px; padding: 8px 12px; }
+  .brand { grid-column: 1; grid-row: 1; gap: 5px; padding: 0; }
+  .brand-logo { width: 26px; height: 30px; }
+  .brand-name { font-size: 16px; }
+  .brand-desk { padding: 5px; }
+  .top-right { grid-column: 2; grid-row: 1; gap: 5px; margin: 0; }
+  .top-right .mode-pill { display: none; }
+  .top-right .btn-wallet { font-size: 10px; padding: 5px 7px; min-height: 30px; height: 30px; }
+  .top-right .icon-btn { width: 28px; height: 28px; }
+  .nav { grid-column: 1 / -1; grid-row: 2; display: flex; flex-wrap: nowrap; width: 100%; min-width: 0; overflow-x: auto; }
+  .nav > * { flex: none; }
+  .nav a, .nav button { padding: 7px 9px; font-size: 11px; }
+  .ca-chip { grid-column: 1 / -1; grid-row: 3; margin: 0; padding: 3px 8px; min-height: 23px; height: 24px; width: 100%; }
+}
+@media (max-width: 600px) {
+  .hero-top { grid-template-columns: minmax(0,1fr); }
+  .hero-top .office { width: 100%; min-width: 0; height: 340px; }
+  .office-bubbles .ob { padding: 4px 6px; gap: 4px; }
+  .office-bubbles .ob-t b { font-size: 10px; }
+  .office-bubbles .ob-t small { display: none; }
+  .ob-no { width: 17px; height: 17px; font-size: 11px; }
+  .preview-note { padding-inline: 12px; font-size: 10px; }
+  .nav { overflow-x: auto; max-width: 100%; }
+}
