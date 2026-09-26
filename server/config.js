@@ -1,3 +1,4 @@
+import { networkConfig } from '../src/networks.js';
 export const strategies = [
   { id: 'balanced', name: 'Balanced', description: 'A measured profile with conservative position limits.', maxPositionPct: 10 },
   { id: 'momentum', name: 'Momentum', description: 'Follow established movement with a defined risk budget.', maxPositionPct: 15 },
@@ -14,8 +15,10 @@ export const characters = [
 export function publicConfig(network) {
   return {
     brand: 'TEKKWORK', network, preview: false, backendOnline: true,
+    networkConfig: ['devnet','mainnet'].includes(network) ? networkConfig(network) : null,
+    mainnetSafetyMode: network === 'mainnet', broadcastEnabled: network === 'devnet',
     launchEnabled: network === 'devnet', tradingEnabled: false,
     mainnetLaunchEnabled: false, contractAddress: '', strategies, characters,
-    capabilities: { walletAuth: true, persistentAgents: true, devnetMint: network === 'devnet', pumpfun: false, autonomousTrading: false },
+    capabilities: { walletAuth: true, persistentAgents: network !== 'mainnet', devnetMint: network === 'devnet', pumpfun: false, autonomousTrading: false },
   };
 }

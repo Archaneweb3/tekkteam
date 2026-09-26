@@ -1,6 +1,13 @@
-const glyphs={overview:'◆',agents:'▦',tokens:'⬡',skins:'✦',how:'?'};
+import {icon} from './icons.js';
+let externalObserver;
 export function enhanceShell(root){
-  root.querySelectorAll('[data-nav]').forEach(a=>{const i=document.createElement('span');i.className='game-nav-icon';i.setAttribute('aria-hidden','true');i.textContent=glyphs[a.dataset.nav];a.prepend(i);});
+  externalObserver?.disconnect();
+  root.querySelectorAll('[data-nav]').forEach(a=>a.insertAdjacentHTML('afterbegin',icon(a.dataset.nav)));
+  const external=()=>root.querySelectorAll('a[href^="https://"]:not([data-external-icon])').forEach(a=>{a.dataset.externalIcon='true';a.insertAdjacentHTML('beforeend',icon('external'));});
+  external();
+  const observer=new MutationObserver(()=>{if(!root.isConnected){observer.disconnect();return;}external();});
+  observer.observe(root,{childList:true,subtree:true});
+  externalObserver=observer;
 }
 export function enhanceLaunch(root){
   const form=root.querySelector('#tw-create'),panel=form.querySelector('.tw-form-panel');

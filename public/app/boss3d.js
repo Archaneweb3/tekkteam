@@ -41,7 +41,7 @@ void main(){
 
 const BOSS = { skin: 0xF3BA86, hair: 0x493424, style: 'side', top: 0x2357BE, pants: 0x163A83, kind: 'suit', tie: 0xF5C451, bag: true, trim: 0x9CC9FF };
 
-export function createBoss(host, { onClick, skin = null, label } = {}) {
+export function createBoss(host, { onClick, skin = null, label, still = false, onReady } = {}) {
   const canvas = document.createElement('canvas');
   canvas.className = 'boss-gl';
   canvas.setAttribute('role', 'img');
@@ -76,10 +76,10 @@ export function createBoss(host, { onClick, skin = null, label } = {}) {
   const coinGL = upload(gl, coin);
 
   // ── state ──
-  let yaw = -0.5, pitch = 0.22, vel = 0.35;
+  let yaw = -0.5, pitch = 0.22, vel = still ? 0 : 0.35;
   let dragging = false, lastX = 0, lastY = 0, lastMove = 0, idleUntil = 0, moved = 0;
   let waveT = -10, t = 0, last = performance.now();
-  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const reduce = still || matchMedia('(prefers-reduced-motion: reduce)').matches;
   let cssW = 1, cssH = 1, raf = 0, visible = true, alive = true;
 
   const isDark = () => {
@@ -199,7 +199,8 @@ export function createBoss(host, { onClick, skin = null, label } = {}) {
       drawMesh(coinGL, chain(T(Math.cos(a) * 0.82, y, Math.sin(a) * 0.82), RY(t * 3 + i), RX(Math.PI / 2), S(0.75)));
     }
 
-    const animating = !reduce || dragging || waving || Math.abs(vel) > 0.01;
+    if (onReady) { const ready=onReady;onReady=null;ready(canvas); }
+    const animating = !still && (!reduce || dragging || waving || Math.abs(vel) > 0.01);
     if (alive && visible && !document.hidden && animating) raf = requestAnimationFrame(frame);
   }
   function kick() { if (!raf && alive) { last = performance.now(); raf = requestAnimationFrame(frame); } }

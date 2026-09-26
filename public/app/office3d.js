@@ -1,3 +1,4 @@
+import {icon} from './icons.js';
 // TEKKWORK voxel operations office, rendered with WebGL2.
 // Workstations flank a clear central aisle; action targets share scene coordinates.
 //
@@ -553,10 +554,10 @@ export function createOffice(host, { onAction } = {}) {
   const layer = document.createElement('div');
   layer.className = 'office-bubbles';
   const BUB = {
-    launch: { icon: '↗', t: 'Create agent', s: 'Bring your idea to life' },
-    shill: { icon: '✦', t: 'Share on X', s: 'Tell your story' },
-    trade: { icon: '↔', t: 'Activity', s: 'Your workspace log' },
-    how: { icon: '?', t: 'Workspace guide', s: 'Find your way around' },
+    launch: { icon: 'plus', t: 'Choose agent', s: 'Your team' },
+    shill: { icon: 'external', t: 'Share on X', s: 'Tell your story' },
+    trade: { icon: 'trade', t: 'Activity', s: 'Your workspace log' },
+    how: { icon: 'how', t: 'Workspace guide', s: 'Find your way around' },
   };
   const labelPoints = {
     launch: [LD.x - 0.72, LD.y + 0.1, LD.z + 1.34],
@@ -570,7 +571,7 @@ export function createOffice(host, { onAction } = {}) {
     b.type = 'button';
     b.className = 'ob ob-' + role;
     b.dataset.role = role;
-    b.innerHTML = `<span class="ob-no" aria-hidden="true">${BUB[role].icon}</span><span class="ob-t"><b>${BUB[role].t}</b><small>${BUB[role].s}</small></span>`;
+    b.innerHTML = `<span class="ob-no" aria-hidden="true">${icon(BUB[role].icon)}</span><span class="ob-t"><b>${BUB[role].t}</b><small>${BUB[role].s}</small></span>`;
     b.addEventListener('click', () => onAction && onAction(role));
     b.addEventListener('pointerenter', () => { hover = role; });
     b.addEventListener('pointerleave', () => { if (hover === role) hover = null; });

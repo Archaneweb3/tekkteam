@@ -4,12 +4,15 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "server:launch": "node server/pump-launch-index.js",
+    "test:pump-launch": "node --test tests/pump-launch.test.mjs tests/pump-readiness.test.mjs tests/pump-simulation-policy.test.mjs tests/initial-buy.test.mjs",
     "server": "node server/index.js",
-    "test:backend": "node --test tests/backend.test.mjs tests/chain.test.mjs",
+    "test:backend": "node --test tests/backend.test.mjs tests/chain.test.mjs tests/wallet-send.test.mjs",
+    "test:mainnet-safety": "node --test tests/mainnet-safety.test.mjs",
     "dev": "vite --host 127.0.0.1",
     "build": "vite build",
     "preview": "vite preview --host 127.0.0.1",
-    "test": "npm run test:backend && node tests/workspace.mjs && node tests/workspace-auth.mjs && node tests/character-bounds.mjs"
+    "test": "npm run test:backend && node tests/workspace.mjs && node tests/workspace-auth.mjs && node tests/confirmation-ui.mjs && node tests/character-bounds.mjs"
   },
   "dependencies": {
     "@solana/spl-token": "^0.4.15",
@@ -19,6 +22,8 @@
     "dotenv": "^18.0.4",
     "express": "^5.2.1",
     "express-rate-limit": "^8.7.0",
+    "lucide": "^1.48.0",
+    "sharp": "^0.35.4",
     "three": "^0.180.0",
     "tweetnacl": "^1.0.3"
   },

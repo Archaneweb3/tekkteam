@@ -16,6 +16,8 @@ test('TEKKWORK auth, private persistence, idempotency, ownership and launch stat
     prepare: async () => ({ transaction: 'test-transaction', message: 'expected', mint: Keypair.generate().publicKey.toBase58(), expiresAt: clock + 90000 }),
     submit: async (tx, msg) => { assert.equal(msg,'expected'); if (tx !== 'signed-expected') throw Object.assign(new Error('Invalid transaction'),{status:400}); return { signature:'test-signature', send:async () => { sends++; } }; },
     status: async () => chainStatus,
+    preflight: async()=>({simulation:'passed',network:'solana:devnet'}),
+    walletStatus: async()=>({status:chainStatus,signature:chainStatus==='confirmed'?'wallet-confirmed':undefined}),
   };
   let service = createServer({ dbPath: join(dir,'db.sqlite'), origins:[origin], network:'devnet', chain, now:()=>clock });
   let server = service.app.listen(0,'127.0.0.1'); await new Promise(r => server.once('listening',r));
@@ -72,12 +74,47 @@ test('TEKKWORK auth, private persistence, idempotency, ownership and launch stat
       assert.equal(service.store.db.prepare('SELECT payload FROM submissions WHERE agent_id=?').get(agent.id),undefined);
       assert.equal((await call(`/agents/${agent.id}/prepare`,{method:'POST',cookie:aliceSession.cookie})).status,409);
     });
+    await t.test('wallet broadcast intent prevents retry and survives unknown results',async()=>{
+      chainStatus='pending';
+      const a=(await call('/agents',{method:'POST',body:input,cookie:aliceSession.cookie,key:'wallet-send-test'})).body;
+      await call(`/agents/${a.id}/prepare`,{method:'POST',cookie:aliceSession.cookie});
+      assert.equal((await call(`/agents/${a.id}/wallet-send`,{method:'POST',cookie:bobSession.cookie,body:{message:'expected'}})).status,404);
+      assert.equal((await call(`/agents/${a.id}/wallet-send`,{method:'POST',cookie:aliceSession.cookie,body:{message:'wrong'}})).status,409);
+      assert.equal((await call(`/agents/${a.id}/wallet-send`,{method:'POST',cookie:aliceSession.cookie,body:{message:'expected'}})).status,200);
+      assert.equal((await call(`/agents/${a.id}/prepare`,{method:'POST',cookie:aliceSession.cookie,body:{fresh:true}})).status,409);
+      assert.equal((await call(`/agents/${a.id}/wallet-send`,{method:'POST',cookie:aliceSession.cookie,body:{message:'expected'}})).status,409);
+      assert.equal((await call(`/agents/${a.id}/reconcile`,{method:'POST',cookie:aliceSession.cookie})).body.status,'SUBMITTED');
+      chainStatus='confirmed';
+      const final=(await call(`/agents/${a.id}/reconcile`,{method:'POST',cookie:aliceSession.cookie})).body;
+      assert.equal(final.status,'DEVNET_LIVE');assert.equal(final.launch.signature,'wallet-confirmed');
+    });
+    await t.test('confirmation checks during worker reconciliation return pending without unlocking or duplicate RPC',async()=>{
+      const a=(await call('/agents',{method:'POST',body:input,cookie:aliceSession.cookie,key:'worker-race-test'})).body;
+      await call(`/agents/${a.id}/prepare`,{method:'POST',cookie:aliceSession.cookie});
+      await call(`/agents/${a.id}/wallet-send`,{method:'POST',cookie:aliceSession.cookie,body:{message:'expected'}});
+      let enter,release,calls=0;
+      const started=new Promise(r=>enter=r),blocked=new Promise(r=>release=r);
+      const original=chain.walletStatus;
+      chain.walletStatus=async()=>{calls++;enter();await blocked;return {status:'expired'};};
+      const worker=service.reconcilePending();await started;
+      try {
+        const result=await call(`/agents/${a.id}/reconcile`,{method:'POST',cookie:aliceSession.cookie});
+        assert.equal(result.status,202);assert.equal(result.body.status,'SUBMITTED');assert.equal(result.body.confirmationCheckInProgress,true);
+        assert.equal((await call(`/agents/${a.id}/reconcile`,{method:'POST',cookie:bobSession.cookie})).status,404);
+        assert.equal((await call(`/agents/${a.id}/prepare`,{method:'POST',cookie:aliceSession.cookie,body:{fresh:true}})).status,409);
+        assert.equal(calls,1);
+      } finally {release();await worker;chain.walletStatus=original;}
+      const result=await call(`/agents/${a.id}/reconcile`,{method:'POST',cookie:aliceSession.cookie});
+      assert.equal(result.status,200);assert.equal(result.body.status,'FAILED');assert.equal(result.body.launch.failure,'expired');
+      assert.equal(result.body.coin.mint,null);
+      assert.equal((await call(`/agents/${a.id}/prepare`,{method:'POST',cookie:aliceSession.cookie,body:{fresh:true}})).status,200);
+    });
     await t.test('stores only encrypted mint keys and survives a restart',async()=>{
       const row=service.store.db.prepare('SELECT secret FROM agents WHERE id=?').get(agent.id); assert.ok(row.secret.length>50);
       assert.throws(()=>service.store.unseal(row.secret,'different-agent'));
       await new Promise(r=>server.close(r)); service.close();
       service=createServer({dbPath:join(dir,'db.sqlite'),origins:[origin],network:'local',now:()=>clock}); server=service.app.listen(0,'127.0.0.1'); await new Promise(r=>server.once('listening',r)); base=`http://127.0.0.1:${server.address().port}/api`;
-      assert.equal((await call('/state',{cookie:aliceSession.cookie})).body.agents[0].id,agent.id);
+      assert.ok((await call('/state',{cookie:aliceSession.cookie})).body.agents.some(a=>a.id===agent.id));
       assert.equal((await call(`/agents/${agent.id}/prepare`,{method:'POST',cookie:aliceSession.cookie})).status,503);
     });
     await t.test('expires sessions and clears logout credentials',async()=>{

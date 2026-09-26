@@ -1,0 +1,23 @@
+[Unit]
+Description=TEKKWORK %i service
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=tekkwork
+Group=tekkwork
+WorkingDirectory=/opt/tekkwork
+EnvironmentFile=/etc/tekkwork/production.env
+ExecStart=/usr/bin/node /opt/tekkwork/server/%i.js
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=25
+UMask=0027
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/tekkwork
+
+[Install]
+WantedBy=multi-user.target

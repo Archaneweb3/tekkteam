@@ -1,0 +1,20 @@
+tekkwork.example.com {
+ encode gzip
+ handle_path /api/pump-launch/* {
+  rewrite * /pump-launch{uri}
+  reverse_proxy 127.0.0.1:4193 {
+   header_up Host 127.0.0.1:4193
+  }
+ }
+ handle /api/* {
+  reverse_proxy 127.0.0.1:4190
+ }
+ handle /metadata/* {
+  root * /var/lib/tekkwork/pump-metadata-site/public
+  file_server
+ }
+ handle {
+  root * /opt/tekkwork/dist
+  file_server
+ }
+}

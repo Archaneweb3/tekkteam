@@ -1,0 +1,38 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {mkdtempSync} from 'node:fs';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
+import {createHash} from 'node:crypto';
+import {Keypair} from '@solana/web3.js';
+import {createServer} from '../server/app.js';
+import {strategyIntent,riskCheck,executePaper,liveExecution,LIMITS} from '../server/paper-engine.js';
+const mint=Keypair.generate().publicKey.toBase58();
+const quote=time=>({mint,network:'solana:101',priceUsd:1,solUsd:150,liquidityUsd:50000,change5m:2,buys5m:20,sells5m:5,volume5m:2000,observedAt:time});
+test('deterministic strategies, entry/exit PnL and hard risk controls',()=>{
+ const time=1800000000000,q=quote(time),s={enabled:true,mode:'paper',strategy:'selective',mint,cashUsd:15,realizedUsd:0,dailySpentSol:0};
+ for(const strategy of ['selective','momentum'])assert.equal(strategyIntent({...s,strategy},q,time).side,'BUY');
+ const intent=strategyIntent(s,q,time),buy=executePaper(s,intent,q,time);assert.equal(buy.risk.allowed,true);assert.ok(s.position);assert.equal(buy.receipt.signature,null);
+ assert.match(riskCheck(s,intent,q,time).reason,/cooldown/);
+ const later=time+61000,down={...q,observedAt:later,priceUsd:.9};
+ const sell=executePaper(s,strategyIntent(s,down,later),down,later);assert.equal(sell.receipt.side,'SELL');assert.equal(s.position,null);assert.ok(s.realizedUsd<0);assert.ok(Math.abs(s.cashUsd-15-s.realizedUsd)<1e-10);
+ const clean={...s,lastTradeAt:0,dailySpentSol:0};
+ for(const [state,i,market] of [[{...clean,enabled:false},intent,q],[clean,{...intent,sol:1},q],[clean,intent,{...q,mint:'wrong'}],[clean,intent,{...q,liquidityUsd:1}],[{...clean,dailyDate:new Date(time).toISOString().slice(0,10),dailySpentSol:.02},intent,q],[clean,intent,{...q,observedAt:time-40000}],[{...clean,cashUsd:0},intent,q]])assert.equal(riskCheck(state,i,market,time).allowed,false);
+ assert.throws(liveExecution,/LOCKED/);assert.ok(Object.isFrozen(LIMITS));
+});
+test('wallet custody, paper loop, history, pause and live lock end-to-end',async t=>{
+ let time=1800000000000,price=1,hold=null;const owner=Keypair.generate().publicKey.toBase58();
+ const instance=createServer({dbPath:join(mkdtempSync(join(tmpdir(),'tekk-paper-')),'db.sqlite'),now:()=>time,tradingOptions:{receipt:a=>a.id==='live'?{mint}:null,market:async()=>{if(hold)await hold;return {...quote(time),priceUsd:price};},balance:async()=>0}});
+ const db=instance.store.db,server=instance.app.listen(0,'127.0.0.1');await new Promise(r=>server.once('listening',r));t.after(()=>{server.close();instance.close();});
+ db.prepare('INSERT INTO sessions VALUES(?,?,?)').run(createHash('sha256').update('paper-cookie').digest('hex'),owner,time+3600000);
+ for(const id of ['live','draft'])db.prepare('INSERT INTO agents(id,owner,data,secret) VALUES(?,?,?,?)').run(id,owner,JSON.stringify({id,creator:owner,status:'DRAFT',strategy:'selective'}),'unused');
+ const call=async(action,body={},method='POST')=>{const r=await fetch(`http://127.0.0.1:${server.address().port}/api/agents/live/trading${action?'/'+action:''}`,{method,headers:{origin:'http://127.0.0.1:5188',cookie:'tw_session=paper-cookie','content-type':'application/json'},...(method==='GET'?{}:{body:JSON.stringify(body)})});return {status:r.status,data:await r.json()};};
+ const w=await call('wallet');assert.equal(w.status,200);assert.equal(w.data.enabled,false);assert.equal((await call('wallet')).data.wallet.address,w.data.wallet.address);
+ const stored=db.prepare('SELECT * FROM agent_wallets').get();assert.ok(stored.secret);assert.doesNotMatch(JSON.stringify(w.data),/secret|privateKey/);assert.equal(JSON.parse(db.prepare('SELECT data FROM agents WHERE id=?').get('live').data).tradingWallet,w.data.wallet.address);
+ assert.equal((await call('balance')).data.wallet.balanceLamports,0);
+ assert.equal((await call('enable',{mode:'live',strategy:'selective'})).status,409);assert.equal((await call('fund')).status,409);
+ assert.equal((await call('enable',{mode:'paper',strategy:'selective',maxTradeSol:100})).status,200);
+ await instance.paperTick();let state=(await call('',{},'GET')).data;assert.equal(state.activity[0].type,'BUY');assert.equal(state.wallet.balanceLamports,0);assert.equal(state.limits.maxTradeSol,.001);
+ time+=61000;price=.9;await instance.paperTick();state=(await call('',{},'GET')).data;assert.equal(state.activity[0].type,'SELL');assert.equal(state.position,null);assert.ok(state.realizedPnlUsd<0);
+ time+=61000;let release;hold=new Promise(r=>release=r);const pending=instance.paperTick();await new Promise(r=>setTimeout(r,10));assert.equal((await call('pause')).data.enabled,false);release();await pending;hold=null;assert.equal((await call('',{},'GET')).data.activity.filter(e=>['BUY','SELL'].includes(e.type)).length,2);
+});
