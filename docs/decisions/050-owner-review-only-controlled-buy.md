@@ -1,0 +1,7 @@
+# 050 — Prepare-only owner review for the first Controlled Real BUY
+
+The one authorized acceptance operation may create a fresh, immutable Mainnet preparation for owner review without arming Agent Wallet signing or broadcasting. `CONTROLLED_BUY_PREPARE_ENABLED` gates only the narrow first-buy prepare route. The route continues to enforce authenticated ownership, fixed mint/pool/input acceptance policy, fresh Mainnet provenance, Risk Engine, atomic balance reservation, full validator, and exact-message unsigned simulation before entering `PREPARED`.
+
+The production adapter remains `allowValueMovement:false`; `/confirm` rejects independently of the prepare gate. Funding, withdrawal, autonomous Live, and the global trading kill switch remain closed. The global real-money emergency stop remains active; a prepare-only policy override is confined to the unsigned executor path and never arms signing or sending. A preparation cannot be promoted from an earlier dry-run. The owner review capability is short-lived and tied to the persisted exact message, reservation, and intent.
+
+If any prepare check fails, there is no owner-confirmable preparation and unsigned reservations are released by the existing state machine. This decision does not authorize confirmation, signing, broadcasting, or another candidate. The existing local application serves the authenticated agent record while the Controlled Real adapter independently pins and verifies Solana Mainnet RPC state; the application-wide Devnet setting is not a substitute for that adapter's Mainnet checks.

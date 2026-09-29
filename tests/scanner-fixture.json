@@ -1,0 +1,724 @@
+{
+  "agent": {
+    "id": "scanner-fixture",
+    "name": "Scanner QA",
+    "characterId": "frank",
+    "strategy": "balanced"
+  },
+  "radar": {
+    "agentId": "scanner-fixture",
+    "mode": "paper",
+    "liveLocked": true,
+    "status": "SCANNING",
+    "serverTime": 1790482315422,
+    "configVersion": 2,
+    "strategy": "balanced",
+    "lastEvaluated": 1790482315422,
+    "lastChecked": 1790482315422,
+    "opportunities": [
+      {
+        "id": "a98ef126-ce84-413f-8eec-a3338137df80",
+        "agentId": "scanner-fixture",
+        "mode": "paper",
+        "timestamp": 1790482315422,
+        "market": {
+          "mint": "52vUra95EmWkmRf4LytKQebaWiapzULguoaZHsJrJzNy",
+          "symbol": "QA1",
+          "name": "Fixture market 1",
+          "network": "solana:101",
+          "source": "Synthetic QA inputs",
+          "pair": null,
+          "venue": null,
+          "priceUsd": 0.01,
+          "solUsd": 150,
+          "liquidityUsd": 50000,
+          "volume5m": 2000,
+          "change5m": 2,
+          "buys5m": 20,
+          "sells5m": 5,
+          "observedAt": 1790482315422,
+          "snapshotId": null,
+          "timestampKind": "Synthetic test timestamp"
+        },
+        "strategy": "balanced",
+        "configVersion": 2,
+        "config": {
+          "strategy": "balanced",
+          "signal": {
+            "minLiquidityUsd": 15000,
+            "minVolume5mUsd": 750,
+            "minPriceChange5mPercent": 0.75
+          },
+          "risk": {
+            "maxSolPerTrade": 0.001,
+            "maxPositionPercent": 10,
+            "maxDailySpendSol": 0.02,
+            "maxOpenPositions": 1
+          },
+          "execution": {
+            "maxSlippageBps": 100,
+            "cooldownSeconds": 60
+          },
+          "position": {
+            "stopLossPercent": 3.5,
+            "takeProfitPercent": 6
+          }
+        },
+        "signalChecks": [
+          {
+            "key": "liquidityPassed",
+            "passed": true,
+            "actual": 50000,
+            "minimum": 15000,
+            "maximum": null
+          },
+          {
+            "key": "volumePassed",
+            "passed": true,
+            "actual": 2000,
+            "minimum": 750,
+            "maximum": null
+          },
+          {
+            "key": "momentumPassed",
+            "passed": true,
+            "actual": 2,
+            "minimum": 0.75,
+            "maximum": 10
+          },
+          {
+            "key": "ratioPassed",
+            "passed": true,
+            "actual": 4,
+            "minimum": 1.25,
+            "maximum": null
+          }
+        ],
+        "signalContext": "Entry filters",
+        "tradeIntent": {
+          "id": "scanner-fixture:1790482315422:BUY",
+          "action": "BUY",
+          "tokenMint": "52vUra95EmWkmRf4LytKQebaWiapzULguoaZHsJrJzNy",
+          "requestedSizeSol": 0.001,
+          "reason": "balanced entry thresholds met"
+        },
+        "risk": {
+          "allowed": true,
+          "reason": null,
+          "reasons": [],
+          "checks": {
+            "configuration": true,
+            "timestamp": true,
+            "killSwitch": true,
+            "mode": true,
+            "allowlist": true,
+            "maxTrade": true,
+            "freshness": true,
+            "price": true,
+            "liquidity": true,
+            "accounting": true,
+            "nativeAccounting": true,
+            "dailyState": true,
+            "cooldownState": null,
+            "cooldown": true,
+            "dailyAmount": true,
+            "dailyLimit": true,
+            "slippage": true,
+            "openPositions": true,
+            "positionSize": true,
+            "balance": true,
+            "sellPosition": null,
+            "positionAccounting": null,
+            "exitFee": null
+          },
+          "impactBps": 26,
+          "adjustedSizeSol": 0.001
+        },
+        "finalDecision": "BUY",
+        "positionState": "POSITION_OPEN",
+        "reason": {
+          "code": "BUY",
+          "summary": "balanced entry thresholds met",
+          "failedSignals": []
+        },
+        "executedSizeSol": 0.001,
+        "eligible": true,
+        "opportunityState": "POSITION_OPEN"
+      },
+      {
+        "id": "0597d09d-8768-4e8d-ae2c-07abae136542",
+        "agentId": "scanner-fixture",
+        "mode": "paper",
+        "timestamp": 1790482315422,
+        "market": {
+          "mint": "9Zr2VxpTEZzhGYidEFx93z2xDPBTmoCESHatH9pRBPtu",
+          "symbol": "QA3",
+          "name": "Fixture market 3",
+          "network": "solana:101",
+          "source": "Synthetic QA inputs",
+          "pair": null,
+          "venue": null,
+          "priceUsd": 0.01,
+          "solUsd": 150,
+          "liquidityUsd": 48000,
+          "volume5m": 2000,
+          "change5m": 2,
+          "buys5m": 20,
+          "sells5m": 5,
+          "observedAt": 1790482315422,
+          "snapshotId": null,
+          "timestampKind": "Synthetic test timestamp"
+        },
+        "strategy": "balanced",
+        "configVersion": 2,
+        "config": {
+          "strategy": "balanced",
+          "signal": {
+            "minLiquidityUsd": 15000,
+            "minVolume5mUsd": 750,
+            "minPriceChange5mPercent": 0.75
+          },
+          "risk": {
+            "maxSolPerTrade": 0.001,
+            "maxPositionPercent": 10,
+            "maxDailySpendSol": 0.02,
+            "maxOpenPositions": 1
+          },
+          "execution": {
+            "maxSlippageBps": 100,
+            "cooldownSeconds": 60
+          },
+          "position": {
+            "stopLossPercent": 3.5,
+            "takeProfitPercent": 6
+          }
+        },
+        "signalChecks": [
+          {
+            "key": "liquidityPassed",
+            "passed": true,
+            "actual": 48000,
+            "minimum": 15000,
+            "maximum": null
+          },
+          {
+            "key": "volumePassed",
+            "passed": true,
+            "actual": 2000,
+            "minimum": 750,
+            "maximum": null
+          },
+          {
+            "key": "momentumPassed",
+            "passed": true,
+            "actual": 2,
+            "minimum": 0.75,
+            "maximum": 10
+          },
+          {
+            "key": "ratioPassed",
+            "passed": true,
+            "actual": 4,
+            "minimum": 1.25,
+            "maximum": null
+          }
+        ],
+        "tradeIntent": null,
+        "risk": null,
+        "finalDecision": "SKIPPED",
+        "positionState": null,
+        "reason": {
+          "code": "WAITING_FOR_CAPACITY",
+          "summary": "One position is already open. Entry evaluation waits for capacity.",
+          "failedSignals": []
+        },
+        "opportunityState": "WAITING_FOR_CAPACITY",
+        "eligible": true,
+        "signalContext": "Entry filters for queue ordering; no TradeIntent or risk evaluation yet"
+      },
+      {
+        "id": "7193cf82-15a9-4454-b1bc-5ccac464c59d",
+        "agentId": "scanner-fixture",
+        "mode": "paper",
+        "timestamp": 1790482315422,
+        "market": {
+          "mint": "CYaG66aWMKXMHvvfjDjpAy8XSurjWGrPsPS2ucEaC5sC",
+          "symbol": "QA5",
+          "name": "Fixture market 5",
+          "network": "solana:101",
+          "source": "Synthetic QA inputs",
+          "pair": null,
+          "venue": null,
+          "priceUsd": 0.01,
+          "solUsd": 150,
+          "liquidityUsd": 46000,
+          "volume5m": 2000,
+          "change5m": 2,
+          "buys5m": 20,
+          "sells5m": 5,
+          "observedAt": 1790482315422,
+          "snapshotId": null,
+          "timestampKind": "Synthetic test timestamp"
+        },
+        "strategy": "balanced",
+        "configVersion": 2,
+        "config": {
+          "strategy": "balanced",
+          "signal": {
+            "minLiquidityUsd": 15000,
+            "minVolume5mUsd": 750,
+            "minPriceChange5mPercent": 0.75
+          },
+          "risk": {
+            "maxSolPerTrade": 0.001,
+            "maxPositionPercent": 10,
+            "maxDailySpendSol": 0.02,
+            "maxOpenPositions": 1
+          },
+          "execution": {
+            "maxSlippageBps": 100,
+            "cooldownSeconds": 60
+          },
+          "position": {
+            "stopLossPercent": 3.5,
+            "takeProfitPercent": 6
+          }
+        },
+        "signalChecks": [
+          {
+            "key": "liquidityPassed",
+            "passed": true,
+            "actual": 46000,
+            "minimum": 15000,
+            "maximum": null
+          },
+          {
+            "key": "volumePassed",
+            "passed": true,
+            "actual": 2000,
+            "minimum": 750,
+            "maximum": null
+          },
+          {
+            "key": "momentumPassed",
+            "passed": true,
+            "actual": 2,
+            "minimum": 0.75,
+            "maximum": 10
+          },
+          {
+            "key": "ratioPassed",
+            "passed": true,
+            "actual": 4,
+            "minimum": 1.25,
+            "maximum": null
+          }
+        ],
+        "tradeIntent": null,
+        "risk": null,
+        "finalDecision": "SKIPPED",
+        "positionState": null,
+        "reason": {
+          "code": "WAITING_FOR_CAPACITY",
+          "summary": "One position is already open. Entry evaluation waits for capacity.",
+          "failedSignals": []
+        },
+        "opportunityState": "WAITING_FOR_CAPACITY",
+        "eligible": true,
+        "signalContext": "Entry filters for queue ordering; no TradeIntent or risk evaluation yet"
+      },
+      {
+        "id": "2c1a884b-cf7a-410f-8c2e-d8ce2e6b423a",
+        "agentId": "scanner-fixture",
+        "mode": "paper",
+        "timestamp": 1790482315422,
+        "market": {
+          "mint": "D5raznaZ5zN8E3eMjFAqfSeYgRiz3gLBj92c1zNwpQ8n",
+          "symbol": "QA2",
+          "name": "Fixture market 2",
+          "network": "solana:101",
+          "source": "Synthetic QA inputs",
+          "pair": null,
+          "venue": null,
+          "priceUsd": 0.01,
+          "solUsd": 150,
+          "liquidityUsd": 49000,
+          "volume5m": 2000,
+          "change5m": 0.2,
+          "buys5m": 20,
+          "sells5m": 5,
+          "observedAt": 1790482315422,
+          "snapshotId": null,
+          "timestampKind": "Synthetic test timestamp"
+        },
+        "strategy": "balanced",
+        "configVersion": 2,
+        "config": {
+          "strategy": "balanced",
+          "signal": {
+            "minLiquidityUsd": 15000,
+            "minVolume5mUsd": 750,
+            "minPriceChange5mPercent": 0.75
+          },
+          "risk": {
+            "maxSolPerTrade": 0.001,
+            "maxPositionPercent": 10,
+            "maxDailySpendSol": 0.02,
+            "maxOpenPositions": 1
+          },
+          "execution": {
+            "maxSlippageBps": 100,
+            "cooldownSeconds": 60
+          },
+          "position": {
+            "stopLossPercent": 3.5,
+            "takeProfitPercent": 6
+          }
+        },
+        "signalChecks": [
+          {
+            "key": "liquidityPassed",
+            "passed": true,
+            "actual": 49000,
+            "minimum": 15000,
+            "maximum": null
+          },
+          {
+            "key": "volumePassed",
+            "passed": true,
+            "actual": 2000,
+            "minimum": 750,
+            "maximum": null
+          },
+          {
+            "key": "momentumPassed",
+            "passed": false,
+            "actual": 0.2,
+            "minimum": 0.75,
+            "maximum": 10
+          },
+          {
+            "key": "ratioPassed",
+            "passed": true,
+            "actual": 4,
+            "minimum": 1.25,
+            "maximum": null
+          }
+        ],
+        "tradeIntent": null,
+        "risk": null,
+        "finalDecision": "SKIPPED",
+        "positionState": null,
+        "reason": {
+          "code": "WAITING_FOR_CAPACITY",
+          "summary": "One position is already open. Entry evaluation waits for capacity.",
+          "failedSignals": []
+        },
+        "opportunityState": "WAITING_FOR_CAPACITY",
+        "eligible": true,
+        "signalContext": "Entry filters for queue ordering; no TradeIntent or risk evaluation yet"
+      },
+      {
+        "id": "2052865f-4f3a-4c57-a02f-da1cf335dbde",
+        "agentId": "scanner-fixture",
+        "mode": "paper",
+        "timestamp": 1790482315422,
+        "market": {
+          "mint": "mtiGnAqWqanucFUgUUhxx94SitkDkAWRhwPWg9jKfwF",
+          "symbol": "QA4",
+          "name": "Fixture market 4",
+          "network": "solana:101",
+          "source": "Synthetic QA inputs",
+          "pair": null,
+          "venue": null,
+          "priceUsd": 0.01,
+          "solUsd": 150,
+          "liquidityUsd": 47000,
+          "volume5m": 2000,
+          "change5m": 0.2,
+          "buys5m": 20,
+          "sells5m": 5,
+          "observedAt": 1790482315422,
+          "snapshotId": null,
+          "timestampKind": "Synthetic test timestamp"
+        },
+        "strategy": "balanced",
+        "configVersion": 2,
+        "config": {
+          "strategy": "balanced",
+          "signal": {
+            "minLiquidityUsd": 15000,
+            "minVolume5mUsd": 750,
+            "minPriceChange5mPercent": 0.75
+          },
+          "risk": {
+            "maxSolPerTrade": 0.001,
+            "maxPositionPercent": 10,
+            "maxDailySpendSol": 0.02,
+            "maxOpenPositions": 1
+          },
+          "execution": {
+            "maxSlippageBps": 100,
+            "cooldownSeconds": 60
+          },
+          "position": {
+            "stopLossPercent": 3.5,
+            "takeProfitPercent": 6
+          }
+        },
+        "signalChecks": [
+          {
+            "key": "liquidityPassed",
+            "passed": true,
+            "actual": 47000,
+            "minimum": 15000,
+            "maximum": null
+          },
+          {
+            "key": "volumePassed",
+            "passed": true,
+            "actual": 2000,
+            "minimum": 750,
+            "maximum": null
+          },
+          {
+            "key": "momentumPassed",
+            "passed": false,
+            "actual": 0.2,
+            "minimum": 0.75,
+            "maximum": 10
+          },
+          {
+            "key": "ratioPassed",
+            "passed": true,
+            "actual": 4,
+            "minimum": 1.25,
+            "maximum": null
+          }
+        ],
+        "tradeIntent": null,
+        "risk": null,
+        "finalDecision": "SKIPPED",
+        "positionState": null,
+        "reason": {
+          "code": "WAITING_FOR_CAPACITY",
+          "summary": "One position is already open. Entry evaluation waits for capacity.",
+          "failedSignals": []
+        },
+        "opportunityState": "WAITING_FOR_CAPACITY",
+        "eligible": true,
+        "signalContext": "Entry filters for queue ordering; no TradeIntent or risk evaluation yet"
+      },
+      {
+        "id": "a557dbfe-362e-4b04-8af2-ffa6a1adf42a",
+        "agentId": "scanner-fixture",
+        "mode": "paper",
+        "timestamp": 1790482315422,
+        "market": {
+          "mint": "2pzxJmMt7Pq6xx8nRg3Wk8DDNci8KACenbmiBzNudJbS",
+          "symbol": "QA6",
+          "name": "Fixture market 6",
+          "network": "solana:101",
+          "source": "Synthetic QA inputs",
+          "pair": null,
+          "venue": null,
+          "priceUsd": 0.01,
+          "solUsd": 150,
+          "liquidityUsd": 45000,
+          "volume5m": 100,
+          "change5m": 0.2,
+          "buys5m": 20,
+          "sells5m": 5,
+          "observedAt": 1790482315422,
+          "snapshotId": null,
+          "timestampKind": "Synthetic test timestamp"
+        },
+        "strategy": "balanced",
+        "configVersion": 2,
+        "config": {
+          "strategy": "balanced",
+          "signal": {
+            "minLiquidityUsd": 15000,
+            "minVolume5mUsd": 750,
+            "minPriceChange5mPercent": 0.75
+          },
+          "risk": {
+            "maxSolPerTrade": 0.001,
+            "maxPositionPercent": 10,
+            "maxDailySpendSol": 0.02,
+            "maxOpenPositions": 1
+          },
+          "execution": {
+            "maxSlippageBps": 100,
+            "cooldownSeconds": 60
+          },
+          "position": {
+            "stopLossPercent": 3.5,
+            "takeProfitPercent": 6
+          }
+        },
+        "signalChecks": [],
+        "tradeIntent": null,
+        "risk": null,
+        "finalDecision": "SKIPPED",
+        "positionState": null,
+        "reason": {
+          "code": "MINIMUM_VOLUME",
+          "summary": "Not eligible: MINIMUM VOLUME",
+          "failedSignals": []
+        },
+        "opportunityState": "SKIPPED",
+        "eligible": false
+      }
+    ],
+    "counts": {
+      "scanned": 6,
+      "eligible": 5,
+      "watching": 4,
+      "evaluated": 1
+    },
+    "rejections": [
+      {
+        "mint": "2pzxJmMt7Pq6xx8nRg3Wk8DDNci8KACenbmiBzNudJbS",
+        "reason": "MINIMUM_VOLUME"
+      }
+    ],
+    "scope": "Dexscreener latest token profiles · up to 24 Solana mints; not all markets or trending tokens.",
+    "limits": {
+      "maxRadarCandidates": 8,
+      "maxActiveEvaluations": 3
+    },
+    "freshnessMs": 30000
+  },
+  "decisions": [
+    {
+      "id": "a98ef126-ce84-413f-8eec-a3338137df80",
+      "agentId": "scanner-fixture",
+      "mode": "paper",
+      "timestamp": 1790482315422,
+      "market": {
+        "mint": "52vUra95EmWkmRf4LytKQebaWiapzULguoaZHsJrJzNy",
+        "symbol": "QA1",
+        "name": "Fixture market 1",
+        "network": "solana:101",
+        "source": "Synthetic QA inputs",
+        "pair": null,
+        "venue": null,
+        "priceUsd": 0.01,
+        "solUsd": 150,
+        "liquidityUsd": 50000,
+        "volume5m": 2000,
+        "change5m": 2,
+        "buys5m": 20,
+        "sells5m": 5,
+        "observedAt": 1790482315422,
+        "snapshotId": null,
+        "timestampKind": "Synthetic test timestamp"
+      },
+      "strategy": "balanced",
+      "configVersion": 2,
+      "config": {
+        "strategy": "balanced",
+        "signal": {
+          "minLiquidityUsd": 15000,
+          "minVolume5mUsd": 750,
+          "minPriceChange5mPercent": 0.75
+        },
+        "risk": {
+          "maxSolPerTrade": 0.001,
+          "maxPositionPercent": 10,
+          "maxDailySpendSol": 0.02,
+          "maxOpenPositions": 1
+        },
+        "execution": {
+          "maxSlippageBps": 100,
+          "cooldownSeconds": 60
+        },
+        "position": {
+          "stopLossPercent": 3.5,
+          "takeProfitPercent": 6
+        }
+      },
+      "signalChecks": [
+        {
+          "key": "liquidityPassed",
+          "passed": true,
+          "actual": 50000,
+          "minimum": 15000,
+          "maximum": null
+        },
+        {
+          "key": "volumePassed",
+          "passed": true,
+          "actual": 2000,
+          "minimum": 750,
+          "maximum": null
+        },
+        {
+          "key": "momentumPassed",
+          "passed": true,
+          "actual": 2,
+          "minimum": 0.75,
+          "maximum": 10
+        },
+        {
+          "key": "ratioPassed",
+          "passed": true,
+          "actual": 4,
+          "minimum": 1.25,
+          "maximum": null
+        }
+      ],
+      "signalContext": "Entry filters",
+      "tradeIntent": {
+        "id": "scanner-fixture:1790482315422:BUY",
+        "action": "BUY",
+        "tokenMint": "52vUra95EmWkmRf4LytKQebaWiapzULguoaZHsJrJzNy",
+        "requestedSizeSol": 0.001,
+        "reason": "balanced entry thresholds met"
+      },
+      "risk": {
+        "allowed": true,
+        "reason": null,
+        "reasons": [],
+        "checks": {
+          "configuration": true,
+          "timestamp": true,
+          "killSwitch": true,
+          "mode": true,
+          "allowlist": true,
+          "maxTrade": true,
+          "freshness": true,
+          "price": true,
+          "liquidity": true,
+          "accounting": true,
+          "nativeAccounting": true,
+          "dailyState": true,
+          "cooldownState": null,
+          "cooldown": true,
+          "dailyAmount": true,
+          "dailyLimit": true,
+          "slippage": true,
+          "openPositions": true,
+          "positionSize": true,
+          "balance": true,
+          "sellPosition": null,
+          "positionAccounting": null,
+          "exitFee": null
+        },
+        "impactBps": 26,
+        "adjustedSizeSol": 0.001
+      },
+      "finalDecision": "BUY",
+      "positionState": "POSITION_OPEN",
+      "reason": {
+        "code": "BUY",
+        "summary": "balanced entry thresholds met",
+        "failedSignals": []
+      },
+      "executedSizeSol": 0.001,
+      "eligible": true,
+      "opportunityState": "POSITION_OPEN"
+    }
+  ]
+}

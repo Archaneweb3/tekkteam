@@ -1,0 +1,66 @@
+{
+  "before": {
+    "checkedAt": "2026-09-27T07:56:03.675Z",
+    "dbPath": "C:\\Users\\budir\\Music\\tekkteam\\server\\data\\tekkwork.sqlite",
+    "walletCount": 1,
+    "address": "7Bt9Q3EciD8ZhoRA6CviqwpLpGhn4tscPrsKfUqGfFVe",
+    "walletRecordCount": 7,
+    "walletLedgerHash": "9cacd17c08353de3d5949aafd10e05e841eca242c3832d9c6776b793d3c232f1",
+    "activeWalletRequests": 0,
+    "counts": {
+      "dex_executions": 0,
+      "dex_receipts": 0,
+      "dex_positions": 0,
+      "real_reserved_accounts": 0
+    },
+    "ownerBalance": {
+      "context": {
+        "apiVersion": "4.3.0",
+        "slot": 450935757
+      },
+      "value": 107067872
+    },
+    "agentBalance": {
+      "context": {
+        "apiVersion": "4.3.0",
+        "slot": 450935757
+      },
+      "value": 4995000
+    },
+    "accountCost": {
+      "missing": 2,
+      "rentEach": "1488440",
+      "peakRent": "2976880"
+    },
+    "flags": {
+      "FUNDING_ENABLED": "false",
+      "WITHDRAWAL_ENABLED": "false",
+      "CONTROLLED_REAL_ENABLED": "false",
+      "LIVE_TRADING_ENABLED": "false",
+      "GLOBAL_TRADING_KILL_SWITCH": "true"
+    },
+    "credentialConfigured": true
+  },
+  "after": {
+    "walletRecordCount": 7,
+    "walletLedgerHash": "9cacd17c08353de3d5949aafd10e05e841eca242c3832d9c6776b793d3c232f1",
+    "activeWalletRequests": 0,
+    "counts": {
+      "dex_executions": 0,
+      "dex_receipts": 0,
+      "dex_positions": 0,
+      "dex_real_expenses": 0,
+      "real_balance_reservations": 0,
+      "real_reserved_accounts": 0
+    },
+    "credentialLeakScan": {
+      "scannedFiles": 629,
+      "matches": 0
+    }
+  },
+  "backendPid": 34832,
+  "endpoint": "http://127.0.0.1:4190/api/health",
+  "realSwapSigned": false,
+  "realSwapBroadcast": false,
+  "gate": "NOT_READY"
+}

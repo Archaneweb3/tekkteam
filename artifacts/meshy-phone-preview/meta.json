@@ -1,0 +1,33 @@
+{
+  "resource": "text-to-3d",
+  "task": {
+    "id": "01a0dfa7-b60f-71e3-b79e-687551e82cd1",
+    "type": "text-to-3d-preview",
+    "name": "",
+    "status": "SUCCEEDED",
+    "progress": 100,
+    "preceding_tasks": 0,
+    "created_at": 1790458707033,
+    "started_at": 1790458707050,
+    "finished_at": 1790458746099,
+    "expires_at": 0,
+    "task_error": null,
+    "model_urls": {
+      "glb": "https://assets.meshy.ai/4d0198b5-14af-4e84-8ea3-2e974e4fa8b8/tasks/01a0dfa7-b60f-71e3-b79e-687551e82cd1/output/model.glb?Expires=4943980800&Signature=q2U23dhn9loQdznJZonFIoEkk7Hurqeoap57XnvE9XpnsPcMtJqPZ5plSTB86Vr~4NbIwt1pJVAuEc4RV1IiRoDBO6M-ODMHrjmIbgw3SRCf7JVesCdHNEIRLxFMHymFna4KL9bOUdGl9A2y0UTzGWov1ppuKWAaiDh69R-7vteWK9vMiCPxi3PnhbZcfnvYqkmDNr9rukIy2LiCswcR4VHSm~zSTMiL9U4N3vgw-ZEy6~~rPKNwV26VuQV7RLFao8Q0mMFKEalMjj8pA5GNlJDSvYPDQb0NyKT82bu5o5T~PISz1Dt2r8CpgD4dfj1cXSk79~DfLtcaABQbzoGJBA__&Key-Pair-Id=K1VGYTHIYLM9UM"
+    },
+    "texture_urls": [],
+    "thumbnail_url": "https://assets.meshy.ai/4d0198b5-14af-4e84-8ea3-2e974e4fa8b8/tasks/01a0dfa7-b60f-71e3-b79e-687551e82cd1/output/preview.png?Expires=4943980800&Signature=UlBBBXUOiTSCwX8WOv65IT0nWVPw5rW6y~AwH1~8nQdIgWdb2amX5aUow9yWPxNgwqT-~xjCvScOGytHwpfYa2rlgKl8WIrpaxKmSz6~B8PWV0Do8PI22lQyRmnNhZi3-KSljQkMrg5XCsqxD-eWmIVu5J7H3A8CWf6f3MayeQQP-w9RMGoxdIyrMJ58wwve~Ie9K80IgaWsON~Mqg-vvbQ5bVV8ZDSLNJ5jOmjgMzzni5TU6OLdRz3qNsaU8uwDAZ7rfYJ9RyaWfnhE1eklVIMKZ8e0AZpoeFE2tAJREyQPQf9-Ek2ae7KT3lHQ3RF-HV2b7l4kHfA390pE7Ioy9w__&Key-Pair-Id=K1VGYTHIYLM9UM",
+    "consumed_credits": 20,
+    "prompt": "Original stylized chunky handheld terminal for a playful voxel agent workspace, upright portrait body, deep beveled octagonal corners, thick navy blue shell, stepped cobalt edge rails, small gold utility latch centered along bottom edge, two narrow side buttons. Large flat rectangular inset blank black screen, separate flat screen surface. No screen graphics, no text, no logo, no camera notch, no antenna, no stand. Clean low-poly game prop, symmetrical front, solid watertight body, isolated single object.",
+    "texture_prompt": "",
+    "texture_image_url": "",
+    "mode": "preview",
+    "model_type": "standard",
+    "seed": 3927123149
+  },
+  "saved_files": [
+    "artifacts\\meshy-phone-preview\\model.glb",
+    "artifacts\\meshy-phone-preview\\thumbnail.png"
+  ],
+  "downloaded_at": "2026-09-26T21:39:14.557Z"
+}

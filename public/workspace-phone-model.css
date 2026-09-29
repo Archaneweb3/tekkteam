@@ -1,0 +1,61 @@
+/* Modern original smartphone hardware; real activity remains accessible DOM. */
+.workforce-device.phone-model-device .workforce-phone{position:relative;width:100%;height:520px;transform:perspective(1000px) rotateY(-5deg) rotateZ(5deg)!important;filter:drop-shadow(0 20px 22px #010722a0);}
+.phone-model-surface{position:absolute;inset:0;pointer-events:none;}
+.phone-model-surface canvas{display:block;width:100%;height:100%;}
+.phone-model-device .phone-screen *{box-sizing:border-box;}
+.phone-model-device .phone-front{position:absolute!important;inset:0!important;border:0!important;background:none!important;box-shadow:none!important;border-radius:0!important;transform:none!important;padding:0!important;pointer-events:none;}
+.phone-model-device .phone-screen{position:absolute!important;left:17.5%!important;top:8.5%!important;width:65%!important;height:83%!important;box-sizing:border-box;border-radius:18px!important;border:0!important;background:#081333!important;padding:14px 10px 10px!important;overflow:hidden;box-shadow:inset 0 0 10px #0007;pointer-events:auto;display:flex;flex-direction:column;}
+.phone-model-device .phone-screen>header{display:flex;align-items:center;justify-content:center;gap:5px;padding:4px 0 12px;margin:0;background:none;border:0;flex:none;}
+.phone-model-device .phone-screen>header>strong{font-family:'Lilita One',sans-serif;font-size:23px;color:#ffda4e;font-weight:400;letter-spacing:-.04em;}
+.phone-model-device .phone-brand{display:none;}
+.phone-model-device .phone-screen-heading{display:flex;align-items:center;justify-content:space-between;gap:4px;padding:8px 0 11px;margin:0;border-bottom:1px solid #314e904d;flex:none;}
+.phone-model-device .phone-screen-heading h2{font-family:'Lilita One',sans-serif;font-size:16px!important;margin:0;line-height:1.2;color:#fff6e9;white-space:nowrap;flex:none;}
+.phone-model-device .phone-paper{font-size:9px;line-height:1;display:flex;align-items:center;gap:4px;padding:0;border:0;background:none;color:#c2d5ff;}
+.phone-model-device .phone-paper i{display:inline-block;width:5px;height:5px;border-radius:50%;background:#28e59b;}
+.phone-model-device [data-device-feed]{flex:1;min-height:0;padding:0!important;overflow:auto;scrollbar-width:none;}
+.phone-model-device .phone-events{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:2px;}
+.phone-model-device .phone-events li{display:flex;align-items:center;position:relative;gap:6px;min-height:60px;padding:10px 5px;margin:0;border:0;border-bottom:1px solid #4168b82b;background:linear-gradient(110deg,#15357787,#0c204c48);border-radius:4px;}
+.phone-model-device .phone-events li>div{min-width:0;flex:1;}
+.phone-model-device .phone-agent-portrait{width:34px;height:43px;object-fit:contain;flex:0 0 34px;}
+.phone-model-device .phone-event-symbol{width:30px;height:36px;flex:0 0 30px;border:0;background:#1c39764d;color:#779bda;display:grid;place-items:center;}
+.phone-model-device .phone-event-symbol svg{width:21px;height:21px;}
+.phone-model-device .phone-events strong{display:block;font-size:12px;font-weight:800;color:#f4f1ec;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.phone-model-device .phone-events p{font-size:10px;line-height:1.4;margin:3px 0 0;color:#a8b9d9;overflow:hidden;text-overflow:ellipsis;}
+.phone-model-device .phone-events small{display:block;font-size:9px;line-height:1.4;max-height:26px;overflow:hidden;color:#98acce;}
+.phone-model-device .phone-events time{font-size:8px;align-self:center;color:#b0c1df;white-space:nowrap;}
+.phone-model-device .phone-event-buy{color:#2aee99!important;}.phone-model-device .phone-event-sell{color:#ff737c!important;}.phone-model-device .phone-event-decision{color:#bdc8df!important;}
+.phone-model-device .phone-idle-note{font-size:9px;line-height:1.3;color:#99afd7;padding:7px 3px;}
+.phone-model-device .phone-idle-rows li{min-height:52px;padding:9px 4px;}.phone-model-device .phone-idle-rows strong{font-size:11px;}.phone-model-device .phone-idle-rows p{font-size:9px;}
+.phone-model-device .phone-screen footer{font-size:8px;padding:8px 0 0;margin:0;border-top:1px solid #314e904d;flex:none;white-space:nowrap;color:#9db4da;}
+.phone-model-device .device-caption{bottom:-8px;}
+.phone-model-device:not(.phone-model-ready) .phone-model-surface{border:7px solid #173773;border-radius:36px;background:#091c3e;box-shadow:inset 0 0 0 2px #4469b8;inset:5% 11%;}
+@media(prefers-reduced-motion:reduce){.workforce-device.phone-model-device .workforce-phone{transform:none!important;}}
+/* Blue laminated bezel and screen chrome; no baked or fabricated activity. */
+.phone-model-device .phone-front:before{content:'';position:absolute;left:14%;top:5.5%;width:72%;height:89%;box-sizing:border-box;pointer-events:none;border-radius:30px;border:2px solid #7c9cff;background:linear-gradient(110deg,#101d64,#152d84 48%,#294cca 75%,#101846);box-shadow:inset 0 0 0 3px #06112d,inset -7px 0 #334b9b,5px 2px 0 #192663,8px 3px 0 #3b51a4,10px 6px 0 #091334;}
+.phone-model-device .phone-screen{top:7.2%!important;height:85%!important;border-radius:23px!important;padding:7px 9px 8px!important;background:linear-gradient(150deg,#061132,#091b4c 60%,#07132c)!important;box-shadow:0 0 0 2px #020a20,inset 0 1px #395b9e;}
+.phone-status-bar{height:18px;flex:none;display:flex;align-items:center;justify-content:space-between;position:relative;color:#dfeaff;font:700 7px/1 'Nunito Sans',sans-serif;padding:0 3px;}
+.phone-status-bar svg{width:26px;height:10px;}
+.phone-notch{position:absolute;left:33%;top:-7px;width:37%;height:13px;border-radius:0 0 8px 8px;background:#02091c;box-shadow:inset 0 -1px #172348;}
+.phone-notch:after{content:'';position:absolute;right:10px;top:4px;width:4px;height:4px;border-radius:50%;background:#12274b;box-shadow:0 0 0 1px #070e20;}
+.phone-model-device .phone-screen>header{position:relative;padding:4px 0 9px;}
+.phone-model-device .phone-screen>header>strong{font-size:21px;text-shadow:0 2px #573b14;}
+.phone-bolt{position:absolute;right:2px;width:18px;height:21px;}
+.phone-model-device .phone-screen-heading{padding:6px 0 8px;}
+.phone-model-device .phone-screen-heading h2{font-size:15px!important;letter-spacing:.01em;}
+.phone-model-device .phone-paper{font-size:9px;text-transform:none;}
+.phone-model-device .phone-events li{background:linear-gradient(110deg,#10265c,#0c1d49);border:1px solid #25427a66;border-radius:4px;min-height:57px;padding:8px 4px;}
+.phone-model-device .phone-idle-rows li{min-height:54px;}
+.phone-model-device .phone-agent-portrait{width:37px;height:44px;flex-basis:37px;}
+.phone-yellow-tab{position:absolute;left:44%;bottom:3.4%;width:21%;height:12px;border-radius:3px 3px 6px 6px;background:linear-gradient(#ffe86c 0 35%,#ffc62c 36% 75%,#bf7716 76%);border:1px solid #f6c759;box-shadow:0 3px #744511;}
+.phone-model-device .phone-front{transform:rotateY(var(--phone-yaw,0deg))!important;backface-visibility:hidden;transform-origin:50% 50%;}
+.phone-model-device .workforce-phone{cursor:grab;touch-action:pan-y;user-select:none;}
+.phone-model-device .workforce-phone.is-dragging{cursor:grabbing;}
+.phone-model-device .phone-screen{pointer-events:none;}
+.phone-model-device .phone-events li{min-height:55px;padding:6px 4px;}
+.phone-model-device .phone-events strong{font-family:'Lilita One',sans-serif;font-weight:400;font-size:13px;}
+.phone-model-device .phone-events p b{font-weight:900;}
+.phone-rotate-controls{position:relative;display:flex;align-items:center;justify-content:center;gap:8px;font:600 10px/1 'Nunito Sans',sans-serif;color:#a9bdeb;margin-top:5px;}
+.phone-rotate-controls button{display:grid;place-items:center;min-width:30px;height:28px;padding:4px 8px;background:#0a1d47;border:1px solid #35588e;border-radius:7px;color:#dfeaff;font:700 10px 'Nunito Sans',sans-serif;cursor:pointer;}
+.phone-rotate-controls button svg{width:15px;height:15px;}
+.phone-rotate-controls button:focus-visible{outline:2px solid #ffdc48;outline-offset:2px;}
+.phone-model-device .device-caption{display:none;}

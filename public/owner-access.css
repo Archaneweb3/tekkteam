@@ -1,0 +1,27 @@
+/* Locked Agent Detail inherits Home's type, CTA, status, and navy/royal palette. */
+.tw-owner-access{position:relative;isolation:isolate;display:grid;grid-template-columns:minmax(0,55%) minmax(0,45%);align-items:center;min-height:560px;overflow:hidden;margin:-28px -26px 0 -36px;padding:64px clamp(28px,5vw,74px) 48px;border-bottom:2px solid #264d91;background:radial-gradient(ellipse at 76% 42%,#214f9f 0,#122f70 31%,#071632 75%),#071632}
+.tw-owner-access:before{content:'';position:absolute;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(110deg,#06163000 0 49%,#5e91dc11 49% 60%,transparent 60%),linear-gradient(0deg,#040e23,transparent 36%)}
+.tw-owner-access-copy{position:relative;z-index:2;padding:10px 0 25px}
+.tw-owner-access .tw-world-eyebrow{color:#92bafa;font:900 11px 'Nunito Sans',sans-serif;letter-spacing:.17em}
+.tw-owner-access h1{margin:18px 0 18px;color:#fff9ec;font:400 clamp(47px,5.4vw,80px)/.94 'Lilita One',sans-serif;letter-spacing:.005em;text-shadow:0 4px #06132d}
+.tw-owner-access h1 em{color:#ffdc43;font-style:normal}
+.tw-owner-access-copy>p{max-width:420px;margin:0 0 27px;color:#c5d7f2;font:600 17px/1.5 'Nunito Sans',sans-serif}
+.tw-owner-access #tw-detail-connect{min-width:260px;min-height:60px;font:900 18px/1 'Nunito Sans',sans-serif}
+.tw-owner-access-trust{display:flex;flex-wrap:wrap;gap:8px 22px;margin-top:27px;color:#b8d0f0;font:800 12px/1.4 'Nunito Sans',sans-serif}
+.tw-owner-access-trust span:first-letter{color:#59e4b0}
+.tw-owner-access-scene{position:relative;align-self:stretch;display:grid;place-items:center;min-height:440px}
+.tw-owner-access-scene:before{content:'';position:absolute;inset:11% 2% 10%;border-radius:50%;background:radial-gradient(ellipse,#4a8ce633,#0c377033 43%,transparent 69%);filter:blur(12px)}
+.tw-owner-access-badge{position:absolute;top:8%;right:2%;z-index:2;color:#b9d7ff!important;border-color:#6d95cf!important;background:#153361!important;box-shadow:0 3px #061735;font-size:10px!important;letter-spacing:.12em!important}
+.tw-owner-access-stage{position:relative;display:grid;place-items:center;width:min(95%,470px);height:390px;border-bottom:5px solid #102b59;border-radius:48% 48% 15px 15px;background:radial-gradient(ellipse at 52% 76%,#3b74c86b,transparent 54%),linear-gradient(0deg,#17396460,transparent 46%)}
+.tw-owner-access-stage:before{content:'';position:absolute;bottom:7px;width:85%;height:78px;border:2px solid #3974bc;border-bottom:7px solid #0a244e;border-radius:50%;background:radial-gradient(ellipse,#3065ad,#163766 75%);box-shadow:0 22px 42px #020a20a8,inset 0 2px #8bb8f33b}
+.tw-owner-access-stage img{position:relative;z-index:1;width:min(84%,365px);max-height:370px;object-fit:contain;filter:brightness(.76) drop-shadow(0 19px 11px #020b26bb)}
+.tw-owner-access-lock{position:absolute;z-index:2;right:7%;bottom:19%;display:grid;place-items:center;width:46px;height:46px;border:1px solid #8bbaff;border-bottom:4px solid #12396a;border-radius:10px;background:linear-gradient(#315b9d,#143660);box-shadow:0 8px 18px #020b26a8;color:#ffe16e}
+.tw-owner-access-lock .tw-icon{width:22px;height:22px}
+@media(max-width:900px){.tw-owner-access{margin:0 -18px;min-height:0;padding:52px 30px 38px}.tw-owner-access h1{font-size:clamp(45px,6vw,65px)}}
+@media(max-width:650px){.tw-owner-access{grid-template-columns:1fr;gap:4px;padding:32px 22px 10px}.tw-owner-access-copy{padding:0}.tw-owner-access h1{font-size:clamp(43px,12vw,58px);margin:13px 0}.tw-owner-access-copy>p{font-size:15px;margin-bottom:22px}.tw-owner-access #tw-detail-connect{width:100%;min-width:0}.tw-owner-access-trust{display:grid;gap:7px;margin-top:20px;font-size:11px}.tw-owner-access-scene{min-height:245px}.tw-owner-access-badge{top:9%;right:0}.tw-owner-access-stage{height:250px;width:min(100%,350px)}.tw-owner-access-stage img{max-height:245px;width:75%}.tw-owner-access-stage:before{height:51px}.tw-owner-access-lock{width:36px;height:36px;right:10%;bottom:15%}.tw-owner-access-lock .tw-icon{width:18px;height:18px}}
+@media(prefers-reduced-motion:reduce){.tw-owner-access *{animation:none!important;transition:none!important}}
+.tw-create-access{margin-bottom:20px;background:radial-gradient(ellipse at 75% 46%,#1f4fa2 0,#112f70 30%,#071632 74%),#071632}
+.tw-create-access .tw-owner-access-scene{min-height:390px}
+.tw-create-access .tw-owner-access-scene:before{inset:17% 0 4%;filter:blur(18px)}
+.tw-create-access-art{position:relative;z-index:1;display:block;width:min(100%,490px);height:auto;max-height:440px;object-fit:contain;filter:drop-shadow(0 22px 18px #020a21aa)}
+@media(max-width:650px){.tw-create-access .tw-owner-access-scene{min-height:230px}.tw-create-access-art{width:min(100%,340px);max-height:280px}.tw-create-access .tw-owner-access-badge{top:4%}}

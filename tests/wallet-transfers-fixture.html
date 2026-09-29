@@ -1,0 +1,17 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Isolated Wallet Transfer QA</title><link rel="stylesheet" href="/public/agent-wallet.css"></head><body><main style="max-width:1080px;margin:24px auto;padding:12px"><h1>Agent wallet</h1><p>ISOLATED UI FIXTURE · No RPC, Phantom or real transfers</p><nav style="display:flex;flex-wrap:wrap;gap:8px" aria-label="Fixture states"><button data-view="ready">Ready fixture</button><button data-view="locked">Flags locked</button><button data-view="unavailable">Balance unavailable</button><button data-view="error">API error</button><button data-view="empty">No wallet</button></nav><div id="wallet"></div><p id="calls" role="status"></p></main><script type="module">
+import {mountAgentWallet} from '../public/app/agent-wallet-ui.js';
+const html=await(await fetch('/index.html')).text(),dom=new DOMParser().parseFromString(html,'text/html');await Promise.all([...dom.querySelectorAll('link[rel=stylesheet]')].map(link=>new Promise(resolve=>{const copy=link.cloneNode();copy.onload=resolve;copy.onerror=resolve;document.head.append(copy);})));const style=document.createElement('link');style.rel='stylesheet';style.href='/public/agent-wallet.css';document.head.append(style);
+const owner='ECMaFXkpb2bDFKXQciAKa1HNtqWgJs9PU3DcEmzgNMNS',wallet='4FPhonYAGentWaLLeTForUITestOnLy123456789abcde',agent={id:'isolated-agent',name:'Nora Signal'};
+let view='ready',operation=null,calls=0,mount;
+const api=async(path,options={})=>{
+ if(view==='error')throw Error('Wallet service unavailable. No balance was assumed.');
+ if(path.endsWith('/wallet'))return {agentId:agent.id,ownerWallet:owner,agentWallet:view==='empty'?null:wallet,balanceStatus:view==='unavailable'?'UNAVAILABLE':view==='empty'?'NO_WALLET':'AVAILABLE',balanceLamports:view==='unavailable'?null:50000000,fundingEnabled:view!=='locked',withdrawalEnabled:view!=='locked',liveLocked:true,activity:operation?[operation]:[{id:'fixture-confirmed',kind:'FUND',source:owner,destination:wallet,amountLamports:50000000,status:'CONFIRMED'}]};
+ const body=JSON.parse(options.body||'{}');
+ if(path.endsWith('/prepare')){const kind=path.includes('/funding/')?'FUND':'WITHDRAW';operation={id:'fixture-request',agentId:agent.id,kind,status:'PREPARED',ownerWallet:owner,agentWallet:wallet,source:kind==='FUND'?owner:wallet,destination:kind==='FUND'?wallet:owner,amountLamports:body.lamports,feeLamports:5000,baseFeeLamports:5000,priorityFeeLamports:0,maxNetworkFeeLamports:5000,destinationBalanceLamports:420000000,expectedDestinationBalanceLamports:420000000+body.lamports,sourceBalanceLamports:kind==='FUND'?420000000:50000000,remainingLamports:(kind==='FUND'?420000000:50000000)-body.lamports-5000};return operation;}
+ if(path.endsWith('/confirm')||path.endsWith('/submit')){calls++;operation={...operation,status:'CONFIRMED'};document.querySelector('#calls').textContent='Mock submissions: '+calls+' · no network transaction';return operation;}
+ if(path.endsWith('/cancel')){operation={...operation,status:'FAILED',reason:'Cancelled before submission'};return operation;}
+ throw Error('Unsupported fixture operation');
+};
+function render(){mount?.destroy();mount=mountAgentWallet(document.querySelector('#wallet'),agent,{api,sign:async()=>{document.querySelector('#calls').textContent='Mock signer only · Phantom was not called';return 'mock-signature';}});}
+document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>{view=b.dataset.view;operation=null;render();});render();
+</script></body></html>

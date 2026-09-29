@@ -25,19 +25,4 @@ test('funding exact destination/amount rejects mutation',()=>{
  assert.throws(()=>inspectFunding(tx,owner.publicKey.toBase58(),wallet.toBase58(),11),/mismatch/);
  tx.add(SystemProgram.transfer({fromPubkey:owner.publicKey,toPubkey:wallet,lamports:1}));assert.throws(()=>inspectFunding(tx,owner.publicKey.toBase58(),wallet.toBase58(),10),/mismatch/);
 });
-test('mock funding prepares, latches single send, verifies confirmation; default locked',async t=>{
- const store=openStore(join(mkdtempSync(join(tmpdir(),'fund-test-')),'db')),db=store.db;
- db.exec('CREATE TABLE agent_wallets(agent_id TEXT PRIMARY KEY,address TEXT,secret TEXT)');
- const owner=Keypair.generate(),wallet=Keypair.generate().publicKey,agent={id:'one',creator:owner.publicKey.toBase58()};
- db.prepare('INSERT INTO agent_wallets VALUES(?,?,?)').run('one',wallet.toBase58(),'not-used');
- let enabled=false,sends=0,signed;
- const c={getGenesisHash:async()=>GENESIS,getLatestBlockhash:async()=>({blockhash:Keypair.generate().publicKey.toBase58(),lastValidBlockHeight:100}),getFeeForMessage:async()=>({value:5000}),getBalance:async()=>100000000,getBlockHeight:async()=>1,simulateTransaction:async()=>({value:{err:null}}),sendRawTransaction:async bytes=>{sends++;signed=Transaction.from(bytes);return bs58.encode(signed.signature);},getTransaction:async()=>{const message=signed.compileMessage(),i=message.accountKeys.findIndex(k=>k.equals(wallet)),preBalances=message.accountKeys.map(()=>0),postBalances=[...preBalances];postBalances[i]=1000;return {transaction:{message},meta:{err:null,preBalances,postBalances}};}};
- const app=express();app.use(express.json());installFunding(app,{db,auth:(q,s,n)=>n(),owned:()=>({agent}),connection:c,valid:()=>true,enabled:()=>enabled});app.use((e,q,s,n)=>s.status(e.status||500).json({error:e.message}));
- const server=app.listen(0,'127.0.0.1');await new Promise(r=>server.once('listening',r));t.after(()=>{server.close();store.close();});
- const call=async(path,body,method='POST')=>{const r=await fetch(`http://127.0.0.1:${server.address().port}/api/agents/one/trading/funding/`+path,{method,headers:{'content-type':'application/json'},...(body?{body:JSON.stringify(body)}:{})});return {status:r.status,data:await r.json()};};
- assert.equal((await call('prepare',{lamports:1000})).status,409);enabled=true;
- assert.equal((await call('prepare',{lamports:10000001})).status,409);
- const p=await call('prepare',{lamports:1000});assert.equal(p.status,200);const tx=Transaction.from(Buffer.from(p.data.transaction,'base64'));tx.sign(owner);
- const body={id:p.data.id,signedTransaction:tx.serialize().toString('base64')};assert.equal((await call('submit',body)).status,200);assert.equal((await call('submit',body)).status,409);assert.equal(sends,1);
- assert.equal((await call(p.data.id,null,'GET')).data.status,'Confirmed');assert.equal(sends,1);
-});
+// Extended route, idempotency and custody coverage lives in wallet-transfers.test.mjs.

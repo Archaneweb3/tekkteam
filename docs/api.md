@@ -1,4 +1,4 @@
-# TEKKWORK API contract
+# TEKKTEAM API contract
 
 All paths start with `/api`. JSON requests use `Content-Type: application/json`. Mutations require an exact allowed `Origin`. Session cookies are HTTP-only, SameSite=Strict, scoped to `/api`, and Secure in production. Mainnet is not supported.
 
@@ -28,7 +28,7 @@ Errors: `{ "error": "..." }`. Codes: 400 validation, 401 authentication, 403 ori
 
 States: `DRAFT → PREPARED → SUBMITTED → DEVNET_LIVE` or `FAILED`. Expired unsigned preparation may reuse the same mint. Unknown submitted signatures remain `SUBMITTED`, never automatically retried as another launch. A background worker checks every 15 seconds and rebroadcasts the identical encrypted saved transaction when pending; finalized block height determines expiry. Preparation returns `estimatedCostSol` and `balanceSol`, and rejects insufficient test SOL with 422.
 
-Devnet tokens: 1,000,000 units, six decimals, no freeze authority and revoked mint authority. Name/description are local TEKKWORK metadata. No pool or pump.fun listing is created.
+Devnet tokens: 1,000,000 units, six decimals, no freeze authority and revoked mint authority. Name/description are local TEKKTEAM metadata. No pool or pump.fun listing is created.
 
 The browser now uses Wallet Standard signAndSendTransaction with explicit Devnet. Wallet intent is SUBMITTED even before approval; rejection/timeout requires reconciliation, not immediate retry. The worker discovers the reserved mint's transaction and checks the exact message and on-chain error status; no signature supplied by the browser is trusted. Wallet-mode recovery does not rebroadcast signed bytes. See decision 014.
 

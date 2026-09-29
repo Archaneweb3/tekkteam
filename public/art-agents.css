@@ -1,0 +1,85 @@
+/* Agent surfaces — shared Command Deck tokens, no behavior or identity changes. */
+.tw-create-dialog.tw-create-page{padding:0;max-width:none;background:none;border:0;box-shadow:none}
+.tw-create-page #tw-create{gap:32px}
+.tw-create-page .tw-character-picker,.tw-create-page .tw-character-picker:hover{background:none;border:0;border-radius:0;padding:0;box-shadow:none}
+.tw-create-page .tw-character-picker legend{font-size:25px;color:var(--text-primary);margin:0 0 20px;padding:0;font-weight:800}
+.tw-create-page .tw-character-options{grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}
+.tw-create-page .tw-character-option:not(:has(:checked)){opacity:1}
+.tw-create-dialog.tw-create-page .tw-character-options .tw-character-choice{min-height:238px;padding:16px 8px 18px;border:1px solid var(--border-soft);border-bottom:4px solid var(--border-strong);border-radius:12px 4px 12px 4px;background:var(--surface-1);box-shadow:inset 0 1px #ffffff08;transition:transform 180ms ease,border-color 180ms ease,background-color 180ms ease}
+.tw-create-dialog.tw-create-page .tw-character-options .tw-character-choice img{height:181px;object-fit:contain;object-position:center;margin:0 0 8px}
+.tw-create-dialog.tw-create-page .tw-character-choice>span:not(.tw-character-check){font-size:14px;line-height:1.4;font-weight:800;color:var(--text-secondary)}
+.tw-create-dialog.tw-create-page .tw-character-options input:checked+.tw-character-choice{border:2px solid var(--accent-yellow);border-bottom-width:4px;background:var(--surface-2);box-shadow:inset 0 1px #fff2}
+.tw-create-dialog.tw-create-page .tw-character-options input:checked+.tw-character-choice>span:not(.tw-character-check){color:var(--text-primary)}
+.tw-create-dialog.tw-create-page .tw-character-check{color:var(--accent-yellow);top:12px;right:12px}
+.tw-create-page .tw-create-configuration{grid-template-columns:minmax(240px,.72fr) minmax(0,1.28fr);gap:36px;padding-top:8px;align-items:start}
+.tw-create-page .tw-token-image{gap:16px;min-width:0}
+.tw-create-page .tw-token-image>label:first-child,.tw-create-page .tw-create-fields h2{font-size:25px;line-height:1.25;color:var(--text-primary);font-weight:800;margin:0}
+.tw-create-page .tw-token-drop{max-width:none;border:1px dashed #57728f;border-radius:12px 4px 12px 4px;background:var(--surface-1);box-shadow:inset 0 0 0 7px var(--canvas);padding:8px;transition:border-color 180ms ease,background 180ms ease}
+.tw-create-page .tw-token-drop:hover{border-color:var(--accent-yellow);background:var(--surface-2)}
+.tw-create-page .tw-token-drop span{max-width:210px;padding:24px;font-size:15px;line-height:1.6;color:var(--text-secondary)}
+.tw-create-page .tw-token-drop img{border-radius:5px}
+.tw-create-page .tw-token-image>label:not(:first-child){font-size:14px;color:var(--text-secondary);line-height:1.55;display:flex;align-items:flex-start;gap:9px}
+.tw-create-page .tw-token-image input[type=checkbox]{margin:3px 0 0;flex:none;accent-color:var(--accent-yellow)}
+.tw-create-page .tw-token-image p{font-size:13px;line-height:1.6;color:var(--text-muted)}
+.tw-create-page .tw-create-fields{gap:20px}
+.tw-create-page .tw-create-token{grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:14px}
+.tw-create-page textarea{min-height:110px;resize:vertical}
+.tw-create-page .tw-strategy-explanation{font-size:14px;line-height:1.6;color:var(--text-muted)}
+.tw-create-page .tw-creation-summary{padding:24px 28px;border-left:3px solid var(--accent-yellow);background:var(--surface-1);border-radius:4px 12px 4px 12px}
+.tw-create-page .tw-creation-summary h2{font-size:25px;margin:0 0 22px}
+.tw-create-page .tw-creation-summary dl{gap:24px}
+.tw-create-page .tw-creation-summary dt{font-size:13px;color:var(--text-muted)}
+.tw-create-page .tw-creation-summary dd{font-size:18px;color:var(--text-primary);font-weight:800;font-variant-numeric:tabular-nums}
+.tw-create-page .tw-dialog-actions{margin:0 0 24px;padding:0;gap:20px}
+.tw-create-page .tw-dialog-actions p{color:var(--text-muted);font-size:14px;line-height:1.6;max-width:580px}
+.tw-create-page .tw-dialog-actions .primary{min-width:190px}
+
+/* Profile: composed identity / model stage rather than a long data table. */
+.tw-detail{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(280px,.9fr);gap:28px;padding:36px;margin:24px 0 32px;background:var(--surface-1);border:1px solid var(--border-soft);border-top:3px solid var(--surface-3);border-radius:12px 4px 12px 4px;box-shadow:var(--shadow-panel);isolation:isolate}
+.tw-detail>div:first-of-type{z-index:1}
+.tw-detail .tw-eyebrow{font-size:12px;color:var(--text-muted);letter-spacing:.09em;margin-bottom:14px}
+.tw-detail h1{font-size:clamp(38px,3.4vw,50px)!important;margin-bottom:16px;padding-right:18px;line-height:1.06}
+.tw-detail>div>p{font-size:16px;line-height:1.65;max-width:45ch;color:var(--text-secondary);margin:20px 0 24px}
+.tw-detail dl{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:22px 20px;margin:28px 0;padding:24px 0;border-block:1px solid var(--border-soft)}
+.tw-detail dl>div{padding:0;border:0;display:block;min-width:0}
+.tw-detail dt{color:var(--text-muted);font-size:13px;margin-bottom:6px}
+.tw-detail dd{font-size:15px;color:var(--text-primary);font-weight:700;text-align:left;line-height:1.5;margin:0;overflow-wrap:anywhere}
+.tw-detail .tw-field{margin:0 0 16px;max-width:420px;font-size:14px}
+.tw-detail-character{height:440px;min-width:0;align-self:center;position:relative;background:none!important}
+.tw-detail-character:before{content:'';position:absolute;inset:12% 5% 5%;z-index:-1;border:1px solid var(--border-soft);border-radius:4px 28px 4px 28px;background:var(--canvas);transform:skewY(-3deg);pointer-events:none}
+.tw-detail-character:after{content:'';position:absolute;bottom:2%;left:18%;right:18%;height:5px;z-index:-1;background:var(--surface-3);transform:skewX(-30deg);pointer-events:none}
+.tw-detail .tw-agent-menu{z-index:4;top:16px;right:16px}
+.tw-detail .tw-agent-menu summary{background:transparent;color:var(--text-secondary);border:1px solid transparent;border-radius:4px}
+.tw-detail .tw-agent-menu summary:hover{border-color:var(--border-soft);background:var(--surface-2)}
+.tw-execution{padding:28px 32px;border-left:3px solid var(--accent-yellow);margin-top:28px}
+.tw-execution h2{font-size:28px;line-height:1.15;margin-bottom:14px}
+.tw-execution p,.tw-execution .tw-field{color:var(--text-secondary);font-size:15px;line-height:1.65}
+.tw-execution [data-summary]{background:var(--canvas);border:1px solid var(--border-soft);border-radius:4px;padding:20px;overflow-wrap:anywhere}
+.tw-execution [data-summary] dt{color:var(--text-muted)}
+.tw-execution [data-summary] dd{color:var(--text-primary);font-variant-numeric:tabular-nums}
+
+/* Canonical crew library. No generated art or invented character stats. */
+.tw-character-gallery{grid-template-columns:repeat(3,minmax(0,1fr));gap:22px}
+.tw-character-gallery article{position:relative;min-width:0;padding:24px;background:var(--surface-1);border:1px solid var(--border-soft);border-top:3px solid var(--surface-3);border-radius:12px 4px 12px 4px;box-shadow:var(--shadow-panel);overflow:hidden}
+.tw-character-gallery article>.tw-eyebrow{font-size:11px;letter-spacing:.08em;color:var(--text-muted)}
+.tw-character-gallery .tw-model{height:310px;margin:8px -16px 12px;background:none!important}
+.tw-character-gallery h2{font-size:27px;line-height:1.1;margin:12px 0;color:var(--text-primary)}
+.tw-character-gallery p{font-size:15px;line-height:1.65;color:var(--text-secondary);min-height:48px;margin-bottom:22px}
+.tw-character-gallery .tw-text-link{min-height:40px;border:1px solid var(--border-soft);border-radius:4px;background:var(--surface-2);box-shadow:0 3px var(--border-strong);font-size:14px;padding:9px 14px;color:var(--text-primary)}
+
+/* Inventory markup plus legacy token-list fallback during shell integration. */
+.tw-token-inventory{margin:28px 0 36px}
+.tw-token-inventory>h2{font-size:27px;margin:0 0 20px}
+.tw-token-grid,.tw-token-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
+.tw-token-card,.tw-token-list>a{display:grid;grid-template-columns:112px minmax(0,1fr);gap:20px;align-items:center;padding:22px;background:var(--surface-1);border:1px solid var(--border-soft);border-radius:12px 4px 12px 4px;box-shadow:var(--shadow-panel);color:var(--text-primary);min-width:0;text-decoration:none;transition:transform 180ms ease,border-color 180ms ease}
+.tw-token-art,.tw-token-list .tw-avatar{width:112px;height:112px;aspect-ratio:1;border:1px solid var(--border-soft);border-radius:4px;background:var(--canvas);overflow:hidden;display:grid;place-items:center;margin:0}
+.tw-token-art img,.tw-token-list .tw-avatar img{width:100%;height:100%;object-fit:contain}
+.tw-token-card-body{min-width:0}
+.tw-token-card h3,.tw-token-list h3{font-size:24px;line-height:1.2;overflow-wrap:anywhere;margin:0 0 9px}
+.tw-token-card p,.tw-token-list p{font-size:14px;line-height:1.6;color:var(--text-secondary);margin:5px 0}
+.tw-token-card .tw-status{margin:10px 0 0}
+.tw-token-mint{display:block;font-size:13px;color:var(--text-muted);font-variant-numeric:tabular-nums;overflow-wrap:anywhere;margin-top:12px}
+@media(hover:hover){.tw-create-dialog.tw-create-page .tw-character-options label:hover>.tw-character-choice{transform:translateY(-2px);border-color:#64809e;background:var(--surface-2);box-shadow:0 5px 12px #0003}.tw-create-dialog.tw-create-page .tw-character-options label:hover>input:checked+.tw-character-choice{border-color:var(--accent-yellow);background:var(--surface-2);box-shadow:inset 0 1px #fff2,0 5px 12px #0003}.tw-token-card:hover,.tw-token-list>a:hover{transform:translateY(-2px);border-color:#64809e}}
+@media(max-width:1300px) and (min-width:901px){.tw-detail{padding:28px;gap:20px;grid-template-columns:minmax(0,1.1fr) minmax(260px,.9fr)}.tw-detail-character{height:400px}.tw-create-page .tw-create-configuration{gap:28px}.tw-create-dialog.tw-create-page .tw-character-options .tw-character-choice{min-height:218px;padding-inline:5px}.tw-create-dialog.tw-create-page .tw-character-options .tw-character-choice img{height:160px}.tw-character-gallery .tw-model{height:270px}.tw-character-gallery article{padding:20px}.tw-token-card,.tw-token-list>a{grid-template-columns:90px minmax(0,1fr);gap:16px;padding:18px}.tw-token-art,.tw-token-list .tw-avatar{width:90px;height:90px}}
+@media(max-width:900px){.tw-detail{padding:28px;grid-template-columns:minmax(0,1fr) minmax(230px,.8fr);gap:20px}.tw-detail-character{height:350px}.tw-create-page .tw-create-configuration{gap:24px}.tw-character-gallery{grid-template-columns:repeat(2,minmax(0,1fr))}.tw-token-grid,.tw-token-list{grid-template-columns:1fr}}
+@media(max-width:700px){.tw-create-page #tw-create{gap:28px}.tw-create-page .tw-character-options{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x proximity;padding:4px 0 14px}.tw-create-page .tw-character-option{flex:0 0 164px;scroll-snap-align:start}.tw-create-dialog.tw-create-page .tw-character-options .tw-character-choice{min-height:228px}.tw-create-dialog.tw-create-page .tw-character-options .tw-character-choice img{height:170px}.tw-create-page .tw-character-picker legend{font-size:24px}.tw-create-page .tw-create-configuration{grid-template-columns:1fr;gap:32px}.tw-create-page .tw-token-drop{max-width:400px}.tw-create-page .tw-creation-summary{padding:22px}.tw-create-page .tw-creation-summary dl{display:grid;grid-template-columns:1fr;gap:20px}.tw-create-page .tw-creation-summary dl>div{display:flex;justify-content:space-between;gap:20px}.tw-create-page .tw-dialog-actions{flex-direction:column;align-items:stretch}.tw-create-page .tw-dialog-actions p{margin:0}.tw-detail{grid-template-columns:1fr;padding:24px;gap:20px}.tw-detail-character{grid-row:1;height:300px;width:100%;margin:0}.tw-detail dl{grid-template-columns:1fr 1fr;gap:20px 16px;margin:24px 0}.tw-detail h1{font-size:38px!important}.tw-detail dl>div{display:block}.tw-detail>div>p{font-size:15px}.tw-execution{padding:24px 22px}.tw-execution [data-summary]{padding:16px}.tw-character-gallery{grid-template-columns:1fr}.tw-character-gallery article{padding:24px}.tw-character-gallery .tw-model{height:310px}.tw-character-gallery p{min-height:0}.tw-token-card,.tw-token-list>a{grid-template-columns:84px minmax(0,1fr);padding:18px;gap:16px}.tw-token-art,.tw-token-list .tw-avatar{width:84px;height:84px}.tw-token-card h3,.tw-token-list h3{font-size:23px}.tw-token-card p,.tw-token-list p{font-size:14px}.tw-token-mint{grid-column:1/-1}}

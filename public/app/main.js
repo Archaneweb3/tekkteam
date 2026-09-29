@@ -1,4 +1,4 @@
-// TEKKWORK frontend entry (live, Solana mainnet)
+// TEKKTEAM frontend entry (live, Solana mainnet)
 import { createApi } from './api.js';
 import { robotSVG } from './robot.js';
 import { ICONS, avatar, STRAT_ICONS, strategyRules, stratIcon, stratKey, riskTag, riskWarning } from './ui.js';
@@ -34,7 +34,7 @@ const NAV_IC = {
   how: nic('<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1 .8-1 1.5v.7"/><path d="M12 17.5v.01"/>'),
 };
 
-// X badge: the official X mark on a black suit with a red tie peeking out (TEKKWORK style)
+// X badge: the official X mark on a black suit with a red tie peeking out (TEKKTEAM style)
 const X_BADGE = `<span class="xb-suit" aria-hidden="true"><svg class="xb-logo" viewBox="0 0 24 24"><path fill="currentColor" d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg><i class="xb-tie"></i></span>`;
 
 function shell(cfg) {
@@ -42,7 +42,7 @@ function shell(cfg) {
   return `
   <header class="topbar">
     <div class="topbar-in">
-      <a class="brand" href="#/" aria-label="TEKKWORK home"><img class="brand-logo" src="brand/boss-96.png" alt="" width="40" height="40"><span class="brand-name">TEKK<span class="brand-desk">WORK</span></span></a>
+      <a class="brand" href="#/" aria-label="TEKKTEAM home"><img class="brand-logo" src="brand/boss-96.png" alt="" width="40" height="40"><span class="brand-name">TEKK<span class="brand-desk">TEAM</span></span></a>
       <nav class="nav" id="nav">
         <a href="#/" data-r="home">${NAV_IC.home}<span>Home</span></a>
         <a href="#/agents" data-r="agents">${NAV_IC.agents}<span>Agents</span></a>
@@ -64,7 +64,7 @@ function shell(cfg) {
   </header>
   <div class="tape" aria-label="Token prices"><div class="tape-track" id="tape"></div></div>
   <main id="page"></main>
-  <footer class="foot"><span class="foot-brand"><img src="brand/boss-96.png" alt="" width="26" height="26"><b>TEKKWORK</b> · your agents do the team work</span>${x ? `<a class="foot-x" href="${esc(x)}" target="_blank" rel="noopener">${X_BADGE}${esc(xHandle(x))}</a>` : ''}<span>TEKKWORK preview · Sample data</span><span>Not financial advice. Memecoins are extremely risky.</span></footer>
+  <footer class="foot"><span class="foot-brand"><img src="brand/boss-96.png" alt="" width="26" height="26"><b>TEKKTEAM</b> · your agents do the team work</span>${x ? `<a class="foot-x" href="${esc(x)}" target="_blank" rel="noopener">${X_BADGE}${esc(xHandle(x))}</a>` : ''}<span>TEKKTEAM preview · Sample data</span><span>Not financial advice. Memecoins are extremely risky.</span></footer>
   <div class="toasts" id="toasts" aria-live="polite"></div>`;
 }
 
@@ -107,7 +107,7 @@ function toast(html, seed) {
 
 async function boot() {
   const app = document.getElementById('app');
-  app.innerHTML = `<div class="wrap"><div class="card"><div class="feed-empty boot"><img src="brand/boss.png" alt="TEKKWORK" width="130" height="130"><span>clocking in at TEKKWORK<span class="cursor"></span></span></div></div></div>`;
+  app.innerHTML = `<div class="wrap"><div class="card"><div class="feed-empty boot"><img src="brand/boss.png" alt="TEKKTEAM" width="130" height="130"><span>clocking in at TEKKTEAM<span class="cursor"></span></span></div></div></div>`;
   const api = await createApi();
   app.innerHTML = shell(api.config || {});
   paintThemeBtn();
@@ -145,7 +145,7 @@ async function boot() {
 
   function openConnect() {
     if (api.config.preview) {
-      modal('Wallet connection — coming soon', '<p>Explore the launch form, agent profiles and strategies in this preview. A TEKKWORK backend is required before wallet funding and live trading become available.</p>');
+      modal('Wallet connection — coming soon', '<p>Explore the launch form, agent profiles and strategies in this preview. A TEKKTEAM backend is required before wallet funding and live trading become available.</p>');
       return Promise.resolve(null);
     }
     return new Promise((resolve) => {
@@ -357,7 +357,7 @@ async function boot() {
     let sel = pick || agent.skin || items[0]?.id || 'default';
     let viewer = null;
     const m = modal(`Skins for ${agent.name}`, `
-      <p>Give ${esc(agent.name)} a new look everywhere on TEKKWORK. Paid with SOL from your creator wallet. <b>The SOL goes to the TEKKWORK rewards wallet</b>, which pays the promotion rewards.${items.some((x) => x.nft) ? ' NFT skins go to your wallet: one NFT dresses one agent, and if you sell the NFT the skin goes with it.' : ''}</p>
+      <p>Give ${esc(agent.name)} a new look everywhere on TEKKTEAM. Paid with SOL from your creator wallet. <b>The SOL goes to the TEKKTEAM rewards wallet</b>, which pays the promotion rewards.${items.some((x) => x.nft) ? ' NFT skins go to your wallet: one NFT dresses one agent, and if you sell the NFT the skin goes with it.' : ''}</p>
       <div class="skin-stage" id="sk-stage"></div>
       <div class="skin-list" id="sk-list"></div>
       <div class="err" id="sk-err" hidden></div>
@@ -583,8 +583,8 @@ async function boot() {
     const lines = (a) => {
       if (!a) {
         const L = [
-          `Launch a coin on TEKKWORK and it gets its own AI agent with its own Solana wallet. It trades real SOL 24/7 and keeps all the creator fees.\n\nYour agent does the team work.${ca ? `\n\nCA: ${ca}` : ''}\n${site}`,
-          `Every coin on TEKKWORK hires its own trader: own wallet, fixed rules, every trade public on-chain.\n\nLaunch one, let it work.${ca ? `\n\nCA: ${ca}` : ''}\n${site}`,
+          `Launch a coin on TEKKTEAM and it gets its own AI agent with its own Solana wallet. It trades real SOL 24/7 and keeps all the creator fees.\n\nYour agent does the team work.${ca ? `\n\nCA: ${ca}` : ''}\n${site}`,
+          `Every coin on TEKKTEAM hires its own trader: own wallet, fixed rules, every trade public on-chain.\n\nLaunch one, let it work.${ca ? `\n\nCA: ${ca}` : ''}\n${site}`,
         ];
         return L[variant % L.length];
       }
@@ -600,7 +600,7 @@ async function boot() {
     const m = modal('Shill on X', `
       <div class="shill-head">${avatar('crew-shill', 56)}<p>The shiller writes the post, you hit send. Nothing is posted until you confirm it on X.</p></div>
       <div class="field"><label for="s-coin">Coin</label>
-        <select class="input" id="s-coin">${opts}<option value="">TEKKWORK itself</option></select></div>
+        <select class="input" id="s-coin">${opts}<option value="">TEKKTEAM itself</option></select></div>
       <div class="field"><label for="s-text">Post</label><textarea class="textarea" id="s-text" rows="7" maxlength="560"></textarea>
         <div class="hint"><span id="s-count"></span> · <button type="button" class="copy" id="s-new">Write another</button></div></div>
       <button class="btn btn-primary btn-block btn-lg" id="s-go" type="button">${ICONS.x}<span>Post on X</span></button>`);
@@ -658,7 +658,7 @@ async function boot() {
     if (api.config.preview) document.querySelectorAll('#page .live').forEach(el => { el.textContent = 'SAMPLE'; });
     document.querySelectorAll('#nav a').forEach((a) => a.classList.toggle('on', a.dataset.r === (r.name === 'agent' ? 'agents' : r.name)));
     if (innerWidth < 900) document.querySelector('#nav a.on')?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
-    document.title = r.name === 'home' ? 'TEKKWORK · your agents do the team work' : 'TEKKWORK · ' + ({ agent: 'Agent', agents: 'Agents', tokens: 'Tokens', launch: 'Launch', how: 'How it works', skins: 'Skins' })[r.name];
+    document.title = r.name === 'home' ? 'TEKKTEAM · your agents do the team work' : 'TEKKTEAM · ' + ({ agent: 'Agent', agents: 'Agents', tokens: 'Tokens', launch: 'Launch', how: 'How it works', skins: 'Skins' })[r.name];
     window.scrollTo(0, 0);
   }
   addEventListener('hashchange', route);
@@ -750,5 +750,5 @@ async function boot() {
 
 boot().catch((e) => {
   console.error(e);
-  document.getElementById('app').innerHTML = `<div class="wrap"><div class="card"><div class="feed-empty">TEKKWORK could not start: ${esc(e.message)}</div></div></div>`;
+  document.getElementById('app').innerHTML = `<div class="wrap"><div class="card"><div class="feed-empty">TEKKTEAM could not start: ${esc(e.message)}</div></div></div>`;
 });

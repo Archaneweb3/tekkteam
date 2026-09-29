@@ -31,13 +31,13 @@ export function SkinsPage(app) {
   const html = () => `<div class="wrap">
     <section class="card skins-hero">
       <header class="card-head"><h2 class="pix">Skins</h2><span class="sub">give your agent a new look</span></header>
-      <p class="skins-intro">A skin changes how your agent looks everywhere on TEKKWORK: its page, the agent list, the live feed and the toasts. ${(S.items || []).some((x) => x.nft) ? 'Every skin is a limited <b>NFT</b>: it goes to your wallet, you can resell it, and whoever holds it can dress one of their agents.' : 'It is bought once per agent with SOL from the creator wallet.'} <b>The SOL goes to the TEKKWORK rewards wallet</b>, which pays the promotion rewards to creators whose agents level up.</p>
+      <p class="skins-intro">A skin changes how your agent looks everywhere on TEKKTEAM: its page, the agent list, the live feed and the toasts. ${(S.items || []).some((x) => x.nft) ? 'Every skin is a limited <b>NFT</b>: it goes to your wallet, you can resell it, and whoever holds it can dress one of their agents.' : 'It is bought once per agent with SOL from the creator wallet.'} <b>The SOL goes to the TEKKTEAM rewards wallet</b>, which pays the promotion rewards to creators whose agents level up.</p>
       <div class="skins-grid">${(S.items || []).map((x) => `
         <article class="skin-shop${x.rarity === 'legendary' || x.rarity === 'epic' ? ' ' + x.rarity : ''}">
           ${x.rarity === 'legendary' ? '<span class="rarity-tag">LEGENDARY</span>' : x.rarity === 'epic' ? '<span class="rarity-tag epic">EPIC</span>' : ''}
           <div class="skin-shop-stage" data-skin="${esc(x.id)}" title="Drag to spin"></div>
           <div class="skin-shop-info">
-            <div><b>${esc(x.name)}${x.nft ? ' <span class="nft-tag">NFT</span>' : ''}</b><small>${x.rarity === 'legendary' ? 'Legendary skin for the TEKKWORKER · drag to spin' : x.rarity === 'epic' ? 'Epic skin · drag to spin' : '3D voxel skin · drag to spin'}</small></div>
+            <div><b>${esc(x.name)}${x.nft ? ' <span class="nft-tag">NFT</span>' : ''}</b><small>${x.rarity === 'legendary' ? 'Legendary skin for the TEKKTEAM agent · drag to spin' : x.rarity === 'epic' ? 'Epic skin · drag to spin' : '3D voxel skin · drag to spin'}</small></div>
             <span class="skin-price">${x.priceSol} SOL</span>
           </div>
           ${x.stock ? `<div class="skin-supply"><div class="skin-supply-bar"><span style="width:${Math.round((x.stock.sold / x.stock.max) * 100)}%"></span></div><span>${x.stock.sold >= x.stock.max ? 'SOLD OUT' : `Only ${x.stock.max} ever · <b>${x.stock.max - x.stock.sold} left</b>`}${x.maxPerWallet ? ' · 1 per wallet' : ''}</span></div>` : ''}

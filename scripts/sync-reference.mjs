@@ -12,7 +12,7 @@ if (process.argv.includes('--config')) {
   const names = { frank: 'Felix Builder', cupsey: 'Nora Signal', fomy: 'Otto Analyst', alon: 'Theo Scout', satoshi: 'Hugo Director', diamond: 'Luca Prism' };
   const config = { ...state.config, preview: true, tradingEnabled: false, launchEnabled: false, contractAddress: '', xUrl: '', siteUrl: '' };
   config.skins = { ...config.skins, items: config.skins.items.map(skin => ({ ...skin, name: names[skin.id] || skin.name })) };
-  await writeFile(resolve('public/preview-config.json'), JSON.stringify(config, null, 2).replace(/BAGWORK/g, 'TEKKWORK'));
+  await writeFile(resolve('public/preview-config.json'), JSON.stringify(config, null, 2).replace(/BAGWORK/g, 'TEKKTEAM'));
 }
 for (const skin of state.config?.skins?.items || []) {
   if (/^[a-z0-9-]+$/.test(skin.id)) for (const variant of ['bust', 'stand']) pending.add(`brand/skins/${skin.id}-${variant}.png`);
@@ -53,7 +53,7 @@ if (process.argv.includes('--apply')) {
     await mkdir(dirname(dest), { recursive: true });
     if (['.js', '.css'].includes(extname(path))) {
       let text = await readFile(resolve(root, path), 'utf8');
-      text = text.replace(/bagwork/gi, m => m === m.toUpperCase() ? 'TEKKWORK' : m === m.toLowerCase() ? 'tekkwork' : 'Tekkwork');
+      text = text.replace(/bagwork/gi, m => m === m.toUpperCase() ? 'TEKKTEAM' : m === m.toLowerCase() ? 'tekkteam' : 'Tekkteam');
       text = text.replace(/bw_theme/g, 'tw_theme').replace(/bag work/g, 'team work');
       await writeFile(dest, text);
     } else await copyFile(resolve(root, path), dest);

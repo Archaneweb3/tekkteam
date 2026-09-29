@@ -9,7 +9,7 @@ import bs58 from 'bs58';
 import { createServer } from '../server/app.js';
 
 const origin = 'http://127.0.0.1:5188';
-test('TEKKWORK auth, private persistence, idempotency, ownership and launch state machine', async t => {
+test('TEKKTEAM auth, private persistence, idempotency, ownership and launch state machine', async t => {
   const dir = mkdtempSync(join(tmpdir(), 'tekkwork-test-'));
   let sends = 0, clock = Date.now(), chainStatus = 'pending';
   const chain = {
@@ -28,6 +28,7 @@ test('TEKKWORK auth, private persistence, idempotency, ownership and launch stat
   };
   const login = async key => {
     const c = await call('/auth/challenge',{method:'POST',body:{address:key.publicKey.toBase58()}});
+    assert.match(c.body.message,/^TEKKTEAM wallet sign-in\n/);
     const input={id:c.body.id,signature:bs58.encode(nacl.sign.detached(Buffer.from(c.body.message),key.secretKey))};
     const result=await call('/auth/verify',{method:'POST',body:input}); assert.equal(result.status,200); return {...result,input};
   };
@@ -39,6 +40,9 @@ test('TEKKWORK auth, private persistence, idempotency, ownership and launch stat
       assert.equal((await call('/agents',{method:'POST',body:{}})).status,401);
       const c=await call('/auth/challenge',{method:'POST',body:{address:alice.publicKey.toBase58()}});
       assert.equal((await call('/auth/verify',{method:'POST',body:{id:c.body.id,signature:'bad'}})).status,401);
+      const legacyMessage=c.body.message.replace(/^TEKKTEAM/,'TEKKWORK');
+      service.store.db.prepare('UPDATE challenges SET message=? WHERE id=?').run(legacyMessage,c.body.id);
+      assert.equal((await call('/auth/verify',{method:'POST',body:{id:c.body.id,signature:bs58.encode(nacl.sign.detached(Buffer.from(legacyMessage),alice.secretKey))}})).status,200,'an outstanding stored legacy challenge remains valid');
       aliceSession=await login(alice); bobSession=await login(bob);
       assert.equal((await call('/auth/verify',{method:'POST',body:aliceSession.input})).status,401);
     });
@@ -57,6 +61,15 @@ test('TEKKWORK auth, private persistence, idempotency, ownership and launch stat
       assert.equal((await call('/agents/'+agent.id,{method:'PATCH',body:{strategy:'momentum'},cookie:bobSession.cookie})).status,404);
       assert.equal((await call('/agents/'+agent.id,{method:'PATCH',body:{strategy:'bad'},cookie:aliceSession.cookie})).status,400);
       assert.equal((await call('/agents/'+agent.id,{method:'PATCH',body:{strategy:'momentum'},cookie:aliceSession.cookie})).body.strategy,'momentum');
+    });
+    await t.test('assigns an owned character only after an explicit request and safely deduplicates',async()=>{
+      const path='/agents/'+agent.id+'/character';
+      assert.equal((await call(path,{method:'POST',body:{character:'cupsey',expectedCharacter:'frank'},cookie:bobSession.cookie})).status,404);
+      assert.equal((await call(path,{method:'POST',body:{character:'missing',expectedCharacter:'frank'},cookie:aliceSession.cookie})).status,400);
+      assert.equal((await call(path,{method:'POST',body:{character:'cupsey',expectedCharacter:'frank'},cookie:aliceSession.cookie})).body.character,'cupsey');
+      assert.equal((await call(path,{method:'POST',body:{character:'cupsey',expectedCharacter:'frank'},cookie:aliceSession.cookie})).body.character,'cupsey');
+      assert.equal((await call(path,{method:'POST',body:{character:'fomy',expectedCharacter:'frank'},cookie:aliceSession.cookie})).status,409);
+      assert.equal((await call('/agents/'+agent.id,{cookie:aliceSession.cookie})).body.character,'cupsey');
     });
     await t.test('prepares once, submits once and waits for confirmation',async()=>{
       const prepared=await call(`/agents/${agent.id}/prepare`,{method:'POST',cookie:aliceSession.cookie}); assert.equal(prepared.status,200); assert.equal(prepared.body.message,undefined);

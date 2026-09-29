@@ -1,0 +1,44 @@
+{
+  "resource": "text-to-3d",
+  "task": {
+    "id": "01a0dfa8-bc8d-7505-bfd6-533c48ba8f1e",
+    "type": "text-to-3d-refine",
+    "name": "",
+    "status": "SUCCEEDED",
+    "progress": 100,
+    "preceding_tasks": 0,
+    "created_at": 1790458774334,
+    "started_at": 1790458774342,
+    "finished_at": 1790458846773,
+    "expires_at": 0,
+    "task_error": null,
+    "model_urls": {
+      "glb": "https://assets.meshy.ai/4d0198b5-14af-4e84-8ea3-2e974e4fa8b8/tasks/01a0dfa8-bc8d-7505-bfd6-533c48ba8f1e/output/model.glb?Expires=4943980800&Signature=C1NmMXkUXwl~q-VlIiaYHXw-gJe3j2NBRwUPuSETQCXSybL9JjUQrMddJmtkrBek9CNAhUtUDu2BLaktbljWd5K~aQ3I1fUoO4m0YamB0mt4NSJwj7P6mE-~xu-tIW1qtCSRKKlwaYSzDak5zGlr3y6WpGF~jXUZPApkSlo56mxvQKc3u9kFfsjinKloappZIpSB3a6uyLPGZ7GDHfw8XP3cCCuWyof3jOT51feDSkRortrejss5JLBOCP~KLKRHomkgQYurqMAwxVhlNpTLJA2hl2o4tg36UHCS5AteHKgVDK058OKdh3Hy72Cx1Ni8s2qyfoPMz83MTsHxLB03yg__&Key-Pair-Id=K1VGYTHIYLM9UM"
+    },
+    "texture_urls": [
+      {
+        "base_color": "https://assets.meshy.ai/4d0198b5-14af-4e84-8ea3-2e974e4fa8b8/tasks/01a0dfa8-bc8d-7505-bfd6-533c48ba8f1e/output/texture_0.png?Expires=4943980800&Signature=KrKPbayDyqPQmn6GkmdQuq9F6hnWKTD3PStByi9HBYIsCjQ3TSB3ZP4MF1PDW1tgXH~g-Qwfi~rF4p6NewYKtSTeSQXIkDglJ7pifyrOAAVIwDTuwiavOdKsopSLl3dfubX1oqWRtwGka9EHwmB4PJZHBQ8kisz4mUNdj~hq52qozj8B-Exi7fAvdtCm~rvm7VAOOwCLcvk886LXGNincJdiASsRDTE19ysuvgpLrg2UGY92KPp7BscNfQ-Ayrpy9Pm0u1sa7IScrR-mt7UBM33enQujC4ZTZpF5vWcJDDShhs4mLKphXFchgpjrCj~yjL8EATkoGMHb64NgbRXCIw__&Key-Pair-Id=K1VGYTHIYLM9UM",
+        "metallic": "https://assets.meshy.ai/4d0198b5-14af-4e84-8ea3-2e974e4fa8b8/tasks/01a0dfa8-bc8d-7505-bfd6-533c48ba8f1e/output/texture_0_metallic.png?Expires=4943980800&Signature=DGzwQISJLpYQwXcHrQSvGBAFjOvjvWDq7qYSigcJh2ZIcWxpvNo-9uFvjaHc4yhRTx1X3B73y~KJW0T9KARMukBbk14C49EYhERFuH9wsuZUlReDIa9Cpxo0HDevC2N53FY6EYy-bcGbnvMosIE-TiX~R9vyeA9ny8qFgafxGPNdWxjlLEaFEoPPKUxOPQaaC~aMAxz5mVocjKR1lvvYMinv5QkNiLEC1ugM4qxu3IEiE-TE-lw2jZXqYQyExkCyEJ9jAUT7KUJG1NT2htHLALke6T5YNdrjQ-GsDRjKzj25~bG1f5eqPgKN2NzWM3ItZfsN9Az2Q7MMuFblIpxZcQ__&Key-Pair-Id=K1VGYTHIYLM9UM",
+        "normal": "https://assets.meshy.ai/4d0198b5-14af-4e84-8ea3-2e974e4fa8b8/tasks/01a0dfa8-bc8d-7505-bfd6-533c48ba8f1e/output/texture_0_normal.png?Expires=4943980800&Signature=lbYmxolJsxoB4SOOvUrxRxuNP-lNJttKB4R9DEfJSsVhCR7vkQ4ESQ~y24-F~sW9QYtIoAHQ6twE0uLbQpZUnYOJD~iPqTbvpvD7X4quNF9wh7tAGPnWePyKvKRUbPx~yB3uQ-Ckfqz~WYmFbFLQE8C2xyJ08i4ud5vRm6TncDi23dshbCCpruppZo34whx1EFW6HuFkPgLsk8UvKojOiCKIWC5Mh5KNGWdYhcmpT-QjCezevh5JWJ0y-PUwh8rIhYh59u-0z267LqOdLrewoF~JDYAE01uktnDXH7n4v9iDWlv-VGKWtWHQYZUW9jYVhQrR9xVCCdphrcox2IV-1g__&Key-Pair-Id=K1VGYTHIYLM9UM",
+        "roughness": "https://assets.meshy.ai/4d0198b5-14af-4e84-8ea3-2e974e4fa8b8/tasks/01a0dfa8-bc8d-7505-bfd6-533c48ba8f1e/output/texture_0_roughness.png?Expires=4943980800&Signature=Qy38CWVKA7JP-UccWj2yfE-BTgWEC7lahpiz3qfYz1drn39yU-ZOiCwrGnlZrV5z7xSfBjVM9F8c6v-ag176GMZGMv0SmwXoO6tr0BS0GixxCNCOPYlXj7Ndek3FstTO-OaYJSkouoo29hfun-LSqaUWNi78PJGuoneHWkFdMGrHPRuwSsRuwzlJ-60kP5KOgKZCJZLtOmGMsoUUOYo5qnNn3h-598RArNOkuZxRkDi-5peHJRdXuG~7FFy-ACnxr-z2Xb3SRVOhLM8P3gFm7BehIBEFogP-1~YuTxOB755IINRSnVpru1OdIskDPfELfVIQoL01Chm1wNhxUIygZQ__&Key-Pair-Id=K1VGYTHIYLM9UM"
+      }
+    ],
+    "thumbnail_url": "https://assets.meshy.ai/4d0198b5-14af-4e84-8ea3-2e974e4fa8b8/tasks/01a0dfa8-bc8d-7505-bfd6-533c48ba8f1e/output/preview.png?Expires=4943980800&Signature=KpzpY-oucsUjWXxhW5Uhbpk5YrxM9kSaq~cPWK~OxS5oSbWIvjPMMexWXew9-TYBjctm1WBRRdMRWE8LNykTARer2k48pWTd71eM5euSe52mo38QG3LrlOW6t1uEHkFgmREuRXT1xr-lHP2N1fzL5~Z5ZfJFJ~ivGsAMBnQrwqHNF0HIirJC9gCz0BKREkOxZM0m9tQSMwX3wYcUjN~v5peroGGn~dITVQOeJzbI4znpw02OGtSiZMfXWuZCy4A6mX40-RLzCh5IcPEVFY~~fdUB~K0xWQqvaizf4C2UsDPd8t0FgjKKuRGAg7ZT5yhnXDnAllFLUoUIBiWBRXkssA__&Key-Pair-Id=K1VGYTHIYLM9UM",
+    "consumed_credits": 10,
+    "prompt": "Original stylized chunky handheld terminal for a playful voxel agent workspace, upright portrait body, deep beveled octagonal corners, thick navy blue shell, stepped cobalt edge rails, small gold utility latch centered along bottom edge, two narrow side buttons. Large flat rectangular inset blank black screen, separate flat screen surface. No screen graphics, no text, no logo, no camera notch, no antenna, no stand. Clean low-poly game prop, symmetrical front, solid watertight body, isolated single object.",
+    "texture_prompt": "Original TEKKWORK handheld terminal. Deep navy blue matte shell, cobalt blue beveled edge rails, restrained warm yellow gold physical button accents. Recessed screen completely plain dark navy black, blank flat uniform color with NO text NO icons NO graphics NO patterns. Clean stylized game material, subtle roughness, no dirt, no labels, no logos.",
+    "texture_image_url": "",
+    "mode": "refine",
+    "model_type": "standard",
+    "seed": 3927123149
+  },
+  "saved_files": [
+    "artifacts\\meshy-phone-refined\\model.glb",
+    "artifacts\\meshy-phone-refined\\thumbnail.png",
+    "artifacts\\meshy-phone-refined\\texture_0_base_color.png",
+    "artifacts\\meshy-phone-refined\\texture_0_metallic.png",
+    "artifacts\\meshy-phone-refined\\texture_0_normal.png",
+    "artifacts\\meshy-phone-refined\\texture_0_roughness.png"
+  ],
+  "downloaded_at": "2026-09-26T21:41:17.431Z"
+}

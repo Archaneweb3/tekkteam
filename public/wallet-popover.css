@@ -1,0 +1,39 @@
+.tw-header .tw-utility-dock #tw-wallet.spatial-glass{min-width:0;max-height:54px;overflow:hidden;white-space:nowrap}
+.tw-header .tw-utility-dock #tw-wallet .tw-connected-label{min-width:0;overflow:hidden}
+.tw-header .tw-utility-dock #tw-wallet .tw-connected-label strong{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px}
+.tw-header .tw-utility-dock #tw-wallet .tw-connected-label small{display:flex;align-items:center;gap:5px;color:#71eab4}
+.tw-connected-label i,.tw-owner-provider small i{display:inline-block;width:6px;height:6px;border-radius:50%;background:#43e5a1;box-shadow:0 0 0 3px #43e5a11c}
+body>.tw-wallet-popover.tw-owner-popover{position:fixed!important;inset:auto;z-index:160;width:344px;max-width:calc(100vw - 24px);max-height:calc(100dvh - 24px);overflow-y:auto;box-sizing:border-box;padding:20px!important;background:linear-gradient(160deg,#172f5c,#0a1832 72%)!important;border:1px solid #5476ae!important;border-radius:16px!important;box-shadow:0 22px 70px #020816b8,inset 0 1px #9cb8ed22!important;color:#eef4ff;animation:tw-wallet-enter .17s ease-out both}
+@media(min-width:901px){body>.tw-wallet-popover.tw-owner-popover{left:calc(var(--rail) + 12px)!important}}
+@keyframes tw-wallet-enter{from{opacity:0;transform:translateY(6px) scale(.985)}to{opacity:1;transform:none}}
+.tw-owner-popover header{display:flex;align-items:center;justify-content:space-between;padding-bottom:16px;border-bottom:1px solid #6184b244;color:#8dbbff;font:900 10px 'Nunito Sans',sans-serif;letter-spacing:.16em}
+.tw-owner-popover button{cursor:pointer;font-family:'Nunito Sans',sans-serif}
+.tw-owner-popover header button,.tw-owner-address button{display:grid;place-items:center;min-width:36px;min-height:36px;border:1px solid #456697;border-radius:9px;background:#153762;color:#d8eaff}
+.tw-owner-popover button svg{width:16px;height:16px}
+.tw-owner-provider{display:flex;align-items:center;gap:12px;margin:17px 0}
+.tw-owner-provider-icon{width:43px;height:43px;display:grid;place-items:center;flex:none;border:1px solid #5d79ae;border-radius:12px;background:#e9f1ff;color:#173a70;overflow:hidden}
+.tw-owner-provider-icon img{width:100%;height:100%;object-fit:contain}
+.tw-owner-provider-icon:has(img){background:transparent;border-color:#6079aa55}
+.tw-owner-provider strong{display:block;font:900 16px 'Nunito Sans',sans-serif;color:#fff}
+.tw-owner-provider small{display:flex;align-items:center;gap:7px;margin-top:3px;color:#71eab4;font:900 10px 'Nunito Sans',sans-serif;letter-spacing:.1em}
+.tw-owner-address{display:flex;align-items:center;justify-content:space-between;gap:8px;min-width:0;padding:9px 10px 9px 13px;border:1px solid #496b9a;border-radius:10px;background:#091d3d}
+.tw-owner-address span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#dce9ff;font:800 13px 'Nunito Sans',sans-serif}
+.tw-owner-copy-feedback{min-height:17px;margin:4px 0 3px;color:#ffe16e;font:900 10px 'Nunito Sans',sans-serif;letter-spacing:.08em}
+.tw-owner-balance{display:grid;gap:3px;padding:10px 0 14px}
+.tw-owner-balance strong{color:#fff;font:400 clamp(27px,3vw,34px)/1 'Lilita One',sans-serif;letter-spacing:.015em}
+.tw-owner-balance span{color:#91aed8;font:900 10px 'Nunito Sans',sans-serif;letter-spacing:.15em}
+.tw-owner-network{display:inline-flex;align-items:center;padding:7px 10px;border:1px solid #4b658e;border-radius:8px;background:#122950;color:#b6cbe8;font:900 10px 'Nunito Sans',sans-serif;letter-spacing:.09em}
+.tw-owner-network[data-state=verified]{border-color:#327862;background:#123b35;color:#6cedb8}
+.tw-owner-actions{display:block;margin-top:14px}
+.tw-owner-actions button{display:flex;align-items:center;justify-content:center;gap:9px;width:100%;min-height:40px;padding:8px 12px;border:1px solid #5377b0;border-bottom:3px solid #071e44;border-radius:9px;background:linear-gradient(#244b8c,#16376f);color:#f2f6ff;font-size:12px;font-weight:900}
+.tw-owner-actions button:hover:not(:disabled),.tw-owner-popover header button:hover,.tw-owner-address button:hover{filter:brightness(1.16)}
+.tw-owner-actions button:disabled{opacity:.65;cursor:wait}
+.tw-owner-actions .is-loading svg{animation:tw-wallet-spin .8s linear infinite}
+@keyframes tw-wallet-spin{to{transform:rotate(360deg)}}
+.tw-owner-disconnect{margin-top:14px;padding-top:9px;border-top:1px solid #5b77a444}
+.tw-owner-disconnect button{display:flex;align-items:center;gap:9px;width:100%;min-height:39px;padding:8px 9px;border:0;border-radius:8px;background:transparent;color:#efadb1;font-size:12px;font-weight:800;text-align:left}
+.tw-owner-disconnect button span:last-child{margin-left:auto}
+.tw-owner-disconnect button:hover{background:#e6879120;color:#ffd0d2}
+.tw-owner-popover :focus-visible{outline:2px solid #ffe279;outline-offset:3px}
+@media(max-width:900px){body.tw-wallet-sheet-open:before{content:'';position:fixed;inset:0;z-index:159;background:#020815a8}body>.tw-wallet-popover.tw-owner-popover{left:12px!important;right:12px!important;top:auto!important;bottom:max(12px,env(safe-area-inset-bottom))!important;width:auto;max-width:none;border-radius:18px!important}}
+@media(prefers-reduced-motion:reduce){body>.tw-wallet-popover.tw-owner-popover{animation:none}.tw-owner-actions .is-loading svg{animation:none}}

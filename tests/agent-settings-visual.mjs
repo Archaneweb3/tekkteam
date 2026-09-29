@@ -1,0 +1,80 @@
+import {chromium} from 'playwright';
+import assert from 'node:assert/strict';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
+import {publicConfig} from '../server/config.js';
+import {defaultStrategyConfig} from '../public/app/strategy-config.js';
+
+const base=process.env.BASE_URL||'http://127.0.0.1:5188';
+const owner='ECMaFXkpb2bDFKXQciAKa1HNtqWgJs9PU3DcEmzgNMNS';
+const agent={id:'settings-visual-fixture',no:3,name:'Nora Fixture',description:'An agent with a careful plan.',creator:owner,createdAt:Date.now(),character:'nora',strategy:'balanced',status:'DRAFT',coin:{name:'Nora Coin',ticker:'NORA'}};
+const wallet={ownerWallet:owner,agentWallet:'7Bt9Q3EciD8ZhoRA6CviqwpLpGhn4tscPrsKfUqGfFVe',balanceStatus:'AVAILABLE',balanceLamports:6995000,assetStatus:'AVAILABLE',assetCount:1,assets:[{mint:'USELESSfixtureMint',amount:'45962',decimals:6}],activity:[{kind:'FUND',amountLamports:2000000,status:'CONFIRMED'}],fundingEnabled:false,withdrawalEnabled:false};
+const trading={agentId:agent.id,status:'PAUSED',strategy:'balanced',activity:[],openPositions:[],paperStartingCapitalSol:.1,paperCashSol:.1,portfolioValueSol:.1,totalPnlSol:0,roiPercent:0};
+const browser=await chromium.launch({headless:true});
+try{
+ for(const width of [1440,390]){
+  const page=await browser.newPage({viewport:{width,height:900}}),writes=[],errors=[];let runtimeWallet=wallet,runtimeTrading=trading,runtimeLaunch={status:'Idle'};
+  page.on('pageerror',error=>errors.push(error.message));
+  await page.route('**/api/**',route=>{
+   const path=new URL(route.request().url()).pathname;
+   if(route.request().method()!=='GET'){writes.push(path);return route.abort();}
+   if(path==='/api/state')return route.fulfill({json:{config:publicConfig('devnet'),session:{address:owner},agents:[agent],events:[],coins:[],feed:[],tokens:[],bonded:[],stats:{}}});
+   if(path==='/api/agents/'+agent.id)return route.fulfill({json:agent});
+   if(path.endsWith('/deletion-eligibility'))return route.fulfill({json:{agentId:agent.id,canDelete:false,launchState:'launched',reason:'Fixture'}});
+   if(path.endsWith('/trading/strategy-config'))return route.fulfill({json:{agentId:agent.id,config:defaultStrategyConfig('balanced'),version:1}});
+   if(path.endsWith('/trading/wallet'))return route.fulfill({json:runtimeWallet});
+   if(path==='/api/pump-launch/status')return route.fulfill({json:runtimeLaunch});
+   if(path.endsWith('/trading'))return route.fulfill({json:runtimeTrading});
+   if(path.endsWith('/analytics'))return route.fulfill({json:{agentId:agent.id,tradeHistory:[]}});
+   return route.fulfill({status:404,json:{error:'Fixture only'}});
+  });
+  await page.goto(base+'/#/agent/'+agent.id);
+  await page.getByRole('tab',{name:'Settings'}).click();
+  await page.locator('.as-settings').waitFor();
+  assert.equal(await page.locator('.as-clean-section').count(),5);
+  assert.equal(await page.locator('.as-nav').count(),0);
+  assert.match(await page.locator('.as-clean-section').first().textContent(),/Nora Fixture/);
+  assert.equal(await page.locator('.as-clean-section input').count(),0,'Main Settings remains read-only');
+  if(process.env.SETTINGS_SCREENSHOTS)await page.screenshot({path:join(tmpdir(),`tekkwork-settings-${width}-general.png`),fullPage:true});
+  await page.locator('[data-settings-action="trading"]').click();
+  await page.locator('.strategy-presets button').first().waitFor();
+  assert.equal(await page.locator('[data-settings-dialog="trading"]').evaluate(el=>el.open),true);
+  assert.equal(await page.locator('.strategy-presets button').count(),3);
+  await page.locator('.strategy-presets [data-preset="momentum"]').click();
+  assert.match(await page.locator('[data-settings-save-state]').textContent(),/UNSAVED/);
+  await page.locator('[data-settings-dialog="trading"] [data-settings-close]').click();
+  assert.equal(await page.locator('[data-settings-dirty]').isVisible(),true);
+  await page.locator('[data-settings-action="wallet"]').click();
+  const drawer=page.locator('.tw-agent-wallet-drawer');
+  assert.equal(await drawer.evaluate(el=>el.open),true);
+  assert.match(await page.locator('[data-agent-short]').textContent(),/7Bt9Q3/);
+  assert.match(await page.locator('[data-agent-balance]').textContent(),/0\.006995/);
+  assert.match(await page.locator('[data-agent-asset-count]').textContent(),/2 assets/);
+  assert.equal(await page.locator('[data-settings-dialog="wallet"]').count(),0,'Settings does not duplicate wallet UI');
+  assert.match(await drawer.locator('.tw-wallet-assets-section').textContent(),/0\.045962/);
+  assert.match(await drawer.locator('.tw-wallet-activity').textContent(),/Deposit/);
+  assert.equal(await drawer.evaluate(el=>el.scrollWidth<=el.clientWidth+1),true,`Wallet drawer overflow at ${width}px`);
+  assert.equal(await drawer.locator('[data-do="fund"]').isDisabled(),true);
+  assert.equal(await drawer.locator('[data-do="withdraw"]').isDisabled(),true);
+  if(process.env.SETTINGS_SCREENSHOTS)await page.screenshot({path:join(tmpdir(),`tekkwork-settings-${width}-wallet.png`)});
+  await drawer.locator('.tw-wallet-drawer-close').click();
+  await drawer.waitFor({state:'detached'});
+  assert.match(await page.locator('[data-token-status]').textContent(),/Not launched/);
+  assert.equal(await page.locator('[data-settings-action="launch"]').textContent(),'LAUNCH TOKEN →');
+  assert.equal(await page.locator('[data-settings-action="delete"]').isEnabled(),true,'Delete opens the server-gated review flow even when blocked');
+  assert.equal(await page.locator('.as-clean-advanced').evaluate(el=>el.open),false);
+  assert.equal(await page.locator('[data-dev-group="controlled"]').evaluate(el=>el.open),false);
+  assert.equal(await page.locator('[data-controlled]').isVisible(),false);
+  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),true,`Settings overflow at ${width}px`);
+  page.once('dialog',dialog=>dialog.dismiss());await page.getByRole('tab',{name:'Activity'}).click();assert.equal(await page.locator('[data-agent-panel]').getAttribute('data-agent-panel'),'settings','Unsaved strategy draft prevents silent tab navigation');
+  runtimeWallet={...wallet,balanceLamports:0};runtimeTrading={...trading,status:'WORKING'};runtimeLaunch={status:'Success',confirmed:true,signature:'fixture-signature',mint:'581XfixtureQKEquT'};
+  await page.reload();await page.getByRole('tab',{name:'Settings'}).click();await page.locator('[data-agent-balance]').getByText('0 SOL').waitFor();
+  assert.equal(await page.locator('.as-clean-section').count(),5,'Running, empty-wallet and launched-token states retain the same structure');
+  assert.match(await page.locator('[data-token-status]').textContent(),/Launched/);
+  assert.match(await page.locator('[data-token-mint]').textContent(),/581X/);
+  assert.deepEqual(writes,[]);
+  assert.deepEqual(errors,[]);
+  await page.close();
+ }
+ console.log('Agent Settings clean desktop/mobile sections, shared strategy and wallet flows, dirty-state guard, token states and collapsed advanced passed.');
+}finally{await browser.close();}

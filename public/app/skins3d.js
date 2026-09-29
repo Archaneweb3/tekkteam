@@ -1,4 +1,5 @@
 import { V, buildToyCharacterMeshes } from './office3d.js';
+import { resolveCharacterId } from './character-registry.js';
 
 // Five original brick-figure colorways, all sharing the office character rig.
 function toySkin(spec) {
@@ -56,3 +57,8 @@ const diamond = () => toySkin({
 });
 
 export const SKIN_MODELS = { frank, cupsey, fomy, alon, satoshi, diamond };
+// Called only after module initialization; office and detail share these factories.
+export function createCanonicalCharacter(value) {
+  const characterId = resolveCharacterId(value);
+  return {characterId, ...SKIN_MODELS[characterId]()};
+}

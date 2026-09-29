@@ -73,6 +73,28 @@ test('ambiguous network send is latched; confirmation check never resends',async
  const result=await s.request('submit',body);assert.match(result.data.notice,/unknown/);
  await s.request('status');await s.request('submit',body);assert.equal(s.calls.sent,1);
 });
+
+test('prepare failures persist exact first stage without creating a launch receipt',async t=>{
+ const scenarios=[
+  {stage:'OWNER_AUTH',adapters:{getAgent:async()=>{throw Object.assign(Error('Sign in first'),{code:'OWNER_AUTH_FAILED'});}}},
+  {stage:'MAINNET_VERIFY',connection:{getGenesisHash:async()=> 'wrong-genesis'}},
+  {stage:'METADATA_VERIFY',adapters:{publishMetadata:async()=>{throw Object.assign(Error('Metadata unavailable'),{code:'METADATA_FAILED'});}}},
+  ...['PAYER_BALANCE','PUMP_READINESS','TRANSACTION_BUILD','VALIDATION','SIMULATION'].map(stage=>({stage,adapters:{prepare:async()=>{throw Object.assign(Error('Fixture diagnostic failure'),{code:`${stage}_FAILED`,stage});}}})),
+ ];
+ for(const scenario of scenarios){
+  const s=await service(t,{connection:scenario.connection,adapters:scenario.adapters});
+  const result=await s.request('prepare',{payer:PAYER,initialBuy:'0.01'});
+  assert.notEqual(result.code,200,scenario.stage);
+  assert.equal(result.data.attempt?.failureStage,scenario.stage,scenario.stage);
+  assert.equal(result.data.attempt?.status,'FAILED');
+  assert.ok(result.data.attempt?.attemptId);
+  const attempts=JSON.parse(readFileSync(s.journal.replace(/\.json$/,'-prepare-attempts.json'),'utf8')).attempts;
+  assert.equal(attempts.length,1);
+  assert.equal(attempts[0].failureStage,scenario.stage);
+  assert.equal(attempts[0].preparedReceiptPersisted,false);
+  assert.equal(s.calls.sent,0);
+ }
+});
 test('wrong mainnet endpoint blocks preparation',async t=>{
  const s=await service(t,{connection:{getGenesisHash:async()=>'devnet'}});assert.equal((await s.request('prepare',{payer:PAYER})).code,400);assert.equal(s.calls.sent,0);
 });

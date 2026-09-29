@@ -1,0 +1,105 @@
+{
+  "observedAt": "2026-09-27T08:05:12.093Z",
+  "network": "solana:mainnet",
+  "programs": [
+    {
+      "address": "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4",
+      "programData": "4Ec7ZxZS6Sbdg5UGSLHbAnM7GQHp2eFd4KYWRexAipQT",
+      "observedSlot": 450937800,
+      "programOwner": "BPFLoaderUpgradeab1e11111111111111111111111",
+      "executable": true,
+      "programDataOwner": "BPFLoaderUpgradeab1e11111111111111111111111",
+      "parsedType": "programData",
+      "lastDeploymentSlot": 449280566,
+      "upgradeAuthority": "CvQZZ23qYDWF2RUpxYJ8y9K4skmuvYEEjH7fK58jtipQ",
+      "dataLength": 2892269,
+      "fullProgramDataSha256": "a2a018f56440b193568ee224e565ddb3f724b181c8e16bbe59f8a3eb5bdc9b7f",
+      "reviewApproved": false
+    },
+    {
+      "address": "DRVSpZ2YUYYKgZP8XtLhAGtT1zYSCKzeHfb4DgRnrgqD",
+      "programData": "6DCXx7tbchQXv7WUgQ1u9STwPciWnwgyWU6DQitnLhh",
+      "observedSlot": 450937801,
+      "programOwner": "BPFLoaderUpgradeab1e11111111111111111111111",
+      "executable": true,
+      "programDataOwner": "BPFLoaderUpgradeab1e11111111111111111111111",
+      "parsedType": "programData",
+      "lastDeploymentSlot": 446965384,
+      "upgradeAuthority": "6wdzUdicUXrBKhAJpZtmYVNq1tvopU3i8zVG383Rw24g",
+      "dataLength": 1450045,
+      "fullProgramDataSha256": "52ae5a66be28f704ef4d2d552ed49687c804298f724e4de0cfefe4471c1f60fb",
+      "reviewApproved": false
+    }
+  ],
+  "agentBalance": {
+    "context": {
+      "apiVersion": "4.3.0",
+      "slot": 450937802
+    },
+    "value": 4995000
+  },
+  "ownerBalance": {
+    "context": {
+      "apiVersion": "4.3.0",
+      "slot": 450937802
+    },
+    "value": 107067872
+  },
+  "accounts": {
+    "network": "solana:mainnet",
+    "slot": 450937834,
+    "observedAt": 1790496312083,
+    "agentWallet": "7Bt9Q3EciD8ZhoRA6CviqwpLpGhn4tscPrsKfUqGfFVe",
+    "solBalanceLamports": "4995000",
+    "inputMint": "So11111111111111111111111111111111111111112",
+    "outputMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+    "inputTokenAccount": "HK9b1xCN5kQdjWofPyU3DKexoNcA7Nr1uDCKvdUBfihR",
+    "outputTokenAccount": "FjPUygpFHEUVpSDUM7ByKRByYTsJoN8E7vTjQCuZKQ9G",
+    "mints": [
+      {
+        "address": "So11111111111111111111111111111111111111112",
+        "decimals": 9,
+        "freezeAuthority": null,
+        "program": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+      },
+      {
+        "address": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+        "decimals": 6,
+        "freezeAuthority": "7dGbd2QZcCKcTndnHcTL8q7SMVXAkp688NTQYwrRCrar",
+        "program": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+      }
+    ],
+    "accounts": [
+      {
+        "address": "HK9b1xCN5kQdjWofPyU3DKexoNcA7Nr1uDCKvdUBfihR",
+        "exists": false,
+        "amount": "0",
+        "rentLamports": "0"
+      },
+      {
+        "address": "FjPUygpFHEUVpSDUM7ByKRByYTsJoN8E7vTjQCuZKQ9G",
+        "exists": false,
+        "amount": "0",
+        "rentLamports": "0"
+      }
+    ],
+    "inputTokenBalance": "0",
+    "ataRentLamports": "2976880",
+    "rentPerAccountLamports": "1488440",
+    "mintsVerified": true,
+    "tokenAccountsVerified": true
+  },
+  "ledger": {
+    "hash": "9cacd17c08353de3d5949aafd10e05e841eca242c3832d9c6776b793d3c232f1",
+    "records": 7,
+    "active": 0,
+    "dexCount": 0
+  },
+  "flags": {
+    "FUNDING_ENABLED": "false",
+    "WITHDRAWAL_ENABLED": "false",
+    "CONTROLLED_REAL_ENABLED": "false",
+    "LIVE_TRADING_ENABLED": "false",
+    "GLOBAL_TRADING_KILL_SWITCH": "true"
+  }
+}

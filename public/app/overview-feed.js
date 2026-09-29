@@ -1,3 +1,4 @@
+import {characterPortraitUrl} from './character-registry.js';
 const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const labels={BUY:'BUY',SELL:'SELL',POSITION_OPENED:'POSITION OPENED',POSITION_CLOSED:'POSITION CLOSED',SIGNAL_DETECTED:'SIGNAL',SIGNAL_SKIPPED:'SKIPPED',RISK_REJECTED:'RISK REJECTED',PAUSED:'PAUSED',RESUMED:'RESUMED',TRADING_STARTED:'STARTED',TRADING_STOPPED:'STOPPED'};
 const number=value=>Number.isFinite(value)?value.toLocaleString('en-US',{maximumFractionDigits:6}):null;
@@ -23,5 +24,5 @@ export function renderOverviewFeed(events,agents=[],filter='all'){
   const hasPnl=pnl!==null||percent!==null;
   const stamp=typeof event.timestamp==='number'?event.timestamp:Date.parse(event.timestamp);
   return `<li class="tw-feed-row"><a class="tw-feed-agent" href="#/trader/${encodeURIComponent(event.agentId)}">${character?`<img data-character="${esc(character)}" alt="${esc(agent?.name||'Agent')} character">`:''}<strong>${esc(agent?.name||event.agentId)}</strong></a><div class="tw-feed-action"><div class="tw-feed-action-title"><span class="tw-feed-event tw-feed-event--${tone}">${esc(labels[event.type]||event.type)}</span>${event.tokenSymbol?`<strong>$${esc(event.tokenSymbol)}</strong>`:''}</div>${event.reason?`<p>${esc(event.reason)}</p>`:''}</div><div class="tw-feed-values">${size!==null?`<strong>${size} <span>SOL</span></strong>`:''}${hasPnl?`<span class="tw-feed-pnl ${((event.pnlSol??event.pnlPercent)>=0)?'is-positive':'is-negative'}">${pnl!==null?(event.pnlSol>0?'+':'')+pnl+' SOL':(event.pnlPercent>0?'+':'')+percent+'%'} <span>P&amp;L</span></span>`:''}</div><time ${Number.isFinite(stamp)?`datetime="${new Date(stamp).toISOString()}" title="${esc(new Date(stamp).toLocaleString())}"`:''}>${relative(event.timestamp)}</time></li>`;
- }).join('')}</ol>`}</section>`;
+ }).join('')}</ol>`}<aside class="tw-feed-art" aria-label="Paper trading"><span>DISCIPLINE BUILDS<br>BETTER AGENTS.</span><img src="${characterPortraitUrl('fomy')}" alt="TEKKTEAM Analyst character"><p>Test your strategy.<br>Paper funds. Real market signals.</p></aside></section>`;
 }

@@ -1,2 +1,3 @@
-// One SVG icon family, provided by the bundled Lucide subset in bootstrap.
-export const icon = name => window.TekkworkIcon(name);
+import {productIcon} from './product-icons.js';
+// Product navigation uses original geometry; familiar utility actions retain Lucide.
+export const icon = name => productIcon(name) || window.TekkworkIcon(name);

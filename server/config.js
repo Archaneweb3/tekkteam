@@ -14,11 +14,11 @@ export const characters = [
 ];
 export function publicConfig(network) {
   return {
-    brand: 'TEKKWORK', network, preview: false, backendOnline: true,
+    brand: 'TEKKTEAM', network, preview: false, backendOnline: true,
     networkConfig: ['devnet','mainnet'].includes(network) ? networkConfig(network) : null,
     mainnetSafetyMode: network === 'mainnet', broadcastEnabled: network === 'devnet',
     launchEnabled: network === 'devnet', tradingEnabled: false,
-    mainnetLaunchEnabled: false, contractAddress: '', strategies, characters,
+    mainnetLaunchEnabled: false, contractAddress: '', contractAddressStatus: 'COMING_SOON', socialXUrl: 'https://x.com', socialTelegramUrl: 'https://t.me', strategies, characters,
     capabilities: { walletAuth: true, persistentAgents: network !== 'mainnet', devnetMint: network === 'devnet', pumpfun: false, autonomousTrading: false },
   };
 }

@@ -1,0 +1,288 @@
+{
+  "app": {
+    "network": "MAINNET",
+    "safetyMode": true,
+    "broadcastEnabled": false,
+    "genesis": "5eykt4UsFv8P8NJdTREpY1vzqKqZKvdpKuc147dw2N9d",
+    "payer": "ECMaFXkpb2bDFKXQciAKa1HNtqWgJs9PU3DcEmzgNMNS",
+    "wallet": {
+      "exists": true,
+      "lamports": 17664446,
+      "owner": "11111111111111111111111111111111",
+      "slot": 450674149
+    },
+    "verifiedProgram": {
+      "address": "MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr",
+      "executable": true,
+      "owner": "BPFLoader2111111111111111111111111111111111",
+      "slot": 450674149
+    },
+    "recent": {
+      "blockhash": "AamfggJjxqPbAJYKEw3o8mHKwjbXCRfD1Xwq2mjBt2oV",
+      "lastValidBlockHeight": 428714073
+    },
+    "feeLamports": 5000,
+    "feeBudgetLamports": 100000,
+    "reserveLamports": 1000000,
+    "transaction": "AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAECxBCUy3k0E8WhPDKok0ecQhbigVahqXQSTupJDaKqtYMFSlNamSkhBk0k6HFg2jh8fDW13bySu4HkH6hAQQVEjY5f2qjBCj8lg5HvK1jAkq1dSD6qvLQa5pbK1C42694EAQEANVRFS0tXT1JLIE1BSU5ORVQgU0FGRVRZOiBwcmV2aWV3IG9ubHk7IGRvIG5vdCBhcHByb3Zl",
+    "simulation": {
+      "context": {
+        "apiVersion": "4.3.0",
+        "slot": 450674151
+      },
+      "value": {
+        "accounts": null,
+        "err": null,
+        "fee": 5000,
+        "innerInstructions": null,
+        "loadedAccountsDataSize": 74928,
+        "loadedAddresses": {
+          "readonly": [],
+          "writable": []
+        },
+        "logs": [
+          "Program MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr invoke [1]",
+          "Program log: Memo (len 53): \"TEKKWORK MAINNET SAFETY: preview only; do not approve\"",
+          "Program MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr consumed 20455 of 200000 compute units",
+          "Program MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr success"
+        ],
+        "postBalances": [
+          17659446,
+          523015135
+        ],
+        "postTokenBalances": [],
+        "preBalances": [
+          17664446,
+          523015135
+        ],
+        "preTokenBalances": [],
+        "replacementBlockhash": null,
+        "returnData": null,
+        "unitsConsumed": 20455
+      }
+    },
+    "preparedAt": "2026-09-26T12:26:28.980Z",
+    "rpcEndpoint": "https://api.mainnet-beta.solana.com",
+    "transportUrl": "http://127.0.0.1:5188/mainnet-rpc",
+    "transportChecks": [
+      {
+        "method": "getBalance",
+        "result": {
+          "context": {
+            "apiVersion": "4.3.0",
+            "slot": 450674148
+          },
+          "value": 17664446
+        },
+        "at": "2026-09-26T12:26:28.326Z"
+      },
+      {
+        "method": "getGenesisHash",
+        "result": "5eykt4UsFv8P8NJdTREpY1vzqKqZKvdpKuc147dw2N9d",
+        "at": "2026-09-26T12:26:28.374Z"
+      },
+      {
+        "method": "getAccountInfo",
+        "result": {
+          "context": {
+            "apiVersion": "4.3.0",
+            "slot": 450674149
+          },
+          "value": {
+            "data": "omitted: public program bytes",
+            "executable": false,
+            "lamports": 17664446,
+            "owner": "11111111111111111111111111111111",
+            "rentEpoch": 18446744073709552000,
+            "space": 0
+          }
+        },
+        "at": "2026-09-26T12:26:28.464Z"
+      },
+      {
+        "method": "getAccountInfo",
+        "result": {
+          "context": {
+            "apiVersion": "4.3.0",
+            "slot": 450674149
+          },
+          "value": {
+            "data": "omitted: public program bytes",
+            "executable": true,
+            "lamports": 523015135,
+            "owner": "BPFLoader2111111111111111111111111111111111",
+            "rentEpoch": 18446744073709552000,
+            "space": 74800
+          }
+        },
+        "at": "2026-09-26T12:26:28.661Z"
+      },
+      {
+        "method": "getLatestBlockhash",
+        "result": {
+          "context": {
+            "apiVersion": "4.3.0",
+            "slot": 450674150
+          },
+          "value": {
+            "blockhash": "AamfggJjxqPbAJYKEw3o8mHKwjbXCRfD1Xwq2mjBt2oV",
+            "lastValidBlockHeight": 428714073
+          }
+        },
+        "at": "2026-09-26T12:26:28.744Z"
+      },
+      {
+        "method": "getFeeForMessage",
+        "result": {
+          "context": {
+            "apiVersion": "4.3.0",
+            "slot": 450674150
+          },
+          "value": 5000
+        },
+        "at": "2026-09-26T12:26:28.864Z"
+      },
+      {
+        "method": "simulateTransaction",
+        "result": {
+          "context": {
+            "apiVersion": "4.3.0",
+            "slot": 450674151
+          },
+          "value": {
+            "accounts": null,
+            "err": null,
+            "fee": 5000,
+            "innerInstructions": null,
+            "loadedAccountsDataSize": 74928,
+            "loadedAddresses": {
+              "readonly": [],
+              "writable": []
+            },
+            "logs": [
+              "Program MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr invoke [1]",
+              "Program log: Memo (len 53): \"TEKKWORK MAINNET SAFETY: preview only; do not approve\"",
+              "Program MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr consumed 20455 of 200000 compute units",
+              "Program MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr success"
+            ],
+            "postBalances": [
+              17659446,
+              523015135
+            ],
+            "postTokenBalances": [],
+            "preBalances": [
+              17664446,
+              523015135
+            ],
+            "preTokenBalances": [],
+            "replacementBlockhash": null,
+            "returnData": null,
+            "unitsConsumed": 20455
+          }
+        },
+        "at": "2026-09-26T12:26:28.980Z"
+      },
+      {
+        "method": "isBlockhashValid",
+        "result": {
+          "context": {
+            "apiVersion": "4.3.0",
+            "slot": 450674232
+          },
+          "value": true
+        },
+        "at": "2026-09-26T12:26:50.109Z"
+      }
+    ],
+    "transactionSha256": "5c4964a382c4e412c76f1b6237c57dee493dfdd8c0427a0e2ddbb3e3d4b231e1",
+    "walletActiveNetwork": "UNKNOWN: not exposed by injected provider",
+    "phantomSimulation": "UNKNOWN: requires extension capture",
+    "expectedPhantomChain": "solana:101",
+    "approved": true,
+    "broadcast": false,
+    "providerCallSha256": "5c4964a382c4e412c76f1b6237c57dee493dfdd8c0427a0e2ddbb3e3d4b231e1",
+    "messageBase64": "AQABAsQQlMt5NBPFoTwyqJNHnEIW4oFWoal0Ek7qSQ2iqrWDBUpTWpkpIQZNJOhxYNo4fHw1td28kruB5B+oQEEFRI2OX9qowQo/JYOR7ytYwJKtXUg+qry0GuaWytQuNuveBAEBADVURUtLV09SSyBNQUlOTkVUIFNBRkVUWTogcHJldmlldyBvbmx5OyBkbyBub3QgYXBwcm92ZQ==",
+    "provider": {
+      "isPhantom": true,
+      "isConnected": true,
+      "publicKey": "ECMaFXkpb2bDFKXQciAKa1HNtqWgJs9PU3DcEmzgNMNS",
+      "method": "signTransaction",
+      "chainArgument": "none: injected API",
+      "activeNetwork": "UNKNOWN"
+    },
+    "preview": "Unexpected approval: returned signature discarded; nothing broadcast"
+  },
+  "comparison": {
+    "appSha256": "5c4964a382c4e412c76f1b6237c57dee493dfdd8c0427a0e2ddbb3e3d4b231e1",
+    "providerCallSha256": "5c4964a382c4e412c76f1b6237c57dee493dfdd8c0427a0e2ddbb3e3d4b231e1",
+    "phantomSha256": "50df0a87232090e2935d34a1132d6ce8aea9a240dde35b36001df3da7b8bd5b3",
+    "appBytes": 222,
+    "phantomBytes": 274,
+    "byteEqual": false,
+    "payer": "ECMaFXkpb2bDFKXQciAKa1HNtqWgJs9PU3DcEmzgNMNS",
+    "blockhash": "AamfggJjxqPbAJYKEw3o8mHKwjbXCRfD1Xwq2mjBt2oV",
+    "blockhashEqual": true,
+    "signatureCount": 0,
+    "instructions": [
+      {
+        "program": "ComputeBudget111111111111111111111111111111",
+        "keys": [],
+        "dataHex": "03d8b8050000000000"
+      },
+      {
+        "program": "ComputeBudget111111111111111111111111111111",
+        "keys": [],
+        "dataHex": "02400d0300"
+      },
+      {
+        "program": "MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr",
+        "keys": [],
+        "dataHex": "54454b4b574f524b204d41494e4e4554205341464554593a2070726576696577206f6e6c793b20646f206e6f7420617070726f7665"
+      }
+    ]
+  },
+  "phantomRequest": {
+    "endpoint": "https://api.phantom.app/simulation/v1?language=id",
+    "chainId": "solana:101",
+    "networkID": "solana:101",
+    "appVersion": "26.30.2",
+    "method": "signTransaction",
+    "url": "http://127.0.0.1:5188/mainnet-diagnostic.html",
+    "transactionBase58": "VTv7gNfwZXwNw2JJaaLyfodtvvce9syiMirVzqniVN3rcWXuxScPZPLzhoWaqjx2fxmGPxcQjVFvuSm8YTH5Hd3tK1Xnun3BvETkvmowpToAcuJtYLv4kRgbfNbEJ4tUW5w3goa68Amb7VtRZymrSDhtBbV9nvTVi88pzRMBccHRbybiZgax6hi8LE2HVzMisbgpgjdrbkvXqsZ2ak48gJzAjinrZBx9BWjfDSsa35GTFjDBVKq4YzjfjEaeQ9D7FL9MBkg42kGQznBQ9fGD3bLPKPHinHVoxFLpSAv27YyEhdSREZAzheYNRCKzmi2QM8fyggJiKiNomt6BPTYpESG4eXdJ1op7Ps5ToLtwafA62mN7KChJL",
+    "safeguardEnabled": true
+  },
+  "phantomResponse": {
+    "type": "transaction",
+    "expectedChanges": [],
+    "topLevelError": "absent in observed preview",
+    "simulationError": "absent in observed preview",
+    "chainId": "solana:101",
+    "requestId": "6b843372-239f-45a6-8829-492cdcd8c200",
+    "feePayers": [
+      "ECMaFXkpb2bDFKXQciAKa1HNtqWgJs9PU3DcEmzgNMNS"
+    ],
+    "totalFee": "80000",
+    "safeguard": {
+      "error": null,
+      "shouldBundle": false,
+      "recommended": false,
+      "transactions": "present; not captured"
+    },
+    "warnings": [
+      {
+        "message": "Perubahan saldo tidak ditemukan. Lanjutkan dengan waspada dan berikan konfirmasi hanya jika Anda memercayai situs ini.",
+        "severity": 4,
+        "kind": null
+      }
+    ]
+  },
+  "completion": {
+    "signTransactionCalls": 1,
+    "assistantApprovalActions": 0,
+    "cancelled": false,
+    "providerPromise": "resolved unexpectedly before cancellation",
+    "returnedResult": "discarded; not inspected or retained",
+    "broadcast": false,
+    "upstreamPhantomRpc": "UNKNOWN"
+  }
+}

@@ -13,16 +13,29 @@ import {publishAgentMetadata} from './agent-metadata.js';
 import {assertUnlaunchedDraft,removeDraftMetadata,verifyExpiredPreparation} from './draft-deletion.js';
 import {readInternalAgent} from './internal-agent-request.js';
 import {parseInitialBuy,buyLamports} from '../src/initial-buy.js';
+import {createPrepareAttemptJournal,publicAttempt,safeDiagnosticMessage,PREPARE_STAGES} from './pump-prepare-diagnostics.js';
 
-export function prepareLaunch(launch){
+export function classifyLaunchPreparationFailure(stderr=''){
+ const fatal=String(stderr).split(/\r?\n/).filter(line=>!/^\s*(?:\(node:|\(Use |Node\.js v|PUMP_EVENT |\s*at |\s*\^)/.test(line)).join(' ');
+ if(/Insufficient Mainnet SOL for initial buy and launch costs|INSUFFICIENT_MAINNET_BALANCE/.test(fatal))return {code:'INSUFFICIENT_LAUNCH_BALANCE',message:'Insufficient Mainnet SOL for initial buy and launch costs'};
+ if(/RPC HTTP 429|HTTP 429|Too Many Requests/.test(fatal))return {code:'RPC_RATE_LIMIT',message:'Read-only Mainnet RPC rate limit during preparation'};
+ if(/Metadata mismatch|Public HTTPS metadata required|HTTP 404/.test(fatal))return {code:'METADATA_VERIFICATION_FAILED',message:'Public token metadata verification failed'};
+ if(/Wrong cluster|Mainnet assertion failed/.test(fatal))return {code:'MAINNET_VERIFICATION_FAILED',message:'Mainnet verification failed'};
+ if(/simulation|Simulate|Launch spending policy rejected/i.test(fatal))return {code:'SIMULATION_FAILED',message:'Launch simulation failed'};
+ if(/IDL|schema mismatch|Non-executable program|Global owner mismatch/.test(fatal))return {code:'PUMP_READINESS_FAILED',message:'Pump readiness verification failed'};
+ return {code:'LAUNCH_PREPARATION_FAILED',message:'Launch preparation failed'};
+}
+
+export function prepareLaunch(launch,onEvent=()=>{}){
  return new Promise((resolve,reject)=>{
-  const child=spawn(process.execPath,['scripts/pump-readiness.mjs','--simulate','--prepare-launch'],{stdio:['ignore','pipe','pipe'],windowsHide:true,env:{...process.env,PUMP_AGENT_LAUNCH:JSON.stringify(launch)}});
-  let output='',errors='';
-  const timer=setTimeout(()=>{child.kill();reject(Error('Preparation timed out. No retry.'));},45000);
+  const child=spawn(process.execPath,['scripts/pump-readiness.mjs','--simulate','--prepare-launch','--events'],{stdio:['ignore','pipe','pipe'],windowsHide:true,env:{...process.env,PUMP_AGENT_LAUNCH:JSON.stringify(launch)}});
+  let output='',errors='',pending='',settled=false,stage='PUMP_READINESS';
+  const emitLine=line=>{if(line.startsWith('PUMP_EVENT ')){try{const event=JSON.parse(line.slice(11));if(PREPARE_STAGES.has(event.stage)){stage=event.stage;onEvent({stage});}}catch{}}else if(/DEP0040|punycode/i.test(line))onEvent({warning:'DEP0040'});else if(line.trim()&&!/^\s*at |^\(node:|^Node\.js v|^\(Use |^\s*\^/.test(line))errors=(errors+' '+line).slice(-4096);};
+  const timer=setTimeout(()=>{child.kill();if(!settled){settled=true;reject(Object.assign(Error('Preparation timed out. No retry.'),{code:'LAUNCH_SERVICE_TIMEOUT',stage:'PUMP_READINESS'}));}},45000);
   child.stdout.on('data',b=>{output+=b;if(output.length>4e6)child.kill();});
-  child.stderr.on('data',b=>{errors+=b;});
-  child.on('error',reject);
-  child.on('close',code=>{clearTimeout(timer);try{if(code!==0)throw Error('Preparation failed: '+errors.slice(-1000));resolve(JSON.parse(output));}catch(e){reject(e);}});
+  child.stderr.on('data',b=>{pending+=b.toString();let i;while((i=pending.indexOf('\n'))>=0){emitLine(pending.slice(0,i).trimEnd());pending=pending.slice(i+1);}if(pending.length>8192)pending=pending.slice(-8192);});
+  child.on('error',error=>{clearTimeout(timer);if(!settled){settled=true;reject(Object.assign(error,{code:'LAUNCH_SERVICE_UNAVAILABLE',stage:'PUMP_READINESS'}));}});
+  child.on('close',code=>{clearTimeout(timer);if(pending)emitLine(pending);if(settled)return;settled=true;try{if(code!==0){const failure=classifyLaunchPreparationFailure(errors);const httpMatch=errors.match(/(?:RPC )?HTTP\s+(\d{3})/i),rpcMatch=errors.match(/"code"\s*:\s*(-?\d{1,6})/);throw Object.assign(Error(failure.message),{code:failure.code,stage,processExitCode:code,httpStatus:httpMatch?Number(httpMatch[1]):null,rpcCode:rpcMatch?Number(rpcMatch[1]):null,fatalStderr:safeDiagnosticMessage(errors)});}resolve(JSON.parse(output));}catch(e){reject(e);}});
  });
 }
 
@@ -30,10 +43,11 @@ export function prepareLaunch(launch){
  * Public receipt only is journaled; no mint secret or signed transaction is saved.
  * /prepare prepares; /submit requires BOTH valid signatures; /status only reads.
  */
-export function createPumpLaunch({journal,rpc='https://api.mainnet-beta.solana.com',origins=['http://127.0.0.1:5188'],serviceHost='127.0.0.1:4193',prepare=prepareLaunch,connection,send,publishMetadata=publishAgentMetadata,removeMetadata=removeDraftMetadata,getAgent=async(id,req)=>{
+export function createPumpLaunch({journal,attemptJournal=journal.replace(/\.json$/,'-prepare-attempts.json'),rpc='https://api.mainnet-beta.solana.com',origins=['http://127.0.0.1:5188'],serviceHost='127.0.0.1:4193',prepare=prepareLaunch,connection,send,publishMetadata=publishAgentMetadata,removeMetadata=removeDraftMetadata,getAgent=async(id,req)=>{
  return readInternalAgent(id,req.headers.cookie||'');
 }}={}){
  const c=connection??new Connection(rpc,{commitment:'confirmed',disableRetryOnRateLimit:true});
+ const attempts=createPrepareAttemptJournal(attemptJournal);
  const launches=new Map();let saved={};
  try{const data=JSON.parse(readFileSync(journal,'utf8'));saved=data.version===2?data.receipts:{};}catch(e){if(e.code!=='ENOENT')throw e;}
  for(const [id,record] of Object.entries(saved))launches.set(id,{record,evidence:null,busy:false});
@@ -50,12 +64,24 @@ export function createPumpLaunch({journal,rpc='https://api.mainnet-beta.solana.c
   if(req.method!=='GET'&&!origins.includes(req.headers.origin))return res.status(403).json({error:'Untrusted origin'});
   next();
  });
+ const responseAttempt=(attempt,status,classification)=>{if(!attempt)return null;attempts.update(attempt,{service:{...attempt.service,httpStatus:status,responseReceived:true,responseClassification:classification}});return publicAttempt(attempt);};
+ const latestAttempt=agentId=>{const records=attempts.all().filter(item=>item.agentId===agentId);return publicAttempt(records.at(-1));};
  app.use(express.json({limit:'8kb'}));
+ app.use((req,res,next)=>{
+  if(req.method!=='POST'||req.path!=='/pump-launch/prepare')return next();
+  const attempt=attempts.begin(req.body);req.prepareAttempt=attempt;
+  attempts.stage(attempt,'OWNER_AUTH');
+  res.on('finish',()=>{attempts.update(attempt,{service:{...attempt.service,httpStatus:res.statusCode,responseReceived:true,responseClassification:attempt.finalStatus==='PREPARED'?'PREPARED':attempt.finalStatus==='FAILED'?'FAILED':'REJECTED'}});});
+  next();
+ });
  app.use(async(req,res,next)=>{
   const id=req.body?.agentId??req.query.agentId;
-  if(typeof id!=='string'||!id)return res.status(400).json({error:'Agent ID required'});
-  req.originalAgent=await getAgent(id,req);
+  if(typeof id!=='string'||!id){if(req.prepareAttempt)attempts.fail(req.prepareAttempt,Object.assign(Error('Agent ID required'),{code:'AGENT_ID_REQUIRED'}),400);return res.status(400).json({error:'Agent ID required',attempt:responseAttempt(req.prepareAttempt,400,'FAILED')});}
+  try{req.originalAgent=await getAgent(id,req);}catch(error){return next(error);}
+  if(req.prepareAttempt)attempts.passed(req.prepareAttempt,'OWNER_AUTH');
+  if(req.prepareAttempt)attempts.stage(req.prepareAttempt,'OWNERSHIP_CHECK');
   const agent=agentLaunchData(req.originalAgent);if(agent.agentId!==id)throw Error('Agent ID mismatch');
+  if(req.prepareAttempt){attempts.passed(req.prepareAttempt,'OWNERSHIP_CHECK');attempts.update(req.prepareAttempt,{owner:typeof agent.owner==='string'&&/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(agent.owner)?agent.owner:null});}
   if(!launches.has(id))launches.set(id,{record:null,evidence:null,busy:false});
   req.launchCell=launches.get(id);req.agentData=agent;next();
  });
@@ -74,23 +100,30 @@ export function createPumpLaunch({journal,rpc='https://api.mainnet-beta.solana.c
   }finally{cell.busy=false;}
  });
  app.post('/pump-launch/prepare',async(req,res)=>{
-  const cell=req.launchCell;let {record}=cell;
+  const cell=req.launchCell;let {record}=cell;const attempt=req.prepareAttempt;
   const save=()=>{cell.record=record;persist();};
   const replace=record?.status==='Prepared'&&!record.signature&&!record.broadcastAttempted&&req.body.replacePreparationId===record.id;
-  if(cell.busy||(record&&!replace))return res.status(409).json({error:'A launch attempt already exists for this agent. No automatic retry.',receipt:record});
-  const initialBuyLamports=parseInitialBuy(req.body.initialBuy??'0');
-  if(req.body.payer!==req.agentData.owner)return res.status(400).json({error:'Use this agent owner wallet'});
+  attempts.stage(attempt,'LAUNCH_STATE_CHECK');
+  if(cell.busy||(record&&!replace)){attempts.fail(attempt,Object.assign(Error('Launch state conflict'),{code:'LAUNCH_STATE_CONFLICT'}),409);return res.status(409).json({code:'LAUNCH_STATE_CONFLICT',error:'A launch attempt already exists for this agent. No automatic retry.',receipt:record,attempt:responseAttempt(attempt,409,'FAILED')});}
+  attempts.passed(attempt,'LAUNCH_STATE_CHECK');
+  const initialBuyLamports=parseInitialBuy(req.body.initialBuy??'0');attempts.update(attempt,{initialBuyLamports});
+  attempts.stage(attempt,'OWNER_AUTH');
+  if(req.body.payer!==req.agentData.owner){attempts.fail(attempt,Object.assign(Error('Use this agent owner wallet'),{code:'OWNER_WALLET_MISMATCH'}),400);return res.status(400).json({error:'Use this agent owner wallet',attempt:responseAttempt(attempt,400,'FAILED')});}
   assertAgentLaunch(req.agentData,req.body.agent);
   cell.busy=true;
   try{
    // Invalidate the prior unsigned preparation before rebuilding; old IDs cannot submit.
    if(replace){cell.evidence=null;record=null;save();}
-   await network();const launch={...req.agentData,metadataUri:await publishMetadata(req.agentData),initialBuyLamports};
+   attempts.stage(attempt,'MAINNET_VERIFY');await network();attempts.passed(attempt,'MAINNET_VERIFY');
+   attempts.stage(attempt,'METADATA_VERIFY');const launch={...req.agentData,metadataUri:await publishMetadata(req.agentData),initialBuyLamports};
    if(!/^https:\/\//.test(launch.metadataUri))throw Error('Public HTTPS metadata required');
-   const e=await prepare(launch);delete e.rpc;assertAgentLaunch(req.agentData,e.launch);if(e.launch?.metadataUri!==launch.metadataUri||buyLamports(e.launch)!==initialBuyLamports)throw Error('Prepared initial buy or metadata mismatch');validateLaunchEvidence(e);verifyLaunchTransaction(e.walletTransactionBase64,e,false);
+   attempts.update(attempt,{metadataPublished:true});attempts.passed(attempt,'METADATA_VERIFY');
+   attempts.stage(attempt,'PUMP_READINESS');const e=await prepare(launch,event=>{if(event.warning)attempts.warn(attempt,event.warning);if(event.stage){const prior=attempt.currentStage;if(prior==='PAYER_BALANCE'||prior==='PUMP_READINESS'||prior==='TRANSACTION_BUILD'||prior==='VALIDATION')attempts.passed(attempt,prior);attempts.stage(attempt,event.stage);if(event.stage==='VALIDATION')attempts.update(attempt,{transactionBuilt:true});if(event.stage==='SIMULATION')attempts.update(attempt,{validationPassed:true});}});
+   attempts.update(attempt,{transactionBuilt:true,validationPassed:true,simulationPassed:true});attempts.passed(attempt,'SIMULATION');
+   delete e.rpc;attempts.stage(attempt,'VALIDATION');assertAgentLaunch(req.agentData,e.launch);if(e.launch?.metadataUri!==launch.metadataUri||buyLamports(e.launch)!==initialBuyLamports)throw Error('Prepared initial buy or metadata mismatch');validateLaunchEvidence(e);verifyLaunchTransaction(e.walletTransactionBase64,e,false);attempts.passed(attempt,'VALIDATION');
    if(await c.getBlockHeight('confirmed')>=e.lastValidBlockHeight-20)throw Error('Preparation expired. No wallet request made.');
    cell.evidence=e;record={...launch,id:randomUUID(),tokenName:launch.name,network:'solana:101',confirmed:false,signature:null,observedSpendLamports:null,confirmedAt:null,status:'Prepared',mint:e.mint,lastValidBlockHeight:e.lastValidBlockHeight,blockhash:e.recentBlockhash,createdAt:Date.now()};save();
-   res.json({id:record.id,evidence:e});
+   attempts.complete(attempt);res.json({id:record.id,evidence:e,attempt:responseAttempt(attempt,200,'PREPARED')});
   }finally{cell.busy=false;}
  });
  app.post('/pump-launch/review',async(req,res)=>{
@@ -119,11 +152,12 @@ export function createPumpLaunch({journal,rpc='https://api.mainnet-beta.solana.c
  });
  app.get('/pump-launch/status',async(req,res)=>{
   const cell=req.launchCell;let {record}=cell;const save=()=>{cell.record=record;persist();};
-  if(!record)return res.json({status:'Idle'});
-  if(!record.signature||record.status==='Success'||record.status==='Failed')return res.json(record);
+  const view=()=>({...record,launchLifecycle:record.status==='Success'&&record.confirmed?'TOKEN_LAUNCHED':record.signature?'RECONCILIATION_REQUIRED':'PREVIOUS_ATTEMPT_ENDED',canStartFreshPreparation:false,resolutionReason:record.signature?'Previous signed transaction requires conclusive reconciliation before another launch.':'No signed transaction on this receipt.',latestAttempt:latestAttempt(req.agentData.agentId)});
+  if(!record)return res.json({status:'Idle',launchLifecycle:'PREVIOUS_ATTEMPT_ENDED',canStartFreshPreparation:true,latestAttempt:latestAttempt(req.agentData.agentId)});
+  if(!record.signature||record.status==='Success')return res.json(view());
   await network();
   const status=(await c.getSignatureStatuses([record.signature],{searchTransactionHistory:true})).value[0];
-  if(status?.err){record.status='Failed';record.error='Transaction failed on-chain: '+JSON.stringify(status.err);save();}
+  if(status?.err){record.status='Failed';record.error='Transaction failed on-chain: '+JSON.stringify(status.err);record.resolution='ONCHAIN_FAILURE';save();}
   else if(['confirmed','finalized'].includes(status?.confirmationStatus)){
    const key=new PublicKey(record.mint),account=await c.getAccountInfo(key,'confirmed');
    if(!account)throw Error('Confirmed signature; mint account not yet available. Check confirmation again.');
@@ -134,9 +168,11 @@ export function createPumpLaunch({journal,rpc='https://api.mainnet-beta.solana.c
    const keys=landed.transaction.message.staticAccountKeys??landed.transaction.message.accountKeys;
    if(keys[0].toBase58()!==record.owner)throw Error('On-chain payer mismatch');
    record={...record,status:'Success',confirmed:true,confirmedAt:Date.now(),observedSpendLamports:landed.meta.preBalances[0]-landed.meta.postBalances[0],networkFeeLamports:landed.meta.fee,pumpUrl:`https://pump.fun/coin/${record.mint}`,explorerUrl:`https://explorer.solana.com/tx/${record.signature}`,mintExplorerUrl:`https://explorer.solana.com/address/${record.mint}`};save();
-  }else if(!status&&await c.getBlockHeight('confirmed')>record.lastValidBlockHeight){record.status='Failed';record.error='Blockhash expired without a recorded confirmation. No retry performed.';save();}
-  res.json(record);
+  }
+  // A null status after blockhash expiry is not proof that a signed,
+  // broadcast-attempted transaction never landed. Keep the launch blocked.
+  res.json(view());
  });
- app.use((err,req,res,next)=>res.status(400).json({error:process.env.NODE_ENV==='production'?'Launch operation stopped. Check launch status; do not retry automatically.':err.message,receipt:req.launchCell?.record}));
+ app.use((err,req,res,next)=>{const known=err.code==='INSUFFICIENT_LAUNCH_BALANCE'||err.code==='RPC_RATE_LIMIT';const status=known&&err.code==='RPC_RATE_LIMIT'?503:err.status&&Number.isInteger(err.status)?err.status:400;const attempt=req.prepareAttempt;if(attempt){if(err.processExitCode!==undefined||err.fatalStderr)attempts.update(attempt,{service:{...attempt.service,processExitCode:Number.isInteger(err.processExitCode)?err.processExitCode:null,fatalStderr:err.fatalStderr||safeDiagnosticMessage(err)}});attempts.fail(attempt,err,err.httpStatus??status);}res.status(status).json({code:known?err.code:'LAUNCH_OPERATION_STOPPED',error:err.code==='INSUFFICIENT_LAUNCH_BALANCE'?"Your wallet doesn't have enough SOL for the initial buy and launch costs.":err.code==='RPC_RATE_LIMIT'?'Read-only Mainnet RPC rate limit during preparation. No transaction was sent.':'Launch operation stopped. Check launch status; do not retry automatically.',receipt:req.launchCell?.record,attempt:responseAttempt(attempt,status,'FAILED')});});
  return app;
 }

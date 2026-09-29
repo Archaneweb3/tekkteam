@@ -12,7 +12,7 @@
     "dev": "vite --host 127.0.0.1",
     "build": "vite build",
     "preview": "vite preview --host 127.0.0.1",
-    "test": "npm run test:backend && node tests/workspace.mjs && node tests/workspace-auth.mjs && node tests/confirmation-ui.mjs && node tests/character-bounds.mjs"
+    "test": "npm run test:backend && node --test tests/wallet-transfers.test.mjs && node tests/workspace.mjs && node tests/workspace-auth.mjs && node tests/confirmation-ui.mjs && node tests/character-bounds.mjs && node tests/wallet-intent-browser.mjs && node tests/wallet-workspace.mjs && node tests/agent-settings-visual.mjs && node tests/agent-delete-browser.mjs"
   },
   "dependencies": {
     "@solana/spl-token": "^0.4.15",

@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TEKKWORK — Phantom isolation test</title>
+<style>body{font:16px system-ui;background:#101827;color:#edf3ff;max-width:850px;margin:48px auto;padding:24px}button{padding:14px;margin:12px 0;font:inherit}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#19263c;padding:20px}strong{color:#ffd885}</style>
+<h1>Phantom devnet isolation test</h1>
+<p>One memo instruction. No mint, token account, transfer, or application backend.</p>
+<p><strong>Inspect the wallet preview, then CANCEL. Do not approve or bypass warnings.</strong></p>
+<p>This page requests signing only. It has no broadcast function. Any returned signature is discarded.</p>
+<button id="test">Inspect minimal transaction in Phantom</button>
+<section aria-labelledby="evidence-title">
+<h2 id="evidence-title">Diagnostic Evidence</h2>
+<p>RPC simulation bytes and provider-call bytes are captured independently. Phantom's private simulator endpoint, chain, and bytes are unknown unless captured in extension DevTools. “Solana” is not a cluster identifier.</p>
+<pre id="result" aria-live="polite">Ready. Local development only.</pre>
+<details><summary>Compare an independently captured Phantom request</summary>
+<p>In the extension's own DevTools, inspect the simulation request's Payload and Response. Paste only its serialized transaction/message below. Do not paste headers, cookies, keys, seed phrases, or a HAR. All comparison stays in this page; nothing is uploaded.</p>
+<label>Captured content <select id="capture-kind"><option value="transaction">Full serialized transaction</option><option value="message">Message only</option></select></label>
+<label>Encoding <select id="capture-encoding"><option>base64</option><option>base58</option></select></label>
+<p><label>Bytes <textarea id="capture-bytes" rows="5" style="width:100%" maxlength="20000"></textarea></label></p>
+<label>Observed chainId <input id="capture-chain" placeholder="Unknown unless captured" maxlength="100"></label>
+<p><label>Simulation response/error (no request headers)<textarea id="capture-response" rows="4" style="width:100%" maxlength="20000"></textarea></label></p>
+<button id="compare" type="button">Compare captured bytes</button>
+<pre id="comparison">No independent Phantom capture. No conclusion A/B/C/D established.</pre>
+</details>
+</section>
+<script type="module" src="/src/phantom-diagnostic.js"></script>
+</html>

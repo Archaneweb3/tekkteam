@@ -1,0 +1,281 @@
+{
+  "status": "BLOCKED",
+  "createdAt": "2026-09-26T12:39:02.193Z",
+  "sources": {
+    "idlUrl": "https://raw.githubusercontent.com/pump-fun/pump-public-docs/81091419e4457566469d4e2a27f64ed84d42419c/idl/pump.json",
+    "idlSha256": "ffe966c42f1af41652ee753fe2f1e3f7cd4077d7e6f49faf3138959c8b56064b",
+    "metadataUri": "https://tekkwork-test-metadata.vercel.app/metadata/tekkwork-test.json",
+    "metadataSha256": "96600409bc6599ea1c0341737abe335056ac94a9c1167836add78f47ca3ee508"
+  },
+  "rpc": "https://api.mainnet-beta.solana.com",
+  "genesis": "5eykt4UsFv8P8NJdTREpY1vzqKqZKvdpKuc147dw2N9d",
+  "chainId": "solana:101",
+  "chainIdSource": "Configured Mainnet identity; no Phantom invoked",
+  "feePayer": "ECMaFXkpb2bDFKXQciAKa1HNtqWgJs9PU3DcEmzgNMNS",
+  "mint": "5Nis1XziD7SW7HEvaoy2RvdXzuc6KwZyer7EiudskZn3",
+  "recentBlockhash": "G4W1GLRUew4d4naLJ189wG2GSAX1DHywRiD451o1SLCQ",
+  "lastValidBlockHeight": 428716872,
+  "transactionBase64": "AgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAIEMQQlMt5NBPFoTwyqJNHnEIW4oFWoal0Ek7qSQ2iqrWDQP9HSavlZpgsN4ZzX5xFlL1xuKWGs4X15nsKCpX/U4wqGDvlJY8Xt8MCCR1FLmQNlim9CZLa/DbUYAJShnl0xnyysqf/MfuemfFxYdMDMGG27uNlZTEFYPRtUkaLnL0+ootf0mq0eaapzGy/awsj62GIWjceASCsqRO+7z0Tini0vDO69btLdR4w3yUn1168dIQKVsBfqlM6Ewendsz3FQPyTqhN8QCAzR0zgAFZqblUmZtlGBw62uKjr8WIHFBTBSrl16fapySm6rCnKVSRhVrUoGcWYGdMTgNFWYA9ZaMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACtrqJ9s8bz0E5c8KICnwPjOY8IU5Xv7+8XH8ZK+BdBOoZeae4PVIDKvPZjV+TcLxjVjUXB6nSJ+zcj2Xk8cqYBVuD2k2Zaz0TbFWi/F1uqUYnLl/XS/ztlXSu2/W0YsIyXJY9OJInxuz0QKRSODYMLWhOZ2v8QhASOe9jb6fhZrPE26wH8HE6IPSPItYRKtZo39mrdV8XprDtT4FnTXGQG3fbh7nWP3hhCXbzkbM3athr8TYO5DSf+vfko2KGL/AbFwc5jjSVn0mRosF65UdGijcxuEjSCtcZ1FJdw5ivy38TXhYnRxcrlEpw1qY3+pgmPJuU9iBu5k+SdkNnWtekBCxABDwMFCgAIDgwHCQQGAg0LlQHWkEzsX4sxtA0AAABURUtLV09SSyBURVNUBAAAAFRFS0tFAAAAaHR0cHM6Ly90ZWtrd29yay10ZXN0LW1ldGFkYXRhLnZlcmNlbC5hcHAvbWV0YWRhdGEvdGVra3dvcmstdGVzdC5qc29uxBCUy3k0E8WhPDKok0ecQhbigVahqXQSTupJDaKqtYMAAAAAAAAAAAAAAA==",
+  "transactionSha256": "903bf0494b66609ed175133a1a8d9de0885c5fbf6168025b2fd210d285a5850a",
+  "serializedLength": 847,
+  "readSlot": 450676948,
+  "payerBalanceLamports": 17664446,
+  "accountObservations": [
+    {
+      "name": "mint",
+      "address": "5Nis1XziD7SW7HEvaoy2RvdXzuc6KwZyer7EiudskZn3",
+      "exists": false,
+      "owner": null,
+      "lamports": null,
+      "executable": null
+    },
+    {
+      "name": "mint_authority",
+      "address": "TSLvdd1pWpHVjahSpsvCXUbgwsL3JAcvokwaKt1eokM",
+      "exists": true,
+      "owner": "11111111111111111111111111111111",
+      "lamports": 1020235880,
+      "executable": false
+    },
+    {
+      "name": "bonding_curve",
+      "address": "9PmbZNY2FY2wLXKxPXTB5CAQyWUASwzk4kXZiLk6EFfs",
+      "exists": false,
+      "owner": null,
+      "lamports": null,
+      "executable": null
+    },
+    {
+      "name": "associated_bonding_curve",
+      "address": "DAWqHQYxrohndteif9AGbg4UjsZpUtyg16hiuoPN1eL4",
+      "exists": false,
+      "owner": null,
+      "lamports": null,
+      "executable": null
+    },
+    {
+      "name": "global",
+      "address": "4wTV1YmiEkRvAtNtsSGPtUrqRYQMe5SKy2uB4Jjaxnjf",
+      "exists": true,
+      "owner": "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P",
+      "lamports": 4089837830,
+      "executable": false
+    },
+    {
+      "name": "user",
+      "address": "ECMaFXkpb2bDFKXQciAKa1HNtqWgJs9PU3DcEmzgNMNS",
+      "exists": true,
+      "owner": "11111111111111111111111111111111",
+      "lamports": 17664446,
+      "executable": false
+    },
+    {
+      "name": "system_program",
+      "address": "11111111111111111111111111111111",
+      "exists": true,
+      "owner": "NativeLoader1111111111111111111111111111111",
+      "lamports": 1,
+      "executable": true
+    },
+    {
+      "name": "token_program",
+      "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+      "exists": true,
+      "owner": "BPFLoaderUpgradeab1e11111111111111111111111",
+      "lamports": 70128638,
+      "executable": true
+    },
+    {
+      "name": "associated_token_program",
+      "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
+      "exists": true,
+      "owner": "BPFLoader2111111111111111111111111111111111",
+      "lamports": 3388612899,
+      "executable": true
+    },
+    {
+      "name": "mayhem_program_id",
+      "address": "MAyhSmzXzV1pTf7LsNkrNwkWKTo4ougAJ1PPg47MD4e",
+      "exists": true,
+      "owner": "BPFLoaderUpgradeab1e11111111111111111111111",
+      "lamports": 11149834,
+      "executable": true
+    },
+    {
+      "name": "global_params",
+      "address": "13ec7XdrjF3h3YcqBTFDSReRcUFwbCnJaAQspM4j6DDJ",
+      "exists": true,
+      "owner": "MAyhSmzXzV1pTf7LsNkrNwkWKTo4ougAJ1PPg47MD4e",
+      "lamports": 3104160,
+      "executable": false
+    },
+    {
+      "name": "sol_vault",
+      "address": "BwWK17cbHxwWBKZkUYvzxLcNQ1YVyaFezduWbtm2de6s",
+      "exists": true,
+      "owner": "11111111111111111111111111111111",
+      "lamports": 56850095231197,
+      "executable": false
+    },
+    {
+      "name": "mayhem_state",
+      "address": "GQXDAkAzScWkiEFcJrRzG9NG44BZrGL3GXmkckHPpAW",
+      "exists": false,
+      "owner": null,
+      "lamports": null,
+      "executable": null
+    },
+    {
+      "name": "mayhem_token_vault",
+      "address": "3qKZFD4qFSpiMZus5EJtq3d4SxoZwbDYxZFJgGzobCPo",
+      "exists": false,
+      "owner": null,
+      "lamports": null,
+      "executable": null
+    },
+    {
+      "name": "event_authority",
+      "address": "Ce6TQqeHC9p8KetsN6JsjHK7UTZk7nasjjnr7XxXp9F1",
+      "exists": true,
+      "owner": "11111111111111111111111111111111",
+      "lamports": 168261611,
+      "executable": false
+    },
+    {
+      "name": "program",
+      "address": "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P",
+      "exists": true,
+      "owner": "BPFLoaderUpgradeab1e11111111111111111111111",
+      "lamports": 9296812471,
+      "executable": true
+    }
+  ],
+  "guard": {
+    "allowed": false,
+    "code": "UNPROVEN_CPI_PAYER_DEBIT",
+    "capLamports": "10000000",
+    "structure": {
+      "instruction": "create_v2",
+      "programId": "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P",
+      "requiredSigners": 2,
+      "accounts": [
+        {
+          "name": "mint",
+          "address": "5Nis1XziD7SW7HEvaoy2RvdXzuc6KwZyer7EiudskZn3",
+          "signer": true,
+          "writable": true
+        },
+        {
+          "name": "mint_authority",
+          "address": "TSLvdd1pWpHVjahSpsvCXUbgwsL3JAcvokwaKt1eokM",
+          "signer": false,
+          "writable": false
+        },
+        {
+          "name": "bonding_curve",
+          "address": "9PmbZNY2FY2wLXKxPXTB5CAQyWUASwzk4kXZiLk6EFfs",
+          "signer": false,
+          "writable": true
+        },
+        {
+          "name": "associated_bonding_curve",
+          "address": "DAWqHQYxrohndteif9AGbg4UjsZpUtyg16hiuoPN1eL4",
+          "signer": false,
+          "writable": true
+        },
+        {
+          "name": "global",
+          "address": "4wTV1YmiEkRvAtNtsSGPtUrqRYQMe5SKy2uB4Jjaxnjf",
+          "signer": false,
+          "writable": false
+        },
+        {
+          "name": "user",
+          "address": "ECMaFXkpb2bDFKXQciAKa1HNtqWgJs9PU3DcEmzgNMNS",
+          "signer": true,
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111",
+          "signer": false,
+          "writable": false
+        },
+        {
+          "name": "token_program",
+          "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+          "signer": false,
+          "writable": false
+        },
+        {
+          "name": "associated_token_program",
+          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
+          "signer": false,
+          "writable": false
+        },
+        {
+          "name": "mayhem_program_id",
+          "address": "MAyhSmzXzV1pTf7LsNkrNwkWKTo4ougAJ1PPg47MD4e",
+          "signer": false,
+          "writable": true
+        },
+        {
+          "name": "global_params",
+          "address": "13ec7XdrjF3h3YcqBTFDSReRcUFwbCnJaAQspM4j6DDJ",
+          "signer": false,
+          "writable": false
+        },
+        {
+          "name": "sol_vault",
+          "address": "BwWK17cbHxwWBKZkUYvzxLcNQ1YVyaFezduWbtm2de6s",
+          "signer": false,
+          "writable": true
+        },
+        {
+          "name": "mayhem_state",
+          "address": "GQXDAkAzScWkiEFcJrRzG9NG44BZrGL3GXmkckHPpAW",
+          "signer": false,
+          "writable": true
+        },
+        {
+          "name": "mayhem_token_vault",
+          "address": "3qKZFD4qFSpiMZus5EJtq3d4SxoZwbDYxZFJgGzobCPo",
+          "signer": false,
+          "writable": true
+        },
+        {
+          "name": "event_authority",
+          "address": "Ce6TQqeHC9p8KetsN6JsjHK7UTZk7nasjjnr7XxXp9F1",
+          "signer": false,
+          "writable": false
+        },
+        {
+          "name": "program",
+          "address": "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P",
+          "signer": false,
+          "writable": false
+        }
+      ],
+      "dataBase64": "1pBM7F+LMbQNAAAAVEVLS1dPUksgVEVTVAQAAABURUtLRQAAAGh0dHBzOi8vdGVra3dvcmstdGVzdC1tZXRhZGF0YS52ZXJjZWwuYXBwL21ldGFkYXRhL3Rla2t3b3JrLXRlc3QuanNvbsQQlMt5NBPFoTwyqJNHnEIW4oFWoal0Ek7qSQ2iqrWDAAAAAAAAAAAAAAA=",
+      "messageBase64": "AgAIEMQQlMt5NBPFoTwyqJNHnEIW4oFWoal0Ek7qSQ2iqrWDQP9HSavlZpgsN4ZzX5xFlL1xuKWGs4X15nsKCpX/U4wqGDvlJY8Xt8MCCR1FLmQNlim9CZLa/DbUYAJShnl0xnyysqf/MfuemfFxYdMDMGG27uNlZTEFYPRtUkaLnL0+ootf0mq0eaapzGy/awsj62GIWjceASCsqRO+7z0Tini0vDO69btLdR4w3yUn1168dIQKVsBfqlM6Ewendsz3FQPyTqhN8QCAzR0zgAFZqblUmZtlGBw62uKjr8WIHFBTBSrl16fapySm6rCnKVSRhVrUoGcWYGdMTgNFWYA9ZaMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACtrqJ9s8bz0E5c8KICnwPjOY8IU5Xv7+8XH8ZK+BdBOoZeae4PVIDKvPZjV+TcLxjVjUXB6nSJ+zcj2Xk8cqYBVuD2k2Zaz0TbFWi/F1uqUYnLl/XS/ztlXSu2/W0YsIyXJY9OJInxuz0QKRSODYMLWhOZ2v8QhASOe9jb6fhZrPE26wH8HE6IPSPItYRKtZo39mrdV8XprDtT4FnTXGQG3fbh7nWP3hhCXbzkbM3athr8TYO5DSf+vfko2KGL/AbFwc5jjSVn0mRosF65UdGijcxuEjSCtcZ1FJdw5ivy38TXhYnRxcrlEpw1qY3+pgmPJuU9iBu5k+SdkNnWtekBCxABDwMFCgAIDgwHCQQGAg0LlQHWkEzsX4sxtA0AAABURUtLV09SSyBURVNUBAAAAFRFS0tFAAAAaHR0cHM6Ly90ZWtrd29yay10ZXN0LW1ldGFkYXRhLnZlcmNlbC5hcHAvbWV0YWRhdGEvdGVra3dvcmstdGVzdC5qc29uxBCUy3k0E8WhPDKok0ecQhbigVahqXQSTupJDaKqtYMAAAAAAAAAAAAAAA==",
+      "initialBuyLamports": 0,
+      "explicitTransfers": [],
+      "priorityFeeLamports": 0
+    },
+    "fees": {
+      "baseFeeLamports": 10000,
+      "priorityFeeLamports": 0,
+      "initialBuyLamports": 0,
+      "explicitTransferLamports": 0,
+      "platformFeeLamports": 0,
+      "protocolFeeLamports": null,
+      "rentLamports": null
+    },
+    "calculatedMaximumPayerDebitLamports": null,
+    "reason": "create_v2 supplies the payer as writable signer to Pump. Its CPI account creation/rent and other possible lamport debits have no max-debit argument in this message. No reviewed execution-time bound is available. Simulation cannot establish the absolute cap.",
+    "simulation": {
+      "status": "NOT_RUN_STATIC_SPENDING_GUARD_REJECTED",
+      "payerBalanceComparison": null
+    }
+  }
+}

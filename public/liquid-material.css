@@ -1,0 +1,33 @@
+/* Pointer material only. Scene transforms remain owned by the map. */
+.liquid-control{--pointer-x:50%;--pointer-y:50%;--pointer-light:0;--material-press:0;position:relative;isolation:isolate;overflow:hidden!important;}
+.liquid-control::before,.liquid-control::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:-1;}
+.liquid-control::before{background:radial-gradient(ellipse 70px 45px at var(--pointer-x) var(--pointer-y),#fff9,transparent 75%),conic-gradient(from var(--pointer-angle,0deg) at var(--pointer-x) var(--pointer-y),transparent 0deg,#bce9ff38 70deg,transparent 120deg,#d4c9ff30 235deg,transparent 290deg);opacity:calc(var(--pointer-light)*.65);box-shadow:inset 0 1px 1px #ffffff70,inset 0 -1px 1px #b8c9ff60;filter:blur(.3px);}
+.liquid-control::after{background:radial-gradient(circle at var(--press-x,50%) var(--press-y,50%),transparent 25%,#effaff55 28%,transparent 34%);opacity:0;}
+.liquid-control.liquid-ripple::after{animation:liquid-refraction 620ms ease-out;}
+@keyframes liquid-refraction{0%{opacity:.55;scale:.15;}100%{opacity:0;scale:3;}}
+.liquid-control:focus-visible{outline:2px solid #d0e6ff!important;outline-offset:4px!important;}
+.liquid-control>.tw-icon,.liquid-control .ob-no{translate:var(--icon-x,0px) var(--icon-y,0px);}
+.tw-header nav.liquid-nav{position:relative;isolation:isolate;}
+.liquid-active-plate{position:absolute;top:0;z-index:0;pointer-events:none;border:1px solid #e7f5ffaa;border-radius:13px;background:linear-gradient(120deg,#fbfcffed,#b9cce3e0 58%,#e2e8f6ed);box-shadow:inset 0 1px 1px #fff, inset 0 -1px 2px #9eb6e599,0 3px 15px #0003;will-change:transform;}
+.tw-header nav.liquid-nav a.liquid-control,.tw-header nav.liquid-nav a.liquid-control:hover{z-index:1;background:transparent!important;border-color:transparent!important;box-shadow:none!important;transform:none!important;color:#e2eaf5;}
+.tw-header nav.liquid-nav a.liquid-control.active,.tw-header nav.liquid-nav a.liquid-control.active:hover{color:#142237!important;}
+.tw-header nav.liquid-nav a.liquid-control.active>.tw-icon{color:inherit!important;}
+.glass-hero-actions .liquid-control,#tw-office .ob.liquid-control{background:linear-gradient(120deg,#435e765e,#1c2d43b3)!important;border:1px solid #c6dbef61!important;box-shadow:inset 0 1px 0 #ffffff45,inset 0 calc(-1px - var(--material-press)*2px) 5px #030b2444,0 calc(8px - var(--material-press)*6px) calc(18px - var(--material-press)*10px) #0004!important;}
+.glass-hero-actions .liquid-control.primary{color:#132137!important;background:linear-gradient(125deg,#fafcffef,#bbcfe7ed 58%,#e5e9f8f5)!important;border-color:#f1f7ffb3!important;}
+.glass-hero-actions .liquid-control,.glass-hero-actions .liquid-control:hover,.glass-hero-actions .liquid-control:active{transform:translateY(calc(var(--material-press)*1.5px - var(--pointer-light)*.7px))!important;transition:none!important;border-radius:18px;}
+/* Projected map buttons own their transform in office3d; press must not move their hit target. */
+#tw-office .ob.liquid-control:active{filter:brightness(1.1);}
+.liquid-control:disabled,.liquid-control[aria-disabled=true]{--pointer-light:0!important;--material-press:0!important;}
+.tw-button.liquid-control:not(.primary),.tw-icon-button.liquid-control{transition:border-color 180ms ease,box-shadow 180ms ease;}
+.tw-button.liquid-control:hover,.tw-button.liquid-control:active,.tw-icon-button.liquid-control:hover,.tw-icon-button.liquid-control:active{transform:none!important;}
+a.tw-agent.liquid-control,a.tw-podium-agent.liquid-control,a.tw-new-hire.liquid-control,a.ov-payroll-card.liquid-control{transform:none!important;}
+a.tw-agent.liquid-control::before,a.tw-podium-agent.liquid-control::before,a.tw-new-hire.liquid-control::before,a.ov-payroll-card.liquid-control::before{opacity:calc(var(--pointer-light)*.24);background:radial-gradient(ellipse 95px 65px at var(--pointer-x) var(--pointer-y),var(--ui-pearl,#e7eefc),transparent 80%);}
+a.tw-agent.liquid-control img,a.tw-podium-agent.liquid-control img,a.tw-new-hire.liquid-control img,a.ov-payroll-card.liquid-control img{scale:calc(1 + var(--pointer-light)*.01);transition:none;}
+.game-tabs{position:relative;isolation:isolate;}
+.game-tab-plate{position:absolute;left:0;top:0;pointer-events:none;z-index:0;border-radius:9px;background:var(--ui-pearl,#e7eefc);box-shadow:inset 0 1px 0 #fff9,0 2px 6px #0002;transition:transform 420ms cubic-bezier(.2,.85,.2,1),width 420ms cubic-bezier(.2,.85,.2,1),height 420ms cubic-bezier(.2,.85,.2,1);}
+.game-tabs>button{position:relative;z-index:1;}
+body .game-tabs.tw-feed-filters>button,body .game-tabs.tw-ranking-switch>button{background:transparent!important;box-shadow:none!important;border-color:transparent!important;}
+.game-tabs>button[aria-pressed=true]{color:var(--ui-ink,#142237)!important;}
+.liquid-control[aria-busy=true]::before,.liquid-control[aria-busy=true]::after,.liquid-control.loading::before,.liquid-control.loading::after{opacity:0!important;animation:none!important;}
+@media(prefers-reduced-motion:reduce){.game-tab-plate{transition:none!important;}.liquid-control img{scale:1!important;}}
+@media(prefers-reduced-motion:reduce){.liquid-control::after{animation:none!important;}.liquid-control>.tw-icon,.liquid-control .ob-no{translate:none!important;}.glass-hero-actions .liquid-control{transform:none!important;}}

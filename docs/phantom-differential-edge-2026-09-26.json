@@ -1,0 +1,506 @@
+{
+  "comparisons": {
+  "A": {
+    "appSha256": "d44baa35950e3fc4855e379c2524dff1184344bad0aec4e6f500735930a77648",
+    "phantomSha256": "89b378ed9690a17453e4a98310ce5a1f1c12d16a0c568cfbca27d77d280e365f",
+    "byteEqual": false,
+    "appBytes": 203,
+    "phantomBytes": 255,
+    "feePayerUnchanged": true,
+    "blockhashUnchanged": true,
+    "publicRpcResult": "passed",
+    "phantomError": "INSUFFICIENT_FUNDS",
+    "phantomWarningKind": "AccountNotFound",
+    "phantomSafeguardError": "NETWORK_NOT_SUPPORTED",
+    "cancelCode": 4001
+  },
+  "B": {
+    "appSha256": "91c7d3b8f15c588dcc784f7f3ca92fd791be109eb58d2f6dbf7d9130fc446d7b",
+    "phantomSha256": "91c7d3b8f15c588dcc784f7f3ca92fd791be109eb58d2f6dbf7d9130fc446d7b",
+    "byteEqual": true,
+    "appBytes": 255,
+    "phantomBytes": 255,
+    "feePayerUnchanged": true,
+    "blockhashUnchanged": true,
+    "publicRpcResult": "passed",
+    "phantomError": "INSUFFICIENT_FUNDS",
+    "phantomWarningKind": "AccountNotFound",
+    "phantomSafeguardError": "NETWORK_NOT_SUPPORTED",
+    "cancelCode": 4001
+  },
+  "C": {
+    "appSha256": "e2e941f21cddd6ebd4b373e4edfda86fe4ab4f1bbccc544c75b0e30f6ac8c18b",
+    "phantomSha256": "50088fd191ef3a218f8f372801b2315b4627c1dd8bc49aeafb39932903ce4e37",
+    "byteEqual": false,
+    "appBytes": 183,
+    "phantomBytes": 235,
+    "feePayerUnchanged": true,
+    "blockhashUnchanged": true,
+    "publicRpcResult": "passed",
+    "phantomError": "INSUFFICIENT_FUNDS",
+    "phantomWarningKind": "AccountNotFound",
+    "phantomSafeguardError": "NETWORK_NOT_SUPPORTED",
+    "cancelCode": 4001
+  }
+},
+  "capturedAt": "2026-09-26T12:11:17.950Z",
+  "endpoint": "https://api.phantom.app/simulation/v1?language=id",
+  "tests": {
+    "A": {
+      "app": {
+        "test": "A",
+        "structure": "memo-only",
+        "method": "injected signTransaction",
+        "broadcast": false,
+        "payer": "ECMaFXkpb2bDFKXQciAKa1HNtqWgJs9PU3DcEmzgNMNS",
+        "network": "devnet",
+        "balanceSol": 5,
+        "blockhash": "BALm3aHZEnNvgTqN2qsgNKjQYP3B2G3ynGNFFrPhde7V",
+        "lastValidBlockHeight": 491652992,
+        "rpcSimulation": "passed",
+        "logs": [
+          "Program MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr invoke [1]",
+          "Program log: Memo (len 34): \"TEKKWORK devnet preview diagnostic\"",
+          "Program MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr consumed 13505 of 200000 compute units",
+          "Program MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr success"
+        ],
+        "preparedAt": "2026-09-26T12:04:25.528Z",
+        "walletPreview": "Inspect Phantom, then cancel",
+        "rpcEvidence": {
+          "endpoint": "https://api.devnet.solana.com",
+          "genesisHash": "EtWTRABZaYq6iMfeYKouRu166VU2xqa1wcaWoxPkrZBG",
+          "commitment": "finalized",
+          "blockhashSource": "https://api.devnet.solana.com",
+          "expectedFeeLamports": 5000,
+          "feeContextSlot": 504401207,
+          "simulationConfig": {
+            "sigVerify": false,
+            "replaceRecentBlockhash": false,
+            "commitment": "finalized"
+          },
+          "simulationSlot": 504401207,
+          "unitsConsumed": 13505,
+          "transaction": {
+            "serializedTransactionBase64": "AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAECxBCUy3k0E8WhPDKok0ecQhbigVahqXQSTupJDaKqtYMFSlNamSkhBk0k6HFg2jh8fDW13bySu4HkH6hAQQVEjZb5cEUSrDnQKCGntqH0/HrKZTcg2dRW/IMUTNBWAdTMAQEAIlRFS0tXT1JLIGRldm5ldCBwcmV2aWV3IGRpYWdub3N0aWM=",
+            "serializedByteLength": 203,
+            "serializedSha256": "d44baa35950e3fc4855e379c2524dff1184344bad0aec4e6f500735930a77648",
+            "messageBase64": "AQABAsQQlMt5NBPFoTwyqJNHnEIW4oFWoal0Ek7qSQ2iqrWDBUpTWpkpIQZNJOhxYNo4fHw1td28kruB5B+oQEEFRI2W+XBFEqw50Cghp7ah9Px6ymU3INnUVvyDFEzQVgHUzAEBACJURUtLV09SSyBkZXZuZXQgcHJldmlldyBkaWFnbm9zdGlj",
+            "messageSha256": "405eb07aa71628d87ebf4bcde0cb551d57c856ef008ec78826af50b6f4d1b474",
+            "recentBlockhash": "BALm3aHZEnNvgTqN2qsgNKjQYP3B2G3ynGNFFrPhde7V",
+            "feePayer": "ECMaFXkpb2bDFKXQciAKa1HNtqWgJs9PU3DcEmzgNMNS",
+            "requiredSignerCount": 1,
+            "messageHeader": {
+              "numRequiredSignatures": 1,
+              "numReadonlySignedAccounts": 0,
+              "numReadonlyUnsignedAccounts": 1
+            },
+            "messageAccountKeys": [
+              "ECMaFXkpb2bDFKXQciAKa1HNtqWgJs9PU3DcEmzgNMNS",
+              "MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr"
+            ],
+            "requiredSigners": [
+              "ECMaFXkpb2bDFKXQciAKa1HNtqWgJs9PU3DcEmzgNMNS"
+            ],
+            "signaturesPresent": 0,
+            "instructions": [
+              {
+                "programId": "MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr",
+                "accountKeys": [],
+                "dataBase64": "VEVLS1dPUksgZGV2bmV0IHByZXZpZXcgZGlhZ25vc3RpYw==",
+                "dataHex": "54454b4b574f524b206465766e6574207072657669657720646961676e6f73746963",
+                "dataUtf8": "TEKKWORK devnet preview diagnostic"
+              }
+            ]
+          }
+        },
+        "phantomInternalRequest": {
+          "status": "Not observed. Extension traffic is isolated from page fetch/network instrumentation.",
+          "chainId": null,
+          "serializedTransaction": null,
+          "simulationResponse": null
+        },
+        "providerCall": {
+          "transaction": {
+            "serializedTransactionBase64": "AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAECxBCUy3k0E8WhPDKok0ecQhbigVahqXQSTupJDaKqtYMFSlNamSkhBk0k6HFg2jh8fDW13bySu4HkH6hAQQVEjZb5cEUSrDnQKCGntqH0/HrKZTcg2dRW/IMUTNBWAdTMAQEAIlRFS0tXT1JLIGRldm5ldCBwcmV2aWV3IGRpYWdub3N0aWM=",
+            "serializedByteLength": 203,
+            "serializedSha256": "d44baa35950e3fc4855e379c2524dff1184344bad0aec4e6f500735930a77648",
+            "messageBase64": "AQABAsQQlMt5NBPFoTwyqJNHnEIW4oFWoal0Ek7qSQ2iqrWDBUpTWpkpIQZNJOhxYNo4fHw1td28kruB5B+oQEEFRI2W+XBFEqw50Cghp7ah9Px6ymU3INnUVvyDFEzQVgHUzAEBACJURUtLV09SSyBkZXZuZXQgcHJldmlldyBkaWFnbm9zdGlj",
+            "messageSha256": "405eb07aa71628d87ebf4bcde0cb551d57c856ef008ec78826af50b6f4d1b474",
+            "recentBlockhash": "BALm3aHZEnNvgTqN2qsgNKjQYP3B2G3ynGNFFrPhde7V",
+            "feePayer": "ECMaFXkpb2bDFKXQciAKa1HNtqWgJs9PU3DcEmzgNMNS",
+            "requiredSignerCount": 1,
+            "messageHeader": {
+              "numRequiredSignatures": 1,
+              "numReadonlySignedAccounts": 0,
+              "numReadonlyUnsignedAccounts": 1
+            },
+            "messageAccountKeys": [
+              "ECMaFXkpb2bDFKXQciAKa1HNtqWgJs9PU3DcEmzgNMNS",
+              "MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr"
+            ],
+            "requiredSigners": [
+              "ECMaFXkpb2bDFKXQciAKa1HNtqWgJs9PU3DcEmzgNMNS"
+            ],
+            "signaturesPresent": 0,
+            "instructions": [
+              {
+                "programId": "MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr",
+                "accountKeys": [],
+                "dataBase64": "VEVLS1dPUksgZGV2bmV0IHByZXZpZXcgZGlhZ25vc3RpYw==",
+                "dataHex": "54454b4b574f524b206465766e6574207072657669657720646961676e6f73746963",
+                "dataUtf8": "TEKKWORK devnet preview diagnostic"
+              }
+            ]
+          },
+          "provider": {
+            "capturedAt": "2026-09-26T12:04:25.530Z",
+            "provider": "window.phantom.solana",
+            "isPhantom": true,
+            "isConnected": true,
+            "publicKey": "ECMaFXkpb2bDFKXQciAKa1HNtqWgJs9PU3DcEmzgNMNS",
+            "method": "signTransaction",
+            "clusterArgument": "None: injected signTransaction does not take the app RPC endpoint",
+            "walletActiveCluster": "Not exposed by documented injected provider API",
+            "simulatorRpcEndpoint": "Not observable from this page",
+            "simulatorChainId": "Not observable from this page",
+            "browserUserAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0",
+            "origin": "http://127.0.0.1:5188"
+          },
+          "invokedAt": "2026-09-26T12:04:25.531Z",
+          "rpcBytesMatchProviderArgument": true,
+          "phantomInternalBytesMatch": "Unknown: provider argument is not proof of internal simulator payload"
+        },
+        "result": "User rejected the request.",
+        "code": 4001
+      },
+      "phantom": {
+        "chainId": "solana:103",
+        "networkID": "solana:103",
+        "serializedTransactionBase58": "cE7qKX9canD3t9EXYmahtN6XPyU8VTU48WpdwxLYdz7ZMNRzxYzHuUCXK3tg2TdNhSAAY62FJFNuY1wN22h6Jw5DW5kD5EGQ5ckJ1kGBtQur7E74tTbUqA5hgUDRkJ7ohyptyW2VbzVo6HXymNHgDAZk3EhvH52KKaACGN6AfdpsD8V5Jg7JZCwHGGNvCTWBJY7jytEmTJ9i1G6cqYQgoaEWaLbD6ZxQovKgM1MniMWCqaZr8HwvT4gBRWxPXzBsA22JdiJU55nT7FFLa5Lx5FBakHvrihkuZ3zqYR32NpQFXpE5rinsLo2dCMZFuoboPLhgcK9569YAd6MTCkjJW2BVBRk",
+        "responseEvidence": "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t3170 tree item advancedDetails : {chainId: \"solana:103\", tokenChange: [],…}\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t3283 tree item chainId : \"solana:103\"\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t3288 tree item requestId : \"b52d28eb-ed36-430b-9d6e-35d76661772d\"\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t3291 tree item safeguard : {error: \"NETWORK_NOT_SUPPORTED\", transactions: [], shouldBundle: false, recommended: false}\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t3295 tree item totalFee : \"80000\"\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t3171 tree item (selectable) error : \"INSUFFICIENT_FUNDS\"\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t3174 tree item (selectable) simulationError : {kind: \"TRANSACTION_ERROR\",…}\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t3177 tree item (selectable) warnings : [{message: \"SOL Anda tidak cukup untuk transaksi ini\", severity: 3, kind: \"AccountNotFound\"}]"
+      }
+    },
+    "B": {
+      "app": {
+        "test": "B",
+        "structure": "captured-compute-budget-plus-memo",
+        "method": "injected signTransaction",
+        "broadcast": false,
+        "payer": "ECMaFXkpb2bDFKXQciAKa1HNtqWgJs9PU3DcEmzgNMNS",
+        "network": "devnet",
+        "balanceSol": 5,
+        "blockhash": "J7ADSZEVoyEEmkaHtq6wLk1La1oGenfhJp1c7avh83rg",
+        "lastValidBlockHeight": 491653856,
+        "rpcSimulation": "passed",
+        "logs": [
+          "Program ComputeBudget111111111111111111111111111111 invoke [1]",
+          "Program ComputeBudget111111111111111111111111111111 success",
+          "Program ComputeBudget111111111111111111111111111111 invoke [1]",
+          "Program ComputeBudget111111111111111111111111111111 success",
+          "Program MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr invoke [1]",
+          "Program log: Memo (len 34): \"TEKKWORK devnet preview diagnostic\"",
+          "Program MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr consumed 13505 of 199700 compute units",
+          "Program MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr success"
+        ],
+        "preparedAt": "2026-09-26T12:07:45.711Z",
+        "walletPreview": "Inspect Phantom, then cancel",
+        "rpcEvidence": {
+          "endpoint": "https://api.devnet.solana.com",
+          "genesisHash": "EtWTRABZaYq6iMfeYKouRu166VU2xqa1wcaWoxPkrZBG",
+          "commitment": "finalized",
+          "blockhashSource": "https://api.devnet.solana.com",
+          "expectedFeeLamports": 80000,
+          "feeContextSlot": 504402072,
+          "simulationConfig": {
+            "sigVerify": false,
+            "replaceRecentBlockhash": false,
+            "commitment": "finalized"
+          },
+          "simulationSlot": 504402072,
+          "unitsConsumed": 13805,
+          "transaction": {
+            "serializedTransactionBase64": "AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAIDxBCUy3k0E8WhPDKok0ecQhbigVahqXQSTupJDaKqtYMDBkZv5SEXMv/srbpyw5vnvIzlu8X3EmssQ5s6QAAAAAVKU1qZKSEGTSTocWDaOHx8NbXdvJK7geQfqEBBBUSN/iqU2sfFP8ZP0KA/0X6c6eAAiyKMc3+D0ILUsBUy1YEDAQAJA9i4BQAAAAAAAQAFAkANAwACACJURUtLV09SSyBkZXZuZXQgcHJldmlldyBkaWFnbm9zdGlj",
+            "serializedByteLength": 255,
+            "serializedSha256": "91c7d3b8f15c588dcc784f7f3ca92fd791be109eb58d2f6dbf7d9130fc446d7b",
+            "messageBase64": "AQACA8QQlMt5NBPFoTwyqJNHnEIW4oFWoal0Ek7qSQ2iqrWDAwZGb+UhFzL/7K26csOb57yM5bvF9xJrLEObOkAAAAAFSlNamSkhBk0k6HFg2jh8fDW13bySu4HkH6hAQQVEjf4qlNrHxT/GT9CgP9F+nOngAIsijHN/g9CC1LAVMtWBAwEACQPYuAUAAAAAAAEABQJADQMAAgAiVEVLS1dPUksgZGV2bmV0IHByZXZpZXcgZGlhZ25vc3RpYw==",
+            "messageSha256": "dbddaff73a833724bd847088b1c429368e1b451b95aa63e9e41635e9a62e5349",
+            "recentBlockhash": "J7ADSZEVoyEEmkaHtq6wLk1La1oGenfhJp1c7avh83rg",
+            "feePayer": "ECMaFXkpb2bDFKXQciAKa1HNtqWgJs9PU3DcEmzgNMNS",
+            "requiredSignerCount": 1,
+            "messageHeader": {
+              "numRequiredSignatures": 1,
+              "numReadonlySignedAccounts": 0,
+              "numReadonlyUnsignedAccounts": 2
+            },
+            "messageAccountKeys": [
+              "ECMaFXkpb2bDFKXQciAKa1HNtqWgJs9PU3DcEmzgNMNS",
+              "ComputeBudget111111111111111111111111111111",
+              "MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr"
+            ],
+            "requiredSigners": [
+              "ECMaFXkpb2bDFKXQciAKa1HNtqWgJs9PU3DcEmzgNMNS"
+            ],
+            "signaturesPresent": 0,
+            "instructions": [
+              {
+                "programId": "ComputeBudget111111111111111111111111111111",
+                "accountKeys": [],
+                "dataBase64": "A9i4BQAAAAAA",
+                "dataHex": "03d8b8050000000000",
+                "dataUtf8": "\u0003ظ\u0005\u0000\u0000\u0000\u0000\u0000"
+              },
+              {
+                "programId": "ComputeBudget111111111111111111111111111111",
+                "accountKeys": [],
+                "dataBase64": "AkANAwA=",
+                "dataHex": "02400d0300",
+                "dataUtf8": "\u0002@\r\u0003\u0000"
+              },
+              {
+                "programId": "MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr",
+                "accountKeys": [],
+                "dataBase64": "VEVLS1dPUksgZGV2bmV0IHByZXZpZXcgZGlhZ25vc3RpYw==",
+                "dataHex": "54454b4b574f524b206465766e6574207072657669657720646961676e6f73746963",
+                "dataUtf8": "TEKKWORK devnet preview diagnostic"
+              }
+            ]
+          }
+        },
+        "phantomInternalRequest": {
+          "status": "Not observed. Extension traffic is isolated from page fetch/network instrumentation.",
+          "chainId": null,
+          "serializedTransaction": null,
+          "simulationResponse": null
+        },
+        "providerCall": {
+          "transaction": {
+            "serializedTransactionBase64": "AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAIDxBCUy3k0E8WhPDKok0ecQhbigVahqXQSTupJDaKqtYMDBkZv5SEXMv/srbpyw5vnvIzlu8X3EmssQ5s6QAAAAAVKU1qZKSEGTSTocWDaOHx8NbXdvJK7geQfqEBBBUSN/iqU2sfFP8ZP0KA/0X6c6eAAiyKMc3+D0ILUsBUy1YEDAQAJA9i4BQAAAAAAAQAFAkANAwACACJURUtLV09SSyBkZXZuZXQgcHJldmlldyBkaWFnbm9zdGlj",
+            "serializedByteLength": 255,
+            "serializedSha256": "91c7d3b8f15c588dcc784f7f3ca92fd791be109eb58d2f6dbf7d9130fc446d7b",
+            "messageBase64": "AQACA8QQlMt5NBPFoTwyqJNHnEIW4oFWoal0Ek7qSQ2iqrWDAwZGb+UhFzL/7K26csOb57yM5bvF9xJrLEObOkAAAAAFSlNamSkhBk0k6HFg2jh8fDW13bySu4HkH6hAQQVEjf4qlNrHxT/GT9CgP9F+nOngAIsijHN/g9CC1LAVMtWBAwEACQPYuAUAAAAAAAEABQJADQMAAgAiVEVLS1dPUksgZGV2bmV0IHByZXZpZXcgZGlhZ25vc3RpYw==",
+            "messageSha256": "dbddaff73a833724bd847088b1c429368e1b451b95aa63e9e41635e9a62e5349",
+            "recentBlockhash": "J7ADSZEVoyEEmkaHtq6wLk1La1oGenfhJp1c7avh83rg",
+            "feePayer": "ECMaFXkpb2bDFKXQciAKa1HNtqWgJs9PU3DcEmzgNMNS",
+            "requiredSignerCount": 1,
+            "messageHeader": {
+              "numRequiredSignatures": 1,
+              "numReadonlySignedAccounts": 0,
+              "numReadonlyUnsignedAccounts": 2
+            },
+            "messageAccountKeys": [
+              "ECMaFXkpb2bDFKXQciAKa1HNtqWgJs9PU3DcEmzgNMNS",
+              "ComputeBudget111111111111111111111111111111",
+              "MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr"
+            ],
+            "requiredSigners": [
+              "ECMaFXkpb2bDFKXQciAKa1HNtqWgJs9PU3DcEmzgNMNS"
+            ],
+            "signaturesPresent": 0,
+            "instructions": [
+              {
+                "programId": "ComputeBudget111111111111111111111111111111",
+                "accountKeys": [],
+                "dataBase64": "A9i4BQAAAAAA",
+                "dataHex": "03d8b8050000000000",
+                "dataUtf8": "\u0003ظ\u0005\u0000\u0000\u0000\u0000\u0000"
+              },
+              {
+                "programId": "ComputeBudget111111111111111111111111111111",
+                "accountKeys": [],
+                "dataBase64": "AkANAwA=",
+                "dataHex": "02400d0300",
+                "dataUtf8": "\u0002@\r\u0003\u0000"
+              },
+              {
+                "programId": "MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr",
+                "accountKeys": [],
+                "dataBase64": "VEVLS1dPUksgZGV2bmV0IHByZXZpZXcgZGlhZ25vc3RpYw==",
+                "dataHex": "54454b4b574f524b206465766e6574207072657669657720646961676e6f73746963",
+                "dataUtf8": "TEKKWORK devnet preview diagnostic"
+              }
+            ]
+          },
+          "provider": {
+            "capturedAt": "2026-09-26T12:07:45.713Z",
+            "provider": "window.phantom.solana",
+            "isPhantom": true,
+            "isConnected": true,
+            "publicKey": "ECMaFXkpb2bDFKXQciAKa1HNtqWgJs9PU3DcEmzgNMNS",
+            "method": "signTransaction",
+            "clusterArgument": "None: injected signTransaction does not take the app RPC endpoint",
+            "walletActiveCluster": "Not exposed by documented injected provider API",
+            "simulatorRpcEndpoint": "Not observable from this page",
+            "simulatorChainId": "Not observable from this page",
+            "browserUserAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0",
+            "origin": "http://127.0.0.1:5188"
+          },
+          "invokedAt": "2026-09-26T12:07:45.713Z",
+          "rpcBytesMatchProviderArgument": true,
+          "phantomInternalBytesMatch": "Unknown: provider argument is not proof of internal simulator payload"
+        },
+        "result": "User rejected the request.",
+        "code": 4001
+      },
+      "phantom": {
+        "chainId": "solana:103",
+        "networkID": "solana:103",
+        "serializedTransactionBase58": "cE7qKX9canD3t9EXYmahtN6XPyU8VTU48WpdwxLYdz7ZMNRzxYzHuUCXK3tg2TdNhSAAY62FJFNuY1wN22h6Jw5DW5kD5EGQ5ckJ1kGBtQur7E74tTbUqA5hgUDRkJ7ohyptyW2VbzVo6HXymNHgDAZk3EhvH52KKaACGN6AfdpsD8V5Jg7JZCwHGGNvCTWBJY7jytEmTJ9i1G6cqYQgoaEWaLbD6ZxR66MGs75wZf9PJVieAtoBZfe6hoUmZ3WYMUxvZyvjoz1Aai1C5Pdbe5oSy1UwPejdjiPweLA1qUYXERzaMNa5mqbcUZ83Nd97xz6EGzc6m6NgfCAncMuVPt1aUgz",
+        "responseEvidence": "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t4224 tree item advancedDetails : {chainId: \"solana:103\", tokenChange: [],…}\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t4262 tree item chainId : \"solana:103\"\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t4267 tree item requestId : \"c4b4b556-61d5-49a2-a072-92ac5000912e\"\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t4270 tree item safeguard : {error: \"NETWORK_NOT_SUPPORTED\", transactions: [], shouldBundle: false, recommended: false}\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t4274 tree item totalFee : \"80000\"\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t4225 tree item (selectable) error : \"INSUFFICIENT_FUNDS\"\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t4227 tree item (selectable) simulationError : {kind: \"TRANSACTION_ERROR\",…}\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t4229 tree item (selectable) warnings : [{message: \"SOL Anda tidak cukup untuk transaksi ini\", severity: 3, kind: \"AccountNotFound\"}]"
+      }
+    },
+    "C": {
+      "app": {
+        "test": "C",
+        "structure": "zero-lamport-self-transfer",
+        "method": "injected signTransaction",
+        "broadcast": false,
+        "payer": "ECMaFXkpb2bDFKXQciAKa1HNtqWgJs9PU3DcEmzgNMNS",
+        "network": "devnet",
+        "balanceSol": 5,
+        "blockhash": "CwYKzgfoZ23hnuG6kBMf5Nz1fw8amEMXp4C7X8wQCsi2",
+        "lastValidBlockHeight": 491654351,
+        "rpcSimulation": "passed",
+        "logs": [
+          "Program 11111111111111111111111111111111 invoke [1]",
+          "Program 11111111111111111111111111111111 success"
+        ],
+        "preparedAt": "2026-09-26T12:09:39.968Z",
+        "walletPreview": "Inspect Phantom, then cancel",
+        "rpcEvidence": {
+          "endpoint": "https://api.devnet.solana.com",
+          "genesisHash": "EtWTRABZaYq6iMfeYKouRu166VU2xqa1wcaWoxPkrZBG",
+          "commitment": "finalized",
+          "blockhashSource": "https://api.devnet.solana.com",
+          "expectedFeeLamports": 5000,
+          "feeContextSlot": 504402566,
+          "simulationConfig": {
+            "sigVerify": false,
+            "replaceRecentBlockhash": false,
+            "commitment": "finalized"
+          },
+          "simulationSlot": 504402566,
+          "unitsConsumed": 150,
+          "transaction": {
+            "serializedTransactionBase64": "AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAECxBCUy3k0E8WhPDKok0ecQhbigVahqXQSTupJDaKqtYMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAALFpV4yMaK+t7YMroGYxegC4+QPdcDhRNLOd0KC4RiT7AQECAAAMAgAAAAAAAAAAAAAA",
+            "serializedByteLength": 183,
+            "serializedSha256": "e2e941f21cddd6ebd4b373e4edfda86fe4ab4f1bbccc544c75b0e30f6ac8c18b",
+            "messageBase64": "AQABAsQQlMt5NBPFoTwyqJNHnEIW4oFWoal0Ek7qSQ2iqrWDAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACxaVeMjGivre2DK6BmMXoAuPkD3XA4UTSzndCguEYk+wEBAgAADAIAAAAAAAAAAAAAAA==",
+            "messageSha256": "b359a3042b5146ef1939204c2cb1c2bea1402b6d341f3e52fa4f32cbf88e0391",
+            "recentBlockhash": "CwYKzgfoZ23hnuG6kBMf5Nz1fw8amEMXp4C7X8wQCsi2",
+            "feePayer": "ECMaFXkpb2bDFKXQciAKa1HNtqWgJs9PU3DcEmzgNMNS",
+            "requiredSignerCount": 1,
+            "messageHeader": {
+              "numRequiredSignatures": 1,
+              "numReadonlySignedAccounts": 0,
+              "numReadonlyUnsignedAccounts": 1
+            },
+            "messageAccountKeys": [
+              "ECMaFXkpb2bDFKXQciAKa1HNtqWgJs9PU3DcEmzgNMNS",
+              "11111111111111111111111111111111"
+            ],
+            "requiredSigners": [
+              "ECMaFXkpb2bDFKXQciAKa1HNtqWgJs9PU3DcEmzgNMNS"
+            ],
+            "signaturesPresent": 0,
+            "instructions": [
+              {
+                "programId": "11111111111111111111111111111111",
+                "accountKeys": [
+                  {
+                    "publicKey": "ECMaFXkpb2bDFKXQciAKa1HNtqWgJs9PU3DcEmzgNMNS",
+                    "isSigner": true,
+                    "isWritable": true
+                  },
+                  {
+                    "publicKey": "ECMaFXkpb2bDFKXQciAKa1HNtqWgJs9PU3DcEmzgNMNS",
+                    "isSigner": true,
+                    "isWritable": true
+                  }
+                ],
+                "dataBase64": "AgAAAAAAAAAAAAAA",
+                "dataHex": "020000000000000000000000",
+                "dataUtf8": "\u0002\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000"
+              }
+            ]
+          }
+        },
+        "phantomInternalRequest": {
+          "status": "Not observed. Extension traffic is isolated from page fetch/network instrumentation.",
+          "chainId": null,
+          "serializedTransaction": null,
+          "simulationResponse": null
+        },
+        "providerCall": {
+          "transaction": {
+            "serializedTransactionBase64": "AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAECxBCUy3k0E8WhPDKok0ecQhbigVahqXQSTupJDaKqtYMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAALFpV4yMaK+t7YMroGYxegC4+QPdcDhRNLOd0KC4RiT7AQECAAAMAgAAAAAAAAAAAAAA",
+            "serializedByteLength": 183,
+            "serializedSha256": "e2e941f21cddd6ebd4b373e4edfda86fe4ab4f1bbccc544c75b0e30f6ac8c18b",
+            "messageBase64": "AQABAsQQlMt5NBPFoTwyqJNHnEIW4oFWoal0Ek7qSQ2iqrWDAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACxaVeMjGivre2DK6BmMXoAuPkD3XA4UTSzndCguEYk+wEBAgAADAIAAAAAAAAAAAAAAA==",
+            "messageSha256": "b359a3042b5146ef1939204c2cb1c2bea1402b6d341f3e52fa4f32cbf88e0391",
+            "recentBlockhash": "CwYKzgfoZ23hnuG6kBMf5Nz1fw8amEMXp4C7X8wQCsi2",
+            "feePayer": "ECMaFXkpb2bDFKXQciAKa1HNtqWgJs9PU3DcEmzgNMNS",
+            "requiredSignerCount": 1,
+            "messageHeader": {
+              "numRequiredSignatures": 1,
+              "numReadonlySignedAccounts": 0,
+              "numReadonlyUnsignedAccounts": 1
+            },
+            "messageAccountKeys": [
+              "ECMaFXkpb2bDFKXQciAKa1HNtqWgJs9PU3DcEmzgNMNS",
+              "11111111111111111111111111111111"
+            ],
+            "requiredSigners": [
+              "ECMaFXkpb2bDFKXQciAKa1HNtqWgJs9PU3DcEmzgNMNS"
+            ],
+            "signaturesPresent": 0,
+            "instructions": [
+              {
+                "programId": "11111111111111111111111111111111",
+                "accountKeys": [
+                  {
+                    "publicKey": "ECMaFXkpb2bDFKXQciAKa1HNtqWgJs9PU3DcEmzgNMNS",
+                    "isSigner": true,
+                    "isWritable": true
+                  },
+                  {
+                    "publicKey": "ECMaFXkpb2bDFKXQciAKa1HNtqWgJs9PU3DcEmzgNMNS",
+                    "isSigner": true,
+                    "isWritable": true
+                  }
+                ],
+                "dataBase64": "AgAAAAAAAAAAAAAA",
+                "dataHex": "020000000000000000000000",
+                "dataUtf8": "\u0002\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000"
+              }
+            ]
+          },
+          "provider": {
+            "capturedAt": "2026-09-26T12:09:39.970Z",
+            "provider": "window.phantom.solana",
+            "isPhantom": true,
+            "isConnected": true,
+            "publicKey": "ECMaFXkpb2bDFKXQciAKa1HNtqWgJs9PU3DcEmzgNMNS",
+            "method": "signTransaction",
+            "clusterArgument": "None: injected signTransaction does not take the app RPC endpoint",
+            "walletActiveCluster": "Not exposed by documented injected provider API",
+            "simulatorRpcEndpoint": "Not observable from this page",
+            "simulatorChainId": "Not observable from this page",
+            "browserUserAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0",
+            "origin": "http://127.0.0.1:5188"
+          },
+          "invokedAt": "2026-09-26T12:09:39.970Z",
+          "rpcBytesMatchProviderArgument": true,
+          "phantomInternalBytesMatch": "Unknown: provider argument is not proof of internal simulator payload"
+        },
+        "result": "User rejected the request.",
+        "code": 4001
+      },
+      "phantom": {
+        "chainId": "solana:103",
+        "networkID": "solana:103",
+        "serializedTransactionBase58": "AsrzPgoaP5EQpXbpdJqxyyqjkn4i7HystXimQH3r96hh8rEukVVvEBh7AxHyzJv6ePc68RfQ6wAmXz8LBmmuziAvF232yYimfeBSoier59o16ee7LB6wFLtEtUSeF4Ppufz5tZJt8oogT95up1zTUhRhTYBcUeizVsfRuKVkQztawZ4NH6qr87Azr6ufL7rqDn4gfkKJGQEVy316yMw1JZRoxa8ukHaDfkJHcg3wbzdVNCf48LYrWhmrNJqSxSWvyaas3Au7JWKUNPbWbFqZe9Y6a25DQNGrrTNumrqC3VQdbxfXVxuWeHnFhrdbSFQB",
+        "responseEvidence": "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t6366 tree item advancedDetails : {chainId: \"solana:103\", tokenChange: [],…}\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t6434 tree item chainId : \"solana:103\"\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t6439 tree item requestId : \"00b14f07-82e4-4d45-88eb-408c664fc01d\"\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t6442 tree item safeguard : {error: \"NETWORK_NOT_SUPPORTED\", transactions: [], shouldBundle: false, recommended: false}\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t6446 tree item totalFee : \"80000\"\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t6367 tree item (selectable) error : \"INSUFFICIENT_FUNDS\"\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t6370 tree item (selectable) simulationError : {kind: \"TRANSACTION_ERROR\",…}\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t6373 tree item (selectable) warnings : [{message: \"SOL Anda tidak cukup untuk transaksi ini\", severity: 3, kind: \"AccountNotFound\"}]"
+      }
+    }
+  }
+}

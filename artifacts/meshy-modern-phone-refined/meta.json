@@ -1,0 +1,44 @@
+{
+  "resource": "text-to-3d",
+  "task": {
+    "id": "01a0dfb6-d5a6-75ca-8668-6b5a6e22c687",
+    "type": "text-to-3d-refine",
+    "name": "",
+    "status": "SUCCEEDED",
+    "progress": 100,
+    "preceding_tasks": 0,
+    "created_at": 1790459698024,
+    "started_at": 1790459698031,
+    "finished_at": 1790459786425,
+    "expires_at": 0,
+    "task_error": null,
+    "model_urls": {
+      "glb": "https://assets.meshy.ai/4d0198b5-14af-4e84-8ea3-2e974e4fa8b8/tasks/01a0dfb6-d5a6-75ca-8668-6b5a6e22c687/output/model.glb?Expires=4943980800&Signature=je9Bvg9ezdEmoQ0htUADiay4PfMLZ~6WpoSQhNWFqncIMA891oztctgCaX0wdk5eVy5YX9iyqNoXPDC7BoxNkqoBJF2i96hdIBJAzEnRHRyn2tDq5HYV93ankk0RAxS2tvJ~XOfsmaTKoRSdVMF6~27lifXTADfSaZK2T0KtqildSsvzCNYm0dgeoP-DCRDMZ4XIULtLuylrX7ddsumlOEL9vW~Ca3EAw~uZu~9ZEe8-hz9QRi1RcVuV9LjemRW3RVzVZadf90KoeGAewElYSu185vqusDlrGLMrIIF5bK-92NpAbGJeirU95LAglzhvpSwH91CDF~XWDgNuqmMkAg__&Key-Pair-Id=K1VGYTHIYLM9UM"
+    },
+    "texture_urls": [
+      {
+        "base_color": "https://assets.meshy.ai/4d0198b5-14af-4e84-8ea3-2e974e4fa8b8/tasks/01a0dfb6-d5a6-75ca-8668-6b5a6e22c687/output/texture_0.png?Expires=4943980800&Signature=HbRpV0xLHIFlIFyfP547EKQTwNLXq1aFawe8VTS~YKHZ6e06byZDGweTsLKJqoMuqoEWaM2WXT5stmyqSTaXeNpXXDgoULcT5tBhVpJXddLbVOK5fQz1vXkbpfpk1l0wSe067pWZejwZ0GJZZVUSTWKOFxamatSzDnaSP6R-TbploocDJL~5-AfnAyFrqrdULWrKq8-WfV2PzTWptm~z8mCDzsTi~ywJBcdDTDo68RKt62F58ItlKU4ww4mDthNc9jBlaVrEtoV6~ge~iWd7sZhH12MFVCVEjngcZ9rVdPWsfiz7~2C926QCLvcuGpmSbv0sRhbXqgKA98fyUsRFvg__&Key-Pair-Id=K1VGYTHIYLM9UM",
+        "metallic": "https://assets.meshy.ai/4d0198b5-14af-4e84-8ea3-2e974e4fa8b8/tasks/01a0dfb6-d5a6-75ca-8668-6b5a6e22c687/output/texture_0_metallic.png?Expires=4943980800&Signature=HKSUiYHN5cSEj99x33C~9y22pq6jgvF8Vbquv-xs08pqPMmkKaXW5UrwkgU2Mabzl2QYvtfGPCh-3oBJQBpR3eOoNDpBJt58mQ2k6qtVLQcOwveyPG-qO7YU1Bgk88mWqTs3bOV69FmgMTERuNHBUV5OdexU1eoU7w2i99dYHzRYgPEgpEIzq6Mejc~wC1S9rHjZrAbx46TDcoQB9ZVSndRvWdkYdELioGs7YCUWyKp9fqA90OkvNmgkexS4TfxyKalvD5wWFvqpIqL80vh18oAh27zH3rMThLWKQUwXJqdvmiUzO-lAEXFC7SETQHORb1PRg3BTyjZvH4Ne8jd3nQ__&Key-Pair-Id=K1VGYTHIYLM9UM",
+        "normal": "https://assets.meshy.ai/4d0198b5-14af-4e84-8ea3-2e974e4fa8b8/tasks/01a0dfb6-d5a6-75ca-8668-6b5a6e22c687/output/texture_0_normal.png?Expires=4943980800&Signature=ELdjHakkZZP1Q~dE56b75j2k396lZvJmm3BXT3GWZkCvGbuCQRYkXCSWBdMR3A3tN0~Th3x7uT4qTU7hRWlaXe9EI~W38vzgL6FRi8BlB4k7eFZkBsdPjkyqXwQmy6Jjthl0yP637UZW5si6VYzm5FcVpgbO1pJOqhKVBFBnKYvAk2OsiCRLQSYBPngLnVRCsEg7ep3m0Ff5VCX98ww6V6~fL8r-RB3BRy3whaPaGjIBynkWJ98FceFmqNblGxXyEtV7g0YHm6rC~O20AXkyH2~lXNpjemIxqTl1TJWEOMzbJt-sHLznDzwet9b6mfkxW0GLkt2Fv5lQHSVXmxQLPg__&Key-Pair-Id=K1VGYTHIYLM9UM",
+        "roughness": "https://assets.meshy.ai/4d0198b5-14af-4e84-8ea3-2e974e4fa8b8/tasks/01a0dfb6-d5a6-75ca-8668-6b5a6e22c687/output/texture_0_roughness.png?Expires=4943980800&Signature=pKalNWMsXCgf1d-WyjrNIL9Fbdk3Bi0w8H37N5DrBG-CfQNn-7NjorAiy6MspcrNwqldwWQnne0Tplh~SCLdhZcHDEHgTFLVRS6GZECuyFG41IOBJoNr9wXq9Hb8f6C6uowI~IccnCa2AbGnl0vSS~n0E9B49weg~QtRYDz4tFYkPJ0Josy7iIueCM9qa1O4-oOZavp~XGiON~LV5hKtFDv1WMnKUg2F3DD36nXX4~WedHXmLLuVJtK-vOS7hZrUkYAYmTQ9Le2RZ4eZABgCG2KzYNcJn~p9Xv~yD15a7uHfeFDnOnWhH66kT3eRJPPHsQigJv-NozLdQJwu7VIvHA__&Key-Pair-Id=K1VGYTHIYLM9UM"
+      }
+    ],
+    "thumbnail_url": "https://assets.meshy.ai/4d0198b5-14af-4e84-8ea3-2e974e4fa8b8/tasks/01a0dfb6-d5a6-75ca-8668-6b5a6e22c687/output/preview.png?Expires=4943980800&Signature=pqGGtbmpOJXFXMELSBE6J~F8P1404Em69scFVvt9xIcVjwxaakk38e7uTlthPAWcpPl~8MBGWGosaH577YzW-QkPDSvd6Xtt-8L1kjX6xpNSabQSueOXFEdg35aGij3TSEidd1gZQe82f9p5XQG1kCPV0oqu8SJ7kEheChtLwwJINSBjvVEhuAvbsK4okrMLSy7MX1sQBzUQ6cJdeMADghXdD~h7hvPVCkEyMnR4ZnYx-q5gmbhRSG22x040Ttn9xuhXuzV4ThrQ3APYW9t1zCIYcucicqIySGLuwReb6ZJoTY559paoXyyK6S7nlxF8yuHj8lNW21uxsR5QjgUDMg__&Key-Pair-Id=K1VGYTHIYLM9UM",
+    "consumed_credits": 10,
+    "prompt": "Modern premium stylized smartphone, portrait ratio width 0.50 height 1. Slim smooth rounded rectangular silhouette, large edge-to-edge flat blank dark front display taking 90 percent of front. Navy royal blue frame, subtle cobalt layered bezel, tiny warm yellow bottom edge accent. Clearly a modern touchscreen smartphone, slightly chunky game proportions. NO physical front buttons, NO D-pad, NO plus/minus controls, NO keyboard, NO console, NO rugged industrial or octagonal casing, NO communicator, NO walkie-talkie. NO logo, NO text, NO screen UI. Isolated single game asset.",
+    "texture_prompt": "Premium stylized modern touchscreen smartphone. Smooth dark royal-blue navy metal frame with subtle cobalt layered bezel. Tiny warm yellow accent centered on bottom edge only. Entire large front display flat uniform dark navy black, intended for dynamic UI compositing. NO text NO logo NO numbers NO icons NO screen graphics NO controls or buttons painted on front. Clean unweathered game asset. Preserve slender smooth rounded rectangular phone silhouette.",
+    "texture_image_url": "",
+    "mode": "refine",
+    "model_type": "standard",
+    "seed": 3540447696
+  },
+  "saved_files": [
+    "artifacts\\meshy-modern-phone-refined\\model.glb",
+    "artifacts\\meshy-modern-phone-refined\\thumbnail.png",
+    "artifacts\\meshy-modern-phone-refined\\texture_0_base_color.png",
+    "artifacts\\meshy-modern-phone-refined\\texture_0_metallic.png",
+    "artifacts\\meshy-modern-phone-refined\\texture_0_normal.png",
+    "artifacts\\meshy-modern-phone-refined\\texture_0_roughness.png"
+  ],
+  "downloaded_at": "2026-09-26T21:56:45.140Z"
+}

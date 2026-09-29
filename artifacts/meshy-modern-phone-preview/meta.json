@@ -1,0 +1,33 @@
+{
+  "resource": "text-to-3d",
+  "task": {
+    "id": "01a0dfb5-308a-7495-87ad-965bc06eb29f",
+    "type": "text-to-3d-preview",
+    "name": "",
+    "status": "SUCCEEDED",
+    "progress": 100,
+    "preceding_tasks": 0,
+    "created_at": 1790459590392,
+    "started_at": 1790459590400,
+    "finished_at": 1790459629837,
+    "expires_at": 0,
+    "task_error": null,
+    "model_urls": {
+      "glb": "https://assets.meshy.ai/4d0198b5-14af-4e84-8ea3-2e974e4fa8b8/tasks/01a0dfb5-308a-7495-87ad-965bc06eb29f/output/model.glb?Expires=4943980800&Signature=mXHBusTXGJ3uTVCr2FsUaVauDyGTHJujikUXMXqzuw60ckD4HclIIf~2LQc06PTb-dnoLjSbNJhGNiBFrUARlxmUOaH92bXZ~nke~aVwQa~S2NgiyDoKsbBrFC5y9saUfyHc2QO2w3dzDj5PVu~q4Sw94ON8mT06SPpl3lsxm1T1LKHr5Dsn5DbG2T4TXd4oIb4nxbXFjWADSRbGSR4t0iMr7CHAcYk7rOnqTzsnfc2~iLBFKq7AN5NeGaIGZ0dhanKd~p~LybmCbY~prNVE~E81WvEQpEOxbkYRfXeTj6Z-prcJWvziMC5zXbB6C~EbmvOMfr4H5XyiUnSklnBHpw__&Key-Pair-Id=K1VGYTHIYLM9UM"
+    },
+    "texture_urls": [],
+    "thumbnail_url": "https://assets.meshy.ai/4d0198b5-14af-4e84-8ea3-2e974e4fa8b8/tasks/01a0dfb5-308a-7495-87ad-965bc06eb29f/output/preview.png?Expires=4943980800&Signature=Hy91HsrfYLK2kasCO9EhzFTwxMnC3CQ--fV4Z8lLEDVD8zvoBbGST~i9tF7XS1VCzDCuWgm07TFUEjaFnlLKrlzAb1DRi~YzPbo6XMhUrPM45NO3Txr4nDc73ZDIPMUkjEoQn3l-78fz9c-iVQhSoYuw-lxZ5FER3PH7JWQ2zXZnRRNPZeZtHPR2eRix2kVoCrwAYhRd7zJt39BUEcJBxcr4vsVV8PuQjzrXEdRe5M8pycG7xFQ2fgnHs1OgUQWvjjCxmNRhQ9Is8HRxdOvqDof3doL~YVkvAB7iEjSNdl2vQumRqueQCQ3tb2T8YxwBQitxBYYHRZoBbIGHKjkTfA__&Key-Pair-Id=K1VGYTHIYLM9UM",
+    "consumed_credits": 20,
+    "prompt": "Modern premium stylized smartphone, portrait ratio width 0.50 height 1. Slim smooth rounded rectangular silhouette, large edge-to-edge flat blank dark front display taking 90 percent of front. Navy royal blue frame, subtle cobalt layered bezel, tiny warm yellow bottom edge accent. Clearly a modern touchscreen smartphone, slightly chunky game proportions. NO physical front buttons, NO D-pad, NO plus/minus controls, NO keyboard, NO console, NO rugged industrial or octagonal casing, NO communicator, NO walkie-talkie. NO logo, NO text, NO screen UI. Isolated single game asset.",
+    "texture_prompt": "",
+    "texture_image_url": "",
+    "mode": "preview",
+    "model_type": "standard",
+    "seed": 3540447696
+  },
+  "saved_files": [
+    "artifacts\\meshy-modern-phone-preview\\model.glb",
+    "artifacts\\meshy-modern-phone-preview\\thumbnail.png"
+  ],
+  "downloaded_at": "2026-09-26T21:54:12.580Z"
+}

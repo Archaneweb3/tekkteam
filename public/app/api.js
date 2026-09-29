@@ -1,5 +1,5 @@
-// Local, read-only snapshot adapter for the TEKKWORK frontend preview.
-// The original TEKKWORK API executes real Solana actions and must never be
+// Local, read-only snapshot adapter for the TEKKTEAM frontend preview.
+// The original TEKKTEAM API executes real Solana actions and must never be
 // called from this separately branded demo without its owner's backend setup.
 const read = async (url) => {
   const response = await fetch(url);
@@ -15,8 +15,8 @@ const unavailable = async () => {
 // social URLs and token links remain the source snapshot's values.
 const demoLabelKeys = new Set(['name', 'ticker', 'symbol', 'agentName', 'coinTicker', 'description', 'goal']);
 const demoName = (value) => value.replace(/bagwork/gi, (match) =>
-  match === match.toUpperCase() ? 'TEKKWORK' :
-  match === match.toLowerCase() ? 'tekkwork' : 'Tekkwork');
+  match === match.toUpperCase() ? 'TEKKTEAM' :
+  match === match.toLowerCase() ? 'tekkteam' : 'Tekkteam');
 function rebrandDemo(value, key = '') {
   if (Array.isArray(value)) return value.map((item) => rebrandDemo(item));
   if (value && typeof value === 'object')

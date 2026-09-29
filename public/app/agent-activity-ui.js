@@ -1,0 +1,76 @@
+import {request as api} from './backend.js';
+import {renderReasoning} from './agent-trading-ui.js';
+
+const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const finite=v=>typeof v==='number'&&Number.isFinite(v);
+const amount=(v,d=6,signed=false)=>finite(v)?`${signed&&v>0?'+':''}${v.toLocaleString('en-US',{maximumFractionDigits:d})}`:'—';
+const at=v=>{if(v==null)return null;const n=typeof v==='number'?v:new Date(v).getTime();return Number.isFinite(n)?n:null;};
+const clock=v=>at(v)==null?'—':new Date(at(v)).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+const relative=v=>{const n=at(v);if(n==null)return '—';const age=Math.max(0,Date.now()-n);return age<60000?`${Math.floor(age/1000)}s ago`:age<3600000?`${Math.floor(age/60000)}m ago`:new Date(n).toLocaleDateString();};
+const duration=v=>finite(v)?v<60000?`${Math.round(v/1000)}s`:v<3600000?`${Math.round(v/60000)}m`:`${(v/3600000).toFixed(1)}h`:'—';
+const tone=(type,pnl)=>type==='BUY'||type==='TRADING_STARTED'||type==='RESUMED'||type==='POSITION_OPENED'||type==='SIGNAL_DETECTED'?'positive':type==='POSITION_CLOSED'?finite(pnl)?pnl<0?'negative':pnl>0?'positive':'neutral':'neutral':type==='RISK_REJECTED'||type==='ERROR'||type==='REJECTED'?'negative':type==='SELL'?'sell':type==='PAUSED'?'paused':['WATCH','HOLD','WATCHING'].includes(type)?'watch':'neutral';
+const labels={BUY:'BUY',SELL:'SELL',POSITION_OPENED:'POSITION OPENED',POSITION_CLOSED:'TRADE CLOSED',SIGNAL_DETECTED:'SIGNAL FOUND',SIGNAL_SKIPPED:'SKIPPED',RISK_REJECTED:'RISK REJECTED',PAUSED:'AGENT PAUSED',RESUMED:'AGENT RESUMED',TRADING_STARTED:'AGENT STARTED',TRADING_STOPPED:'AGENT STOPPED',STRATEGY_CHANGED:'STRATEGY UPDATED',SKIPPED:'SKIPPED',REJECTED:'RISK REJECTED',WATCH:'WATCH',HOLD:'HOLD'};
+const label=type=>labels[type]??String(type??'UPDATE').replaceAll('_',' ');
+const systemTypes=new Set(['PAUSED','RESUMED','TRADING_STARTED','TRADING_STOPPED','STRATEGY_CHANGED']);
+const tradeTypes=new Set(['BUY','SELL','POSITION_OPENED','POSITION_CLOSED']);
+
+export function activityRows(trading,decisions,analytics){
+ const trades=new Map((analytics?.tradeHistory??[]).filter(x=>x.positionId).map(x=>[x.positionId,x]));
+ const groups=new Map();let index=0;
+ const paper=(trading?.activity??[]).filter(e=>!['POLL_COMPLETED','FETCH_COMPLETED','HEARTBEAT','RPC_READ','BACKGROUND_REFRESH','SIGNAL_DETECTED'].includes(e.type)).map((e,i)=>{const kind=tradeTypes.has(e.type)?'TRADES':systemTypes.has(e.type)?'SYSTEM':'DECISIONS';let group=null;if(e.positionId){if(!groups.has(e.positionId))groups.set(e.positionId,++index);group=groups.get(e.positionId);}return {id:'paper:'+String(e.eventId??e.timestamp??i),kind,type:e.type,at:e.timestamp,token:e.tokenSymbol||null,description:e.reason||null,tone:tone(e.type,e.pnlSol),group,raw:e,trade:trades.get(e.positionId)??null};});
+ const snapshots=(decisions?.decisions??[]).map((d,i)=>({id:'decision:'+String(d.id??d.timestamp??i),kind:'DECISIONS',type:d.finalDecision??'HOLD',at:d.timestamp,token:d.market?.symbol||d.market?.name||null,description:d.reason?.summary||null,tone:tone(d.finalDecision),raw:d}));
+ const ordered=[...paper,...snapshots].sort((a,b)=>(at(b.at)??0)-(at(a.at)??0)),visible=[];
+ for(const row of ordered){const previous=visible.at(-1),repeatable=['SIGNAL_SKIPPED','RISK_REJECTED','SKIPPED','WATCH','HOLD'].includes(row.type);if(repeatable&&previous?.type===row.type&&previous.kind===row.kind&&previous.token===row.token&&previous.description===row.description&&at(previous.at)!=null&&at(row.at)!=null&&at(previous.at)-at(row.at)<=300000){previous.sourceEvents.push(row);continue;}visible.push({...row,sourceEvents:[row]});}
+ return visible;
+}
+
+const humanReason=value=>{const text=String(value??'').trim();if(!text)return 'Reason not recorded.';if(/momentum.*(below|less than|threshold)/i.test(text))return 'Momentum below threshold';if(/buy.?sell.*(below|less than|threshold)/i.test(text))return 'Buy/sell activity below threshold';if(/cooldown|entry_cooldown_active/i.test(text))return 'Trade cooldown active';if(/liquidity.*(below|less than)/i.test(text))return 'Liquidity below threshold';if(/volume.*(below|less than)/i.test(text))return 'Volume below threshold';return text.includes('_')?text.replaceAll('_',' ').toLowerCase().replace(/^./,c=>c.toUpperCase()):text;};
+const dateGroup=value=>{const n=at(value);if(n==null)return 'DATE UNAVAILABLE';const d=new Date(n),today=new Date(),yesterday=new Date();yesterday.setDate(today.getDate()-1);return d.toDateString()===today.toDateString()?'TODAY':d.toDateString()===yesterday.toDateString()?'YESTERDAY':d.toLocaleDateString([],{day:'numeric',month:'short',year:d.getFullYear()===today.getFullYear()?undefined:'numeric'}).toUpperCase();};
+function summary(trading,decisions,rows){
+ const day=new Date().toDateString(),today=(decisions?.decisions??[]).filter(d=>at(d.timestamp)!=null&&new Date(at(d.timestamp)).toDateString()===day).length;
+ const activity=(trading?.activity??[]).filter(e=>at(e.timestamp)!=null&&new Date(at(e.timestamp)).toDateString()===day),buys=activity.filter(e=>e.type==='BUY').length,sells=activity.filter(e=>e.type==='SELL').length,latest=rows[0]?.at;
+ return `<p class="aa-summary">TODAY <strong>${decisions?today:'—'} ${today===1?'decision':'decisions'}</strong><span aria-hidden="true">·</span><strong>${trading?buys+sells:'—'} ${buys+sells===1?'trade':'trades'}</strong><span aria-hidden="true">·</span>Last active ${latest?esc(relative(latest)):'—'}</p>`;
+}
+const statusText=r=>label(r.type);
+function item(r,i){
+ const system=r.kind==='SYSTEM',closed=r.type==='POSITION_CLOSED',d=r.raw;
+ const pnl=closed?(r.trade?.pnlSol??d.pnlSol):null,ret=closed?(r.trade?.returnPercent??d.pnlPercent):null;
+ return `<li class="aa-item ${system?'aa-system':''} ${closed?'aa-closed':''}" data-tone="${r.tone}"><time class="aa-time">${esc(clock(r.at))}</time><span class="aa-node ${r.tone}" aria-hidden="true"></span><button type="button" class="aa-event tw-feed-row" data-activity-detail="${i}" aria-label="View ${esc(label(r.type))} details${r.token?' for '+esc(r.token):''}"><b class="aa-badge tw-feed-event tw-feed-event--${r.tone==='positive'?'buy':r.tone==='negative'?'risk':r.tone==='sell'?'sell':'decision'} ${r.tone}">${esc(statusText(r))}${r.sourceEvents.length>1?' × '+r.sourceEvents.length:''}</b><strong class="aa-token">${esc(r.token||'—')}</strong><span class="aa-event-desc">${esc(humanReason(r.description||(!system?'Market evaluation recorded.':'Agent setting changed.')))}</span><span class="aa-detail-arrow" aria-hidden="true">VIEW DETAILS →</span></button></li>`;
+}
+function empty(all,filter,search){
+ const title=!all.length?'NO ACTIVITY YET':filter==='TRADES'&&!search?'NO TRADES YET':'NO MATCHING EVENTS';
+ const body=!all.length?'Start your agent and its work will appear here.':filter==='TRADES'&&!search?'Paper trades will appear after your agent opens or closes a position.':'Try another activity filter or search.';
+ return `<div class="aa-empty"><span aria-hidden="true">✦</span><strong>${title}</strong><p>${body}</p></div>`;
+}
+function facts(fields){return `<dl class="aa-detail-facts">${fields.map(([name,v])=>`<div><dt>${name}</dt><dd>${v}</dd></div>`).join('')}</dl>`;}
+const repeatDetails=r=>r.sourceEvents?.length>1?`<details class="aa-advanced"><summary>VIEW ALL ${r.sourceEvents.length} RECORDED EVENTS</summary><ol>${r.sourceEvents.map(event=>`<li>${esc(at(event.at)==null?'Time unavailable':new Date(at(event.at)).toLocaleString())} · ${esc(event.id)}</li>`).join('')}</ol></details>`:'';
+function details(r){
+ const e=r.raw??{},tr=r.trade,kind=r.kind;
+ if(kind==='DECISIONS'&&e.market)return `<p class="aa-detail-time">${esc(at(r.at)==null?'Time unavailable':new Date(at(r.at)).toLocaleString())}</p>${renderReasoning(e)}${repeatDetails(r)}${advanced(r)}`;
+ if(kind==='TRADES'){
+  const entry=tr?.entryPriceUsd??e.entryPrice,exit=tr?.exitPriceUsd??e.exitPrice,size=tr?.sizeSol??e.executedSizeSol??e.requestedSizeSol,ret=tr?.returnPercent??e.pnlPercent,pnl=tr?.pnlSol??e.pnlSol;
+  return `<div class="aa-detail-lead"><span class="aa-badge ${r.tone}">${esc(statusText(r))}</span><h3>${esc(r.token||'TOKEN')}</h3><p>${esc(r.description||label(r.type))}</p></div>${r.type==='POSITION_CLOSED'?`<div class="aa-detail-pnl ${r.tone}"><strong>${amount(ret,2,true)}${finite(ret)?'%':''}</strong><span>${amount(pnl,9,true)}${finite(pnl)?' SOL':''}</span></div>`:''}${facts([['ENTRY',`${amount(entry,8)} USD`],['EXIT',`${amount(exit,8)} USD`],['SIZE',`${amount(size,9)} SOL`],['RETURN',`${amount(ret,2,true)}${finite(ret)?'%':''}`],['PNL',`${amount(pnl,9,true)}${finite(pnl)?' SOL':''}`],['DURATION',duration(tr?.holdingMs)],['RECORDED',esc(at(r.at)==null?'—':new Date(at(r.at)).toLocaleString())]])}<p class="aa-detail-note">${esc(r.description||'Entry or exit reason not recorded.')}</p>${repeatDetails(r)}${advanced(r)}`;
+ }
+ return `<div class="aa-detail-lead"><span class="aa-badge ${r.tone}">${esc(label(r.type))}</span><h3>${esc(label(r.type))}</h3><p>${esc(r.description||'A Paper agent event was recorded.')}</p></div>${facts([['TIME',esc(at(r.at)==null?'—':new Date(at(r.at)).toLocaleString())],['STRATEGY',esc(e.strategy||'—')]])}${repeatDetails(r)}${advanced(r)}`;
+}
+function advanced(r){const e=r.raw??{};return `<details class="aa-advanced"><summary>ADVANCED · TECHNICAL DETAILS</summary>${facts([['EVENT ID',esc(e.eventId||e.id||'—')],['POSITION ID',esc(e.positionId||'—')],['REASON CODE',esc(e.reason?.code||'—')],['STRATEGY VERSION',esc(e.strategyConfigVersion??e.configVersion??'—')],['MARKET SNAPSHOT',esc(e.marketSnapshotId||'—')]])}</details>`;}
+
+export function mountAgentActivity(host,agent,{request=api,isCurrent=()=>true}={}){
+ const base='/agents/'+encodeURIComponent(agent.id);let dead=false,busy=false,filter='ALL',search='',token='ALL',visible=20,rows=[],trading=null,decisions=null,analytics=null;
+ host.innerHTML=`<section class="aa-activity aa-clean"><header class="aa-header tw-world-section-head"><div><span class="aa-kicker tw-world-eyebrow">AGENT HISTORY</span><h2>ACTIVITY</h2><p>Everything your Agent has been doing.</p></div></header><div data-activity-body><div class="aa-skeleton" role="status" aria-label="Loading activity"><span></span><span></span><span></span><span></span></div></div><dialog class="at-drawer aa-drawer" aria-label="Activity details"><div class="at-drawer-inner"><header><div><span class="aa-kicker">ACTIVITY DETAILS</span><h2>EVENT DETAILS</h2></div><button type="button" class="at-drawer-close" data-close-activity aria-label="Close activity details">×</button></header><div data-activity-detail-body></div></div></dialog></section>`;
+ const body=host.querySelector('[data-activity-body]'),drawer=host.querySelector('.aa-drawer');let opener=null;
+ function render(){
+  const tokens=[...new Set(rows.map(r=>r.token).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
+  const filtered=rows.filter(r=>(filter==='ALL'||r.kind===filter)&&(token==='ALL'||r.token===token)&&(!search||`${r.token||''} ${label(r.type)} ${r.description||''}`.toLowerCase().includes(search)));
+  let previousDate='';const list=filtered.slice(0,visible).map((r,i)=>{const date=dateGroup(r.at),heading=date!==previousDate?`<li class="aa-date">${esc(date)}</li>`:'';previousDate=date;return heading+item(r,i);}).join('');
+  body.innerHTML=`${summary(trading,decisions,rows)}<div class="aa-controls"><div class="aa-filters tw-feed-filters" role="group" aria-label="Activity filter">${['ALL','DECISIONS','TRADES','SYSTEM'].map(f=>`<button type="button" data-activity-filter="${f}" aria-pressed="${f===filter}">${f}</button>`).join('')}</div><div class="aa-compact-filters"><label><span class="sr-only">Search token or event</span><input type="search" data-activity-search placeholder="Search token or event…" value="${esc(search)}"></label><details class="aa-token-filter"><summary>FILTERS</summary><label><span class="sr-only">Filter token</span><select data-activity-token><option value="ALL">ALL TOKENS</option>${tokens.map(t=>`<option value="${esc(t)}" ${t===token?'selected':''}>${esc(t)}</option>`).join('')}</select></label></details></div></div><section class="aa-work-panel"><div class="aa-timeline-heading"><h3>ACTIVITY TIMELINE</h3><small>${filtered.length} EVENT${filtered.length===1?'':'S'}</small></div>${filtered.length?`<ol class="aa-timeline tw-feed-list">${list}</ol>`:empty(rows,filter,search)}${filtered.length>visible?'<button type="button" class="tw-world-cta secondary aa-load-more" data-activity-more>LOAD MORE <span aria-hidden="true">↓</span></button>':''}</section>`;
+ }
+ function current(){return rows.filter(r=>(filter==='ALL'||r.kind===filter)&&(token==='ALL'||r.token===token)&&(!search||`${r.token||''} ${label(r.type)} ${r.description||''}`.toLowerCase().includes(search)));}
+ const click=e=>{const b=e.target.closest('button');if(!b)return;if(b.hasAttribute('data-activity-retry'))refresh();else if(b.dataset.activityFilter){filter=b.dataset.activityFilter;visible=20;render();}else if(b.hasAttribute('data-activity-more')){visible+=20;render();body.querySelector('[data-activity-more]')?.focus();}else if(b.dataset.activityDetail!==undefined){const r=current()[Number(b.dataset.activityDetail)];if(!r)return;opener=b;drawer.querySelector('[data-activity-detail-body]').innerHTML=details(r);drawer.showModal();}else if(b.hasAttribute('data-close-activity'))drawer.close();};
+ const input=e=>{if(!e.target.matches('[data-activity-search]'))return;search=e.target.value.trim().toLowerCase();visible=20;const start=e.target.selectionStart,end=e.target.selectionEnd;render();const replacement=body.querySelector('[data-activity-search]');replacement.focus();replacement.setSelectionRange(start??search.length,end??search.length);};
+ const change=e=>{if(e.target.matches('[data-activity-token]')){token=e.target.value;visible=20;render();body.querySelector('.aa-token-filter').open=true;}};
+ host.addEventListener('click',click);host.addEventListener('input',input);host.addEventListener('change',change);
+ drawer.addEventListener('click',e=>{if(e.target===drawer)drawer.close();});drawer.addEventListener('close',()=>opener?.focus());
+ async function refresh(){if(dead||busy||!isCurrent()||drawer.open||document.hidden)return;busy=true;try{const [t,d,a]=await Promise.allSettled([request(base+'/trading'),request(base+'/trading/decisions?filter=all'),request(base+'/analytics')]);if(dead||!isCurrent())return;if(t.status==='rejected'&&d.status==='rejected'&&a.status==='rejected'){body.innerHTML='<div class="aa-error" role="alert"><strong>ACTIVITY UNAVAILABLE</strong><p>We couldn\'t load this Agent\'s history.</p><button type="button" data-activity-retry>TRY AGAIN</button></div>';return;}trading=t.status==='fulfilled'&&t.value.agentId===agent.id?t.value:null;decisions=d.status==='fulfilled'&&d.value.agentId===agent.id?d.value:null;analytics=a.status==='fulfilled'&&a.value.agentId===agent.id?a.value:null;rows=activityRows(trading,decisions,analytics);render();}finally{busy=false;}}
+ refresh();const timer=setInterval(refresh,20000);return {destroy(){dead=true;clearInterval(timer);host.removeEventListener('click',click);host.removeEventListener('input',input);host.removeEventListener('change',change);}};
+}

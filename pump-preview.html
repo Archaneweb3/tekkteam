@@ -1,0 +1,5 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>TEKKWORK — preview button debug</title>
+<style>body{background:#101b2b;color:white;font:16px system-ui;margin:16px;max-width:1100px}button{padding:16px;max-width:100%;position:relative;z-index:1;pointer-events:auto}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#17263c;padding:12px}.error{color:#ffb7b7}li{margin:6px 0}</style>
+<button id="go" type="button">Inspect ONE preview</button><h1>ONE Phantom Mainnet preview</h1>
+<p>Validates and simulates create_v2, then requests signTransaction once only if the estimated debit is at most 0.01 SOL. Review and approve or reject manually in Phantom. Initial buy: 0. No broadcast or retry. Any returned signed transaction is discarded.</p>
+<p id="boot">Bootstrap pending…</p><ol id="stages"></ol><pre id="evidence" aria-live="polite"></pre><script src="/src/pump-preview-boot.js"></script></html>

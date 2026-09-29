@@ -1,0 +1,53 @@
+.tw-wallet-workspace{padding:24px 28px 64px;font-family:'Nunito Sans',sans-serif}
+.tw-wallet-page-head{margin:0 0 28px}
+.tw-wallet-page-head h1{font:400 clamp(36px,4vw,58px)/1 'Lilita One',sans-serif;margin:8px 0;color:#fff}
+.tw-wallet-page-head p{font-size:16px;color:#b8cce9;margin:0}
+.tw-wallet-treasury{display:flex;align-items:end;justify-content:space-between;gap:20px;padding:24px;margin-bottom:48px;background:linear-gradient(110deg,#15386e,#0b1c3c 72%);border:1px solid #4268a5;border-bottom:4px solid #214681;border-radius:12px}
+.tw-wallet-treasury strong{display:block;font:400 clamp(36px,4vw,52px)/1.1 'Lilita One',sans-serif;margin:8px 0;color:#fff}
+.tw-wallet-treasury small,.tw-wallet-treasury-mark{color:#a9c6eb;font-size:13px}
+.tw-wallet-treasury-mark{font-weight:900;letter-spacing:.08em;white-space:nowrap}
+.tw-wallet-section{margin-bottom:48px}
+.tw-wallet-section-head{display:flex;align-items:end;justify-content:space-between;gap:14px;border-bottom:1px solid #35507a;padding-bottom:12px;margin-bottom:16px}
+.tw-wallet-section-head h2{font:400 30px/1 'Lilita One',sans-serif;margin:7px 0 0}
+.tw-wallet-section-head>strong{font-size:12px;color:#ffdc43;letter-spacing:.08em}
+.tw-wallet-owner{display:grid;grid-template-columns:minmax(0,1fr) minmax(170px,.65fr) auto;align-items:center;gap:24px;padding:24px;background:#101f3a;border:1px solid #3b5b8a;border-radius:12px}
+.tw-wallet-owner-identity,.tw-wallet-owner-value{display:grid;gap:7px;min-width:0}
+.tw-wallet-owner-identity>span,.tw-wallet-owner-value>span{font-size:12px;font-weight:900;letter-spacing:.08em;color:#9fc3f1}
+.tw-wallet-owner-identity strong{font:400 25px 'Lilita One',sans-serif;overflow-wrap:anywhere}
+.tw-wallet-owner-value strong{font:400 35px 'Lilita One',sans-serif}
+.tw-wallet-owner-value small{font-size:12px;color:#9fc3f1}
+.tw-wallet-owner-actions{display:grid;gap:8px;min-width:150px}
+.tw-wallet-owner-actions .tw-button{white-space:nowrap;min-height:40px}
+.tw-wallet-owner-actions>span{font-size:11px;color:#ffdc43;text-align:center}
+.tw-wallet-search{display:grid;gap:6px;width:min(100%,330px);font-size:12px;color:#a9c6eb;font-weight:800;margin:0 0 14px}
+.tw-wallet-search input{height:42px;background:#091a35;color:#fff;border:1px solid #3d5d8c;border-radius:8px;padding:0 12px;font:600 14px 'Nunito Sans',sans-serif}
+.tw-wallet-search input:focus-visible{outline:2px solid #ffdc43;outline-offset:2px}
+.tw-wallet-table-wrap{border:1px solid #355786;border-radius:10px;overflow:hidden;background:#0e1d38}
+.tw-wallet-table{width:100%;border-collapse:collapse;text-align:left}
+.tw-wallet-table th{padding:14px 16px;color:#91b8e8;font-size:11px;letter-spacing:.1em;background:#142a50}
+.tw-wallet-table td{padding:17px 16px;border-top:1px solid #2d4b73;font-size:14px;overflow-wrap:anywhere}
+.tw-wallet-table tbody tr:hover{background:#162d52}
+.tw-wallet-table td strong{font-size:16px;color:#fff}
+.tw-wallet-table td:nth-child(2){font-family:ui-monospace,Consolas,monospace}
+.tw-wallet-row-status{display:inline-block;font-size:11px;font-weight:900;letter-spacing:.06em;color:#a8d5ff}
+.tw-wallet-row-status[data-state=UNAVAILABLE]{color:#ffbb76}
+.tw-wallet-table button,.tw-wallet-view-all{border:0;background:none;color:#ffdc43;font:900 13px 'Nunito Sans',sans-serif;white-space:nowrap;cursor:pointer}
+.tw-wallet-table button:hover,.tw-wallet-view-all:hover{text-decoration:underline}
+.tw-wallet-empty{padding:22px;margin:0;color:#a9bedf;background:#0e1d38;border:1px solid #355786;border-radius:9px}
+.tw-wallet-transfers{border:1px solid #355786;border-radius:10px;overflow:hidden}
+.tw-wallet-transfer{background:#0e1d38;border-bottom:1px solid #2d4b73}
+.tw-wallet-transfer:last-child{border-bottom:0}
+.tw-wallet-transfer summary{display:grid;grid-template-columns:115px minmax(0,1fr) 55px 130px 125px;gap:14px;align-items:center;cursor:pointer;min-height:66px;padding:12px 18px;list-style:none}
+.tw-wallet-transfer summary::-webkit-details-marker{display:none}
+.tw-wallet-transfer summary:hover{background:#172f54}
+.tw-wallet-transfer summary span:first-child{color:#a9c6eb;font-size:12px}
+.tw-wallet-transfer summary strong{overflow-wrap:anywhere}
+.tw-wallet-transfer-status{color:#9de1be;font-size:11px;font-weight:900;letter-spacing:.05em}
+.tw-wallet-transfer-status[data-status=FAILED]{color:#ff9aa8}
+.tw-wallet-transfer-status[data-status=UNKNOWN]{color:#ffcc69}
+.tw-wallet-transfer-detail{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;padding:18px;background:#152847;color:#a9c6eb;font-size:12px}
+.tw-wallet-transfer-detail div{display:grid;gap:4px;min-width:0}
+.tw-wallet-transfer-detail strong{color:#fff;overflow-wrap:anywhere}
+.tw-wallet-transfer-detail a,.tw-wallet-transfer-detail button{justify-self:start;color:#ffdc43;background:none;border:0;font:900 12px 'Nunito Sans',sans-serif;cursor:pointer}
+@media(max-width:900px){.tw-wallet-owner{grid-template-columns:1fr 1fr}.tw-wallet-owner-actions{grid-column:1/-1;grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:650px){.tw-wallet-workspace{padding:20px 14px 48px}.tw-wallet-treasury{display:block}.tw-wallet-treasury-mark{display:block;margin-top:14px}.tw-wallet-owner{grid-template-columns:1fr;gap:18px}.tw-wallet-owner-actions{grid-column:auto}.tw-wallet-owner-identity strong{font-size:23px}.tw-wallet-table-wrap{border:0;background:none}.tw-wallet-table thead{display:none}.tw-wallet-table,.tw-wallet-table tbody,.tw-wallet-table tr,.tw-wallet-table td{display:block}.tw-wallet-table tr{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;padding:17px;background:#0e1d38;border:1px solid #355786;border-radius:10px}.tw-wallet-table td{border:0;padding:0;min-width:0}.tw-wallet-table td:first-child,.tw-wallet-table td:last-child{grid-column:1/-1}.tw-wallet-table td:before{content:attr(data-label);display:block;color:#91b8e8;font:900 10px 'Nunito Sans',sans-serif;letter-spacing:.08em;margin-bottom:3px}.tw-wallet-table td:nth-child(2){grid-column:1/-1}.tw-wallet-table td:last-child button{min-height:40px;padding:0}.tw-wallet-transfer summary{grid-template-columns:1fr auto;gap:7px;padding:15px}.tw-wallet-transfer summary span:nth-child(3){display:none}.tw-wallet-transfer summary strong:nth-child(2){grid-column:1/-1;grid-row:2}.tw-wallet-transfer summary strong:nth-child(4){grid-column:2;grid-row:2}.tw-wallet-transfer-status{grid-column:2;grid-row:1}.tw-wallet-transfer-detail{grid-template-columns:1fr}}

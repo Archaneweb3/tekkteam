@@ -1,4 +1,6 @@
 import {icon} from './icons.js';
+import {createCanonicalCharacter} from './skins3d.js';
+import {OFFICE_CHARACTERS} from './character-registry.js';
 // TEKKWORK voxel operations office, rendered with WebGL2.
 // Workstations flank a clear central aisle; action targets share scene coordinates.
 //
@@ -388,17 +390,18 @@ export function createOffice(host, { onAction } = {}) {
   };
   // A continuous tiled floor makes these stations read as a workplace,
   // without restoring the reference's enclosing walls and desk-row layout.
-  room.box(0.55, -0.42, 0.25, 10.35, -0.03, 7.75, 0x18345E);
-  room.box(0.75, -0.03, 0.45, 10.15, 0, 7.55, 0xB9CCE6);
-  for (let x = 1.55; x < 10.1; x += 0.8) room.box(x, 0, 0.45, x + 0.018, 0.005, 7.55, 0x9FB7D7);
-  for (let z = 1.25; z < 7.55; z += 0.8) room.box(0.75, 0, z, 10.15, 0.005, z + 0.018, 0x9FB7D7);
+  // Cobalt architecture + warm working surfaces retain the real office footprint.
+  room.box(0.55, -0.42, 0.25, 10.35, -0.03, 7.75, 0x1938A0);
+  room.box(0.75, -0.03, 0.45, 10.15, 0, 7.55, 0x8795BF);
+  for (let x = 1.55; x < 10.1; x += 0.8) room.box(x, 0, 0.45, x + 0.018, 0.005, 7.55, 0x556795);
+  for (let z = 1.25; z < 7.55; z += 0.8) room.box(0.75, 0, z, 10.15, 0.005, z + 0.018, 0x556795);
   // One segmented back wall and low partitions keep the front open to the camera.
-  room.box(0.65, 0, 0.25, 10.3, 2.75, 0.45, 0x6F8BAB);
-  room.box(0.65, 2.75, 0.25, 10.3, 2.86, 0.52, 0xCADFF5);
-  room.box(4.45, 0, 0.44, 6.15, 2.7, 0.59, 0x244767);
+  room.box(0.65, 0, 0.25, 10.3, 2.75, 0.45, 0x304B99);
+  room.box(0.65, 2.75, 0.25, 10.3, 2.86, 0.52, 0x6B8CF0);
+  room.box(4.45, 0, 0.44, 6.15, 2.7, 0.59, 0x182C64);
   for (let x = 0.95; x < 4.2; x += 0.8) {
-    room.box(x, 1.25, 0.47, x + 0.64, 2.5, 0.52, 0x97CBE2);
-    room.box(x, 1.83, 0.52, x + 0.64, 1.87, 0.56, 0x2D5779);
+    room.box(x, 1.25, 0.47, x + 0.64, 2.5, 0.52, 0x77A9ED);
+    room.box(x, 1.83, 0.52, x + 0.64, 1.87, 0.56, 0x21396F);
   }
   room.box(6.1, 0, 3.5, 9.9, 0.85, 3.67, 0x668EA8);
   room.box(6.1, 0.85, 3.49, 9.9, 0.95, 3.68, 0xBDD8EC);
@@ -433,8 +436,8 @@ export function createOffice(host, { onAction } = {}) {
     room.box(x - 0.22, y + 0.28, z - 0.25, x + 0.22, y + 0.73, z - 0.16, 0x29496D);
     room.cylinder(x, y, z, 0.055, y + 0.21, 0x6384AB, 8);
   };
-  sideDesk(2.35, 0.02, 5.9, 0xD2E1F2);
-  sideDesk(3.35, 0.02, 5.9, 0xD2E1F2);
+  sideDesk(2.35, 0.02, 5.9, 0xDDC9B2);
+  sideDesk(3.35, 0.02, 5.9, 0xDDC9B2);
   chair(2.15, 0.02, 6.65);
   chair(3.45, 0.02, 6.65);
   chair(2.45, 0.02, 3.75);
@@ -447,6 +450,30 @@ export function createOffice(host, { onAction } = {}) {
     room.box(x - 0.2, 1.05, z - 0.16, x + 0.2, 1.36, z + 0.16, 0x70B29B);
   };
   planter(1.0, 1.0); planter(9.75, 1.0); planter(1.05, 7.1);
+  planter(9.65, 7.0); planter(6.65, 1.0);
+  // Dense perimeter furnishings leave the existing walking aisle and roles intact.
+  room.box(6.65, 0, 0.55, 9.1, 0.65, 1.08, 0x253E82);
+  room.box(6.6, 0.65, 0.53, 9.15, 0.75, 1.12, 0xD6BE9D);
+  for (const x of [7.05, 7.85, 8.65]) {
+    room.box(x - 0.3, 0.14, 1.09, x + 0.3, 0.55, 1.12, 0x3655A3);
+    room.box(x - 0.08, 0.4, 1.12, x + 0.08, 0.44, 1.15, 0xBFCAE7);
+  }
+  // Warm architectural wall sconces; emissive faces reuse the existing shader.
+  for (const x of [0.85, 6.3, 9.9]) {
+    room.box(x - 0.14, 1.2, 0.48, x + 0.14, 1.85, 0.7, 0x172A63);
+    room.box(x - 0.1, 1.3, 0.71, x + 0.1, 1.74, 0.76, 0xFFD77F, 0, 1);
+  }
+  // Low lounge on the open frontage, below worker silhouettes.
+  room.box(5.55, 0.08, 6.8, 7.3, 0.38, 7.37, 0x19358A);
+  room.box(5.55, 0.34, 7.18, 7.3, 0.81, 7.43, 0x345BD0);
+  for (const x of [5.6, 6.15, 6.7]) room.box(x, 0.37, 6.8, x + 0.51, 0.48, 7.18, 0x446CDC);
+  room.box(5.42, 0.08, 6.72, 5.6, 0.6, 7.43, 0x254BAE);
+  room.box(7.3, 0.08, 6.72, 7.48, 0.6, 7.43, 0x254BAE);
+  // Inlaid headquarters emblem is a floor detail, not another interaction target.
+  room.box(4.3, 0.006, 3.7, 5.95, 0.035, 4.95, 0x204FC9);
+  room.box(4.38, 0.035, 3.78, 5.87, 0.045, 4.87, 0x426EEA);
+  room.box(4.68, 0.046, 4.02, 5.55, 0.062, 4.2, 0xFFCF49);
+  room.box(5.02, 0.046, 4.2, 5.21, 0.062, 4.65, 0xFFCF49);
 
   // screens (textured quads) collected here
   const quads = [];
@@ -466,20 +493,26 @@ export function createOffice(host, { onAction } = {}) {
   };
   drawRocket(tex.rocket); tex.rocket.push();
   drawX(tex.x); tex.x.push();
-  tex.wall.ctx.fillStyle = '#163455';
+  tex.wall.ctx.fillStyle = '#152653';
   tex.wall.ctx.fillRect(0, 0, 256, 160);
-  tex.wall.ctx.fillStyle = '#93E8FF';
+  tex.wall.ctx.fillStyle = '#FFE078';
   tex.wall.ctx.font = 'bold 32px sans-serif';
   tex.wall.ctx.textAlign = 'center';
-  tex.wall.ctx.fillText('TEKKWORK', 128, 79);
+  tex.wall.ctx.fillText('TEKKTEAM', 128, 79);
   tex.wall.ctx.font = '14px monospace';
   tex.wall.ctx.fillText('AGENT OPERATIONS', 128, 111);
   tex.wall.push();
   quad('wall', 5.3, 1.9, 0.6, 1.6, 0.95, 1);
+  for (const x of [2.35, 3.35]) {
+    const m = monitor(x, 0.55, 5.68, 1, 0.7, 0.46);
+    quad('wall', m.cx, m.cy, m.zFront, m.w, m.h, 1);
+  }
+  const wallDisplay = monitor(8.05, 0.75, 0.73, 1, 1.5, 0.88);
+  quad('wall', wallDisplay.cx, wallDisplay.cy, wallDisplay.zFront, wallDisplay.w, wallDisplay.h, 1);
 
   // Launch: a circular fabrication table and gold token stack.
   const LD = ZONES.launch;
-  let top = plinth(LD.x, LD.y, LD.z - 0.5, 0.72, 0xF3F8FF);
+  let top = plinth(LD.x, LD.y, LD.z - 0.5, 0.72, 0xF0D9B8);
   room.cylinder(LD.x, top, LD.z - 0.5, 0.32, top + 0.09, 0xF5C95E, 16);
   room.stud(LD.x, top + 0.09, LD.z - 0.5, 0.21, 0xFFE49C);
   for (const a of [-0.48, 0.48]) room.cylinder(LD.x + a, top, LD.z - 0.5, 0.11, top + 0.19, 0xEAAA3D, 12);
@@ -488,7 +521,7 @@ export function createOffice(host, { onAction } = {}) {
 
   // Shill: a broadcast tower with one outward-facing display.
   const SD = ZONES.shill;
-  top = plinth(SD.x, SD.y, SD.z - 0.5, 0.68, 0xD6F7F4);
+  top = plinth(SD.x, SD.y, SD.z - 0.5, 0.68, 0xD5D3C5);
   room.cylinder(SD.x - 0.52, top, SD.z - 0.7, 0.07, top + 0.74, 0x2C6F8E, 12);
   room.cylinder(SD.x - 0.52, top + 0.74, SD.z - 0.7, 0.2, top + 0.82, 0x69DFD5, 12, 1);
   const shM = monitor(SD.x + 0.15, top, SD.z - 0.47, 1, 0.82, 0.56);
@@ -496,7 +529,7 @@ export function createOffice(host, { onAction } = {}) {
 
   // Trade: twin chart panels rise from a violet data podium.
   const TD = ZONES.trade;
-  top = plinth(TD.x, TD.y, TD.z - 0.54, 0.76, 0xE5E7FF);
+  top = plinth(TD.x, TD.y, TD.z - 0.54, 0.76, 0xDBCCBF);
   const m1 = monitor(TD.x - 0.4, top, TD.z - 0.59, 1, 0.72, 0.48);
   const m2 = monitor(TD.x + 0.39, top, TD.z - 0.59, 1, 0.66, 0.46);
   quad('chart', m1.cx, m1.cy, m1.zFront, m1.w, m1.h, 1);
@@ -540,11 +573,12 @@ export function createOffice(host, { onAction } = {}) {
   const spawn = (kind, x, y, z) => particles.push({ kind, x, y, z, vx: (Math.random() - 0.5) * 0.25, vy: 0.55 + Math.random() * 0.3, vz: (Math.random() - 0.5) * 0.25 + 0.15, life: 0, max: 1.9 + Math.random() * 0.6, spin: Math.random() * 6 });
 
   // ── characters ──
+  const canonicalParts = role => Object.fromEntries(Object.entries(createCanonicalCharacter(OFFICE_CHARACTERS[role]).parts).map(([key, mesh]) => [key, upload(gl, mesh)]));
   const crew = {
-    launch: { role: 'launch', parts: buildCharacter(gl, { skin: 0xF2BD93, hair: 0x2E221C, style: 'messy', top: 0xF7C957, pants: 0x2255AD, kind: 'tee', cap: 0x2F5FD0, capBack: true }), x: LD.x, y: LD.y, z: LD.z + 0.8, yaw: 0, seated: false, phase: 0 },
-    shill: { role: 'shill', parts: buildCharacter(gl, { skin: 0xEFBE95, hair: 0x1D1916, style: 'messy', top: 0xB9E8ED, pants: 0x31427B, kind: 'sweater', headphones: true }), x: SD.x, y: SD.y, z: SD.z + 0.8, yaw: 0.18, seated: false, phase: 1.7 },
-    trade: { role: 'trade', parts: buildCharacter(gl, { skin: 0xDFA777, hair: 0x6E3B1F, style: 'side', top: 0x4AC2AA, pants: 0x233E7B, kind: 'sweater', glasses: true }), x: TD.x, y: TD.y, z: TD.z + 0.8, yaw: -0.18, seated: false, phase: 3.1 },
-    boss: { role: 'how', parts: buildCharacter(gl, { skin: 0xF3BA86, hair: 0x493424, style: 'side', top: 0x2357BE, pants: 0x163A83, kind: 'suit', tie: 0xF5C451, bag: true }), x: ZONES.how.x, y: ZONES.how.y, z: ZONES.how.z, yaw: 0.5, seated: false, phase: 0 },
+    launch: { role: 'launch', parts: canonicalParts('launch'), x: LD.x, y: LD.y, z: LD.z + 0.8, yaw: 0, seated: false, phase: 0 },
+    shill: { role: 'shill', parts: canonicalParts('shill'), x: SD.x, y: SD.y, z: SD.z + 0.8, yaw: 0.18, seated: false, phase: 1.7 },
+    trade: { role: 'trade', parts: canonicalParts('trade'), x: TD.x, y: TD.y, z: TD.z + 0.8, yaw: -0.18, seated: false, phase: 3.1 },
+    boss: { role: 'how', parts: canonicalParts('boss'), x: ZONES.how.x, y: ZONES.how.y, z: ZONES.how.z, yaw: 0.5, seated: false, phase: 0 },
   };
   const bossPath = [[4.9, 5.4], [4.75, 4.45], [5.45, 4.45], [5.45, 6.55], [4.75, 6.55]];
   const boss = crew.boss;
@@ -554,15 +588,15 @@ export function createOffice(host, { onAction } = {}) {
   const layer = document.createElement('div');
   layer.className = 'office-bubbles';
   const BUB = {
-    launch: { icon: 'plus', t: 'Choose agent', s: 'Your team' },
+    launch: { icon: 'agents', t: 'Choose agent', s: 'Your workforce' },
     shill: { icon: 'external', t: 'Share on X', s: 'Tell your story' },
-    trade: { icon: 'trade', t: 'Activity', s: 'Your workspace log' },
+    trade: { icon: 'trade', t: 'Activity', s: 'Paper trading log' },
     how: { icon: 'how', t: 'Workspace guide', s: 'Find your way around' },
   };
   const labelPoints = {
-    launch: [LD.x - 0.72, LD.y + 0.1, LD.z + 1.34],
-    shill: [SD.x - 0.55, SD.y + 0.1, SD.z + 1.32],
-    trade: [TD.x + 0.55, TD.y + 0.1, TD.z + 1.34],
+    launch: [LD.x - 0.72, LD.y + 1.2, LD.z + 1.1],
+    shill: [SD.x - 0.55, SD.y + 1.2, SD.z + 1.1],
+    trade: [TD.x + 0.55, TD.y + 1.2, TD.z + 1.1],
     how: [ZONES.how.x, ZONES.how.y + 0.1, ZONES.how.z + 0.84],
   };
   const bubbles = {};
@@ -573,7 +607,8 @@ export function createOffice(host, { onAction } = {}) {
     b.dataset.role = role;
     b.innerHTML = `<span class="ob-no" aria-hidden="true">${icon(BUB[role].icon)}</span><span class="ob-t"><b>${BUB[role].t}</b><small>${BUB[role].s}</small></span>`;
     b.addEventListener('click', () => onAction && onAction(role));
-    b.addEventListener('pointerenter', () => { hover = role; });
+    b.addEventListener('pointerenter', () => { hover = role; yawTarget = yaw; });
+    b.addEventListener('pointerdown', e => { yawTarget = yaw; b.setPointerCapture?.(e.pointerId); });
     b.addEventListener('pointerleave', () => { if (hover === role) hover = null; });
     b.addEventListener('focus', () => { hover = role; });
     b.addEventListener('blur', () => { if (hover === role) hover = null; });
@@ -599,7 +634,8 @@ export function createOffice(host, { onAction } = {}) {
     const cw = (r - l), ch = (t - b);
     // Keep the complete office footprint visible inside the reference hero column.
     const narrow = cssW < 640;
-    let zoom = narrow ? 1.03 : 1.02;
+    // Fit the complete office bounds with breathing room on every viewport.
+    let zoom = 1.08;
     let hw = cw / 2 * zoom, hh = ch / 2 * zoom;
     if (hw / hh > aspect) hh = hw / aspect; else hw = hh * aspect;
     const mx = (l + r) / 2 + (narrow ? 0 : 0.1), my = (b + t) / 2 + (narrow ? 0 : 0.05);
@@ -631,6 +667,7 @@ export function createOffice(host, { onAction } = {}) {
   // pointer: gentle parallax + clicking the workers themselves
   let anchors = {};
   const onMove = (e) => {
+    if(e.target.closest?.('.ob'))return;
     const r = host.getBoundingClientRect();
     const px = (e.clientX - r.left) / r.width;
     yawTarget = -0.62 + (px - 0.5) * 0.16;
@@ -833,12 +870,12 @@ export function createOffice(host, { onAction } = {}) {
     gl.uniform3fv(prog.u.uSunDir, sunDir);
     const n = night;
     const lerp3 = (a, b) => a.map((x, i) => x + (b[i] - x) * n);
-    gl.uniform3fv(prog.u.uSunCol, lerp3([0.62, 0.56, 0.47], [0.12, 0.16, 0.24]));
-    gl.uniform3fv(prog.u.uSky, lerp3([0.66, 0.67, 0.72], [0.38, 0.43, 0.55]));
+    gl.uniform3fv(prog.u.uSunCol, lerp3([0.72, 0.59, 0.43], [0.20, 0.23, 0.38]));
+    gl.uniform3fv(prog.u.uSky, lerp3([0.62, 0.68, 0.84], [0.40, 0.46, 0.68]));
     gl.uniform3fv(prog.u.uGround, lerp3([0.5, 0.48, 0.47], [0.24, 0.27, 0.36]));
     gl.uniform1f(prog.u.uNight, n);
     const lp = [LD.x, 1.5, LD.z + 0.9, SD.x, 1.5, SD.z + 0.7, TD.x, 1.4, TD.z + 0.6, 3.2, 2.4, 4.8];
-    const lc = [0.9, 0.95, 1.1, 0.9, 0.95, 1.1, 0.45, 1.1, 0.6, 1.2, 0.95, 0.7].map((x) => x * n * 0.55);
+    const lc = [1.2, 0.84, 0.42, 0.55, 0.82, 1.2, 0.45, 0.88, 1.2, 1.2, 0.88, 0.5].map((x) => x * (0.12 + n * 0.55));
     gl.uniform3fv(prog.u.uLP, lp); gl.uniform3fv(prog.u.uLC, lc);
     drawMesh(prog, wallsGL, I);
     drawMesh(prog, roomGL, I);

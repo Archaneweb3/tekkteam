@@ -2,7 +2,7 @@
 //
 //   const boss = createBoss(el, { onClick() {} });  boss.wave();  boss.destroy();
 import { V, Mesh, compile, upload, buildCharacter, posed, mul, T, RX, RY, S, chain, lookAt, ortho, norm } from './office3d.js';
-import { SKIN_MODELS } from './skins3d.js';
+import { createCanonicalCharacter } from './skins3d.js';
 
 const VS = `#version 300 es
 layout(location=0) in vec3 aPos; layout(location=1) in vec3 aNrm; layout(location=2) in vec3 aCol;
@@ -45,13 +45,14 @@ export function createBoss(host, { onClick, skin = null, label, still = false, o
   const canvas = document.createElement('canvas');
   canvas.className = 'boss-gl';
   canvas.setAttribute('role', 'img');
-  canvas.setAttribute('aria-label', label || 'The TEKKWORK boss. Drag to spin him around.');
+  canvas.setAttribute('aria-label', label || 'The TEKKTEAM boss. Drag to spin him around.');
   host.appendChild(canvas);
   const gl = canvas.getContext('webgl2', { antialias: true, alpha: true, premultipliedAlpha: true });
   if (!gl) { canvas.remove(); throw new Error('no webgl2'); }
   const prog = compile(gl, VS, FS);
   // a paid skin replaces the boss model (same skeleton, its own meshes + resting pose)
-  const model = skin && SKIN_MODELS[skin] ? SKIN_MODELS[skin]() : null;
+  const model = createCanonicalCharacter(skin);
+  canvas.dataset.characterId = model.characterId;
   const parts = model ? Object.fromEntries(Object.entries(model.parts).map(([k, m]) => [k, upload(gl, m)])) : buildCharacter(gl, BOSS);
   const rest = model?.pose || {};
 

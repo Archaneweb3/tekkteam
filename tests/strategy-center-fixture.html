@@ -1,0 +1,10 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Strategy UI test fixture</title></head><body><main style="max-width:1120px;margin:24px auto;padding:16px"><p>ISOLATED UI TEST FIXTURE · No real agents, wallet or transactions</p><a href="#/other">Test navigation</a><section class="tw-panel tw-trading"><div id="tw-strategy-center"></div></section></main><script type="module">
+import {createElement,Plus,Minus,Box} from 'lucide';
+import {defaultStrategyConfig,validateStrategyConfig,configEqual} from '../public/app/strategy-config.js';
+import {mountStrategyCenter} from '../public/app/strategy-center.js';
+const html=await (await fetch('/index.html')).text();const source=new DOMParser().parseFromString(html,'text/html');for(const link of source.querySelectorAll('link[rel=stylesheet]'))document.head.append(link.cloneNode());
+window.TekkworkIcon=name=>createElement(({plus:Plus,minus:Minus})[name]||Box,{width:18,height:18,'aria-hidden':true}).outerHTML;
+let config=defaultStrategyConfig('balanced'),version=0,state={agentId:'fixture',status:'READY',defaultTokenMint:'Fixture market',strategy:'balanced'};
+const request=async(path,options={})=>{if(path.endsWith('/strategy-config')){if(options.method==='POST'){const body=JSON.parse(options.body);if(body.version!==version)throw Error('Version conflict');config=validateStrategyConfig(body.config);version++;}return structuredClone({agentId:'fixture',config,version});}if(options.method==='POST'){if(path.endsWith('/enable'))state.status='WORKING';if(path.endsWith('/pause'))state.status='PAUSED';}return structuredClone(state);};
+mountStrategyCenter(document.querySelector('#tw-strategy-center'),{id:'fixture',name:'Nora · UI test',character:'cupsey'},{request});
+</script></body></html>

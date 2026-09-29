@@ -1,0 +1,7 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Paper status acceptance — isolated fixture</title></head><body><main style="max-width:1120px;margin:24px auto;padding:16px"><h1>Isolated Paper status QA</h1><p>Test-only data · no agents started · no wallet or backend writes</p><div id="matrix"></div></main><script type="module">
+import {renderRadar} from '../public/app/market-radar-ui.js';
+const html=await(await fetch('/index.html')).text(),dom=new DOMParser().parseFromString(html,'text/html');
+await Promise.all([...dom.querySelectorAll('link[rel=stylesheet]')].map(link=>new Promise(resolve=>{const copy=link.cloneNode();copy.onload=resolve;copy.onerror=resolve;document.head.append(copy);}))); 
+const agent={id:'isolated',name:'Fixture agent',characterId:'felix',strategy:'momentum'};
+document.querySelector('#matrix').innerHTML=['WORKING','PAUSED'].flatMap(agentStatus=>['HEALTHY','DEGRADED'].map(marketHealth=>renderRadar(agent,{agentStatus,marketHealth,dataStale:false,status:agentStatus==='PAUSED'?'PAUSED':'SCANNING',strategy:'momentum',scope:'Isolated bounded discovery fixture — not full market coverage',opportunities:[],coverage:{discovered:23,quoted:marketHealth==='HEALTHY'?23:13,unavailable:marketHealth==='HEALTHY'?0:10}}))).join('');
+</script></body></html>

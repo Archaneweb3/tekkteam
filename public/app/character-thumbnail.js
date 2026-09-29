@@ -1,4 +1,5 @@
 import {createBoss} from './boss3d.js';
+import {characterPortraitUrl} from './character-registry.js';
 const cache=new Map();let queue=Promise.resolve();
 // One temporary WebGL context, captured from the exact Detail model/config.
 function thumbnail(skin){
@@ -13,7 +14,11 @@ function thumbnail(skin){
  return cache.get(skin);
 }
 export function hydrateCharacters(root){
- root.querySelectorAll('img[data-character]').forEach(img=>thumbnail(img.dataset.character).then(src=>{if(img.isConnected){img.src=src;img.dataset.ready='true';}}).catch(()=>{if(img.isConnected)img.alt='Character preview unavailable';}));
+ root.querySelectorAll('img[data-character]').forEach(img=>{
+  img.onload=()=>{img.dataset.ready='true';};
+  img.onerror=()=>{img.alt='Character preview unavailable';};
+  img.src=characterPortraitUrl(img.dataset.character);
+ });
 }
 export async function characterTokenImage(skin){
  const source=new Image();source.src=await thumbnail(skin);await source.decode();

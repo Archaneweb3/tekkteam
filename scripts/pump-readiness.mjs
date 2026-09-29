@@ -12,6 +12,7 @@ const metadataUri=launch?.metadataUri??URI;
 const hash=b=>createHash('sha256').update(b).digest('hex');
 const progress=(stage,detail)=>{if(process.argv.includes('--events'))process.stderr.write('PUMP_EVENT '+JSON.stringify({stage,detail})+'\n');};
 progress('STATIC_VALIDATION_STARTED','Pinned official IDL, approved metadata and Mainnet accounts');
+progress('METADATA_VERIFY');
 async function get(url){const r=await fetch(url,{redirect:'error'});if(!r.ok)throw Error(`HTTP ${r.status}`);return Buffer.from(await r.arrayBuffer());}
 const idlUrl=`https://raw.githubusercontent.com/pump-fun/pump-public-docs/${PUMP_COMMIT}/idl/pump.json`;
 const raw=await get(idlUrl), idl=JSON.parse(raw), definition=idl.instructions.find(i=>i.name==='create_v2');
@@ -30,13 +31,16 @@ const accounts=creationAccounts(mint,launch?.owner??PAYER);
 if(definition.accounts.length!==accounts.length)throw Error('IDL account count mismatch');
 definition.accounts.forEach((a,i)=>{const e=accounts[i];if(a.name!==e.name||!!a.writable!==e.isWritable||!!a.signer!==e.isSigner||(a.address&&a.address!==e.pubkey.toBase58()))throw Error(`IDL account mismatch ${a.name}`);});
 const rpc=process.env.MAINNET_RPC_URL||'https://api.mainnet-beta.solana.com', c=new Connection(rpc,'finalized');
+progress('MAINNET_VERIFY');
 const genesis=await c.getGenesisHash();if(genesis!==GENESIS)throw Error('Wrong cluster');
+progress('PUMP_READINESS');
 const state=await c.getMultipleAccountsInfoAndContext(accounts.map(a=>a.pubkey));
 if(state.value[0])throw Error('Mint already exists');
 const programIndices=[6,7,8,9,15];
 for(const i of programIndices)if(!state.value[i]?.executable)throw Error(`Non-executable program ${accounts[i].name}`);
 if(state.value[4]?.owner.toBase58()!==PUMP)throw Error('Global owner mismatch');
 if(state.value[5]?.owner.toBase58()!=='11111111111111111111111111111111')throw Error('Payer owner mismatch');
+progress('PAYER_BALANCE');
 if(buyLamports(launch)){
  const buy=idl.instructions.find(i=>i.name==='buy_exact_sol_in'),keys=initialBuyAccounts(mint,launch.owner);
  if(JSON.stringify(buy?.discriminator)!=='[56,252,116,8,158,223,205,95]'||JSON.stringify(buy.args.map(a=>[a.name,a.type]))!==JSON.stringify([['spendable_sol_in','u64'],['min_tokens_out','u64'],['track_volume',{defined:{name:'OptionBool'}}]]))throw Error('Buy IDL mismatch');
@@ -50,10 +54,12 @@ if(buyLamports(launch)){
  const feeProgram=await c.getAccountInfo(keys[15].pubkey);if(!feeProgram?.executable)throw Error('Fee program not executable');
 }
 const latest=await c.getLatestBlockhash('finalized');
+progress('TRANSACTION_BUILD');
 const tx=buildCreation(mint,latest.blockhash,launch), bytes=tx.serialize({requireAllSignatures:false,verifySignatures:false});
 const fee=await c.getFeeForMessage(tx.compileMessage(),'finalized');
 if(process.argv.includes('--simulate')) {
  const context={mint,blockhash:latest.blockhash,genesis,chainId:'solana:101',launch};
+ progress('VALIDATION');
  const structure=inspectCreation(bytes,context);
  progress('STATIC_VALIDATION_PASSED / FAILED',{status:'PASSED',chainId:'solana:101',payer:PAYER,initialBuy:0});
  progress('FRESH_MAINNET_BLOCKHASH_RECEIVED',latest);
@@ -65,6 +71,7 @@ if(process.argv.includes('--simulate')) {
   const body=await response.json();if(body.error)throw Error(JSON.stringify(body.error));return body.result;
  };
  const addresses=accounts.map(a=>a.pubkey.toBase58());
+ progress('SIMULATION');
  const before=await read('getMultipleAccounts',[addresses,{encoding:'base64',commitment:'finalized'}]);
  const simulationOptions={encoding:'base64',sigVerify:false,replaceRecentBlockhash:false,commitment:'finalized',minContextSlot:before.context.slot,innerInstructions:true,accounts:{encoding:'base64',addresses}};
  progress('MAINNET_SIMULATION_STARTED',{sha256:hash(bytes),sigVerify:false,replaceRecentBlockhash:false});

@@ -19,7 +19,7 @@ export function HomePage(app) {
     office.setData({ trades: snap.feed || [], tokens: snap.tokens || [], coins: snap.coins || [] });
   };
   // no WebGL: the office picture with the same bubbles on top
-  const fallbackHTML = () => `<div class="office-fallback-scene"><img class="office-img" src="brand/office-fallback.png" alt="The TEKKWORK office">
+  const fallbackHTML = () => `<div class="office-fallback-scene"><img class="office-img" src="brand/office-fallback-tekkteam.png" alt="The TEKKTEAM office">
     <button type="button" class="fb-bub ob" data-role="launch" style="left:26.3%;top:67.5%"><span class="ob-t"><b>Launch a coin</b></span></button>
     <button type="button" class="fb-bub ob" data-role="shill" style="left:56.3%;top:52%"><span class="ob-t"><b>Shill on X</b></span></button>
     <button type="button" class="fb-bub ob" data-role="trade" style="left:78.9%;top:60.3%"><span class="ob-t"><b>Trade</b></span></button>
@@ -130,9 +130,9 @@ export function HomePage(app) {
         <div class="home-main">
           <section class="intro">
             <div class="hero-copy">
-              <div class="eyebrow">TEKKWORK preview · one coin, one AI agent</div>
+              <div class="eyebrow">TEKKTEAM preview · one coin, one AI agent</div>
               <h1>Launch a coin. <em>Your agent does the team work.</em></h1>
-              <p class="lede">Meet your TEKKWORK agent: its own identity, a strategy you choose, and a dedicated trading dashboard. Explore the launch form and team in this preview. Live wallet funding, coin creation and trading are coming soon.</p>
+              <p class="lede">Meet your TEKKTEAM agent: its own identity, a strategy you choose, and a dedicated trading dashboard. Explore the launch form and team in this preview. Live wallet funding, coin creation and trading are coming soon.</p>
               <div class="hero-cta">
                 <a class="btn btn-primary btn-lg" href="#/launch">Launch coin + agent</a>
                 <button class="btn btn-lg" type="button" data-shill>Shill on X</button>
@@ -182,7 +182,7 @@ export function HomePage(app) {
         <aside class="boss-col" aria-label="The boss">
           <div class="boss-say" id="h-boss-say" aria-live="polite"></div>
           <div class="boss-stage" id="h-boss" tabindex="0" title="Drag to spin, click to say hi">
-            <img class="boss-fallback" src="brand/boss.png" alt="The TEKKWORK boss" hidden>
+            <img class="boss-fallback" src="brand/boss.png" alt="The TEKKTEAM boss" hidden>
           </div>
           <div class="boss-hint">Drag to spin him · click to say hi</div>
           <div class="boss-memo">

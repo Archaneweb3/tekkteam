@@ -1,0 +1,265 @@
+{
+  "slot": 450943832,
+  "agentBalance": 4995000,
+  "ataRentLamports": 1488440,
+  "block": {
+    "blockhash": "757XAC6eBoGHfjXvRrj1jzyxuBowgZqXfwFNAZzerHH8",
+    "lastValidBlockHeight": 428983685
+  },
+  "accountProofs": [
+    {
+      "address": "HK9b1xCN5kQdjWofPyU3DKexoNcA7Nr1uDCKvdUBfihR",
+      "exists": false,
+      "owner": null,
+      "amount": "0"
+    },
+    {
+      "address": "FjPUygpFHEUVpSDUM7ByKRByYTsJoN8E7vTjQCuZKQ9G",
+      "exists": false,
+      "owner": null,
+      "amount": "0"
+    }
+  ],
+  "messages": [
+    {
+      "direction": "BUY",
+      "quote": {
+        "amount": "100000",
+        "tradeFee": "250",
+        "creatorFee": "0",
+        "protocolFee": "30",
+        "fundFee": "10",
+        "effectiveInput": "99750",
+        "output": "12409",
+        "minimumOutput": "12284"
+      },
+      "intent": {
+        "network": "solana:mainnet",
+        "agentWallet": "7Bt9Q3EciD8ZhoRA6CviqwpLpGhn4tscPrsKfUqGfFVe",
+        "inputMint": "So11111111111111111111111111111111111111112",
+        "outputMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+        "inputAmount": "100000",
+        "direction": "BUY"
+      },
+      "encoded": "AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAkQW+/CXUIZuX3MY14BaYZGxy3G5EeciUkHzV3FXWc0FBXyYSd3Brh4ncrrw0V3K62p6inmAvDT+tcHcCNveyKd3Nrfbo1ha4o/lPmIZn2EDwVN1yghnGHycO6+Qm1WD2WrXbzZw6JqYkIB+ggM0A6ibyCcAb935ZYqOlp2FWGouvJgaGeBLKPSP+Vn10VYVtw/GLhOQWE/ikhEyPyRe97h5yqF9UErHBLXbM7XRuTzBST6c0supmoUHaL9KjDBPhAqMdaxD8OZRUq3gXKtaEfDMLDFG1xhTzARClaNoz9oxJUDBkZv5SEXMv/srbpyw5vnvIzlu8X3EmssQ5s6QAAAAIyXJY9OJInxuz0QKRSODYMLWhOZ2v8QhASOe9jb6fhZBpuIV/6rgYT7aH9jRhjANdrEOdwa6ztVmKDwAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAbd9uHXZaGT2cvhRs7reawctIXtX1s3kTqM9YV+/wCpxvp6877brTo9ZfNqq8l0MbG75MLS9uDkfKYCA0UvXWGpKlqLTylZUoQlUKqT/VuVtazmqOuSDJOULkNpDCDsc+sA2fWykrQhSsfQN7TW8GRQuWRgDfNzBSu16E8vjppnsyE/uov5yH+pHkeBlijDg+AL6n6Yx6A+A7oQac/D9vNaM9EjxhWwBLPgIdXwhWoutwbPfp3Cv7zfRVytNqU6/wgHAAkDAAAAAAAAAAAHAAUCQA0DAAgGAAEACQoLAQEIBgACAAwKCwEBCgIAAQwCAAAAoIYBAAAAAAALAQEBEQ0NAA4PAwECBAULCwkMBhiPvlraxB4z3qCGAQAAAAAA/C8AAAAAAAALAwEAAAEJ",
+      "messageHash": "24eb4a55db73337e32912a5f7225f4c4d8cb66a525edb0357edf407b3195b4a4",
+      "signatureCount": 1,
+      "allSignaturesZero": true,
+      "version": "legacy",
+      "altCount": 0,
+      "accountRoles": [
+        {
+          "address": "7Bt9Q3EciD8ZhoRA6CviqwpLpGhn4tscPrsKfUqGfFVe",
+          "role": "payer",
+          "signer": true,
+          "writable": false
+        },
+        {
+          "address": "GpMZbSM2GgvTKHJirzeGfMFoaZ8UR2X7F4v8vHTvxFbL",
+          "role": "authority",
+          "signer": false,
+          "writable": false
+        },
+        {
+          "address": "D4FPEruKEHrG5TenZ2mpDGEfu1iUvTiqBxvpU8HLBvC2",
+          "role": "config",
+          "signer": false,
+          "writable": false
+        },
+        {
+          "address": "7JuwJuNU88gurFnyWeiyGKbFmExMWcmRZntn9imEzdny",
+          "role": "pool",
+          "signer": false,
+          "writable": true
+        },
+        {
+          "address": "HK9b1xCN5kQdjWofPyU3DKexoNcA7Nr1uDCKvdUBfihR",
+          "role": "userInput",
+          "signer": false,
+          "writable": true
+        },
+        {
+          "address": "FjPUygpFHEUVpSDUM7ByKRByYTsJoN8E7vTjQCuZKQ9G",
+          "role": "userOutput",
+          "signer": false,
+          "writable": true
+        },
+        {
+          "address": "7VLUXrnSSDo9BfCa4NWaQs68g7ddDY1sdXBKW6Xswj9Y",
+          "role": "inputVault",
+          "signer": false,
+          "writable": true
+        },
+        {
+          "address": "3rzbbW5Q8MA7sCaowf28hNgACNPecdS2zceWy7Ptzua9",
+          "role": "outputVault",
+          "signer": false,
+          "writable": true
+        },
+        {
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+          "role": "inputProgram",
+          "signer": false,
+          "writable": false
+        },
+        {
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+          "role": "outputProgram",
+          "signer": false,
+          "writable": false
+        },
+        {
+          "address": "So11111111111111111111111111111111111111112",
+          "role": "inputMint",
+          "signer": false,
+          "writable": false
+        },
+        {
+          "address": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+          "role": "outputMint",
+          "signer": false,
+          "writable": false
+        },
+        {
+          "address": "4MYrPgjgFceyhtwhG1ZX8UVb4wn1aQB5wzMimtFqg7U8",
+          "role": "observation",
+          "signer": false,
+          "writable": true
+        }
+      ],
+      "fullValidator": {
+        "status": "REJECTED",
+        "reason": "ATA_MISMATCH"
+      },
+      "nativeLifecycle": {
+        "wsolAccount": "HK9b1xCN5kQdjWofPyU3DKexoNcA7Nr1uDCKvdUBfihR",
+        "outputTokenAccount": "FjPUygpFHEUVpSDUM7ByKRByYTsJoN8E7vTjQCuZKQ9G",
+        "inputMaximum": "100000",
+        "closeDestination": "7Bt9Q3EciD8ZhoRA6CviqwpLpGhn4tscPrsKfUqGfFVe",
+        "setupVerified": true,
+        "routeVerified": false
+      },
+      "sellSourceBalanceSufficient": null
+    },
+    {
+      "direction": "SELL",
+      "quote": {
+        "amount": "10000",
+        "tradeFee": "25",
+        "creatorFee": "0",
+        "protocolFee": "3",
+        "fundFee": "1",
+        "effectiveInput": "9975",
+        "output": "80142",
+        "minimumOutput": "79340"
+      },
+      "intent": {
+        "network": "solana:mainnet",
+        "agentWallet": "7Bt9Q3EciD8ZhoRA6CviqwpLpGhn4tscPrsKfUqGfFVe",
+        "inputMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+        "outputMint": "So11111111111111111111111111111111111111112",
+        "inputAmount": "10000",
+        "direction": "SELL"
+      },
+      "encoded": "AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAkQW+/CXUIZuX3MY14BaYZGxy3G5EeciUkHzV3FXWc0FBXyYSd3Brh4ncrrw0V3K62p6inmAvDT+tcHcCNveyKd3F282cOiamJCAfoIDNAOom8gnAG/d+WWKjpadhVhqLry2t9ujWFrij+U+YhmfYQPBU3XKCGcYfJw7r5CbVYPZasqhfVBKxwS12zO10bk8wUk+nNLLqZqFB2i/SowwT4QKmBoZ4Eso9I/5WfXRVhW3D8YuE5BYT+KSETI/JF73uHnMdaxD8OZRUq3gXKtaEfDMLDFG1xhTzARClaNoz9oxJUDBkZv5SEXMv/srbpyw5vnvIzlu8X3EmssQ5s6QAAAAIyXJY9OJInxuz0QKRSODYMLWhOZ2v8QhASOe9jb6fhZBpuIV/6rgYT7aH9jRhjANdrEOdwa6ztVmKDwAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAbd9uHXZaGT2cvhRs7reawctIXtX1s3kTqM9YV+/wCpqSpai08pWVKEJVCqk/1blbWs5qjrkgyTlC5DaQwg7HPrANn1spK0IUrH0De01vBkULlkYA3zcwUrtehPL46aZ7MhP7qL+ch/qR5HgZYow4PgC+p+mMegPgO6EGnPw/bzxvp6877brTo9ZfNqq8l0MbG75MLS9uDkfKYCA0UvXWFaM9EjxhWwBLPgIdXwhWoutwbPfp3Cv7zfRVytNqU6/wUHAAkDAAAAAAAAAAAHAAUCQA0DAAgGAAEACQoLAQEMDQANDgIDAQQFCwsPCQYYj75a2sQeM94QJwAAAAAAAOw1AQAAAAAACwMBAAABCQ==",
+      "messageHash": "4f2ac560c6a7a1205ea2790203781294f8edb68ebcb9676146f5661d0dc4c809",
+      "signatureCount": 1,
+      "allSignaturesZero": true,
+      "version": "legacy",
+      "altCount": 0,
+      "accountRoles": [
+        {
+          "address": "7Bt9Q3EciD8ZhoRA6CviqwpLpGhn4tscPrsKfUqGfFVe",
+          "role": "payer",
+          "signer": true,
+          "writable": false
+        },
+        {
+          "address": "GpMZbSM2GgvTKHJirzeGfMFoaZ8UR2X7F4v8vHTvxFbL",
+          "role": "authority",
+          "signer": false,
+          "writable": false
+        },
+        {
+          "address": "D4FPEruKEHrG5TenZ2mpDGEfu1iUvTiqBxvpU8HLBvC2",
+          "role": "config",
+          "signer": false,
+          "writable": false
+        },
+        {
+          "address": "7JuwJuNU88gurFnyWeiyGKbFmExMWcmRZntn9imEzdny",
+          "role": "pool",
+          "signer": false,
+          "writable": true
+        },
+        {
+          "address": "FjPUygpFHEUVpSDUM7ByKRByYTsJoN8E7vTjQCuZKQ9G",
+          "role": "userInput",
+          "signer": false,
+          "writable": true
+        },
+        {
+          "address": "HK9b1xCN5kQdjWofPyU3DKexoNcA7Nr1uDCKvdUBfihR",
+          "role": "userOutput",
+          "signer": false,
+          "writable": true
+        },
+        {
+          "address": "3rzbbW5Q8MA7sCaowf28hNgACNPecdS2zceWy7Ptzua9",
+          "role": "inputVault",
+          "signer": false,
+          "writable": true
+        },
+        {
+          "address": "7VLUXrnSSDo9BfCa4NWaQs68g7ddDY1sdXBKW6Xswj9Y",
+          "role": "outputVault",
+          "signer": false,
+          "writable": true
+        },
+        {
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+          "role": "inputProgram",
+          "signer": false,
+          "writable": false
+        },
+        {
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+          "role": "outputProgram",
+          "signer": false,
+          "writable": false
+        },
+        {
+          "address": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+          "role": "inputMint",
+          "signer": false,
+          "writable": false
+        },
+        {
+          "address": "So11111111111111111111111111111111111111112",
+          "role": "outputMint",
+          "signer": false,
+          "writable": false
+        },
+        {
+          "address": "4MYrPgjgFceyhtwhG1ZX8UVb4wn1aQB5wzMimtFqg7U8",
+          "role": "observation",
+          "signer": false,
+          "writable": true
+        }
+      ],
+      "fullValidator": {
+        "status": "REJECTED",
+        "reason": "UNSUPPORTED_ROUTE_OR_PROGRAM"
+      },
+      "nativeLifecycle": {
+        "wsolAccount": "HK9b1xCN5kQdjWofPyU3DKexoNcA7Nr1uDCKvdUBfihR",
+        "outputTokenAccount": "HK9b1xCN5kQdjWofPyU3DKexoNcA7Nr1uDCKvdUBfihR",
+        "inputMaximum": "10000",
+        "closeDestination": "7Bt9Q3EciD8ZhoRA6CviqwpLpGhn4tscPrsKfUqGfFVe",
+        "setupVerified": true,
+        "routeVerified": false
+      },
+      "sellSourceBalanceSufficient": false
+    }
+  ]
+}

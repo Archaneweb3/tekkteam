@@ -33,6 +33,13 @@ test('native SOL basis survives SOL price movement and partial close counts only
  assert.ok(close.receipt.solNotional<.001);assert.ok(Math.abs(close.receipt.closedPositionPnlSol-s.realizedSol)<1e-12);
  assert.ok(Math.abs(s.cashSol-s.initialSol-s.realizedSol)<1e-12);
 });
+test('SIDEKINU-style stop-loss exits are not delayed by entry cooldown',()=>{
+ const s=state(),entry=market(now,.000459,150);executePaper(s,strategyIntent(s,entry,now),entry,now);
+ const crossedAt=now+59860,down=market(crossedAt,.0003549,150),exit=strategyIntent(s,down,crossedAt);
+ assert.equal(exit.side,'SELL');assert.equal(exit.reason,'Stop loss');
+ assert.equal(riskCheck(s,exit,down,crossedAt).allowed,true);
+ assert.equal(executePaper(s,exit,down,crossedAt).receipt.side,'SELL');
+});
 test('market requests coalesce and cached snapshot observation is not refreshed',async()=>{
  let clock=now,calls=0;
  const feed=createMarketFeed({now:()=>clock,fetcher:async url=>{calls++;await new Promise(r=>setTimeout(r,5));const address=url.split('/').at(-1);return {ok:true,json:async()=>[{chainId:'solana',baseToken:{address,symbol:address===SOL_MINT?'SOL':'TEST'},dexId:'raydium',pairAddress:'pair-'+address,priceUsd:'1',liquidity:{usd:100000},txns:{m5:{buys:3,sells:2}}}]};}});

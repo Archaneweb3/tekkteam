@@ -13,7 +13,7 @@ function safetyRules(f) {
   if (f.maxDevPct != null) r.push(['Dev', `holds at most ${P(f.maxDevPct)} and has not sold anything`]);
   if (f.maxEarlyBuyers != null) r.push(['Bundles', `max ${f.maxEarlyBuyers} buyers in the first 3 s, max ${P(f.maxUnseenPct || 0)} bought in the launch block`]);
   if (f.maxTopHolderPct != null) r.push(['Whales', `top holder ≤ ${P(f.maxTopHolderPct)}, top 10 ≤ ${P(f.maxTop10Pct)}`]);
-  if (f.maxAgentsPerCoin != null) r.push(['Crowding', `max ${f.maxAgentsPerCoin} TEKKWORK agents in the same coin`]);
+  if (f.maxAgentsPerCoin != null) r.push(['Crowding', `max ${f.maxAgentsPerCoin} TEKKTEAM agents in the same coin`]);
   r.push(['Early exit', 'sells at once if the dev sells, sellers take over or trading stops']);
   return r;
 }

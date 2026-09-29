@@ -1,0 +1,285 @@
+{
+  "agent": {
+    "id": "analytics-fixture",
+    "name": "Nora Signal",
+    "characterId": "cupsey",
+    "strategy": "momentum"
+  },
+  "populated": {
+    "agentId": "analytics-fixture",
+    "name": "Nora Signal",
+    "mode": "paper",
+    "liveLocked": true,
+    "range": "ALL",
+    "strategy": "momentum",
+    "configVersion": 2,
+    "summary": {
+      "paperStartingCapitalSol": 0.1,
+      "paperCashSol": 0.0989446580889687,
+      "portfolioValueSol": 0.09997198703371236,
+      "realizedPnlSol": -0.00004734191103131855,
+      "unrealizedPnlSol": 0.00001932894474366664,
+      "totalPnlSol": -0.00002801296628764105,
+      "roiPercent": -0.02801296628764105,
+      "openPositions": [
+        {
+          "positionId": "analytics-fixture:1790483400000",
+          "tokenMint": "fixture-token-A",
+          "tokenSymbol": null,
+          "quantity": 0.14961101137043686,
+          "entryPriceUsd": 1.0026,
+          "currentPriceUsd": 1.03,
+          "sizeSol": 0.001008,
+          "marketValueSol": 0.0010273289447436666,
+          "pnlSol": 0.00001932894474366664,
+          "pnlPercent": 1.9175540420304207,
+          "openedAt": 1790483400000
+        }
+      ],
+      "closedPositionCount": 2,
+      "wins": 1,
+      "losses": 1,
+      "breakevens": 0,
+      "unknownOutcomes": 0,
+      "winRate": 50,
+      "averageWinSol": 0.00007301194893277479,
+      "averageLossSol": -0.00012035385996409334,
+      "largestWinSol": 0.00007301194893277479,
+      "largestLossSol": -0.00012035385996409334,
+      "currentDrawdownPercent": -0.1064845338478504,
+      "maxDrawdownPercent": -0.13638324912136346,
+      "executionCount": 6
+    },
+    "valuation": {
+      "asOf": 1790483700000,
+      "stale": false
+    },
+    "portfolioHistory": [
+      {
+        "timestamp": 1790481600000,
+        "portfolioValueSol": 0.1
+      },
+      {
+        "timestamp": 1790481900000,
+        "portfolioValueSol": 0.09998940674246959
+      },
+      {
+        "timestamp": 1790482200000,
+        "portfolioValueSol": 0.10007855521671655
+      },
+      {
+        "timestamp": 1790482500000,
+        "portfolioValueSol": 0.10007301194893278
+      },
+      {
+        "timestamp": 1790482800000,
+        "portfolioValueSol": 0.10006241869140237
+      },
+      {
+        "timestamp": 1790483100000,
+        "portfolioValueSol": 0.0999526580889687
+      },
+      {
+        "timestamp": 1790483400000,
+        "portfolioValueSol": 0.09994206483143828
+      },
+      {
+        "timestamp": 1790483700000,
+        "portfolioValueSol": 0.09997198703371236
+      }
+    ],
+    "historyCoverage": {
+      "from": 1790481600000,
+      "to": 1790483700000,
+      "maximumPoints": 8640,
+      "days": 30,
+      "cadenceMs": 300000,
+      "backfilled": false
+    },
+    "decisionFunnel": {
+      "marketsEvaluated": 7,
+      "signalsPassed": 3,
+      "riskRejected": 0,
+      "paperEntries": 3,
+      "closedTrades": 2,
+      "scope": "Retained meaningful decision snapshots only (up to 500 / 30 days); closed trades use the full ledger.",
+      "from": 1790481900000
+    },
+    "contributors": {
+      "top": [
+        {
+          "key": "fixture-token-A",
+          "tokenMint": "fixture-token-A",
+          "tokenSymbol": "ALPHA",
+          "strategy": "momentum",
+          "configVersion": 0,
+          "pnlSol": 0.00007301194893277479,
+          "closedPositionCount": 1,
+          "wins": 1,
+          "losses": 0,
+          "breakevens": 0,
+          "unknownOutcomes": 0,
+          "winRate": 100,
+          "averageWinSol": 0.00007301194893277479,
+          "averageLossSol": null,
+          "largestWinSol": 0.00007301194893277479,
+          "largestLossSol": null
+        }
+      ],
+      "bottom": [
+        {
+          "key": "fixture-token-B",
+          "tokenMint": "fixture-token-B",
+          "tokenSymbol": "BETA",
+          "strategy": "balanced",
+          "configVersion": 1,
+          "pnlSol": -0.00012035385996409334,
+          "closedPositionCount": 1,
+          "wins": 0,
+          "losses": 1,
+          "breakevens": 0,
+          "unknownOutcomes": 0,
+          "winRate": 0,
+          "averageWinSol": null,
+          "averageLossSol": -0.00012035385996409334,
+          "largestWinSol": null,
+          "largestLossSol": -0.00012035385996409334
+        }
+      ],
+      "unavailable": []
+    },
+    "strategyPerformance": [
+      {
+        "key": "[\"balanced\",1]",
+        "tokenMint": "fixture-token-B",
+        "tokenSymbol": "BETA",
+        "strategy": "balanced",
+        "configVersion": 1,
+        "pnlSol": -0.00012035385996409334,
+        "closedPositionCount": 1,
+        "wins": 0,
+        "losses": 1,
+        "breakevens": 0,
+        "unknownOutcomes": 0,
+        "winRate": 0,
+        "averageWinSol": null,
+        "averageLossSol": -0.00012035385996409334,
+        "largestWinSol": null,
+        "largestLossSol": -0.00012035385996409334
+      },
+      {
+        "key": "[\"momentum\",0]",
+        "tokenMint": "fixture-token-A",
+        "tokenSymbol": "ALPHA",
+        "strategy": "momentum",
+        "configVersion": 0,
+        "pnlSol": 0.00007301194893277479,
+        "closedPositionCount": 1,
+        "wins": 1,
+        "losses": 0,
+        "breakevens": 0,
+        "unknownOutcomes": 0,
+        "winRate": 100,
+        "averageWinSol": 0.00007301194893277479,
+        "averageLossSol": null,
+        "largestWinSol": 0.00007301194893277479,
+        "largestLossSol": null
+      }
+    ],
+    "tradeHistory": [
+      {
+        "positionId": "analytics-fixture:1790482800000",
+        "tokenMint": "fixture-token-B",
+        "tokenSymbol": "BETA",
+        "entryPriceUsd": 1.0026,
+        "exitPriceUsd": 0.8976599999999999,
+        "sizeSol": 0.001,
+        "costSol": 0.001008,
+        "pnlSol": -0.00012035385996409334,
+        "returnPercent": -11.939867059929894,
+        "openedAt": 1790482800000,
+        "closedAt": 1790483100000,
+        "holdingMs": 300000,
+        "strategy": "balanced",
+        "configVersion": 1
+      },
+      {
+        "positionId": "analytics-fixture:1790481900000",
+        "tokenMint": "fixture-token-A",
+        "tokenSymbol": "ALPHA",
+        "entryPriceUsd": 1.0026,
+        "exitPriceUsd": 1.09714,
+        "sizeSol": 0.001,
+        "costSol": 0.001008,
+        "pnlSol": 0.00007301194893277479,
+        "returnPercent": 7.243248902060991,
+        "openedAt": 1790481900000,
+        "closedAt": 1790482500000,
+        "holdingMs": 600000,
+        "strategy": "momentum",
+        "configVersion": 0
+      }
+    ]
+  },
+  "empty": {
+    "agentId": "analytics-fixture",
+    "name": "Nora Signal",
+    "mode": "paper",
+    "liveLocked": true,
+    "range": "ALL",
+    "strategy": "momentum",
+    "configVersion": 2,
+    "summary": {
+      "paperStartingCapitalSol": 0.1,
+      "paperCashSol": 0.1,
+      "portfolioValueSol": 0.1,
+      "realizedPnlSol": 0,
+      "unrealizedPnlSol": 0,
+      "totalPnlSol": 0,
+      "roiPercent": 0,
+      "openPositions": [],
+      "closedPositionCount": 0,
+      "wins": 0,
+      "losses": 0,
+      "breakevens": 0,
+      "unknownOutcomes": 0,
+      "winRate": null,
+      "averageWinSol": null,
+      "averageLossSol": null,
+      "largestWinSol": null,
+      "largestLossSol": null,
+      "currentDrawdownPercent": null,
+      "maxDrawdownPercent": null,
+      "executionCount": 0
+    },
+    "valuation": {
+      "asOf": 1790483700000,
+      "stale": false
+    },
+    "portfolioHistory": [],
+    "historyCoverage": {
+      "from": null,
+      "to": null,
+      "maximumPoints": 8640,
+      "days": 30,
+      "cadenceMs": 300000,
+      "backfilled": false
+    },
+    "decisionFunnel": {
+      "marketsEvaluated": 0,
+      "signalsPassed": 0,
+      "riskRejected": 0,
+      "paperEntries": 0,
+      "closedTrades": 0,
+      "scope": "Retained meaningful decision snapshots only (up to 500 / 30 days); closed trades use the full ledger.",
+      "from": null
+    },
+    "contributors": {
+      "top": [],
+      "bottom": [],
+      "unavailable": []
+    },
+    "strategyPerformance": [],
+    "tradeHistory": []
+  }
+}

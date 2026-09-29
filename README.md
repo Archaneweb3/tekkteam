@@ -1,4 +1,4 @@
-# TEKKWORK workspace
+# TEKKTEAM workspace
 
 An original blue agent workspace with a retained WebGL office, six voxel characters, wallet authentication, private persistent drafts and a devnet-only test-token implementation. This is a local development release, not a production financial service or autonomous AI trader. Reference balances are no longer loaded by the active application.
 

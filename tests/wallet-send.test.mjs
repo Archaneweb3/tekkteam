@@ -5,7 +5,7 @@ import bs58 from 'bs58';
 test('application requests devnet and keeps mint signature (mock, not Phantom integration)',async()=>{
   const oldWindow=globalThis.window,oldFetch=globalThis.fetch;
   const owner=Keypair.generate(),mint=Keypair.generate();let calls=0;
-  const account={address:owner.publicKey.toBase58(),chains:['solana:devnet']};
+  const account={address:owner.publicKey.toBase58(),chains:['solana:mainnet','solana:devnet']};
   const tx=new Transaction({feePayer:owner.publicKey,recentBlockhash:Keypair.generate().publicKey.toBase58()}).add(SystemProgram.createAccount({fromPubkey:owner.publicKey,newAccountPubkey:mint.publicKey,lamports:1000,space:82,programId:SystemProgram.programId}));tx.partialSign(mint);
   const bytes=tx.serialize({requireAllSignatures:false}).toString('base64');
   const wallet={name:'Phantom',accounts:[account],features:{

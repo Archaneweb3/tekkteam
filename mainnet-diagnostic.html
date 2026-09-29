@@ -1,0 +1,9 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>TEKKWORK Mainnet safety diagnostic</title>
+<style>body{background:#101a2a;color:#eef4ff;font:16px system-ui;max-width:1000px;margin:40px auto;padding:24px}button{padding:16px;margin:8px 0}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#1b2940;padding:20px}strong{color:#ffcc66}</style>
+<h1>Mainnet safety diagnostic</h1><p>One unsigned Memo. No transfers, token instructions, backend signing, or broadcasting.</p>
+<p><strong>Never approve. Inspect the Phantom preview, then CANCEL. Do not bypass warnings.</strong></p>
+<p>This page cannot determine Phantom's selected network or private simulator cluster. Select Mainnet yourself before previewing.</p>
+<button id="prepare">Connect existing Phantom account and simulate</button><br>
+<label><input id="confirm" type="checkbox">I have selected Mainnet in Phantom. I will cancel the preview.</label><br>
+<button id="preview" disabled>Open ONE signTransaction preview</button><h2>Diagnostic Evidence</h2><pre id="evidence">Not started. No wallet request made.</pre>
+<script type="module" src="/src/mainnet-diagnostic.js"></script></html>

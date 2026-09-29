@@ -1,0 +1,51 @@
+/* Compact game-HUD presentation. Ranking, identities and activity stay real. */
+:root{--tw-home-panel-fill:linear-gradient(125deg,#0b214e,#050f2b 75%);--tw-home-panel-border:#2862c9;--tw-home-panel-top-border:#4285f3;--tw-home-panel-shadow:inset 0 1px #739cf323,0 5px #020a20;--tw-home-panel-radius:14px}
+.ov-dashboard .tw-overview-top-grid .tw-overview-panel-head h2{font-family:'Lilita One',sans-serif!important;text-transform:uppercase!important;font-weight:400!important}
+.ov-dashboard .tw-new-hire-identity h3{font-family:'Lilita One',sans-serif!important;text-transform:uppercase!important}
+.ov-dashboard .tw-overview-top-grid{grid-template-columns:1.12fr 1fr;gap:12px;align-items:stretch}
+.ov-dashboard .tw-overview-top-grid>.tw-overview-panel{padding:12px 14px 10px;border:1px solid var(--tw-home-panel-border);border-top-color:var(--tw-home-panel-top-border);border-radius:var(--tw-home-panel-radius);background:var(--tw-home-panel-fill);box-shadow:var(--tw-home-panel-shadow);overflow:hidden;position:relative;min-height:232px}
+.ov-dashboard .tw-overview-top-grid .tw-overview-panel-head{position:relative;z-index:1;min-height:24px;gap:10px;align-items:center;display:flex}
+.ov-dashboard .tw-overview-top-grid .tw-overview-panel-head h2{display:flex;align-items:center;gap:7px;font:400 16px/1.15 'Lilita One',sans-serif;text-transform:uppercase;letter-spacing:.01em;margin:0;color:#fff8ee}
+.ov-dashboard .tw-overview-top-grid .tw-overview-panel-head h2:before{content:'';width:22px;height:22px;flex:0 0 22px;background:center/contain no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M4 9l7 6 5-11 5 11 7-6-4 17H8z' fill='%23ffcf32' stroke='%23ffef92' stroke-width='2' stroke-linejoin='round'/%3E%3Cpath d='M9 23h14' stroke='%23e88a14' stroke-width='3'/%3E%3C/svg%3E")}
+.ov-dashboard .tw-new-hires .tw-overview-panel-head h2:before{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M6 12h8l12-7v22l-12-7H6z' fill='%23ffbf32' stroke='%23ffed8a' stroke-width='1.5' stroke-linejoin='round'/%3E%3Cpath d='M10 21l2 9h5l-3-9' fill='%23e98027'/%3E%3Cpath d='M23 8v16M5 13v6' stroke='%23fff4b5' stroke-width='3'/%3E%3C/svg%3E")}
+.ov-dashboard .tw-overview-top-grid .tw-overview-note{font:600 10px/1.3 'Nunito Sans',sans-serif;color:#9cafda;margin:0}
+.ov-dashboard .tw-employee>.tw-overview-note{margin-top:3px;font-size:9px}
+.ov-dashboard .tw-ranking-switch{padding:2px;gap:0;border:1px solid #254d97;border-radius:20px;background:#030c27;box-shadow:none}
+.ov-dashboard .tw-ranking-switch button{font:800 10px/1 'Nunito Sans',sans-serif;min-height:22px;min-width:42px;padding:5px 10px;border-radius:16px;color:#adbee8;box-shadow:none}
+.ov-dashboard .tw-ranking-switch button[aria-pressed=true]{background:linear-gradient(#279dff,#0060ff);color:white;box-shadow:inset 0 1px #93daff}
+.ov-dashboard .tw-employee-podium{position:relative;gap:9px;padding:0 20px;align-items:end;background:conic-gradient(from 220deg at 50% 100%,#193b7d44,transparent 24%,#244d9533 30%,transparent 37%,#122e6944 55%,transparent 70%);margin-top:0}
+.ov-dashboard .tw-podium-agent{display:flex;flex-direction:column;align-items:center;position:relative;padding:0 0 44px;background:none;border:0;box-shadow:none;border-radius:0}
+.ov-dashboard .tw-podium-character,.ov-dashboard .tw-podium-rank-1 .tw-podium-character{height:76px;width:100%;padding:0}
+.ov-dashboard .tw-podium-rank-1 .tw-podium-character{height:98px}
+.ov-dashboard .tw-podium-character img{object-fit:contain;object-position:center bottom;filter:drop-shadow(0 3px 2px #0008)}
+.ov-dashboard .tw-podium-platform,.ov-dashboard .tw-podium-rank-1 .tw-podium-platform{padding:0 2px 7px;min-height:0;background:none;border:0;box-shadow:none;width:100%}
+.ov-dashboard .tw-podium-platform:before,.ov-dashboard .tw-podium-character:after{display:none}
+.ov-dashboard .tw-podium-agent h3{font:400 13px/1.15 'Lilita One',sans-serif!important;min-height:0;margin:0 0 4px;color:#fff8ee;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ov-dashboard .tw-podium-platform strong{font:900 16px/1.1 'Nunito Sans',sans-serif!important;color:#28edb2}
+.ov-dashboard .tw-podium-platform strong.tw-metric-negative{color:#ff788d}
+.ov-dashboard .tw-podium-strategy,.ov-dashboard .tw-podium-primary-label,.ov-dashboard .tw-podium-secondary{display:none}
+.ov-dashboard .tw-podium-place{position:absolute;top:auto;bottom:0;left:0;transform:none;width:100%;height:39px;display:grid;place-items:center;border-radius:12px 12px 2px 2px;border:1px solid #d6dfff;background:linear-gradient(115deg,#bacaff,#617bcc);box-shadow:inset 8px 0 #ffffff20,0 4px #283c7a;color:#fff;font:400 29px/1 'Lilita One',sans-serif;text-shadow:0 2px #1b2d64;-webkit-text-stroke:1px #33477d}
+.ov-dashboard .tw-podium-rank-1{padding-bottom:61px}
+.ov-dashboard .tw-podium-rank-1 .tw-podium-place{height:56px;background:linear-gradient(115deg,#ffe969,#ffb314);border-color:#fff29c;box-shadow:inset 10px 0 #ffffff2b,0 4px #ad650d;color:#fff;font-size:38px;-webkit-text-stroke:1px #8e4b08}
+.ov-dashboard .tw-podium-rank-3 .tw-podium-place{background:linear-gradient(115deg,#e8b093,#a36549);border-color:#ffd9b0}
+.ov-dashboard .tw-employee-runners{display:none}
+.ov-dashboard .tw-overview-top-grid .tw-overview-section-link{font:700 10px/1.2 'Nunito Sans',sans-serif;margin-top:9px;color:#9fb8e8;text-decoration:none}
+.ov-dashboard .tw-ranking-empty{min-height:150px;padding:20px 14px;gap:12px;background:linear-gradient(135deg,#16357266,transparent 65%);border-radius:7px;margin-top:8px;display:flex;flex-direction:row;align-items:center}
+.ov-dashboard .tw-ranking-empty img{width:68px;height:80px;object-fit:contain;opacity:.55}
+.ov-dashboard .tw-overview-top-grid .tw-overview-empty h3{font:400 19px/1.2 'Lilita One',sans-serif;margin:0 0 7px}
+.ov-dashboard .tw-overview-top-grid .tw-overview-empty p{font:500 12px/1.5 'Nunito Sans',sans-serif;color:#a6b7d8;max-width:300px}
+.ov-dashboard .tw-new-hire-list{margin:8px 0 0;padding:0;display:grid;gap:3px}
+.ov-dashboard .tw-new-hire-list li+li{border:0}
+.ov-dashboard .tw-new-hire-list a{position:relative;display:flex;align-items:center;gap:12px;padding:5px 9px;background:linear-gradient(100deg,#152f60aa,#0c1d42aa);border:1px solid #28478055;border-radius:7px;min-height:45px}
+.ov-dashboard .tw-new-hire-list a:hover{background:#1b3971;transform:none}
+.ov-dashboard .tw-new-hire-character{flex:0 0 38px;width:38px;height:38px;padding:0;background:#081a38;border:1px solid #35588666;border-radius:7px;box-shadow:none}
+.ov-dashboard .tw-new-hire-character img{object-fit:contain}
+.ov-dashboard .tw-new-hire-identity{flex:1;position:relative;padding-right:88px;min-width:0}
+.ov-dashboard .tw-new-hire-identity h3{font:400 13px/1.1 'Lilita One',sans-serif;margin:0 0 4px;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#fff8ed}
+.ov-dashboard .tw-new-hire-identity p{font:500 11px/1.2 'Nunito Sans',sans-serif;margin:0;color:#97add7;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ov-dashboard .tw-new-hire-identity>div{position:absolute;right:0;top:0;display:flex;flex-direction:column;align-items:flex-end;gap:3px;font:700 11px/1.2 'Nunito Sans',sans-serif}
+.ov-dashboard .tw-new-hire-identity time{font-size:10px;color:#8298c4}
+.ov-dashboard .tw-hire-status{color:#c3d3ff;background:none;padding:0}
+.ov-dashboard .tw-hire-live{color:#25e9ad;font-size:10px}
+@media(max-width:900px){.ov-dashboard .tw-overview-top-grid{grid-template-columns:1fr}.ov-dashboard .tw-overview-top-grid>.tw-overview-panel{min-height:220px}}
+@media(max-width:540px){.ov-dashboard .tw-overview-top-grid>.tw-overview-panel{padding:12px 10px}.ov-dashboard .tw-overview-top-grid .tw-overview-panel-head h2{font-size:13px}.ov-dashboard .tw-employee-podium{padding-inline:0}.ov-dashboard .tw-new-hires .tw-overview-panel-head>span{margin:0;font-size:9px}.ov-dashboard .tw-ranking-switch button{min-width:34px;padding-inline:7px}}

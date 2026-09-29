@@ -13,6 +13,10 @@ import {installAgentTrading} from './agent-trading.js';
 import {logError} from './runtime.js';
 import {normalizeTokenImage,stageTokenImage} from './token-image.js';
 import {mainnetWalletBalance} from './wallet-balance.js';
+import {installControlledDex} from './dex/routes.js';
+import {createRealMoneyNetwork} from './real-money-network.js';
+import {TOKEN_PROGRAM_ID,TOKEN_2022_PROGRAM_ID} from '@solana/spl-token';
+import {deleteBlockers} from './delete-policy.js';
 
 const hash = v => createHash('sha256').update(v).digest('hex');
 const fail = (status, message) => { throw Object.assign(new Error(message), { status }); };
@@ -21,7 +25,7 @@ const text = (v, min, max, label) => {
   return v.trim();
 };
 const address = v => { try { if (typeof v !== 'string' || !PublicKey.isOnCurve(new PublicKey(v).toBytes())) throw 0; return v; } catch { fail(400, 'Invalid wallet address'); } };
-export function createServer({ dbPath, vaultKey, origins = ['http://127.0.0.1:5188'], network = 'local', rpc, mainnetSafetyMode = false, production = false, chain: injectedChain, now = Date.now, deletionGuard=reserveDraftDeletion, tradingOptions={} } = {}) {
+export function createServer({ dbPath, vaultKey, origins = ['http://127.0.0.1:5188'], network = 'local', rpc, mainnetSafetyMode = false, production = false, chain: injectedChain, now = Date.now, deletionGuard=reserveDraftDeletion, tradingOptions={}, realMoneyNetwork } = {}) {
   network = network.toLowerCase();
   if (!['local', 'devnet', 'mainnet'].includes(network)) throw new Error('Unknown network');
   if (network === 'mainnet' && (!mainnetSafetyMode || !rpc || injectedChain)) throw new Error('Mainnet requires explicit safety mode and separate RPC; injected execution adapters prohibited');
@@ -44,7 +48,7 @@ export function createServer({ dbPath, vaultKey, origins = ['http://127.0.0.1:51
   app.use('/api', rateLimit({ windowMs: 60_000, limit: 180, standardHeaders: 'draft-8', legacyHeaders: false }));
   app.use(express.json({ limit: '5mb' }));
   app.use('/api/agents', (req,res,next) => {
-    if (network === 'mainnet' && !['GET','HEAD','OPTIONS'].includes(req.method)) return res.status(403).json({error:'MAINNET SAFETY MODE: drafts, token issuance, submission and value-moving actions disabled'});
+    if (network === 'mainnet' && !['GET','HEAD','OPTIONS'].includes(req.method) && !(req.method==='POST' && /^\/[^/]+\/character$/.test(req.path))) return res.status(403).json({error:'MAINNET SAFETY MODE: drafts, token issuance, submission and value-moving actions disabled'});
     next();
   });
   app.get('/api/safety/memo', async(req,res) => {
@@ -57,7 +61,8 @@ export function createServer({ dbPath, vaultKey, origins = ['http://127.0.0.1:51
     return token ? db.prepare('SELECT * FROM sessions WHERE hash=? AND expires>?').get(hash(token), now()) : null;
   };
   const auth = (req, res, next) => { req.session = getSession(req); if (!req.session) return res.status(401).json({ error: 'Sign in with your wallet first' }); next(); };
-  const ownerBalance=mainnetWalletBalance();
+  const realMoney=realMoneyNetwork??createRealMoneyNetwork();
+  const ownerBalance=mainnetWalletBalance({connection:realMoney.connection,verifyNetwork:realMoney.verify});
   app.get('/api/wallet/mainnet-balance',auth,async(req,res)=>{
     try{res.json(await ownerBalance(req.session.address,req.query.refresh==='1'));}
     catch{res.status(503).json({error:'Mainnet balance unavailable'});}
@@ -67,7 +72,9 @@ export function createServer({ dbPath, vaultKey, origins = ['http://127.0.0.1:51
     const row = db.prepare('SELECT * FROM agents WHERE (id=? OR CAST(no AS TEXT)=?) AND owner=?').get(req.params.id, req.params.id, req.session.address);
     if (!row) fail(404, 'Agent not found'); return { row, agent: rowAgent(row) };
   };
-  const trading=installAgentTrading(app,{store,auth,owned,now,...tradingOptions});
+  const trading=installAgentTrading(app,{store,auth,owned,now,realMoney,sessionValid:req=>getSession(req)?.address===req.session?.address,...tradingOptions});
+  const controlledDex=installControlledDex(app,{db,store,auth,owned,now,realMoney,sessionValid:req=>getSession(req)?.address===req.session?.address});
+  if(controlledDex.autonomousScheduler)trading.tick.setAutonomousTick(()=>controlledDex.autonomousScheduler.tick());
   const event = (a, type, message) => db.prepare('INSERT INTO events (agent_id,owner,type,message,created_at) VALUES (?,?,?,?,?)').run(a.id, a.creator, type, message, now());
   const save = a => db.prepare('UPDATE agents SET data=? WHERE id=?').run(JSON.stringify(a), a.id);
   const cookie = (res, token, maxAge) => res.cookie('tw_session', token, { httpOnly: true, sameSite: 'strict', secure: production, path: '/api', maxAge });
@@ -84,7 +91,7 @@ export function createServer({ dbPath, vaultKey, origins = ['http://127.0.0.1:51
     if(!chain)fail(503,'Devnet is not configured');
     res.json(await chain.wallet(req.session.address));
   });
-  app.get('/api/health', (req, res) => {db.prepare('SELECT 1').get();res.json({ ok: true, service: 'tekkwork-api', network, mainnet: network === 'mainnet', safetyMode: network === 'mainnet', broadcastEnabled: network === 'devnet', trading: false,liveTradingEnabled:false,paperTrading:true,fundingEnabled:process.env.FUNDING_ENABLED==='true',globalTradingKillSwitch:process.env.GLOBAL_TRADING_KILL_SWITCH!=='false' });});
+  app.get('/api/health', (req, res) => {db.prepare('SELECT 1').get();const arm=controlledDex.oneShot?.status(),autonomousKillSwitch=process.env.AUTONOMOUS_KILL_SWITCH!=='false'||process.env.GLOBAL_TRADING_KILL_SWITCH!=='false',realMoneyEmergencyStop=process.env.REAL_MONEY_EMERGENCY_STOP!=='false';res.json({ ok: true, service: 'tekkwork-api', network, applicationNetwork:network, mainnet: network === 'mainnet', safetyMode: network === 'mainnet', broadcastEnabled: network === 'devnet', applicationBroadcastEnabled:network==='devnet', controlledRealBroadcastArmed:arm?.status==='ARMED', trading: false,liveTradingEnabled:process.env.LIVE_TRADING_ENABLED==='true'&&process.env.LIVE_AUTONOMOUS_ENABLED==='true'&&!autonomousKillSwitch&&!realMoneyEmergencyStop,paperTrading:true,fundingEnabled:process.env.FUNDING_ENABLED==='true',withdrawalEnabled:process.env.WITHDRAWAL_ENABLED==='true',walletTransfersPaused:process.env.WALLET_TRANSFERS_PAUSED==='true',globalTradingKillSwitch:process.env.GLOBAL_TRADING_KILL_SWITCH!=='false',autonomousKillSwitch,realMoneyEmergencyStop,controlledRealEnabled:false,controlledRealRequested:process.env.CONTROLLED_REAL_ENABLED==='true',controlledPrepareReviewEnabled:process.env.CONTROLLED_BUY_PREPARE_ENABLED==='true',controlledDexAdapter:arm?.status==='ARMED'?'CPMM_ONE_SHOT_ARMED':'CPMM_WIRED_DISARMED',...realMoney.status() });});
   app.get('/api/state', (req, res) => {
     const session = getSession(req);
     const agents = session ? db.prepare('SELECT * FROM agents WHERE owner=? ORDER BY no DESC').all(session.address).map(rowAgent).map(a=>({...a,tradingStatus:trading.projection(a).status})) : [];
@@ -93,7 +100,7 @@ export function createServer({ dbPath, vaultKey, origins = ['http://127.0.0.1:51
   });
   app.post('/api/auth/challenge', authLimit, (req, res) => {
     const owner = address(req.body.address), id = randomUUID(), expires = now() + 5 * 60_000;
-    const message = `TEKKWORK wallet sign-in\nOrigin: ${req.headers.origin}\nWallet: ${owner}\nNonce: ${id}\nExpires: ${new Date(expires).toISOString()}\nThis signature signs you in. It does not authorize a payment.`;
+    const message = `TEKKTEAM wallet sign-in\nOrigin: ${req.headers.origin}\nWallet: ${owner}\nNonce: ${id}\nExpires: ${new Date(expires).toISOString()}\nThis signature signs you in. It does not authorize a payment.`;
     db.prepare('DELETE FROM challenges WHERE expires<?').run(now());
     db.prepare('INSERT INTO challenges VALUES (?,?,?,?)').run(id, owner, message, expires);
     res.json({ id, message, expires });
@@ -143,6 +150,17 @@ export function createServer({ dbPath, vaultKey, origins = ['http://127.0.0.1:51
     if (!strategies.some(s => s.id === req.body.strategy)) fail(400, 'Unknown strategy');
     trading.setStrategy(a.id,req.body.strategy);a.strategy = req.body.strategy; a.updatedAt = now(); save(a); event(a, 'settings', `${a.name}'s strategy profile was updated. Live execution remains locked.`); res.json(a);
   });
+  app.post('/api/agents/:id/character', auth, (req,res) => {
+    const {agent:a}=owned(req);
+    const next=text(req.body.character,1,40,'character');
+    if(!characters.some(c=>c.id===next))fail(400,'Unknown character');
+    const expected=text(req.body.expectedCharacter,1,40,'current character');
+    if(a.character!==expected && a.character!==next)fail(409,'Agent character changed. Review the assignment again.');
+    if(a.character===next)return res.json(a);
+    a.character=next;a.avatarSeed=`skin:${next}`;a.updatedAt=now();save(a);
+    event(a,'settings',`${a.name}'s character was assigned.`);
+    res.json(a);
+  });
   const locked = handler => async (req, res) => {
     const { row, agent } = owned(req);
     if (locks.has(agent.id)) fail(409, 'An operation is already in progress');
@@ -150,8 +168,29 @@ export function createServer({ dbPath, vaultKey, origins = ['http://127.0.0.1:51
   };
   const eligibility=async a=>{
     const result=await deletionEligibility(a);
-    if(result.canDelete&&(db.prepare('SELECT 1 FROM agent_wallets WHERE agent_id=?').get(a.id)||db.prepare('SELECT 1 FROM submissions WHERE agent_id=?').get(a.id)))return {...result,canDelete:false,launchState:'unknown',reason:'Agent wallet or pending submission exists. Deletion is locked.'};
-    return result;
+    const wallet=db.prepare('SELECT address FROM agent_wallets WHERE agent_id=?').get(a.id);
+    const executions=db.prepare('SELECT status,data FROM dex_executions WHERE agent_id=?').all(a.id);
+    const transfers=db.prepare('SELECT data FROM agent_funding WHERE agent_id=?').all(a.id).map(row=>JSON.parse(row.data));
+    const position=db.prepare('SELECT data FROM dex_positions WHERE agent_id=?').all(a.id).some(row=>BigInt(JSON.parse(row.data).quantity)>0n);
+    const paperRow=db.prepare('SELECT data FROM paper_states WHERE agent_id=?').get(a.id);
+    const paperPosition=!!(paperRow&&JSON.parse(paperRow.data).position);
+    const activeReservation=db.prepare("SELECT 1 FROM real_balance_reservations WHERE status IN ('PREPARING','PREPARED','SIGNED','SUBMITTED','UNKNOWN','Prepared','Confirming') AND (data LIKE ? OR data LIKE ?) LIMIT 1").get('%'+a.id+'%','%'+(wallet?.address||'!no-wallet!')+'%');
+    const pendingSubmission=!!db.prepare('SELECT 1 FROM submissions WHERE agent_id=?').get(a.id);
+    let solLamports=wallet?null:0,tokenBalances=[];
+    if(wallet){
+      try{
+        await realMoney.verify();
+        const key=new PublicKey(wallet.address);
+        const [balance,legacy,t22]=await Promise.all([realMoney.connection.getBalance(key,'confirmed'),realMoney.connection.getParsedTokenAccountsByOwner(key,{programId:TOKEN_PROGRAM_ID},'confirmed'),realMoney.connection.getParsedTokenAccountsByOwner(key,{programId:TOKEN_2022_PROGRAM_ID},'confirmed')]);
+        solLamports=balance;
+        tokenBalances=[...legacy.value,...t22.value].map(row=>({mint:row.account.data.parsed.info.mint,amount:row.account.data.parsed.info.tokenAmount.amount,decimals:row.account.data.parsed.info.tokenAmount.decimals})).filter(t=>BigInt(t.amount)>0n);
+      }catch{solLamports=null;tokenBalances=[];}
+    }
+    const active=executions.some(e=>['QUOTED','PREPARING','PREPARED','SIGNED','SUBMITTED','UNKNOWN'].includes(e.status))||transfers.some(t=>['PREPARED','Prepared','Confirming','SIGNED','SUBMITTED','UNKNOWN'].includes(t.status));
+    const unresolved=executions.some(e=>['SIGNED','SUBMITTED','UNKNOWN'].includes(e.status))||transfers.some(t=>['Confirming','SIGNED','SUBMITTED','UNKNOWN'].includes(t.status));
+    const blockers=deleteBlockers({wallet:!!wallet,solLamports,tokenBalances,realPosition:position,activeExecution:active,unresolvedExecution:unresolved,activeReservation:!!activeReservation,pendingSubmission,tokenLaunched:!!a.coin?.mint,realHistory:executions.length>0||transfers.length>0,paperPosition});
+    if(!result.canDelete&&!blockers.length)blockers.push({code:'LAUNCH_OR_DRAFT_STATE',message:result.reason||'The Agent is not an unlaunched draft.'});
+    return {...result,canDelete:result.canDelete&&!blockers.length,deleteEligible:result.canDelete&&!blockers.length,deleteBlockedReasons:blockers,reason:blockers[0]?.message||result.reason,walletAddress:wallet?.address||null,solLamports,tokenBalances,realPositionOpen:position,paperPositionOpen:paperPosition,activeExecution:active,unresolvedExecution:unresolved,activeReservation:!!activeReservation,pendingSubmission};
   };
   app.get('/api/agents/:id/deletion-eligibility',auth,async(req,res)=>res.json(await eligibility(owned(req).agent)));
   app.delete('/api/agents/:id',auth,locked(async(req,res,row,a)=>{
@@ -249,5 +288,5 @@ export function createServer({ dbPath, vaultKey, origins = ['http://127.0.0.1:51
     if (status >= 500) logError('api',err);
     res.status(status).json({ error: status >= 500 ? 'Service unavailable. Your saved data has been preserved; try again later.' : err.message });
   });
-  return { app, close: store.close, store, reconcilePending, paperTick:trading.tick };
+  return { app, close: store.close, store, realMoney, reconcilePending, paperTick:trading.tick,analyticsTick:trading.analyticsTick,walletReconcile:trading.walletReconcile };
 }

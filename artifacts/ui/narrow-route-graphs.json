@@ -1,0 +1,2434 @@
+{
+  "singleDeriversePayloadObservation": {
+    "sample": 0,
+    "policy": "jupiter-deriverse-observation-v1",
+    "idlSha256": "cf5b1abb503ba25caf3423a89e29c7aa127c44867fabe6a22e143c554d813b7d",
+    "consumedBytes": 44,
+    "declaredInputAmount": "100000",
+    "declaredQuotedOutput": "12224",
+    "declaredSlippageBps": 100,
+    "platformFeeBps": 0,
+    "positiveSlippageBps": 0,
+    "variant": "Deriverse",
+    "side": 1,
+    "instrumentId": 0,
+    "allocationBps": 10000,
+    "inputIndex": 0,
+    "outputIndex": 1,
+    "provenCpiMinimumOutput": null,
+    "supported": false,
+    "executable": false,
+    "reason": "UNPROVEN_DERIVERSE_CPI_AND_DEPLOYED_SEMANTICS"
+  },
+  "graphs": [
+    {
+      "sample": 0,
+      "claimedRoute": [
+        {
+          "percent": 100,
+          "bps": 10000,
+          "swapInfo": {
+            "ammKey": "8Wk2L1yDovBJifCN1o86X7g7pDcqLau39m6tEsJ9Sheh",
+            "label": "Deriverse",
+            "inputMint": "So11111111111111111111111111111111111111112",
+            "outputMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+            "inAmount": "100000",
+            "outAmount": "12224"
+          }
+        }
+      ],
+      "claimedExpectedOutput": "12102",
+      "claimIsNotProof": true,
+      "observedUnderlyingExecutables": [
+        "DRVSpZ2YUYYKgZP8XtLhAGtT1zYSCKzeHfb4DgRnrgqD"
+      ],
+      "historicalTokenAccounts": [
+        {
+          "address": "CJ1fhvsz9FwFM54JyXpNvAj6dvxtiRQjMhYmG1aQVVX8",
+          "signer": false,
+          "writable": true,
+          "slot": 450935489,
+          "exists": true,
+          "programOwner": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+          "executable": false,
+          "authorized": false,
+          "category": "UNVERIFIED_POOL_TOKEN_ACCOUNT",
+          "tokenOwner": "CJ1fhvsz9FwFM54JyXpNvAj6dvxtiRQjMhYmG1aQVVX8",
+          "mint": "So11111111111111111111111111111111111111112"
+        },
+        {
+          "address": "EPUHjseXG3izk3MVUJ1PcyWT9xeBhtAnq8gUpq3j8Uni",
+          "signer": false,
+          "writable": true,
+          "slot": 450935489,
+          "exists": true,
+          "programOwner": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+          "executable": false,
+          "authorized": false,
+          "category": "UNVERIFIED_POOL_TOKEN_ACCOUNT",
+          "tokenOwner": "EPUHjseXG3izk3MVUJ1PcyWT9xeBhtAnq8gUpq3j8Uni",
+          "mint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
+        }
+      ],
+      "versions": [
+        {
+          "observationOnly": true,
+          "approved": false,
+          "executionAllowed": false,
+          "reason": "CPI_VALUE_FLOW_NOT_PROVEN",
+          "version": "legacy",
+          "messageHash": "5a2bee445a8476d49fb608bb013a6fed8f561626809ea96a7c9b9454ed19478a",
+          "feePayer": "7Bt9Q3EciD8ZhoRA6CviqwpLpGhn4tscPrsKfUqGfFVe",
+          "header": {
+            "numRequiredSignatures": 1,
+            "numReadonlySignedAccounts": 0,
+            "numReadonlyUnsignedAccounts": 9
+          },
+          "signatureCount": 1,
+          "allSignaturesZero": true,
+          "blockhash": "9XgWfDJUrgBF1C8ESNePinKGV4PKFHse88VbXHBACt3j",
+          "accounts": [
+            {
+              "address": "7Bt9Q3EciD8ZhoRA6CviqwpLpGhn4tscPrsKfUqGfFVe",
+              "signer": true,
+              "writable": true,
+              "index": 0,
+              "origin": "static",
+              "role": "INTENDED_AGENT"
+            },
+            {
+              "address": "HK9b1xCN5kQdjWofPyU3DKexoNcA7Nr1uDCKvdUBfihR",
+              "signer": false,
+              "writable": true,
+              "index": 1,
+              "origin": "static",
+              "role": "DERIVED_AGENT_ATA"
+            },
+            {
+              "address": "FjPUygpFHEUVpSDUM7ByKRByYTsJoN8E7vTjQCuZKQ9G",
+              "signer": false,
+              "writable": true,
+              "index": 2,
+              "origin": "static",
+              "role": "DERIVED_AGENT_ATA"
+            },
+            {
+              "address": "CJ1fhvsz9FwFM54JyXpNvAj6dvxtiRQjMhYmG1aQVVX8",
+              "signer": false,
+              "writable": true,
+              "index": 3,
+              "origin": "static",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "EPUHjseXG3izk3MVUJ1PcyWT9xeBhtAnq8gUpq3j8Uni",
+              "signer": false,
+              "writable": true,
+              "index": 4,
+              "origin": "static",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "8Wk2L1yDovBJifCN1o86X7g7pDcqLau39m6tEsJ9Sheh",
+              "signer": false,
+              "writable": true,
+              "index": 5,
+              "origin": "static",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "3vCToKSjuzX3dZ48hert2LsCTRyfDS6Cf7fXULfxsoPy",
+              "signer": false,
+              "writable": true,
+              "index": 6,
+              "origin": "static",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "BaojxUEuwerwQHQRBtTpuuMUreboaxymjyySPsdoJkYc",
+              "signer": false,
+              "writable": true,
+              "index": 7,
+              "origin": "static",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "5163SrbBvsKPQz86yfSGXLnPqu83X6bAQD1Gy7AA4n3",
+              "signer": false,
+              "writable": true,
+              "index": 8,
+              "origin": "static",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "9zeBhQkMGmvko7CyPcYg3TUmfneES329dTYtMGs3wx6j",
+              "signer": false,
+              "writable": true,
+              "index": 9,
+              "origin": "static",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "HfJ9RgUGSrcsx1ctERFUUkHaMeeNr4a6vB7QQDFBKFwJ",
+              "signer": false,
+              "writable": true,
+              "index": 10,
+              "origin": "static",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "ComputeBudget111111111111111111111111111111",
+              "signer": false,
+              "writable": false,
+              "index": 11,
+              "origin": "static",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
+              "signer": false,
+              "writable": false,
+              "index": 12,
+              "origin": "static",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "So11111111111111111111111111111111111111112",
+              "signer": false,
+              "writable": false,
+              "index": 13,
+              "origin": "static",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "11111111111111111111111111111111",
+              "signer": false,
+              "writable": false,
+              "index": 14,
+              "origin": "static",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+              "signer": false,
+              "writable": false,
+              "index": 15,
+              "origin": "static",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+              "signer": false,
+              "writable": false,
+              "index": 16,
+              "origin": "static",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4",
+              "signer": false,
+              "writable": false,
+              "index": 17,
+              "origin": "static",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "D8cy77BBepLMngZx6ZukaTff5hCt1HrWyKk3Hnd9oitf",
+              "signer": false,
+              "writable": false,
+              "index": 18,
+              "origin": "static",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "DRVSpZ2YUYYKgZP8XtLhAGtT1zYSCKzeHfb4DgRnrgqD",
+              "signer": false,
+              "writable": false,
+              "index": 19,
+              "origin": "static",
+              "role": "UNPROVEN"
+            }
+          ],
+          "lookups": [],
+          "instructions": [
+            {
+              "index": 0,
+              "program": "ComputeBudget111111111111111111111111111111",
+              "accountIndices": [],
+              "dataHex": "02c05c1500",
+              "semantic": "SET_COMPUTE_UNIT_LIMIT",
+              "flow": null,
+              "units": 1400000
+            },
+            {
+              "index": 1,
+              "program": "ComputeBudget111111111111111111111111111111",
+              "accountIndices": [],
+              "dataHex": "033f03000000000000",
+              "semantic": "SET_COMPUTE_UNIT_PRICE",
+              "flow": null,
+              "microLamports": "831"
+            },
+            {
+              "index": 2,
+              "program": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
+              "accountIndices": [
+                0,
+                1,
+                0,
+                13,
+                14,
+                15
+              ],
+              "dataHex": "01",
+              "semantic": "CREATE_IDEMPOTENT_ATA_UNVALIDATED",
+              "flow": null
+            },
+            {
+              "index": 3,
+              "program": "11111111111111111111111111111111",
+              "accountIndices": [
+                0,
+                1
+              ],
+              "dataHex": "02000000a086010000000000",
+              "semantic": "SYSTEM_TRANSFER",
+              "flow": {
+                "source": "7Bt9Q3EciD8ZhoRA6CviqwpLpGhn4tscPrsKfUqGfFVe",
+                "destination": "HK9b1xCN5kQdjWofPyU3DKexoNcA7Nr1uDCKvdUBfihR",
+                "lamports": "100000"
+              }
+            },
+            {
+              "index": 4,
+              "program": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+              "accountIndices": [
+                1
+              ],
+              "dataHex": "11",
+              "semantic": "SYNC_NATIVE",
+              "flow": null
+            },
+            {
+              "index": 5,
+              "program": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
+              "accountIndices": [
+                0,
+                2,
+                0,
+                16,
+                14,
+                15
+              ],
+              "dataHex": "01",
+              "semantic": "CREATE_IDEMPOTENT_ATA_UNVALIDATED",
+              "flow": null
+            },
+            {
+              "index": 6,
+              "program": "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4",
+              "accountIndices": [
+                0,
+                1,
+                2,
+                13,
+                16,
+                15,
+                15,
+                17,
+                18,
+                17,
+                19,
+                0,
+                13,
+                16,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9,
+                10,
+                1,
+                2,
+                15,
+                15
+              ],
+              "dataHex": "bb64facc31c4af14a086010000000000c02f00000000000064000000000001000000a1010000000010270001",
+              "semantic": "UNDECODED",
+              "flow": null
+            },
+            {
+              "index": 7,
+              "program": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+              "accountIndices": [
+                1,
+                0,
+                0
+              ],
+              "dataHex": "09",
+              "semantic": "CLOSE_ACCOUNT",
+              "flow": {
+                "source": "HK9b1xCN5kQdjWofPyU3DKexoNcA7Nr1uDCKvdUBfihR",
+                "destination": "7Bt9Q3EciD8ZhoRA6CviqwpLpGhn4tscPrsKfUqGfFVe",
+                "authority": "7Bt9Q3EciD8ZhoRA6CviqwpLpGhn4tscPrsKfUqGfFVe",
+                "lamports": "UNPROVEN_AT_EXECUTION"
+              }
+            }
+          ],
+          "derivedAtas": [
+            {
+              "mint": "So11111111111111111111111111111111111111112",
+              "address": "HK9b1xCN5kQdjWofPyU3DKexoNcA7Nr1uDCKvdUBfihR"
+            },
+            {
+              "mint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+              "address": "FjPUygpFHEUVpSDUM7ByKRByYTsJoN8E7vTjQCuZKQ9G"
+            }
+          ],
+          "unknownWritableAccounts": [
+            "CJ1fhvsz9FwFM54JyXpNvAj6dvxtiRQjMhYmG1aQVVX8",
+            "EPUHjseXG3izk3MVUJ1PcyWT9xeBhtAnq8gUpq3j8Uni",
+            "8Wk2L1yDovBJifCN1o86X7g7pDcqLau39m6tEsJ9Sheh",
+            "3vCToKSjuzX3dZ48hert2LsCTRyfDS6Cf7fXULfxsoPy",
+            "BaojxUEuwerwQHQRBtTpuuMUreboaxymjyySPsdoJkYc",
+            "5163SrbBvsKPQz86yfSGXLnPqu83X6bAQD1Gy7AA4n3",
+            "9zeBhQkMGmvko7CyPcYg3TUmfneES329dTYtMGs3wx6j",
+            "HfJ9RgUGSrcsx1ctERFUUkHaMeeNr4a6vB7QQDFBKFwJ"
+          ],
+          "instructionGraphHash": "b3b6978631a2b5c2d2a02c592c73b3ee9a88d19972d48702d6cdd6b2eee4683d",
+          "provenRouteInput": null,
+          "provenRouteMinimumOutput": null,
+          "provenCpiPrograms": null
+        },
+        {
+          "observationOnly": true,
+          "approved": false,
+          "executionAllowed": false,
+          "reason": "CPI_VALUE_FLOW_NOT_PROVEN",
+          "version": 0,
+          "messageHash": "f93674fb722625a9060cc3d051020fd7bed82d99e69c374fa835cb8475e83e72",
+          "feePayer": "7Bt9Q3EciD8ZhoRA6CviqwpLpGhn4tscPrsKfUqGfFVe",
+          "header": {
+            "numRequiredSignatures": 1,
+            "numReadonlySignedAccounts": 0,
+            "numReadonlyUnsignedAccounts": 6
+          },
+          "signatureCount": 1,
+          "allSignaturesZero": true,
+          "blockhash": "9XgWfDJUrgBF1C8ESNePinKGV4PKFHse88VbXHBACt3j",
+          "accounts": [
+            {
+              "address": "7Bt9Q3EciD8ZhoRA6CviqwpLpGhn4tscPrsKfUqGfFVe",
+              "signer": true,
+              "writable": true,
+              "index": 0,
+              "origin": "static",
+              "role": "INTENDED_AGENT"
+            },
+            {
+              "address": "HK9b1xCN5kQdjWofPyU3DKexoNcA7Nr1uDCKvdUBfihR",
+              "signer": false,
+              "writable": true,
+              "index": 1,
+              "origin": "static",
+              "role": "DERIVED_AGENT_ATA"
+            },
+            {
+              "address": "FjPUygpFHEUVpSDUM7ByKRByYTsJoN8E7vTjQCuZKQ9G",
+              "signer": false,
+              "writable": true,
+              "index": 2,
+              "origin": "static",
+              "role": "DERIVED_AGENT_ATA"
+            },
+            {
+              "address": "ComputeBudget111111111111111111111111111111",
+              "signer": false,
+              "writable": false,
+              "index": 3,
+              "origin": "static",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
+              "signer": false,
+              "writable": false,
+              "index": 4,
+              "origin": "static",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "11111111111111111111111111111111",
+              "signer": false,
+              "writable": false,
+              "index": 5,
+              "origin": "static",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+              "signer": false,
+              "writable": false,
+              "index": 6,
+              "origin": "static",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4",
+              "signer": false,
+              "writable": false,
+              "index": 7,
+              "origin": "static",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "D8cy77BBepLMngZx6ZukaTff5hCt1HrWyKk3Hnd9oitf",
+              "signer": false,
+              "writable": false,
+              "index": 8,
+              "origin": "static",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "CJ1fhvsz9FwFM54JyXpNvAj6dvxtiRQjMhYmG1aQVVX8",
+              "signer": false,
+              "writable": true,
+              "index": 9,
+              "origin": "ALT",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "EPUHjseXG3izk3MVUJ1PcyWT9xeBhtAnq8gUpq3j8Uni",
+              "signer": false,
+              "writable": true,
+              "index": 10,
+              "origin": "ALT",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "8Wk2L1yDovBJifCN1o86X7g7pDcqLau39m6tEsJ9Sheh",
+              "signer": false,
+              "writable": true,
+              "index": 11,
+              "origin": "ALT",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "3vCToKSjuzX3dZ48hert2LsCTRyfDS6Cf7fXULfxsoPy",
+              "signer": false,
+              "writable": true,
+              "index": 12,
+              "origin": "ALT",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "BaojxUEuwerwQHQRBtTpuuMUreboaxymjyySPsdoJkYc",
+              "signer": false,
+              "writable": true,
+              "index": 13,
+              "origin": "ALT",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "5163SrbBvsKPQz86yfSGXLnPqu83X6bAQD1Gy7AA4n3",
+              "signer": false,
+              "writable": true,
+              "index": 14,
+              "origin": "ALT",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "9zeBhQkMGmvko7CyPcYg3TUmfneES329dTYtMGs3wx6j",
+              "signer": false,
+              "writable": true,
+              "index": 15,
+              "origin": "ALT",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "HfJ9RgUGSrcsx1ctERFUUkHaMeeNr4a6vB7QQDFBKFwJ",
+              "signer": false,
+              "writable": true,
+              "index": 16,
+              "origin": "ALT",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "So11111111111111111111111111111111111111112",
+              "signer": false,
+              "writable": false,
+              "index": 17,
+              "origin": "ALT",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+              "signer": false,
+              "writable": false,
+              "index": 18,
+              "origin": "ALT",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "DRVSpZ2YUYYKgZP8XtLhAGtT1zYSCKzeHfb4DgRnrgqD",
+              "signer": false,
+              "writable": false,
+              "index": 19,
+              "origin": "ALT",
+              "role": "UNPROVEN"
+            }
+          ],
+          "lookups": [
+            {
+              "address": "j2VUW8UGtzuLq8b3vjZTDbk1Fs6FSV19UrsLZqc1Vyi",
+              "writableIndexes": [
+                157,
+                151,
+                158,
+                155,
+                150,
+                159,
+                73,
+                154
+              ],
+              "readonlyIndexes": [
+                6,
+                21,
+                156
+              ],
+              "snapshotSlot": 450933699
+            }
+          ],
+          "instructions": [
+            {
+              "index": 0,
+              "program": "ComputeBudget111111111111111111111111111111",
+              "accountIndices": [],
+              "dataHex": "02c05c1500",
+              "semantic": "SET_COMPUTE_UNIT_LIMIT",
+              "flow": null,
+              "units": 1400000
+            },
+            {
+              "index": 1,
+              "program": "ComputeBudget111111111111111111111111111111",
+              "accountIndices": [],
+              "dataHex": "033f03000000000000",
+              "semantic": "SET_COMPUTE_UNIT_PRICE",
+              "flow": null,
+              "microLamports": "831"
+            },
+            {
+              "index": 2,
+              "program": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
+              "accountIndices": [
+                0,
+                1,
+                0,
+                17,
+                5,
+                6
+              ],
+              "dataHex": "01",
+              "semantic": "CREATE_IDEMPOTENT_ATA_UNVALIDATED",
+              "flow": null
+            },
+            {
+              "index": 3,
+              "program": "11111111111111111111111111111111",
+              "accountIndices": [
+                0,
+                1
+              ],
+              "dataHex": "02000000a086010000000000",
+              "semantic": "SYSTEM_TRANSFER",
+              "flow": {
+                "source": "7Bt9Q3EciD8ZhoRA6CviqwpLpGhn4tscPrsKfUqGfFVe",
+                "destination": "HK9b1xCN5kQdjWofPyU3DKexoNcA7Nr1uDCKvdUBfihR",
+                "lamports": "100000"
+              }
+            },
+            {
+              "index": 4,
+              "program": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+              "accountIndices": [
+                1
+              ],
+              "dataHex": "11",
+              "semantic": "SYNC_NATIVE",
+              "flow": null
+            },
+            {
+              "index": 5,
+              "program": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
+              "accountIndices": [
+                0,
+                2,
+                0,
+                18,
+                5,
+                6
+              ],
+              "dataHex": "01",
+              "semantic": "CREATE_IDEMPOTENT_ATA_UNVALIDATED",
+              "flow": null
+            },
+            {
+              "index": 6,
+              "program": "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4",
+              "accountIndices": [
+                0,
+                1,
+                2,
+                17,
+                18,
+                6,
+                6,
+                7,
+                8,
+                7,
+                19,
+                0,
+                17,
+                18,
+                9,
+                10,
+                11,
+                12,
+                13,
+                14,
+                15,
+                16,
+                1,
+                2,
+                6,
+                6
+              ],
+              "dataHex": "bb64facc31c4af14a086010000000000c02f00000000000064000000000001000000a1010000000010270001",
+              "semantic": "UNDECODED",
+              "flow": null
+            },
+            {
+              "index": 7,
+              "program": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+              "accountIndices": [
+                1,
+                0,
+                0
+              ],
+              "dataHex": "09",
+              "semantic": "CLOSE_ACCOUNT",
+              "flow": {
+                "source": "HK9b1xCN5kQdjWofPyU3DKexoNcA7Nr1uDCKvdUBfihR",
+                "destination": "7Bt9Q3EciD8ZhoRA6CviqwpLpGhn4tscPrsKfUqGfFVe",
+                "authority": "7Bt9Q3EciD8ZhoRA6CviqwpLpGhn4tscPrsKfUqGfFVe",
+                "lamports": "UNPROVEN_AT_EXECUTION"
+              }
+            }
+          ],
+          "derivedAtas": [
+            {
+              "mint": "So11111111111111111111111111111111111111112",
+              "address": "HK9b1xCN5kQdjWofPyU3DKexoNcA7Nr1uDCKvdUBfihR"
+            },
+            {
+              "mint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+              "address": "FjPUygpFHEUVpSDUM7ByKRByYTsJoN8E7vTjQCuZKQ9G"
+            }
+          ],
+          "unknownWritableAccounts": [
+            "CJ1fhvsz9FwFM54JyXpNvAj6dvxtiRQjMhYmG1aQVVX8",
+            "EPUHjseXG3izk3MVUJ1PcyWT9xeBhtAnq8gUpq3j8Uni",
+            "8Wk2L1yDovBJifCN1o86X7g7pDcqLau39m6tEsJ9Sheh",
+            "3vCToKSjuzX3dZ48hert2LsCTRyfDS6Cf7fXULfxsoPy",
+            "BaojxUEuwerwQHQRBtTpuuMUreboaxymjyySPsdoJkYc",
+            "5163SrbBvsKPQz86yfSGXLnPqu83X6bAQD1Gy7AA4n3",
+            "9zeBhQkMGmvko7CyPcYg3TUmfneES329dTYtMGs3wx6j",
+            "HfJ9RgUGSrcsx1ctERFUUkHaMeeNr4a6vB7QQDFBKFwJ"
+          ],
+          "instructionGraphHash": "d108ae37525c5a47e12239989e5c92191611e3e22d33043078ec9ba2a72aa7f6",
+          "provenRouteInput": null,
+          "provenRouteMinimumOutput": null,
+          "provenCpiPrograms": null
+        }
+      ]
+    },
+    {
+      "sample": 1,
+      "claimedRoute": [
+        {
+          "percent": 24.92,
+          "bps": 2492,
+          "swapInfo": {
+            "ammKey": "DbuvwPuLvH8uy2B1sKuu18aCd2QpCvfZdfDtdRZztBd2",
+            "label": "1DEX",
+            "inputMint": "So11111111111111111111111111111111111111112",
+            "outputMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+            "inAmount": "49845",
+            "outAmount": "6093"
+          }
+        },
+        {
+          "percent": 67.38,
+          "bps": 6738,
+          "swapInfo": {
+            "ammKey": "8Wk2L1yDovBJifCN1o86X7g7pDcqLau39m6tEsJ9Sheh",
+            "label": "Deriverse",
+            "inputMint": "So11111111111111111111111111111111111111112",
+            "outputMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+            "inAmount": "134752",
+            "outAmount": "16472"
+          }
+        },
+        {
+          "percent": 7.7,
+          "bps": 770,
+          "swapInfo": {
+            "ammKey": "7XawhbbxtsRcQA8KTkHT9f9nc6d69UwqCDh6U5EEbEmX",
+            "label": "Raydium",
+            "inputMint": "So11111111111111111111111111111111111111112",
+            "outputMint": "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB",
+            "inAmount": "15403",
+            "outAmount": "1883"
+          }
+        },
+        {
+          "percent": 100,
+          "bps": 10000,
+          "swapInfo": {
+            "ammKey": "Fo2hjjMNkPUTJa9FDJYnkf7hhesRugc8Ah5PQD4JFZC7",
+            "label": "Stableswap",
+            "inputMint": "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB",
+            "outputMint": "2b1kV6DkPAnxd5ixfnxCpjxmKwqjjaYmCZfHsFu24GXo",
+            "inAmount": "1883",
+            "outAmount": "1883"
+          }
+        },
+        {
+          "percent": 100,
+          "bps": 10000,
+          "swapInfo": {
+            "ammKey": "FVz9gveEdRw2fqkZFLCXxpZErS4mBQvwKwQeForLUyW6",
+            "label": "AlphaQ",
+            "inputMint": "2b1kV6DkPAnxd5ixfnxCpjxmKwqjjaYmCZfHsFu24GXo",
+            "outputMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+            "inAmount": "1883",
+            "outAmount": "1883"
+          }
+        }
+      ],
+      "claimedExpectedOutput": "24204",
+      "claimIsNotProof": true,
+      "observedUnderlyingExecutables": [
+        "ghosty4ZU1Qk1HN7Ymz4pZ15QfspzJZgSYFkdKN6ZLK",
+        "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+        "675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8",
+        "ALPHAQmeA7bjrVuccPsYPiCvsi428SNwte66Srvs4pHA",
+        "DRVSpZ2YUYYKgZP8XtLhAGtT1zYSCKzeHfb4DgRnrgqD",
+        "DEXYosS6oEGvk8uCDayvwEZz4qEyDJRf9nFgYCaqPMTm"
+      ],
+      "historicalTokenAccounts": [
+        {
+          "address": "BuqEDKUwyAotZuK37V4JYEykZVKY8qo1zKbpfU9gkJMo",
+          "signer": false,
+          "writable": true,
+          "slot": 450935491,
+          "exists": true,
+          "programOwner": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+          "executable": false,
+          "authorized": false,
+          "category": "UNVERIFIED_POOL_TOKEN_ACCOUNT",
+          "tokenOwner": "6LXutJvKUw8Q5ue2gCgKHQdAN4suWW8awzFVC6XCguFx",
+          "mint": "So11111111111111111111111111111111111111112"
+        },
+        {
+          "address": "G4CD7aqqZZ6QKCNHrc1MPdS9Aw8BWmQ5ZkDd54W6mAEG",
+          "signer": false,
+          "writable": true,
+          "slot": 450935491,
+          "exists": true,
+          "programOwner": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+          "executable": false,
+          "authorized": false,
+          "category": "UNVERIFIED_POOL_TOKEN_ACCOUNT",
+          "tokenOwner": "6LXutJvKUw8Q5ue2gCgKHQdAN4suWW8awzFVC6XCguFx",
+          "mint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
+        },
+        {
+          "address": "52ASTPfF9PZ8sH4Vqd7k5Vug88RLByLnKEjWo5Xgtc5D",
+          "signer": false,
+          "writable": true,
+          "slot": 450935491,
+          "exists": true,
+          "programOwner": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+          "executable": false,
+          "authorized": false,
+          "category": "UNVERIFIED_POOL_TOKEN_ACCOUNT",
+          "tokenOwner": "6LXutJvKUw8Q5ue2gCgKHQdAN4suWW8awzFVC6XCguFx",
+          "mint": "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB"
+        },
+        {
+          "address": "5LJbxPCEbufGGrsVJDDvFXcWdH3aZKGD3eQFedbd93Vy",
+          "signer": false,
+          "writable": true,
+          "slot": 450935491,
+          "exists": true,
+          "programOwner": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+          "executable": false,
+          "authorized": false,
+          "category": "UNVERIFIED_POOL_TOKEN_ACCOUNT",
+          "tokenOwner": "29rqYq5idSQWyJQTFFtFAWJChgsAhwLyv5L9atuiiw1M",
+          "mint": "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB"
+        },
+        {
+          "address": "876Z9waBygfzUrwwKFfnRcc7cfY4EQf6Kz1w7GRgbVYW",
+          "signer": false,
+          "writable": true,
+          "slot": 450935491,
+          "exists": true,
+          "programOwner": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+          "executable": false,
+          "authorized": false,
+          "category": "UNVERIFIED_POOL_TOKEN_ACCOUNT",
+          "tokenOwner": "5Q544fKrFoe6tsEbD7S8EmxGTJYAKtTVhAW5Q5pge4j1",
+          "mint": "So11111111111111111111111111111111111111112"
+        },
+        {
+          "address": "CB86HtaqpXbNWbq67L18y5x2RhqoJ6smb7xHUcyWdQAQ",
+          "signer": false,
+          "writable": true,
+          "slot": 450935491,
+          "exists": true,
+          "programOwner": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+          "executable": false,
+          "authorized": false,
+          "category": "UNVERIFIED_POOL_TOKEN_ACCOUNT",
+          "tokenOwner": "5Q544fKrFoe6tsEbD7S8EmxGTJYAKtTVhAW5Q5pge4j1",
+          "mint": "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB"
+        },
+        {
+          "address": "F2KCaXcp7AoQtxTDvNEDCyMyWjSCAMWNzcyN9dsPfPs5",
+          "signer": false,
+          "writable": true,
+          "slot": 450935491,
+          "exists": true,
+          "programOwner": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+          "executable": false,
+          "authorized": false,
+          "category": "UNVERIFIED_POOL_TOKEN_ACCOUNT",
+          "tokenOwner": "F2KCaXcp7AoQtxTDvNEDCyMyWjSCAMWNzcyN9dsPfPs5",
+          "mint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
+        },
+        {
+          "address": "CJ1fhvsz9FwFM54JyXpNvAj6dvxtiRQjMhYmG1aQVVX8",
+          "signer": false,
+          "writable": true,
+          "slot": 450935491,
+          "exists": true,
+          "programOwner": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+          "executable": false,
+          "authorized": false,
+          "category": "UNVERIFIED_POOL_TOKEN_ACCOUNT",
+          "tokenOwner": "CJ1fhvsz9FwFM54JyXpNvAj6dvxtiRQjMhYmG1aQVVX8",
+          "mint": "So11111111111111111111111111111111111111112"
+        },
+        {
+          "address": "EPUHjseXG3izk3MVUJ1PcyWT9xeBhtAnq8gUpq3j8Uni",
+          "signer": false,
+          "writable": true,
+          "slot": 450935491,
+          "exists": true,
+          "programOwner": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+          "executable": false,
+          "authorized": false,
+          "category": "UNVERIFIED_POOL_TOKEN_ACCOUNT",
+          "tokenOwner": "EPUHjseXG3izk3MVUJ1PcyWT9xeBhtAnq8gUpq3j8Uni",
+          "mint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
+        },
+        {
+          "address": "HZ5JFB1ZoZs6NQLr7bb4MMEXDgty4Vs1ZghoyX35mNnV",
+          "signer": false,
+          "writable": true,
+          "slot": 450935491,
+          "exists": true,
+          "programOwner": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+          "executable": false,
+          "authorized": false,
+          "category": "UNVERIFIED_POOL_TOKEN_ACCOUNT",
+          "tokenOwner": "Enc6rB84ZwGxZU8aqAF41dRJxg3yesiJgD7uJFVhMraM",
+          "mint": "So11111111111111111111111111111111111111112"
+        },
+        {
+          "address": "AHFAv95Z67xnPYuHTf5a9uMEHdXFvbQvwc4EazY3tpt7",
+          "signer": false,
+          "writable": true,
+          "slot": 450935491,
+          "exists": true,
+          "programOwner": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+          "executable": false,
+          "authorized": false,
+          "category": "UNVERIFIED_POOL_TOKEN_ACCOUNT",
+          "tokenOwner": "Enc6rB84ZwGxZU8aqAF41dRJxg3yesiJgD7uJFVhMraM",
+          "mint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
+        },
+        {
+          "address": "GswwnegnBMWEuEsptDCBDmRB9YtG5zjetTSw7RunUQMY",
+          "signer": false,
+          "writable": true,
+          "slot": 450935491,
+          "exists": true,
+          "programOwner": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+          "executable": false,
+          "authorized": false,
+          "category": "UNVERIFIED_POOL_TOKEN_ACCOUNT",
+          "tokenOwner": "ATowQwFzdJBJ9VFSfoNKmuB8GiSeo8foM5vRriwmKmFB",
+          "mint": "So11111111111111111111111111111111111111112"
+        },
+        {
+          "address": "DuFXxPxAyJhHj4gMpE8As1Ta4nSSVXv8xfEDRrWQmJ9G",
+          "signer": false,
+          "writable": true,
+          "slot": 450935491,
+          "exists": true,
+          "programOwner": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+          "executable": false,
+          "authorized": false,
+          "category": "UNVERIFIED_POOL_TOKEN_ACCOUNT",
+          "tokenOwner": "45ruCyfdRkWpRNGEqWzjCiXRHkZs8WXCLQ67Pnpye7Hp",
+          "mint": "So11111111111111111111111111111111111111112"
+        }
+      ],
+      "versions": [
+        {
+          "version": "legacy",
+          "unavailableReason": "SIZE_OR_RPC_LOOKUP_VALIDATION_FAILED",
+          "approved": false
+        },
+        {
+          "observationOnly": true,
+          "approved": false,
+          "executionAllowed": false,
+          "reason": "CPI_VALUE_FLOW_NOT_PROVEN",
+          "version": 0,
+          "messageHash": "cd8047fa3ea2b39f61ca9b92cd6ca22a94062a9f1e400d00fbbaeabfb22b6fc0",
+          "feePayer": "7Bt9Q3EciD8ZhoRA6CviqwpLpGhn4tscPrsKfUqGfFVe",
+          "header": {
+            "numRequiredSignatures": 1,
+            "numReadonlySignedAccounts": 0,
+            "numReadonlyUnsignedAccounts": 6
+          },
+          "signatureCount": 1,
+          "allSignaturesZero": true,
+          "blockhash": "4aHWcaVEuqCcuFMYL7GZFdcMbJdgGecznE1yKEiUVDdQ",
+          "accounts": [
+            {
+              "address": "7Bt9Q3EciD8ZhoRA6CviqwpLpGhn4tscPrsKfUqGfFVe",
+              "signer": true,
+              "writable": true,
+              "index": 0,
+              "origin": "static",
+              "role": "INTENDED_AGENT"
+            },
+            {
+              "address": "HK9b1xCN5kQdjWofPyU3DKexoNcA7Nr1uDCKvdUBfihR",
+              "signer": false,
+              "writable": true,
+              "index": 1,
+              "origin": "static",
+              "role": "DERIVED_AGENT_ATA"
+            },
+            {
+              "address": "FjPUygpFHEUVpSDUM7ByKRByYTsJoN8E7vTjQCuZKQ9G",
+              "signer": false,
+              "writable": true,
+              "index": 2,
+              "origin": "static",
+              "role": "DERIVED_AGENT_ATA"
+            },
+            {
+              "address": "6LXutJvKUw8Q5ue2gCgKHQdAN4suWW8awzFVC6XCguFx",
+              "signer": false,
+              "writable": true,
+              "index": 3,
+              "origin": "static",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "BuqEDKUwyAotZuK37V4JYEykZVKY8qo1zKbpfU9gkJMo",
+              "signer": false,
+              "writable": true,
+              "index": 4,
+              "origin": "static",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "G4CD7aqqZZ6QKCNHrc1MPdS9Aw8BWmQ5ZkDd54W6mAEG",
+              "signer": false,
+              "writable": true,
+              "index": 5,
+              "origin": "static",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "52ASTPfF9PZ8sH4Vqd7k5Vug88RLByLnKEjWo5Xgtc5D",
+              "signer": false,
+              "writable": true,
+              "index": 6,
+              "origin": "static",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "EH7fRKLe74pmZwREnZGubaaTJLPP3j5Gt8DTeBDqg1Uo",
+              "signer": false,
+              "writable": true,
+              "index": 7,
+              "origin": "static",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "ComputeBudget111111111111111111111111111111",
+              "signer": false,
+              "writable": false,
+              "index": 8,
+              "origin": "static",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
+              "signer": false,
+              "writable": false,
+              "index": 9,
+              "origin": "static",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "11111111111111111111111111111111",
+              "signer": false,
+              "writable": false,
+              "index": 10,
+              "origin": "static",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+              "signer": false,
+              "writable": false,
+              "index": 11,
+              "origin": "static",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4",
+              "signer": false,
+              "writable": false,
+              "index": 12,
+              "origin": "static",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "D8cy77BBepLMngZx6ZukaTff5hCt1HrWyKk3Hnd9oitf",
+              "signer": false,
+              "writable": false,
+              "index": 13,
+              "origin": "static",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "29rqYq5idSQWyJQTFFtFAWJChgsAhwLyv5L9atuiiw1M",
+              "signer": false,
+              "writable": true,
+              "index": 14,
+              "origin": "ALT",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "5LJbxPCEbufGGrsVJDDvFXcWdH3aZKGD3eQFedbd93Vy",
+              "signer": false,
+              "writable": true,
+              "index": 15,
+              "origin": "ALT",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "2qgzbY616z1kJw1P3uxwgJyQEy7KphSve71EEGrdyvRB",
+              "signer": false,
+              "writable": true,
+              "index": 16,
+              "origin": "ALT",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "7XawhbbxtsRcQA8KTkHT9f9nc6d69UwqCDh6U5EEbEmX",
+              "signer": false,
+              "writable": true,
+              "index": 17,
+              "origin": "ALT",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "876Z9waBygfzUrwwKFfnRcc7cfY4EQf6Kz1w7GRgbVYW",
+              "signer": false,
+              "writable": true,
+              "index": 18,
+              "origin": "ALT",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "CB86HtaqpXbNWbq67L18y5x2RhqoJ6smb7xHUcyWdQAQ",
+              "signer": false,
+              "writable": true,
+              "index": 19,
+              "origin": "ALT",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "9gXvza14Bp6kBDdd5rWowt7NssYy36eSNvV7MzpWzLF3",
+              "signer": false,
+              "writable": true,
+              "index": 20,
+              "origin": "ALT",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "CsRTqU5ayapHqDn11Fkw5ZWY3kuisDf1zN1UrLEB9F7Z",
+              "signer": false,
+              "writable": true,
+              "index": 21,
+              "origin": "ALT",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "F2KCaXcp7AoQtxTDvNEDCyMyWjSCAMWNzcyN9dsPfPs5",
+              "signer": false,
+              "writable": true,
+              "index": 22,
+              "origin": "ALT",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "CJ1fhvsz9FwFM54JyXpNvAj6dvxtiRQjMhYmG1aQVVX8",
+              "signer": false,
+              "writable": true,
+              "index": 23,
+              "origin": "ALT",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "EPUHjseXG3izk3MVUJ1PcyWT9xeBhtAnq8gUpq3j8Uni",
+              "signer": false,
+              "writable": true,
+              "index": 24,
+              "origin": "ALT",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "8Wk2L1yDovBJifCN1o86X7g7pDcqLau39m6tEsJ9Sheh",
+              "signer": false,
+              "writable": true,
+              "index": 25,
+              "origin": "ALT",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "3vCToKSjuzX3dZ48hert2LsCTRyfDS6Cf7fXULfxsoPy",
+              "signer": false,
+              "writable": true,
+              "index": 26,
+              "origin": "ALT",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "BaojxUEuwerwQHQRBtTpuuMUreboaxymjyySPsdoJkYc",
+              "signer": false,
+              "writable": true,
+              "index": 27,
+              "origin": "ALT",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "5163SrbBvsKPQz86yfSGXLnPqu83X6bAQD1Gy7AA4n3",
+              "signer": false,
+              "writable": true,
+              "index": 28,
+              "origin": "ALT",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "9zeBhQkMGmvko7CyPcYg3TUmfneES329dTYtMGs3wx6j",
+              "signer": false,
+              "writable": true,
+              "index": 29,
+              "origin": "ALT",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "HfJ9RgUGSrcsx1ctERFUUkHaMeeNr4a6vB7QQDFBKFwJ",
+              "signer": false,
+              "writable": true,
+              "index": 30,
+              "origin": "ALT",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "DbuvwPuLvH8uy2B1sKuu18aCd2QpCvfZdfDtdRZztBd2",
+              "signer": false,
+              "writable": true,
+              "index": 31,
+              "origin": "ALT",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "HZ5JFB1ZoZs6NQLr7bb4MMEXDgty4Vs1ZghoyX35mNnV",
+              "signer": false,
+              "writable": true,
+              "index": 32,
+              "origin": "ALT",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "AHFAv95Z67xnPYuHTf5a9uMEHdXFvbQvwc4EazY3tpt7",
+              "signer": false,
+              "writable": true,
+              "index": 33,
+              "origin": "ALT",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "GswwnegnBMWEuEsptDCBDmRB9YtG5zjetTSw7RunUQMY",
+              "signer": false,
+              "writable": true,
+              "index": 34,
+              "origin": "ALT",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "DuFXxPxAyJhHj4gMpE8As1Ta4nSSVXv8xfEDRrWQmJ9G",
+              "signer": false,
+              "writable": true,
+              "index": 35,
+              "origin": "ALT",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "So11111111111111111111111111111111111111112",
+              "signer": false,
+              "writable": false,
+              "index": 36,
+              "origin": "ALT",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+              "signer": false,
+              "writable": false,
+              "index": 37,
+              "origin": "ALT",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "ghosty4ZU1Qk1HN7Ymz4pZ15QfspzJZgSYFkdKN6ZLK",
+              "signer": false,
+              "writable": false,
+              "index": 38,
+              "origin": "ALT",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB",
+              "signer": false,
+              "writable": false,
+              "index": 39,
+              "origin": "ALT",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "2b1kV6DkPAnxd5ixfnxCpjxmKwqjjaYmCZfHsFu24GXo",
+              "signer": false,
+              "writable": false,
+              "index": 40,
+              "origin": "ALT",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "AKfiu7aytWbcHKzeS1VjDYU4Ukum7gUURP2rJJ8etgnW",
+              "signer": false,
+              "writable": false,
+              "index": 41,
+              "origin": "ALT",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "821LpQ3bYtS2Ztc5Gcu7X8CQVzqokn1agj4Uhw3HX862",
+              "signer": false,
+              "writable": false,
+              "index": 42,
+              "origin": "ALT",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "Fo2hjjMNkPUTJa9FDJYnkf7hhesRugc8Ah5PQD4JFZC7",
+              "signer": false,
+              "writable": false,
+              "index": 43,
+              "origin": "ALT",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+              "signer": false,
+              "writable": false,
+              "index": 44,
+              "origin": "ALT",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8",
+              "signer": false,
+              "writable": false,
+              "index": 45,
+              "origin": "ALT",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "5Q544fKrFoe6tsEbD7S8EmxGTJYAKtTVhAW5Q5pge4j1",
+              "signer": false,
+              "writable": false,
+              "index": 46,
+              "origin": "ALT",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "ALPHAQmeA7bjrVuccPsYPiCvsi428SNwte66Srvs4pHA",
+              "signer": false,
+              "writable": false,
+              "index": 47,
+              "origin": "ALT",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "FVz9gveEdRw2fqkZFLCXxpZErS4mBQvwKwQeForLUyW6",
+              "signer": false,
+              "writable": false,
+              "index": 48,
+              "origin": "ALT",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "Sysvar1nstructions1111111111111111111111111",
+              "signer": false,
+              "writable": false,
+              "index": 49,
+              "origin": "ALT",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "DRVSpZ2YUYYKgZP8XtLhAGtT1zYSCKzeHfb4DgRnrgqD",
+              "signer": false,
+              "writable": false,
+              "index": 50,
+              "origin": "ALT",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "DEXYosS6oEGvk8uCDayvwEZz4qEyDJRf9nFgYCaqPMTm",
+              "signer": false,
+              "writable": false,
+              "index": 51,
+              "origin": "ALT",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "5nmAbnjJfW1skrPvYjLTBNdhoKzJfznnbvDcM8G2U7Ki",
+              "signer": false,
+              "writable": false,
+              "index": 52,
+              "origin": "ALT",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "Enc6rB84ZwGxZU8aqAF41dRJxg3yesiJgD7uJFVhMraM",
+              "signer": false,
+              "writable": false,
+              "index": 53,
+              "origin": "ALT",
+              "role": "UNPROVEN"
+            }
+          ],
+          "lookups": [
+            {
+              "address": "4nwg8ewqkrPQBus9BoAu4d2taR7W33X7nsLC22EAnfwG",
+              "writableIndexes": [
+                92,
+                43,
+                72
+              ],
+              "readonlyIndexes": [
+                7,
+                15,
+                73,
+                27,
+                68,
+                42,
+                69,
+                71,
+                52
+              ],
+              "snapshotSlot": 450933699
+            },
+            {
+              "address": "AAvt3Rhz3b83xTs3NkABrNiwmegKVFeoJ7NuWUhuyH3V",
+              "writableIndexes": [
+                200,
+                196,
+                198
+              ],
+              "readonlyIndexes": [
+                1,
+                9
+              ],
+              "snapshotSlot": 450933699
+            },
+            {
+              "address": "FQCY2Cbea1jazkUc6xjBUD72gMT2o8Mr4mnMd7gpL2F1",
+              "writableIndexes": [
+                221,
+                223,
+                68
+              ],
+              "readonlyIndexes": [
+                73,
+                222,
+                69
+              ],
+              "snapshotSlot": 450933699
+            },
+            {
+              "address": "j2VUW8UGtzuLq8b3vjZTDbk1Fs6FSV19UrsLZqc1Vyi",
+              "writableIndexes": [
+                157,
+                151,
+                158,
+                155,
+                150,
+                159,
+                73,
+                154
+              ],
+              "readonlyIndexes": [
+                156
+              ],
+              "snapshotSlot": 450933699
+            },
+            {
+              "address": "23iTfgGpQMxmeDhF4BcjW6D33UYG4Up25ttdc27vDD42",
+              "writableIndexes": [
+                56,
+                50,
+                54,
+                34,
+                35
+              ],
+              "readonlyIndexes": [
+                16,
+                20,
+                51
+              ],
+              "snapshotSlot": 450933699
+            }
+          ],
+          "instructions": [
+            {
+              "index": 0,
+              "program": "ComputeBudget111111111111111111111111111111",
+              "accountIndices": [],
+              "dataHex": "02c05c1500",
+              "semantic": "SET_COMPUTE_UNIT_LIMIT",
+              "flow": null,
+              "units": 1400000
+            },
+            {
+              "index": 1,
+              "program": "ComputeBudget111111111111111111111111111111",
+              "accountIndices": [],
+              "dataHex": "030303000000000000",
+              "semantic": "SET_COMPUTE_UNIT_PRICE",
+              "flow": null,
+              "microLamports": "771"
+            },
+            {
+              "index": 2,
+              "program": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
+              "accountIndices": [
+                0,
+                1,
+                0,
+                36,
+                10,
+                11
+              ],
+              "dataHex": "01",
+              "semantic": "CREATE_IDEMPOTENT_ATA_UNVALIDATED",
+              "flow": null
+            },
+            {
+              "index": 3,
+              "program": "11111111111111111111111111111111",
+              "accountIndices": [
+                0,
+                1
+              ],
+              "dataHex": "02000000400d030000000000",
+              "semantic": "SYSTEM_TRANSFER",
+              "flow": {
+                "source": "7Bt9Q3EciD8ZhoRA6CviqwpLpGhn4tscPrsKfUqGfFVe",
+                "destination": "HK9b1xCN5kQdjWofPyU3DKexoNcA7Nr1uDCKvdUBfihR",
+                "lamports": "200000"
+              }
+            },
+            {
+              "index": 4,
+              "program": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+              "accountIndices": [
+                1
+              ],
+              "dataHex": "11",
+              "semantic": "SYNC_NATIVE",
+              "flow": null
+            },
+            {
+              "index": 5,
+              "program": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
+              "accountIndices": [
+                0,
+                2,
+                0,
+                37,
+                10,
+                11
+              ],
+              "dataHex": "01",
+              "semantic": "CREATE_IDEMPOTENT_ATA_UNVALIDATED",
+              "flow": null
+            },
+            {
+              "index": 6,
+              "program": "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4",
+              "accountIndices": [
+                3,
+                0,
+                1,
+                4,
+                5,
+                2,
+                36,
+                37,
+                11,
+                11,
+                13,
+                12,
+                51,
+                52,
+                31,
+                53,
+                32,
+                33,
+                3,
+                4,
+                5,
+                34,
+                35,
+                11,
+                50,
+                3,
+                36,
+                37,
+                23,
+                24,
+                25,
+                26,
+                27,
+                28,
+                29,
+                30,
+                4,
+                5,
+                11,
+                11,
+                45,
+                11,
+                17,
+                46,
+                18,
+                19,
+                4,
+                6,
+                3,
+                38,
+                3,
+                14,
+                39,
+                40,
+                41,
+                42,
+                15,
+                16,
+                6,
+                7,
+                43,
+                38,
+                10,
+                9,
+                11,
+                44,
+                47,
+                3,
+                48,
+                20,
+                7,
+                5,
+                21,
+                22,
+                21,
+                22,
+                22,
+                11,
+                49,
+                40,
+                44,
+                12
+              ],
+              "dataHex": "d19853937cfed8e907400d030000000000805f0000000000006400000000000500000030bc090005a10100000000521a00056902030003b310270304680110270405",
+              "semantic": "UNDECODED",
+              "flow": null
+            },
+            {
+              "index": 7,
+              "program": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+              "accountIndices": [
+                1,
+                0,
+                0
+              ],
+              "dataHex": "09",
+              "semantic": "CLOSE_ACCOUNT",
+              "flow": {
+                "source": "HK9b1xCN5kQdjWofPyU3DKexoNcA7Nr1uDCKvdUBfihR",
+                "destination": "7Bt9Q3EciD8ZhoRA6CviqwpLpGhn4tscPrsKfUqGfFVe",
+                "authority": "7Bt9Q3EciD8ZhoRA6CviqwpLpGhn4tscPrsKfUqGfFVe",
+                "lamports": "UNPROVEN_AT_EXECUTION"
+              }
+            }
+          ],
+          "derivedAtas": [
+            {
+              "mint": "So11111111111111111111111111111111111111112",
+              "address": "HK9b1xCN5kQdjWofPyU3DKexoNcA7Nr1uDCKvdUBfihR"
+            },
+            {
+              "mint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+              "address": "FjPUygpFHEUVpSDUM7ByKRByYTsJoN8E7vTjQCuZKQ9G"
+            }
+          ],
+          "unknownWritableAccounts": [
+            "6LXutJvKUw8Q5ue2gCgKHQdAN4suWW8awzFVC6XCguFx",
+            "BuqEDKUwyAotZuK37V4JYEykZVKY8qo1zKbpfU9gkJMo",
+            "G4CD7aqqZZ6QKCNHrc1MPdS9Aw8BWmQ5ZkDd54W6mAEG",
+            "52ASTPfF9PZ8sH4Vqd7k5Vug88RLByLnKEjWo5Xgtc5D",
+            "EH7fRKLe74pmZwREnZGubaaTJLPP3j5Gt8DTeBDqg1Uo",
+            "29rqYq5idSQWyJQTFFtFAWJChgsAhwLyv5L9atuiiw1M",
+            "5LJbxPCEbufGGrsVJDDvFXcWdH3aZKGD3eQFedbd93Vy",
+            "2qgzbY616z1kJw1P3uxwgJyQEy7KphSve71EEGrdyvRB",
+            "7XawhbbxtsRcQA8KTkHT9f9nc6d69UwqCDh6U5EEbEmX",
+            "876Z9waBygfzUrwwKFfnRcc7cfY4EQf6Kz1w7GRgbVYW",
+            "CB86HtaqpXbNWbq67L18y5x2RhqoJ6smb7xHUcyWdQAQ",
+            "9gXvza14Bp6kBDdd5rWowt7NssYy36eSNvV7MzpWzLF3",
+            "CsRTqU5ayapHqDn11Fkw5ZWY3kuisDf1zN1UrLEB9F7Z",
+            "F2KCaXcp7AoQtxTDvNEDCyMyWjSCAMWNzcyN9dsPfPs5",
+            "CJ1fhvsz9FwFM54JyXpNvAj6dvxtiRQjMhYmG1aQVVX8",
+            "EPUHjseXG3izk3MVUJ1PcyWT9xeBhtAnq8gUpq3j8Uni",
+            "8Wk2L1yDovBJifCN1o86X7g7pDcqLau39m6tEsJ9Sheh",
+            "3vCToKSjuzX3dZ48hert2LsCTRyfDS6Cf7fXULfxsoPy",
+            "BaojxUEuwerwQHQRBtTpuuMUreboaxymjyySPsdoJkYc",
+            "5163SrbBvsKPQz86yfSGXLnPqu83X6bAQD1Gy7AA4n3",
+            "9zeBhQkMGmvko7CyPcYg3TUmfneES329dTYtMGs3wx6j",
+            "HfJ9RgUGSrcsx1ctERFUUkHaMeeNr4a6vB7QQDFBKFwJ",
+            "DbuvwPuLvH8uy2B1sKuu18aCd2QpCvfZdfDtdRZztBd2",
+            "HZ5JFB1ZoZs6NQLr7bb4MMEXDgty4Vs1ZghoyX35mNnV",
+            "AHFAv95Z67xnPYuHTf5a9uMEHdXFvbQvwc4EazY3tpt7",
+            "GswwnegnBMWEuEsptDCBDmRB9YtG5zjetTSw7RunUQMY",
+            "DuFXxPxAyJhHj4gMpE8As1Ta4nSSVXv8xfEDRrWQmJ9G"
+          ],
+          "instructionGraphHash": "5db3d65fe693c453c7bc489f75414dc515ec894041a25b54574def4e5cdfdddb",
+          "provenRouteInput": null,
+          "provenRouteMinimumOutput": null,
+          "provenCpiPrograms": null
+        }
+      ]
+    },
+    {
+      "sample": 2,
+      "claimedRoute": [
+        {
+          "percent": 57.46,
+          "bps": 5746,
+          "swapInfo": {
+            "ammKey": "2SixkjMjaLqXcEEJZfeth7qjH711R2uvp6TrUaHNMB65",
+            "label": "Quantum",
+            "inputMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+            "outputMint": "So11111111111111111111111111111111111111112",
+            "inAmount": "5746",
+            "outAmount": "47018"
+          }
+        },
+        {
+          "percent": 32.62,
+          "bps": 3262,
+          "swapInfo": {
+            "ammKey": "6YuRXMMF4W8zo216CP1A7iiE627GdDaitCRS2iXEdM2q",
+            "label": "Meteora DLMM",
+            "inputMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+            "outputMint": "So11111111111111111111111111111111111111112",
+            "inAmount": "3262",
+            "outAmount": "26712"
+          }
+        },
+        {
+          "percent": 9.92,
+          "bps": 992,
+          "swapInfo": {
+            "ammKey": "5GGvkcqQ1554ibdc18JXiPqR8aJz6WV3JSNShoj32ufT",
+            "label": "StepN",
+            "inputMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+            "outputMint": "So11111111111111111111111111111111111111112",
+            "inAmount": "992",
+            "outAmount": "8124"
+          }
+        }
+      ],
+      "claimedExpectedOutput": "81036",
+      "claimIsNotProof": true,
+      "observedUnderlyingExecutables": [
+        "LBUZKhRxPF3XUpBCjp4YzTKgLccjZhTSDM9YuVaPwxo",
+        "QuaNtZsgYRe5Z9Bk4LZ4cTD9tbkVoyCNf1R2BN9bBDv",
+        "Dooar9JkhdZ7J3LHN3A7YCuoGRUggXhQaG4kijfLGU2j"
+      ],
+      "historicalTokenAccounts": [
+        {
+          "address": "3FKpkMEmqMifpPErCxpnYY8gTH1BxeDLH3r5t8vLU6ZK",
+          "signer": false,
+          "writable": true,
+          "slot": 450935495,
+          "exists": true,
+          "programOwner": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+          "executable": false,
+          "authorized": false,
+          "category": "UNVERIFIED_POOL_TOKEN_ACCOUNT",
+          "tokenOwner": "ACdcvqnvh1Stb4zzBiJDfvURyVZFCJJ64psVGhgBsoDT",
+          "mint": "DajMqwbJXA7JbqgU97zycA1zReQhmTqf1YjNNQjo6gCQ"
+        },
+        {
+          "address": "Do86A4P6J2j4BFQHXcVd8cH5pbVZoeXhKncs5AtaNfuc",
+          "signer": false,
+          "writable": true,
+          "slot": 450935495,
+          "exists": true,
+          "programOwner": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+          "executable": false,
+          "authorized": false,
+          "category": "UNVERIFIED_POOL_TOKEN_ACCOUNT",
+          "tokenOwner": "6YuRXMMF4W8zo216CP1A7iiE627GdDaitCRS2iXEdM2q",
+          "mint": "So11111111111111111111111111111111111111112"
+        },
+        {
+          "address": "yQaQddrNTyHcwT2yQrnhXMe25qjcneATWeEtpE1mTTT",
+          "signer": false,
+          "writable": true,
+          "slot": 450935495,
+          "exists": true,
+          "programOwner": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+          "executable": false,
+          "authorized": false,
+          "category": "UNVERIFIED_POOL_TOKEN_ACCOUNT",
+          "tokenOwner": "6YuRXMMF4W8zo216CP1A7iiE627GdDaitCRS2iXEdM2q",
+          "mint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
+        },
+        {
+          "address": "Dtsi97xhNZ7aHCMiZEQbkKA57as93dMQ2kMJX4GKCvug",
+          "signer": false,
+          "writable": true,
+          "slot": 450935495,
+          "exists": true,
+          "programOwner": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+          "executable": false,
+          "authorized": false,
+          "category": "UNVERIFIED_POOL_TOKEN_ACCOUNT",
+          "tokenOwner": "2SixkjMjaLqXcEEJZfeth7qjH711R2uvp6TrUaHNMB65",
+          "mint": "So11111111111111111111111111111111111111112"
+        },
+        {
+          "address": "9ZmnXr7WdFvx1Uv8HJ1sSv3J4Mxo6HrgvYx6fHQErXZr",
+          "signer": false,
+          "writable": true,
+          "slot": 450935495,
+          "exists": true,
+          "programOwner": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+          "executable": false,
+          "authorized": false,
+          "category": "UNVERIFIED_POOL_TOKEN_ACCOUNT",
+          "tokenOwner": "2SixkjMjaLqXcEEJZfeth7qjH711R2uvp6TrUaHNMB65",
+          "mint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
+        },
+        {
+          "address": "ARryk4nSoS6bu7nyv6BgQah8oU23svFm7Rek7kR4fy3X",
+          "signer": false,
+          "writable": true,
+          "slot": 450935495,
+          "exists": true,
+          "programOwner": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+          "executable": false,
+          "authorized": false,
+          "category": "UNVERIFIED_POOL_TOKEN_ACCOUNT",
+          "tokenOwner": "5w1nmqvpus3UfpP67EpYuHhE63aSFdF5AT8VHZTkvnp5",
+          "mint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
+        },
+        {
+          "address": "GVfKYBNMdaER21wwuqa4CSQV8ajVpuPbNZVV3wcuKWhE",
+          "signer": false,
+          "writable": true,
+          "slot": 450935495,
+          "exists": true,
+          "programOwner": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+          "executable": false,
+          "authorized": false,
+          "category": "UNVERIFIED_POOL_TOKEN_ACCOUNT",
+          "tokenOwner": "5w1nmqvpus3UfpP67EpYuHhE63aSFdF5AT8VHZTkvnp5",
+          "mint": "So11111111111111111111111111111111111111112"
+        }
+      ],
+      "versions": [
+        {
+          "version": "legacy",
+          "unavailableReason": "SIZE_OR_RPC_LOOKUP_VALIDATION_FAILED",
+          "approved": false
+        },
+        {
+          "observationOnly": true,
+          "approved": false,
+          "executionAllowed": false,
+          "reason": "CPI_VALUE_FLOW_NOT_PROVEN",
+          "version": 0,
+          "messageHash": "b7e0f394a37309c655e1f2cc68f071ef9777215d8943e6b1b757104b77c4762b",
+          "feePayer": "7Bt9Q3EciD8ZhoRA6CviqwpLpGhn4tscPrsKfUqGfFVe",
+          "header": {
+            "numRequiredSignatures": 1,
+            "numReadonlySignedAccounts": 0,
+            "numReadonlyUnsignedAccounts": 6
+          },
+          "signatureCount": 1,
+          "allSignaturesZero": true,
+          "blockhash": "7PdF8x4u6RSvrCTU6VhhwNyJzpiY9YPFqZq5HYPDWJ5p",
+          "accounts": [
+            {
+              "address": "7Bt9Q3EciD8ZhoRA6CviqwpLpGhn4tscPrsKfUqGfFVe",
+              "signer": true,
+              "writable": true,
+              "index": 0,
+              "origin": "static",
+              "role": "INTENDED_AGENT"
+            },
+            {
+              "address": "HK9b1xCN5kQdjWofPyU3DKexoNcA7Nr1uDCKvdUBfihR",
+              "signer": false,
+              "writable": true,
+              "index": 1,
+              "origin": "static",
+              "role": "DERIVED_AGENT_ATA"
+            },
+            {
+              "address": "FjPUygpFHEUVpSDUM7ByKRByYTsJoN8E7vTjQCuZKQ9G",
+              "signer": false,
+              "writable": true,
+              "index": 2,
+              "origin": "static",
+              "role": "DERIVED_AGENT_ATA"
+            },
+            {
+              "address": "bjc85ZFWhVnB3CyHku2ejJzbXM3WPoZXoFDZ2bFxmZd",
+              "signer": false,
+              "writable": true,
+              "index": 3,
+              "origin": "static",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "9D7EtmWwnLPbnTVKXvgrfhoarhTRyT57umwmcCesJFKs",
+              "signer": false,
+              "writable": true,
+              "index": 4,
+              "origin": "static",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "3FKpkMEmqMifpPErCxpnYY8gTH1BxeDLH3r5t8vLU6ZK",
+              "signer": false,
+              "writable": true,
+              "index": 5,
+              "origin": "static",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "ComputeBudget111111111111111111111111111111",
+              "signer": false,
+              "writable": false,
+              "index": 6,
+              "origin": "static",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
+              "signer": false,
+              "writable": false,
+              "index": 7,
+              "origin": "static",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "11111111111111111111111111111111",
+              "signer": false,
+              "writable": false,
+              "index": 8,
+              "origin": "static",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+              "signer": false,
+              "writable": false,
+              "index": 9,
+              "origin": "static",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4",
+              "signer": false,
+              "writable": false,
+              "index": 10,
+              "origin": "static",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "D8cy77BBepLMngZx6ZukaTff5hCt1HrWyKk3Hnd9oitf",
+              "signer": false,
+              "writable": false,
+              "index": 11,
+              "origin": "static",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "6YuRXMMF4W8zo216CP1A7iiE627GdDaitCRS2iXEdM2q",
+              "signer": false,
+              "writable": true,
+              "index": 12,
+              "origin": "ALT",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "Do86A4P6J2j4BFQHXcVd8cH5pbVZoeXhKncs5AtaNfuc",
+              "signer": false,
+              "writable": true,
+              "index": 13,
+              "origin": "ALT",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "yQaQddrNTyHcwT2yQrnhXMe25qjcneATWeEtpE1mTTT",
+              "signer": false,
+              "writable": true,
+              "index": 14,
+              "origin": "ALT",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "GK4N2DyrYdjvScXqKrHNzQ1odSQX7XgKZnNWsF7DcTWA",
+              "signer": false,
+              "writable": true,
+              "index": 15,
+              "origin": "ALT",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "8PhFdgzTUAvrt4cgLc2d3WUXQBkooudb7cej4pKivX5A",
+              "signer": false,
+              "writable": true,
+              "index": 16,
+              "origin": "ALT",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "B7izTuCzTetkkMdfabLgDXhp8WjAp7zFeDJpSK5CXfv3",
+              "signer": false,
+              "writable": true,
+              "index": 17,
+              "origin": "ALT",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "2SixkjMjaLqXcEEJZfeth7qjH711R2uvp6TrUaHNMB65",
+              "signer": false,
+              "writable": true,
+              "index": 18,
+              "origin": "ALT",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "Dtsi97xhNZ7aHCMiZEQbkKA57as93dMQ2kMJX4GKCvug",
+              "signer": false,
+              "writable": true,
+              "index": 19,
+              "origin": "ALT",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "9ZmnXr7WdFvx1Uv8HJ1sSv3J4Mxo6HrgvYx6fHQErXZr",
+              "signer": false,
+              "writable": true,
+              "index": 20,
+              "origin": "ALT",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "ARryk4nSoS6bu7nyv6BgQah8oU23svFm7Rek7kR4fy3X",
+              "signer": false,
+              "writable": true,
+              "index": 21,
+              "origin": "ALT",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "GVfKYBNMdaER21wwuqa4CSQV8ajVpuPbNZVV3wcuKWhE",
+              "signer": false,
+              "writable": true,
+              "index": 22,
+              "origin": "ALT",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "DajMqwbJXA7JbqgU97zycA1zReQhmTqf1YjNNQjo6gCQ",
+              "signer": false,
+              "writable": true,
+              "index": 23,
+              "origin": "ALT",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "So11111111111111111111111111111111111111112",
+              "signer": false,
+              "writable": false,
+              "index": 24,
+              "origin": "ALT",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+              "signer": false,
+              "writable": false,
+              "index": 25,
+              "origin": "ALT",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "LBUZKhRxPF3XUpBCjp4YzTKgLccjZhTSDM9YuVaPwxo",
+              "signer": false,
+              "writable": false,
+              "index": 26,
+              "origin": "ALT",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "D1ZN9Wj1fRSUQfCjhvnu1hqDMT7hzjzBBpi12nVniYD6",
+              "signer": false,
+              "writable": false,
+              "index": 27,
+              "origin": "ALT",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "QuaNtZsgYRe5Z9Bk4LZ4cTD9tbkVoyCNf1R2BN9bBDv",
+              "signer": false,
+              "writable": false,
+              "index": 28,
+              "origin": "ALT",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "3JumrbigQRj9TqEuy5fKGPHsQ6zCTwqqfVGhFhyoEMqH",
+              "signer": false,
+              "writable": false,
+              "index": 29,
+              "origin": "ALT",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "SysvarC1ock11111111111111111111111111111111",
+              "signer": false,
+              "writable": false,
+              "index": 30,
+              "origin": "ALT",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "Sysvar1nstructions1111111111111111111111111",
+              "signer": false,
+              "writable": false,
+              "index": 31,
+              "origin": "ALT",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "Dooar9JkhdZ7J3LHN3A7YCuoGRUggXhQaG4kijfLGU2j",
+              "signer": false,
+              "writable": false,
+              "index": 32,
+              "origin": "ALT",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "5GGvkcqQ1554ibdc18JXiPqR8aJz6WV3JSNShoj32ufT",
+              "signer": false,
+              "writable": false,
+              "index": 33,
+              "origin": "ALT",
+              "role": "UNPROVEN"
+            },
+            {
+              "address": "5w1nmqvpus3UfpP67EpYuHhE63aSFdF5AT8VHZTkvnp5",
+              "signer": false,
+              "writable": false,
+              "index": 34,
+              "origin": "ALT",
+              "role": "UNPROVEN"
+            }
+          ],
+          "lookups": [
+            {
+              "address": "BXvefSCLa6TcCihiuNvR6MocuUuaysKP3tURuRrrP4bt",
+              "writableIndexes": [
+                124,
+                127,
+                128,
+                119,
+                123,
+                120
+              ],
+              "readonlyIndexes": [
+                5,
+                126,
+                81,
+                82
+              ],
+              "snapshotSlot": 450933699
+            },
+            {
+              "address": "93gcWHc7v6jTuP14GWLwxohs71dWWSSrNDNrBJeJrhiJ",
+              "writableIndexes": [
+                58,
+                52,
+                59
+              ],
+              "readonlyIndexes": [
+                61,
+                53,
+                54,
+                55
+              ],
+              "snapshotSlot": 450933699
+            },
+            {
+              "address": "2AHr7kHv6mfZVHtFeqra7DAhxogt8cGN2ufSRGMGMkr5",
+              "writableIndexes": [
+                204,
+                200,
+                201
+              ],
+              "readonlyIndexes": [
+                203,
+                205,
+                199
+              ],
+              "snapshotSlot": 450933699
+            }
+          ],
+          "instructions": [
+            {
+              "index": 0,
+              "program": "ComputeBudget111111111111111111111111111111",
+              "accountIndices": [],
+              "dataHex": "02c05c1500",
+              "semantic": "SET_COMPUTE_UNIT_LIMIT",
+              "flow": null,
+              "units": 1400000
+            },
+            {
+              "index": 1,
+              "program": "ComputeBudget111111111111111111111111111111",
+              "accountIndices": [],
+              "dataHex": "033f03000000000000",
+              "semantic": "SET_COMPUTE_UNIT_PRICE",
+              "flow": null,
+              "microLamports": "831"
+            },
+            {
+              "index": 2,
+              "program": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
+              "accountIndices": [
+                0,
+                1,
+                0,
+                24,
+                8,
+                9
+              ],
+              "dataHex": "01",
+              "semantic": "CREATE_IDEMPOTENT_ATA_UNVALIDATED",
+              "flow": null
+            },
+            {
+              "index": 3,
+              "program": "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4",
+              "accountIndices": [
+                0,
+                2,
+                1,
+                25,
+                24,
+                9,
+                9,
+                10,
+                11,
+                10,
+                28,
+                0,
+                1,
+                2,
+                18,
+                19,
+                20,
+                29,
+                9,
+                30,
+                31,
+                26,
+                12,
+                3,
+                13,
+                14,
+                2,
+                1,
+                24,
+                25,
+                15,
+                26,
+                0,
+                9,
+                9,
+                27,
+                26,
+                4,
+                16,
+                17,
+                10,
+                32,
+                9,
+                33,
+                34,
+                0,
+                2,
+                21,
+                22,
+                1,
+                23,
+                5
+              ],
+              "dataHex": "bb64facc31c4af141027000000000000be3f010000000000640000000000030000007d017216000326be0c000303e0030003",
+              "semantic": "UNDECODED",
+              "flow": null
+            },
+            {
+              "index": 4,
+              "program": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+              "accountIndices": [
+                1,
+                0,
+                0
+              ],
+              "dataHex": "09",
+              "semantic": "CLOSE_ACCOUNT",
+              "flow": {
+                "source": "HK9b1xCN5kQdjWofPyU3DKexoNcA7Nr1uDCKvdUBfihR",
+                "destination": "7Bt9Q3EciD8ZhoRA6CviqwpLpGhn4tscPrsKfUqGfFVe",
+                "authority": "7Bt9Q3EciD8ZhoRA6CviqwpLpGhn4tscPrsKfUqGfFVe",
+                "lamports": "UNPROVEN_AT_EXECUTION"
+              }
+            }
+          ],
+          "derivedAtas": [
+            {
+              "mint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+              "address": "FjPUygpFHEUVpSDUM7ByKRByYTsJoN8E7vTjQCuZKQ9G"
+            },
+            {
+              "mint": "So11111111111111111111111111111111111111112",
+              "address": "HK9b1xCN5kQdjWofPyU3DKexoNcA7Nr1uDCKvdUBfihR"
+            }
+          ],
+          "unknownWritableAccounts": [
+            "bjc85ZFWhVnB3CyHku2ejJzbXM3WPoZXoFDZ2bFxmZd",
+            "9D7EtmWwnLPbnTVKXvgrfhoarhTRyT57umwmcCesJFKs",
+            "3FKpkMEmqMifpPErCxpnYY8gTH1BxeDLH3r5t8vLU6ZK",
+            "6YuRXMMF4W8zo216CP1A7iiE627GdDaitCRS2iXEdM2q",
+            "Do86A4P6J2j4BFQHXcVd8cH5pbVZoeXhKncs5AtaNfuc",
+            "yQaQddrNTyHcwT2yQrnhXMe25qjcneATWeEtpE1mTTT",
+            "GK4N2DyrYdjvScXqKrHNzQ1odSQX7XgKZnNWsF7DcTWA",
+            "8PhFdgzTUAvrt4cgLc2d3WUXQBkooudb7cej4pKivX5A",
+            "B7izTuCzTetkkMdfabLgDXhp8WjAp7zFeDJpSK5CXfv3",
+            "2SixkjMjaLqXcEEJZfeth7qjH711R2uvp6TrUaHNMB65",
+            "Dtsi97xhNZ7aHCMiZEQbkKA57as93dMQ2kMJX4GKCvug",
+            "9ZmnXr7WdFvx1Uv8HJ1sSv3J4Mxo6HrgvYx6fHQErXZr",
+            "ARryk4nSoS6bu7nyv6BgQah8oU23svFm7Rek7kR4fy3X",
+            "GVfKYBNMdaER21wwuqa4CSQV8ajVpuPbNZVV3wcuKWhE",
+            "DajMqwbJXA7JbqgU97zycA1zReQhmTqf1YjNNQjo6gCQ"
+          ],
+          "instructionGraphHash": "501731172822dededef6f36c1d73ba50232beeb50c4d4b36f55eb343dd81ed0c",
+          "provenRouteInput": null,
+          "provenRouteMinimumOutput": null,
+          "provenCpiPrograms": null
+        }
+      ]
+    }
+  ],
+  "capital": {
+    "observationOnly": true,
+    "executionAllowed": false,
+    "routeProven": false,
+    "currentAgentBalanceLamports": "4995000",
+    "protectedReserveLamports": "2020000",
+    "safetyMarginIncludedLamports": "10000",
+    "missingAtaCount": 2,
+    "accountCreationCostLamports": "2976880",
+    "maxNetworkCostLamports": "10000",
+    "capitalBeforeInputLamports": "5006880",
+    "maximumPolicyInputLamports": "0",
+    "minimumSafeTestInputLamports": null,
+    "minimumRequiredAgentBalanceLamports": null,
+    "additionalSolRequiredLamports": null,
+    "reason": "NO_PROVEN_ROUTE_OR_MINIMUM_EXECUTABLE_INPUT",
+    "hypothetical": {
+      "inputLamports": "100000",
+      "conditionalRequiredBalanceLamports": "5106880",
+      "conditionalAdditionalLamports": "111880",
+      "isSafeInputClaim": false
+    }
+  }
+}

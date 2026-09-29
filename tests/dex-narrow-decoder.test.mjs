@@ -1,0 +1,24 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import {inflateSync} from 'node:zlib';
+import {createHash} from 'node:crypto';
+import {PublicKey} from '@solana/web3.js';
+import {observeSingleDeriverseRoute,NARROW_IDL_SHA256} from '../server/dex/jupiter-narrow-decoder.js';
+const s=JSON.parse(readFileSync(new URL('./fixtures/jupiter-production-corpus.json',import.meta.url)))[0];
+const observe=ix=>observeSingleDeriverseRoute(ix,s.intent,{quotedOutAmount:s.build.outAmount});
+test('real single Deriverse bytes fully decode but never authorize CPI',()=>{const r=observe(s.build.swapInstruction);assert.equal(r.inAmount,'100000');assert.equal(r.quotedOutAmount,'12224');assert.equal(r.route.instrumentId,0);assert.equal(r.consumedBytes,44);assert.equal(r.supported,false);assert.equal(r.executable,false);});
+for(const [name,offset] of [['amount',8],['quoted output',16],['slippage',24],['platform fee',26],['positive slippage',28],['route count',30],['variant',34],['allocation',40],['index',43]])test('reject changed '+name,()=>{const ix=structuredClone(s.build.swapInstruction),b=Buffer.from(ix.data,'base64');b[offset]^=1;ix.data=b.toString('base64');assert.throws(()=>observe(ix));});
+test('reject trailing bytes',()=>{const ix=structuredClone(s.build.swapInstruction);ix.data=Buffer.concat([Buffer.from(ix.data,'base64'),Buffer.of(0)]).toString('base64');assert.throws(()=>observe(ix));});
+for(const i of [0,1,2,3,4,5,6,7,8,9])test('reject changed top-level role '+i,()=>{const ix=structuredClone(s.build.swapInstruction);ix.accounts[i].pubkey='11111111111111111111111111111111';assert.throws(()=>observe(ix));});
+test('reject unpinned schema and different router',()=>{assert.throws(()=>observeSingleDeriverseRoute(s.build.swapInstruction,s.intent,{idlHash:'0'.repeat(64)}));assert.equal(NARROW_IDL_SHA256.length,64);assert.throws(()=>observe({...s.build.swapInstruction,programId:'11111111111111111111111111111111'}));});
+test('unproven downstream mutation still cannot authorize',()=>{const ix=structuredClone(s.build.swapInstruction);ix.accounts[14].pubkey='11111111111111111111111111111111';assert.equal(observe(ix).supported,false);});
+test('on-chain IDL snapshot derives correctly and reproduces the pinned schema bytes',async()=>{
+ const proof=JSON.parse(readFileSync(new URL('./fixtures/jupiter-v2-idl-rpc-proof.json',import.meta.url))),published=JSON.parse(readFileSync(new URL('./fixtures/jupiter-v2-idl-observation.json',import.meta.url))),program=new PublicKey(s.build.swapInstruction.programId);
+ const derived=await PublicKey.createWithSeed(PublicKey.findProgramAddressSync([],program)[0],'anchor:idl',program);
+ assert.equal(proof.address,derived.toBase58());assert.equal(proof.owner,program.toBase58());assert.equal(proof.executable,false);
+ const bytes=Buffer.from(proof.accountDataBase64,'base64');assert.equal(bytes.subarray(0,8).toString('hex'),'184662bf3a907b9e');assert.equal(new PublicKey(bytes.subarray(8,40)).toBase58(),proof.authority);
+ const len=bytes.readUInt32LE(40),inflated=inflateSync(bytes.subarray(44,44+len));assert.equal(createHash('sha256').update(inflated).digest('hex'),NARROW_IDL_SHA256);assert.deepEqual(JSON.parse(inflated),published.idl);
+ const route=published.idl.instructions.find(i=>i.name==='route_v2');assert.equal(Buffer.from(route.discriminator).toString('hex'),'bb64facc31c4af14');assert.deepEqual(route.args.slice(0,5).map(a=>a.type),['u64','u64','u16','u16','u16']);assert.equal(published.idl.types.find(t=>t.name==='Swap').type.variants[161].name,'Deriverse');
+});
+test('reject noncanonical base64 rather than silently dropping garbage',()=>{assert.throws(()=>observe({...s.build.swapInstruction,data:s.build.swapInstruction.data+'!'}),/NONCANONICAL/);});

@@ -276,7 +276,7 @@ export function AgentPage(app, id) {
         ${c.website ? `<dt>Website</dt><dd><a class="ext" href="${esc(link(c.website))}" target="_blank" rel="noopener">${esc(c.website.replace(/^https?:\/\//, ''))}</a></dd>` : ''}
       </dl>
       ${c.mint ? `<a class="btn btn-sm" href="https://pump.fun/coin/${esc(c.mint)}" target="_blank" rel="noopener">View on pump.fun ↗</a>` : ''}
-      <p class="note">The agent wallet is this coin's creator on pump.fun. Agents never trade TEKKWORK coins.</p>
+      <p class="note">The agent wallet is this coin's creator on pump.fun. Agents never trade TEKKTEAM coins.</p>
     </section>`;
   };
 
