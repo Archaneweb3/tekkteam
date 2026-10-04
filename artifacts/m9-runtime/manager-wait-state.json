@@ -1,0 +1,30 @@
+{
+  "checkedAt": "2026-10-04T16:16:26.782811+00:00",
+  "evidence": "Read-only Hostinger terminal SQLite/journal/PM2/HTTPS health",
+  "database": "/var/lib/tekkteam-staging/wallet-test.sqlite",
+  "quickCheck": "ok",
+  "status": "READY_FOR_REVIEW",
+  "executionId": "8e47534a-5948-4777-97fc-76b3c3acb23e",
+  "expired": true,
+  "approvalOpened": false,
+  "ownerSigned": false,
+  "broadcastAttempted": false,
+  "receiptCount": 0,
+  "httpsHealth": 200,
+  "pm2": [
+    {"name": "tekkteam-api", "pid": 10722, "status": "online", "restarts": 0},
+    {"name": "tekkteam-launch", "pid": 10893, "status": "online", "restarts": 0},
+    {"name": "tekkteam-staging-api", "pid": 43919, "status": "online", "restarts": 15}
+  ],
+  "terminal": {"id": "986477523", "healthy": true, "cwd": "/var/www/tekkteam-staging", "recoveredVia": "Existing authenticated hPanel session"},
+  "sourceHead": "5fd3c6519e3358eb1c1fb08e895a582bc8d64da6",
+  "independentEligibilityReview": "No concrete necessary independent source action ready",
+  "goalTurnClassification": "IMPASSE_AUDIT",
+  "previousTurn": "PROGRESS source implementation reviewed and pushed",
+  "consecutiveImpasseTurns": 1,
+  "humanGate": "Pending readiness then fresh review/manual approval; no approval inferred",
+  "requiredOutcomes": ["M4 fresh review and manual transaction approval", "M5 authoritative receipt binding", "M6/M7 qualified venue, binding, provisioned balances/reserve and separate financial gates", "M9 operator-qualified consistent restricted snapshot/restore", "M10 qualified release evidence"],
+  "runtimeChanges": false,
+  "productionChanges": false,
+  "realRpcPerformed": false
+}

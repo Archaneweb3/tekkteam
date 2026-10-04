@@ -1,5 +1,19 @@
 # CURRENT — M4 Phase 1 verified; WAITING_FOR_HUMAN financial gate
 
+4October2026 23:17WIB readiness checkpoint. Missing/expired browser terminal
+recovered through the already-authenticated hPanel; live terminal523 at staging root.
+Read-only23:16:26WIB proof: staging HTTPS200/SQLitequick_checkOK; same expired
+M4 execution, approvalfalse/ownerSignedfalse/broadcastfalse/receipt0. Production
+PM210722/0 and10893/0 and staging43919/15 unchanged; no process/config/data writes.
+Independent bounded eligibility review found no necessary ready source fix remaining.
+M4 needs human readiness then fresh review/manual approval; M5 requires real receipt;
+M6/M7 require authoritative binding/accounts/reserve/protocol qualification and their
+financial gates; M9 consistent restricted snapshot/restore needs operator/security
+qualification; M10 needs those actual outcomes. No fabricated downstream progress.
+Current dependent branch WAITING_FOR_HUMAN; no active engineering task. This is the
+first consecutive impasse audit after transport source progress, not goal completion.
+Evidence artifacts/m9-runtime/manager-wait-state.json and manager-wait-terminal.png.
+
 4October2026 23:12WIB safe transport checkpoint (started23:04; target23:24).
 Existing HTTPS factory now has explicit default-off finalityOnly mode: genesis,
 exactly one canonical signature status, finalized base64 V0 transaction only.
