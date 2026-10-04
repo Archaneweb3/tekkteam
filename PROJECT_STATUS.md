@@ -1,5 +1,30 @@
 # CURRENT — M4 Phase 1 verified; WAITING_FOR_HUMAN financial gate
 
+4October2026 22:37WIB checkpoint (safe batch started22:22; target22:52, finished early).
+Independent M6 engineering PARTIAL/REVIEWED: pure unmounted curve effect verifier
+now binds signed landed bytes/signature to the canonical prepared policy, exact ABI
+roles, full transaction-atomic native/token balances, Pump event CPI/logs, ceil fees,
+input/output/reserve bounds. Existing adapter persists policy in immutable plan;
+complete planDigest/fingerprint enforced. No current quote/config used for expired
+finalized recovery. Successful LOCAL_FIXTURE BUY/SELL and durable restart/UNKNOWN
+hold rejection proven; fee-only failures accounted. 128focused new/runtime/risk/routes
+testsPASS; two independent reviewsPASS, syntaxPASS. No client/UI source changed;
+canonical build25.27s from preceding verified checkpoint remains the current build.
+Not a real trade or complete venue qualification: trusted finalized reader/raw mutable
+state, nonzero buyback semantics, PumpSwap/provisioning/rent and actual Agent-wallet
+binding still required. Unsupported evidence rejects; no signing/send ports added.
+Source checkpoint c936364 already pushed for build/schema/template/141-byte decoder.
+Accounting source and this checkpoint committed together; no staging deployment.
+Actual staging22:32WIB: HTTPShealth200, DBquick_checkOK, expired READY_FOR_REVIEW,
+approvalopenedfalse, ownerSignedfalse, broadcastfalse, receipts0. PM2staging43919/15,
+production10722/0 and10893/0 unchanged. Browser22:35WIB reused connected/authenticated
+owner without Connect/SignIn; saved aaaaada/ret3ED reopened with expired review and
+disabled Approve. Screenshot artifacts/m9-runtime/expired-m4-handoff.png.
+M4 dependent branch WAITING_FOR_HUMAN; pending financial readiness question unchanged.
+M5 real binding awaits confirmed M4; M6 real execution requires separate gate; M7
+requires M6PASS. M9 full consistent restore remains UNVERIFIED; M10 release cannot
+claim launch/trading without authoritative receipts. No owner transaction/spend occurred.
+
 4October2026 22:22WIB safe checkpoint (started22:09; target22:25). Two independent
 engineering gaps closed without runtime activation: canonical isolated staging build
 now emits the shared token-draft schema imported by raw public modules, and the

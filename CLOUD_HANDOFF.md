@@ -1,5 +1,22 @@
 # TEKKTEAM manager handoff
 
+22:37WIB latest: new pure curve finalized-accounting verifier + persisted canonical
+effectPolicy via existing adapter, default off;128focused tests/syntax/two independent
+reviewsPASS. Signed message serialization, planDigest/fingerprint, atomic balances,
+event/CPI/log provenance, fee arithmetic/budget/reserve all checked. Restart of expired
+LOCAL_FIXTURE finality verified; UNKNOWN holds stay locked on bad evidence. No actual
+trade or full venue qualification claimed. No deploy/restart/client changes this batch.
+M6 remaining trusted finalized reader/raw mutable state, nonzero buyback split,
+PumpSwap/provisioning/rent, authoritative receipt/Agent-wallet and financial gate.
+22:32actualstaginghealth200/DBOK/M4expired/ownerSignedfalse/broadcastfalse/receipt0;
+staging43919/15, prod10722/0 and10893/0 unchanged. Fresh owner browser session22:35
+connected/authenticated, saved target and expired approval disabled; financial pending.
+Healthy Hostinger terminal was reestablished without VPS restart, left at staging root.
+Browser handoff target https://staging.tekkteam.tech/#/launch (new Edge tab420);
+panel shows expired review/Prepare fresh review, no approval clicked. Do not rely on
+old restored tab388 (CDP timeout); keep selected Edge3, obtain fresh tab if needed.
+Source c936364 pushed; accounting source and checkpoint committed/pushed together; verify Git HEAD/origin.
+
 22:22WIB latest safe checkpoint: canonical staging build emits src/token-draft-schema.js
 (byte-identical); graph56/missing0, build25.27s/independent reviewPASS. Nginx template
 updated with existing revision alias, public content-hash routes and5m body cap; active

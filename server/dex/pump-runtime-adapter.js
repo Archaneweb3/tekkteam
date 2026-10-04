@@ -3,6 +3,7 @@ import {inspectOfflinePumpWalletAccounts} from './pump-wallet-accounts.js';
 import {buildOfflinePumpEnvelope,validateOfflinePumpEnvelope} from './pump-offline-envelope.js';
 import {reject} from './intent.js';
 import {decodedPumpState} from './pump-account-decoder.js';
+import {createPumpCurveEffectPolicy} from './pump-finalized-effects.js';
 
 // All chain I/O/effect qualification must be supplied explicitly. No send ports.
 export function createPumpRuntimeAdapter({readSnapshot,simulateUnsigned,readFinalized,verifyFinalizedEffects,qualification=()=>false,now=Date.now}={}){
@@ -20,6 +21,7 @@ export function createPumpRuntimeAdapter({readSnapshot,simulateUnsigned,readFina
    const simulation=structuredClone(await simulateUnsigned({unsignedTransaction:envelope.unsignedTransaction,messageHash:envelope.messageHash,sigVerify:false,replaceRecentBlockhash:false}));await assertCurrent();
    if(simulation?.source!==snapshot.venue.source||simulation.messageHash!==envelope.messageHash||simulation.success!==true||simulation.err!==null)reject('PUMP_RUNTIME_SIMULATION_FAILED');
    const plan={source:snapshot.venue.source,observedAt:decodedPumpState(snapshot.venue).context.observedAt,venueKind:snapshot.venue.kind,quote,unsignedTransaction:envelope.unsignedTransaction,messageHash:envelope.messageHash,simulation:{source:simulation.source,messageHash:simulation.messageHash,success:true,notReceipt:true},balances:{native:wallet.solBalance,token:wallet.baseBalance,wsol:wallet.wsolBalance??'0'},feeCapLamports:snapshot.feeCapLamports??'10000',rentCapLamports:snapshot.rentCapLamports??'0',refundCapLamports:snapshot.refundCapLamports??'0',snapshotSlot:snapshot.venue.slot,proofHash:snapshot.venue.proofHash};
+   if(snapshot.venue.kind==='PUMP_BONDING_CURVE')plan.effectPolicy=await createPumpCurveEffectPolicy(options);
    prepared.set(plan.messageHash,options);if(prepared.size>128)prepared.delete(prepared.keys().next().value);return plan;
   },
   async verifyPrepared(r){const options=prepared.get(r.plan.messageHash);if(!options)reject('PUMP_RUNTIME_PREPARE_OPTIONS_MISSING');const proof=await validateOfflinePumpEnvelope(r.plan.unsignedTransaction,{...options,now:now()});return proof.messageHash===r.plan.messageHash&&proof.abiMatched===true;},

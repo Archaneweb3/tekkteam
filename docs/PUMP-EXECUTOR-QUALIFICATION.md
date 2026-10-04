@@ -1,5 +1,26 @@
 # Pump Executor Qualification Contract
 
+CURRENT 2026-10-04: `pump-finalized-effects.js` supplies a pure, unmounted accounting
+verifier for the zero-buyback bonding-curve subset. The canonical adapter persists a
+DERIVED effect policy in the existing immutable plan: pinned SDK/IDL, ordered ABI
+accounts/roles, selected recipients, creator/mint/wallet, exact unsigned bytes and
+digests. Reconciliation checks the complete plan digest and intent fingerprint,
+cryptographic signature, canonical serialized landed bytes, atomic native/token
+metadata, Pump self-CPI event, balanced invocation logs, transfer CPIs, ceil fees,
+budget/minimum output and reserve. Historical finality never rebuilds an expired
+quote. Failed finalized transactions require fee-only effects; rejected/unknown
+evidence retains its hold. No reader, signer, sender, route or default qualification
+is supplied. LOCAL_FIXTURE stays LOCAL_FIXTURE through durable restart/settlement.
+
+Qualification still requires a trusted finalized Mainnet reader, authoritative M4
+receipt and Agent-wallet/account binding, and full mutable program/account-state
+qualification. `getTransaction.meta` cannot prove raw curve/volume-account state.
+Nonzero buyback split semantics, sharing/cashback/rewards, PumpSwap, account creation,
+rent/refunds and legacy truncated events deliberately reject. BUY volume/creator
+auxiliary accounts must already exist too. Do not assume normal coins have zero
+buyback; do not add fee+buyback without proven attribution. This source increment
+does not establish a real trade, executor activation or M6 PASS.
+
 CURRENT 2026-10-02 reconciliation: the later scoped assignment already implemented
 default-off Pump runtime registration, local DI curve/PumpSwap adapter preparation,
 asset-aware reservations, atomic receipt/expense/position settlement, durable UNKNOWN
@@ -10,8 +31,8 @@ and unmounted-adapter descriptions describe the decision093 snapshot, not curren
 The existing controlled CPMM exact-debit paths remain unchanged. Default Pump routes
 have no signing/broadcast ports; no production adapter or worker is installed.
 readSnapshot, simulateUnsigned, readFinalized and verifyFinalizedEffects are explicit
-dependencies in pump-runtime-adapter.js. Actual finalized reader/effect decoder and
-pool/program qualification remain absent/unqualified. Local DI accounting is
+dependencies in pump-runtime-adapter.js. Actual finalized reader and complete
+pool/program/state effect qualification remain absent/unqualified. Local DI accounting is
 DERIVED/LOCAL_FIXTURE and creates no qualified production position or receipt.
 Historical program/global account reads do not qualify an associated mint or pool.
 

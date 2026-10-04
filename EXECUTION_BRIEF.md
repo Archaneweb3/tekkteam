@@ -1,5 +1,17 @@
 # M4 — WAITING_FOR_HUMAN; Phase 1 reviewed, financial execution pending
 
+22:37WIB safe batch complete ahead of22:52 target: pure curve finalized-effects
+accounting subset and canonical immutable policy integrated through existing local
+adapter;128focused regressions/syntax/two independent reviewsPASS. No runtime mounting,
+UI change, signing/broadcast, staging deploy or restart. Nonzero buyback, raw mutable
+state, trusted reader, PumpSwap/provisioning and actual wallet/receipt qualification
+remain explicit M6 blockers; never use fixture settlement as a Real trade.
+Actual staging22:32health200/produnchanged/receipt0; owner session reused22:35 and
+expired M4 review approval disabled. Financial readiness question remains pending.
+Next dependent action: only after human readiness regenerate fresh M4 context/bytes/
+simulation/debit/digest, present exact one-launch gate and manual Phantom approval.
+No new preparation retry merely to refresh a stale display while user is absent.
+
 Safe independent batch22:09–22:25WIB checkpoint22:22: canonical build/schema and Nginx
 template corrected, build25.27s and56-module graphPASS/reviewPASS. Observed141-byte
 Pump curve layout accepted with zero reserved tail only; actual unsigned simulation
