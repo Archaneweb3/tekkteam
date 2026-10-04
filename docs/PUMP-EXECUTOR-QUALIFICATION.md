@@ -1,5 +1,18 @@
 # Pump Executor Qualification Contract
 
+CURRENT 2026-10-04: the existing runtime adapter explicitly separates execution
+source from read provenance. Default LOCAL_FIXTURE cannot consume a backend snapshot;
+explicit ON_CHAIN cannot consume a fixture descriptor. Genuine decoded venue/context
+and simulation must match BACKEND_RPC_READ, while only plan.source maps to ON_CHAIN.
+Quote, simulation and effect policy remain DERIVED, not receipts/authorization.
+Existing qualification predicate must synchronously return exactly true before each
+active callback and after its await, including final executor authority recheck before
+ledger persistence. Mutable dependency data detaches in the first await continuation.
+Passive existing-signature reconciliation does not depend on current qualification.
+No app/routes/worker mounting or default qualification activation follows. Synthetic
+DI tests establish this interface only; actual trusted transport/venue/account/receipt
+qualification remains mandatory before any real runtime can be installed.
+
 CURRENT 2026-10-04: `pump-finalized-reader.js` now provides an unmounted read-only
 DI reader for an existing UNKNOWN bonding-curve ledger signature. Only genesis,
 signature status and finalized base64 transaction calls are permitted by its code;

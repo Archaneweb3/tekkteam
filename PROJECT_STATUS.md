@@ -1,5 +1,32 @@
 # CURRENT — M4 Phase 1 verified; WAITING_FOR_HUMAN financial gate
 
+4October2026 22:59WIB safe source-contract checkpoint (started22:52; target23:12).
+Concrete M6 integration mismatch closed in existing adapter/executor: explicit source
+defaults LOCAL_FIXTURE, qualified ON_CHAIN plans require genuine decoded read source
+BACKEND_RPC_READ; only plan.source maps, quote/simulation/effectPolicy retain read
+provenance and DERIVED/notReceipt/authorizationfalse flags. Qualification exacttrue
+is checked before dependency callbacks and after awaits, plus immediately before
+ledger persistence after final owner-authority await. Fixture/backend substitutions
+and cloned descriptors reject. Passive old-signature finality stays available after
+qualification revocation; default app/routes still LOCAL_FIXTURE-only and disarmed.
+Independent review found two microtask timing defects during implementation; both
+reproduced and fixed: dependency mutation before clone, and revoked qualification
+before the next callback. Snapshot/Buffer and simulation detach in first continuation;
+thunk guards run before invoking dependencies. Queued failed simulation stays failed,
+next simulator never starts after revocation; no record/hold/receipt/position persisted.
+205focused regressionsPASS; independent71 and145selectionsPASS, source reviewPASS,
+syntax/diff checksPASS. Synthetic DI positive cases prove namespace handling only;
+no synthetic ON_CHAIN receipt/position, real RPC, venue qualification or activation.
+No client/build/runtime/config/deployment/restart/financial changes; prior canonical
+client build25.27s remains unchanged. Last live22:47:50staging proof unchanged in
+reader-state.json: HTTPS200/DBOK/expired review/ownerSignedfalse/broadcastfalse/
+receipt0/production PIDs untouched. Source and docs committed/pushed together.
+M4 remains WAITING_FOR_HUMAN. M5 waits real receipt. M6 still needs bounded trusted
+transport integration, complete raw-state/buyback/PumpSwap/provisioning qualification,
+actual receipt/Agent-wallet/accounts/reserve and separate real roundtrip gate.
+M9 restricted full backup/restore and M10 real qualification/release remain incomplete.
+Evidence artifacts/m9-runtime/source-regressions.tap and source-checkpoint.json.
+
 4October2026 22:51WIB safe checkpoint (started22:39; target23:09). M6 independent
 reader engineering DONE locally: unmounted existing-signature finality DI supplies
 only genesis/status/finalized base64 reads; strict tracked UNKNOWN/plan/intent/source/

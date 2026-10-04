@@ -1,5 +1,23 @@
 # TEKKTEAM manager handoff
 
+22:59WIB latest: concrete BACKEND_RPC_READ versus ON_CHAIN adapter/ledger mismatch
+closed through explicit default-off source contract, preserving quote/simulation/
+effectPolicy read provenance. Qualification exacttrue before callbacks/after awaits;
+final executor persistence guard covers last owner-context await. Reviewer-found
+microtask mutation and pre-call revocation defects repaired, exact negative tests.
+205regressionsPASS; independent71/145selectionsPASS + final source reviewsPASS.
+No real RPC/ON_CHAIN receipt/position or venue activation. Default HTTP/app DI stays
+LOCAL_FIXTURE-only; passive old-signature recovery still works after revocation.
+No client/runtime/config/deploy/restart/financial changes. Source/docs committed and
+pushed together; verify HEAD/origin. Prior client build25.27s remains current.
+Current active M4 remains WAITING_FOR_HUMAN; do not reuse expired review or repeat
+preparation without human readiness. Last actual live22:47:50staging DBOK/HTTPS200/
+approvalfalse/ownerSignedfalse/broadcastfalse/receipt0/produnchanged (reader-state.json).
+M6 source enum gap now DONE; actual trusted bounded transport, raw mutable venue
+state/nonzero buyback math/PumpSwap/provisioning, receipt/Agent-wallet and financial
+qualification remain required. Full consistent restricted restore remains operator
+qualification, not an auth/code defect. M10 cannot claim release from these fixtures.
+
 22:51WIB latest: exact existing UNKNOWN-signature reader added as unmounted DI source;
 only read-only genesis/status/finalized base64 transaction. 176focused regressionsPASS,
 reader48 independentlyPASS/source reviewPASS; accessor/proxy provider error leak

@@ -1,5 +1,23 @@
 # M4 — WAITING_FOR_HUMAN; Phase 1 reviewed, financial execution pending
 
+22:59WIB source-contract batch complete before23:12 target: existing adapter now
+explicitly maps execution source only after qualified decoded backend-read provenance;
+default fixture and passive reconciliation unchanged. Two reviewer microtask defects
+reproduced/fixed with first-continuation detachment and pre/post thunk guards. Final
+executor qualification revocation prevents any durable record/hold/receipt/position.
+205focused regressions/two independent reviews/syntax/diffPASS. No real RPC, app
+mounting, qualified venue, client/runtime/deploy/restart or financial action.
+M4 active dependent branch still pending human readiness for fresh review + manual
+one-launch Phantom approval. Never refresh preparation automatically while awaiting
+that reply. Real M5/M6/M7/M10 remain dependent on actual receipts and their gates;
+trusted transport/raw-state/nonzero-buyback/provisioning qualification remains open.
+
+Safe independent source-contract batch4October2026 22:52WIB, checkpoint23:12WIB:
+correct adapter read-versus-execution provenance through explicit default-off source
+option and exact qualification rechecks, including final executor persistence guard.
+Preserve passive old-signature reconciliation after qualification revocation. No app/
+route mounting, real RPC, qualification activation, receipt or financial action.
+
 22:51WIB safe reader batch complete before23:09 target: unmounted read-only exact
 existing-signature reader, integrated through existing fixture adapter/restart test,
 176regressionsPASS; independent reviewPASS (48reader tests independently). Sanitized

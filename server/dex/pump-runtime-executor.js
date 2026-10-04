@@ -18,6 +18,7 @@ function transaction(encoded,record,{signed=false}={}){
 
 // No signer, broadcaster, automatic worker or network fallback exists here.
 export function createPumpRuntimeExecutor({ledger,adapter,readContext,source='LOCAL_FIXTURE',riskPolicy,now=Date.now}={}){
+ const qualified=()=>{if(source!=='LOCAL_FIXTURE'&&adapter?.qualification?.()!==true)reject('PUMP_RUNTIME_VENUE_NOT_QUALIFIED');};
  const guard=async(actor,intent,{passive=false}={})=>{
   const c=await readContext(actor,intent.agentId);
   if(c?.authenticated!==true||c.owner!==intent.owner||c.agentId!==intent.agentId||c.agentWallet!==intent.agentWallet||c.network!=='solana:101'||c.genesis!==GENESIS||c.associatedMint!==(intent.side==='BUY'?intent.outputMint:intent.inputMint)||c.authorityVerified!==true||!Number.isSafeInteger(c.revision)||c.revision<0)reject('PUMP_RUNTIME_AUTHORITY');
@@ -35,13 +36,14 @@ export function createPumpRuntimeExecutor({ledger,adapter,readContext,source='LO
    if(intent.network!=='solana:101'||intent.genesis!==GENESIS||!['BUY','SELL'].includes(intent.side)||(intent.side==='BUY'?intent.inputMint:intent.outputMint)!==SOL_MINT||!Number.isSafeInteger(intent.expiresAt)||intent.expiresAt<=now()||intent.expiresAt>now()+30000||!Number.isSafeInteger(intent.slippageBps)||intent.slippageBps<0||intent.slippageBps>100)reject('PUMP_RUNTIME_INTENT');
    integer(intent.inputAmount);const c=await guard(actor,intent);
    const existing=ledger.lookup(intent,requestKey);if(existing)return existing;
-   if(source!=='LOCAL_FIXTURE'&&adapter.qualification?.()!==true)reject('PUMP_RUNTIME_VENUE_NOT_QUALIFIED');
+   qualified();
    const plan=structuredClone(await adapter.prepare(structuredClone(intent),structuredClone(c),async()=>same(c,await guard(actor,intent))));same(c,await guard(actor,intent));
    if(plan?.source!==source||!['PUMP_BONDING_CURVE','PUMPSWAP'].includes(plan.venueKind)||plan.quote?.side!==intent.side||plan.quote.agentId!==intent.agentId||plan.quote.slippageBps!==intent.slippageBps||plan.quote.expiresAt>intent.expiresAt||plan.quote.expiresAt<=now())reject('PUMP_RUNTIME_PLAN');
    const r={intent,plan};transaction(plan.unsignedTransaction,r);
    if(await adapter.verifyPrepared(structuredClone(r))!==true)reject('PUMP_RUNTIME_PREPARATION_UNVERIFIED');same(c,await guard(actor,intent));fresh(r);
    plan.risk=evaluatePumpRuntimeRisk(intent,plan,riskPolicy,now());
    if(plan.risk.expiresAt<=now())reject('PUMP_RUNTIME_RISK_EXPIRED');
+   qualified(); // Includes revocation during the final asynchronous authority guard.
    return ledger.prepare({intent,plan,requestKey});
   },
   // Trusted in-process import of an already-existing signed transaction only.
