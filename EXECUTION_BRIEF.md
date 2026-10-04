@@ -1,5 +1,14 @@
 # M4 — WAITING_FOR_HUMAN; Phase 1 reviewed, financial execution pending
 
+Safe independent batch22:09–22:25WIB checkpoint22:22: canonical build/schema and Nginx
+template corrected, build25.27s and56-module graphPASS/reviewPASS. Observed141-byte
+Pump curve layout accepted with zero reserved tail only; actual unsigned simulation
+bytes roundtrip/pinned schemaPASS,101regressions/independent reviewPASS. No runtime
+activation/restart/deployment. M4 remains single active milestone, expired review and
+pending manual financial gate. Next safe batch22:22–22:52WIB: pure unmounted bonding-
+curve finalized-effect verifier, exact signed message/event/atomic balance binding;
+no signer/send/storage ports, no claim of ON_CHAIN qualification from fixtures.
+
 22:09WIB: independent M5 conditional receipt presentation DONE/REVIEWED and deployed
 only to staging (7hashes/HTTPS200;64regressions/build19.61sPASS). No actual M5 completion
 or receipt claimed. Authenticated owner browser reload kept saved Agent/draft and

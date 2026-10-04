@@ -1,5 +1,17 @@
 # TEKKTEAM manager handoff
 
+22:22WIB latest safe checkpoint: canonical staging build emits src/token-draft-schema.js
+(byte-identical); graph56/missing0, build25.27s/independent reviewPASS. Nginx template
+updated with existing revision alias, public content-hash routes and5m body cap; active
+Nginx not changed. Curve decoder141-byte correction remains unmounted/DISARMED:
+pinned125-byte fields plus16zero bytes, actual unsigned simulation roundtrip,101tests
+and independent reviewPASS. No landed curve/receipt qualification. No staging/prod
+restart/deployment or new simulation. M4 financial gate still pending, review expired.
+Next safe engineering: pure bonding-curve finalized-effects verifier through existing
+adapter DI, no runtime mounting/signing/send. M6 missing qualified reader, authoritative
+M4+Agent wallet/account provisioning/funding and financial authorization remain distinct.
+Full consistent restore UNVERIFIED; SQLite backup alone cannot prove runtime recovery.
+
 22:09WIB latest: M4 financial gate pending; no owner signature/broadcast/spending.
 Safe M5 conditional presentation implemented/tested/reviewed and staged: owner confirmed
 receipt allowlist, LAUNCHED labels, existing-Agent navigation only. No runtime receipt

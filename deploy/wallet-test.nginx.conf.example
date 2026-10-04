@@ -7,9 +7,23 @@ server {
     ssl_certificate_key /etc/ssl/REPLACE_STAGING_KEY.pem;
     root /opt/tekkteam-wallet-test/site;
     index index.html;
-    client_max_body_size 64k;
+    client_max_body_size 5m;
     add_header X-Content-Type-Options nosniff always;
     add_header Referrer-Policy same-origin always;
+
+    # Current build revision. Keep alias aligned with VITE_APP_REVISION.
+    location ^~ /app/m3-20261003/ {
+        alias /opt/tekkteam-wallet-test/site/app/;
+        add_header Cache-Control no-store always;
+    }
+    # Only existing public content-hash metadata endpoints, never DATA_DIR aliases.
+    location ~ "^/[A-Za-z0-9_-]{43}$|^/metadata/agents/[A-Za-z0-9_-]{1,100}/[a-f0-9]{64}\.png$" {
+        proxy_pass http://127.0.0.1:4395;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-Proto https;
+        proxy_set_header Origin $http_origin;
+        add_header Cache-Control no-store always;
+    }
 
     location /api/ {
         proxy_pass http://127.0.0.1:4395;

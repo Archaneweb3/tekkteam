@@ -1,5 +1,25 @@
 # CURRENT — M4 Phase 1 verified; WAITING_FOR_HUMAN financial gate
 
+4October2026 22:22WIB safe checkpoint (started22:09; target22:25). Two independent
+engineering gaps closed without runtime activation: canonical isolated staging build
+now emits the shared token-draft schema imported by raw public modules, and the
+checked-in Nginx template includes the actual revision alias/public metadata routing.
+Fresh build25.27sPASS; exact schema hash matches source; browser-semantics import
+graph56files/missing0; independent reviewPASS. Active Nginx/runtime untouched.
+Pump decoder now accepts observed141-byte bonding curve only with the pinned125-byte
+field layout and all16reserved bytes zero. Actual unsigned M4 simulation bytes
+roundtrip byte-identically through pinned SDK; no landed mint or receipt inferred.
+101focused decoder/inventory/quote/adapter testsPASS; independent decoder40PASS and
+source reviewPASS. Source remains DERIVED/DISARMED, unmounted; no trade authorization.
+Evidence artifacts/m9-runtime/{build-proof,curve-141-proof}.json and curve-tests.tap.
+No new RPC, simulation, owner signature, broadcast, deployment or process restart.
+M9 full consistent runtime backup/restore still UNVERIFIED: prior SQLite backup
+quick_check does not prove recovery of auth marker/key, journals, metadata and state.
+M6 real roundtrip needs confirmed M4, proven Agent-wallet binding, account provisioning,
+funding/reserve, qualified finalized-effect reader and separate financial gate. Safe
+pure finalized-effects verifier analysis continues; no fixture promotion to Real.
+M4 review remains expired; human financial question pending. No routine re-auth request.
+
 4October2026 22:09WIB continuation: safe M5 presentation engineering DONE/REVIEWED,
 actual M5 remains WAITING_FOR_CONFIRMED_M4. Owner-only confirmed receipt DTO now
 allowlists metadata, confirmed slot/time, exact Pump provenance and immutable draft
@@ -286,7 +306,7 @@ Staging source/client installed33verified files, backup updates/m4-20261004. Pen
 ## Previous checkpoints — preserved
 ## CURRENT — M3 PARTIAL / PENDING_USER_OWNER, 3October2026 22:46 WIB
 
-- Continuation started22:24WIB, target checkpoint22:54WIB. Independent authorized
+- Continuation started22:22WIB, target checkpoint22:54WIB. Independent authorized
   code/integration work completed before target; no M4 and no execution while waiting.
 - Latest user authorizes one actual staging test coin TEKKTEAM M3 TEST / TKM3 with
   initial buy0 and a real application Agent. Codex IAB is guest, no injected wallet

@@ -105,6 +105,19 @@ is added to these Pump modules.
 
 ## Release preparation
 
+Canonical staging artifact: `node tools/build-wallet-test.mjs` uses the isolated Vite
+configuration and dedicated Reown environment only. Verify generated
+`site/src/token-draft-schema.js` is byte-identical to the current source and resolve
+raw public-module imports, not just the bundled entry. The staging Nginx template
+must match the built revision alias and proxy only the bounded public metadata/API
+paths to4395. Never expose DATA_DIR or install that block into production.
+
+The staging SQLite backup with quick_checkOK is database evidence only. Full runtime
+restore requires a consistent isolated backup/restore of the operator-managed auth
+key/marker, SQLite, launch journals and metadata with stopped staging writers. Keep
+restricted material outside Git/artifacts/cloud. This qualification is not complete;
+never roll back a live database after broadcast or erase durable transaction facts.
+
 Run test suites serially and config/env-file-free bundle build. Inspect desktop1440/mobile390 screenshots and actual owner flows, then independent source/security review. Stage deployment requires named target, approved secret injection, persistence volumes, supervisor/health/log redaction, backups and rollback artifact; production deployment needs separate user authorization. Do not launch server/index.js with ambient credentials as a preview fallback. Never roll back unrelated user changes, receipt history or irreversible chain facts.
 
 ## B2 product HTTP-only mode (local, explicitly selected)

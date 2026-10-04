@@ -3,6 +3,17 @@ import assert from 'node:assert/strict';
 import {decodePumpVenueBundle,decodedPumpState} from '../server/dex/pump-account-decoder.js';
 import {pumpAccountFixture,fixtureOwner} from './pump-account-fixture.mjs';
 import {ExtensionType} from '@solana/spl-token';
+test('create_v2 141-byte allocation decodes pinned fields and stays DERIVED/DISARMED',async()=>{
+ const x=await pumpAccountFixture({curveSize:141}),v=decodePumpVenueBundle(x),state=decodedPumpState(v);
+ assert.equal(x.accounts.curve.data.length,141);assert.equal(x.accounts.curve.data.subarray(125).every(byte=>byte===0),true);
+ assert.equal(state.curve.creator.toBase58(),fixtureOwner.toBase58());assert.equal(state.curve.tokenTotalSupply.toString(),'1000000000000000');
+ assert.equal(state.curve.quoteMint.toBase58(),'11111111111111111111111111111111');assert.equal(state.curve.isMayhemMode,false);assert.equal(state.curve.isCashbackCoin,false);assert.equal(state.curve.isHolderReward,false);
+ assert.equal(v.source,'LOCAL_FIXTURE');assert.equal(v.provenance,'DERIVED');assert.equal(v.state,'DISARMED');assert.equal(v.onChainVerified,false);assert.equal(v.authorizationGranted,false);
+});
+test('141-byte allocation rejects unknown reserved bytes and unsupported modes',async()=>{
+ for(const [offset,error]of [[125,'PUMP_CURVE_LAYOUT_UNQUALIFIED'],[140,'PUMP_CURVE_LAYOUT_UNQUALIFIED'],[81,'PUMP_MODE_UNQUALIFIED'],[82,'PUMP_MODE_UNQUALIFIED'],[124,'PUMP_MODE_UNQUALIFIED']]){const x=await pumpAccountFixture({curveSize:141});x.accounts.curve.data[offset]=1;assert.throws(()=>decodePumpVenueBundle(x),new RegExp(error));}
+ for(const size of [140,142]){const x=await pumpAccountFixture({curveSize:size});assert.throws(()=>decodePumpVenueBundle(x),/PUMP_ACCOUNT_BINDING_INVALID/);}
+});
 for(const migrated of [false,true])test(`official offline decoder ${migrated?'canonical PumpSwap':'bonding curve'} remains disarmed`,async()=>{
  const input=await pumpAccountFixture({migrated}),v=decodePumpVenueBundle(input);assert.equal(v.kind,migrated?'PUMPSWAP':'PUMP_BONDING_CURVE');assert.equal(v.owner,fixtureOwner.toBase58());assert.equal(v.onChainVerified,false);assert.equal(v.authorizationGranted,false);assert.equal(Object.isFrozen(v),true);assert.throws(()=>decodedPumpState(JSON.parse(JSON.stringify(v))),/DECODED_STATE_REQUIRED/);
  if(migrated)assert.equal(decodedPumpState(v).pool.virtualQuoteReserves.toString(),'-5000000000');

@@ -33,7 +33,13 @@ export function decodePumpVenueBundle({agent,receipt,context,accounts}={}){
   try{const bytes=getExtensionData(ExtensionType.TokenMetadata,minted.tlvData),metadata=unpackMetadata(bytes);if(!metadata.mint.equals(mint)||!Buffer.from(packMetadata(metadata)).equals(bytes))rejectPump('PUMP_TOKEN_METADATA_INVALID');}catch(e){if(e.code)throw e;rejectPump('PUMP_TOKEN_METADATA_INVALID');}
  }
  const curveKey=pumpSdk.bondingCurvePda(mint);
- let curve;try{curve=pumpSdk.PUMP_SDK.decodeBondingCurve(account('curve',curveKey,pumpSdk.PUMP_PROGRAM_ID,{sizes:[49,81,82,83,115,124,125,151]}));}catch(e){if(e.code)throw e;rejectPump('PUMP_CURVE_DECODE_INVALID');}
+ let curve;try{
+  const info=account('curve',curveKey,pumpSdk.PUMP_PROGRAM_ID,{sizes:[49,81,82,83,115,124,125,141,151]});
+  // Observed create_v2 allocation: pinned125-byte fields +16 zero reserved bytes.
+  // Nonzero unknown tail is not a supported protocol extension or venue proof.
+  if(info.data.length===141&&info.data.subarray(125).some(byte=>byte!==0))rejectPump('PUMP_CURVE_LAYOUT_UNQUALIFIED');
+  curve=pumpSdk.PUMP_SDK.decodeBondingCurve(info);
+ }catch(e){if(e.code)throw e;rejectPump('PUMP_CURVE_DECODE_INVALID');}
  if(!curve.creator.equals(owner)||!curve.quoteMint.equals(PublicKey.default)&&!curve.quoteMint.equals(NATIVE_MINT))rejectPump('PUMP_CURVE_CREATOR_OR_QUOTE_INVALID');modes(curve);
  for(const field of ['virtualTokenReserves','virtualQuoteReserves','realTokenReserves','realQuoteReserves','tokenTotalSupply'])amount(curve[field]);
  if(amount(curve.tokenTotalSupply)!==minted.supply)rejectPump('PUMP_SUPPLY_DISAGREEMENT');
