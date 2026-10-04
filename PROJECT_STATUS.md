@@ -1,5 +1,21 @@
 # CURRENT — M4 Phase 1 verified; WAITING_FOR_HUMAN financial gate
 
+4October2026 23:12WIB safe transport checkpoint (started23:04; target23:24).
+Existing HTTPS factory now has explicit default-off finalityOnly mode: genesis,
+exactly one canonical signature status, finalized base64 V0 transaction only.
+No submit/sign/public-fetch capability; mixing an M4 target rejects. Canonical
+own-key payload copy closes reviewer-reproduced toJSON/getter wire mutation.
+99related regressionsPASS; two independent reviewsPASS (29/89selections), syntax/
+diffPASS. Existing preparation/M4 branches, startup/config and runtime unchanged.
+Tests use mocked HTTPS/LOCAL_FIXTURE signed bytes, no real RPC or receipt.
+Deadline20seconds, response24MiB, public DNS/TLS guards and sanitized errors remain.
+No deployment/restart/production or financial action. Prior client build25.27s
+remains applicable; no client change. Source/docs/evidence committed and pushed.
+Transport capability separation DONE locally; actual trusted mounting/provider,
+full venue/raw-state/nonzero-buyback/provisioning qualification still pending.
+M4 human readiness remains pending; expired review cannot authorize any operation.
+Evidence artifacts/m9-runtime/{transport-regressions.tap,transport-checkpoint.json}.
+
 4October2026 22:59WIB safe source-contract checkpoint (started22:52; target23:12).
 Concrete M6 integration mismatch closed in existing adapter/executor: explicit source
 defaults LOCAL_FIXTURE, qualified ON_CHAIN plans require genuine decoded read source

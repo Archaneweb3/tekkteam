@@ -1,0 +1,32 @@
+{
+  "checkpointWib": "2026-10-04T23:12:00+07:00",
+  "startedWib": "2026-10-04T23:04:00+07:00",
+  "deadlineWib": "2026-10-04T23:24:00+07:00",
+  "task": "Existing HTTPS finality-only capability separation",
+  "sourceState": "IMPLEMENTED_REVIEWED_UNMOUNTED_DEFAULT_OFF",
+  "evidenceClass": "LOCAL_FIXTURE_MOCKED_HTTPS",
+  "methods": ["getGenesisHash", "getSignatureStatuses", "getTransaction"],
+  "capabilities": {"sign": false, "submit": false, "publicFetch": false},
+  "bounds": {"timeoutMs": 20000, "responseBytes": 25165824, "statusSignatures": 1, "commitment": "finalized", "encoding": "base64", "maxSupportedTransactionVersion": 0},
+  "reviewDefect": "Caller toJSON could change validated wire params",
+  "fix": "Own exact keys and primitive values captured once into canonical arrays/options before JSON serialization",
+  "verification": {
+    "relatedRegressions": {"pass": 99, "fail": 0, "artifact": "transport-regressions.tap"},
+    "independentReview": ["m4_diag_review PASS 29 tests", "cloud_commit_inventory PASS 89 tests"],
+    "syntax": "PASS",
+    "diffCheck": "PASS",
+    "clientBuild": "UNCHANGED prior 25.27s PASS"
+  },
+  "runtimeMount": false,
+  "realRpcPerformed": false,
+  "newPreparation": false,
+  "deployed": false,
+  "processRestart": false,
+  "productionModified": false,
+  "ownerTransactionsSigned": 0,
+  "broadcasts": 0,
+  "solSpent": 0,
+  "realReceiptCreated": false,
+  "m4": "WAITING_FOR_HUMAN expired review cannot be reused",
+  "remaining": ["actual trusted transport mounting/provider verification", "authoritative M4 receipt and Agent wallet binding", "full raw mutable venue state qualification", "nonzero buyback version-bound handler math", "PumpSwap/provisioning and reserve qualification", "separate real trading authorization", "restricted consistent runtime restore qualification"]
+}

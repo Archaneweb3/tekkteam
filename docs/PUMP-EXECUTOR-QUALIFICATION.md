@@ -1,5 +1,14 @@
 # Pump Executor Qualification Contract
 
+CURRENT 2026-10-04: the existing preparation HTTPS factory now offers explicit
+default-off `finalityOnly:true`, separate from the target-bound M4 submit capability.
+Only genesis, singleton canonical signature status and finalized base64 V0 reads
+are exposed; no public fetch/sign/submit port. Accepted wire params are canonical
+copies, independent of caller serialization hooks. Existing timeout/size/DNS/TLS
+bounds are retained. Offline mocked transport tests qualify this capability shape
+only. No runtime mounting, provider availability or signature/effect authorization
+is implied; the tracked reader and effect verifier remain mandatory.
+
 CURRENT 2026-10-04: the existing runtime adapter explicitly separates execution
 source from read provenance. Default LOCAL_FIXTURE cannot consume a backend snapshot;
 explicit ON_CHAIN cannot consume a fixture descriptor. Genuine decoded venue/context

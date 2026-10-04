@@ -1,0 +1,525 @@
+TAP version 13
+# (node:27556) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+# (Use `node --trace-deprecation ...` to show where the warning was created)
+# (node:27556) ExperimentalWarning: The MockTimers API is an experimental feature and might change at any time
+# Subtest: explicit finality mode exposes only frozen provider and read RPC capabilities
+ok 1 - explicit finality mode exposes only frozen provider and read RPC capabilities
+  ---
+  duration_ms: 16.5989
+  ...
+# Subtest: default preparation and target-bound M4 capabilities remain separate
+ok 2 - default preparation and target-bound M4 capabilities remain separate
+  ---
+  duration_ms: 4.7432
+  ...
+# Subtest: mode is boolean, default-off, and cannot coexist with a broadcast target
+ok 3 - mode is boolean, default-off, and cannot coexist with a broadcast target
+  ---
+  duration_ms: 1.086
+  ...
+# Subtest: allowed reads send exact bounded JSON-RPC options and capture caller params before await
+ok 4 - allowed reads send exact bounded JSON-RPC options and capture caller params before await
+  ---
+  duration_ms: 6.2116
+  ...
+# Subtest: finality denies sendTransaction before any HTTPS request
+ok 5 - finality denies sendTransaction before any HTTPS request
+  ---
+  duration_ms: 0.6833
+  ...
+# Subtest: finality denies sendRawTransaction before any HTTPS request
+ok 6 - finality denies sendRawTransaction before any HTTPS request
+  ---
+  duration_ms: 0.5161
+  ...
+# Subtest: finality denies requestAirdrop before any HTTPS request
+ok 7 - finality denies requestAirdrop before any HTTPS request
+  ---
+  duration_ms: 0.365
+  ...
+# Subtest: finality denies simulateTransaction before any HTTPS request
+ok 8 - finality denies simulateTransaction before any HTTPS request
+  ---
+  duration_ms: 0.4171
+  ...
+# Subtest: finality denies getMultipleAccounts before any HTTPS request
+ok 9 - finality denies getMultipleAccounts before any HTTPS request
+  ---
+  duration_ms: 0.756
+  ...
+# Subtest: finality denies getBalance before any HTTPS request
+ok 10 - finality denies getBalance before any HTTPS request
+  ---
+  duration_ms: 0.7854
+  ...
+# Subtest: finality denies getBlockHeight before any HTTPS request
+ok 11 - finality denies getBlockHeight before any HTTPS request
+  ---
+  duration_ms: 0.728
+  ...
+# Subtest: finality denies getLatestBlockhash before any HTTPS request
+ok 12 - finality denies getLatestBlockhash before any HTTPS request
+  ---
+  duration_ms: 0.3757
+  ...
+# Subtest: finality denies getSignaturesForAddress before any HTTPS request
+ok 13 - finality denies getSignaturesForAddress before any HTTPS request
+  ---
+  duration_ms: 0.264
+  ...
+# Subtest: finality denies getFeeForMessage before any HTTPS request
+ok 14 - finality denies getFeeForMessage before any HTTPS request
+  ---
+  duration_ms: 0.3232
+  ...
+# Subtest: status reads require exactly one canonical nonzero 64-byte signature and history true
+ok 15 - status reads require exactly one canonical nonzero 64-byte signature and history true
+  ---
+  duration_ms: 2.5712
+  ...
+# Subtest: transaction reads require finalized base64 V0 with no extra options or arguments
+ok 16 - transaction reads require finalized base64 V0 with no extra options or arguments
+  ---
+  duration_ms: 2.7586
+  ...
+# Subtest: wire params are canonical copies immune to caller toJSON and repeated getter mutation
+ok 17 - wire params are canonical copies immune to caller toJSON and repeated getter mutation
+  ---
+  duration_ms: 2.3517
+  ...
+# Subtest: inherited required fields and throwing accessors/proxies fail before HTTPS with fixed error
+ok 18 - inherited required fields and throwing accessors/proxies fail before HTTPS with fixed error
+  ---
+  duration_ms: 2.528
+  ...
+# Subtest: existing tracked reader works through finality-only factory without send capability
+ok 19 - existing tracked reader works through finality-only factory without send capability
+  ---
+  duration_ms: 221.0846
+  ...
+# Subtest: HTTP 401 remains bounded and sanitized without retry
+ok 20 - HTTP 401 remains bounded and sanitized without retry
+  ---
+  duration_ms: 7.6099
+  ...
+# Subtest: HTTP 403 remains bounded and sanitized without retry
+ok 21 - HTTP 403 remains bounded and sanitized without retry
+  ---
+  duration_ms: 1.6729
+  ...
+# Subtest: HTTP 429 remains bounded and sanitized without retry
+ok 22 - HTTP 429 remains bounded and sanitized without retry
+  ---
+  duration_ms: 2.3627
+  ...
+# Subtest: provider RPC error cannot leak provider content or trigger retry
+ok 23 - provider RPC error cannot leak provider content or trigger retry
+  ---
+  duration_ms: 1.218
+  ...
+# Subtest: wrong id cannot leak provider content or trigger retry
+ok 24 - wrong id cannot leak provider content or trigger retry
+  ---
+  duration_ms: 0.5873
+  ...
+# Subtest: missing result cannot leak provider content or trigger retry
+ok 25 - missing result cannot leak provider content or trigger retry
+  ---
+  duration_ms: 0.8212
+  ...
+# Subtest: bad JSON cannot leak provider content or trigger retry
+ok 26 - bad JSON cannot leak provider content or trigger retry
+  ---
+  duration_ms: 3.0404
+  ...
+# Subtest: socket failure cannot leak provider content or trigger retry
+ok 27 - socket failure cannot leak provider content or trigger retry
+  ---
+  duration_ms: 2.728
+  ...
+# Subtest: oversized body cannot leak provider content or trigger retry
+ok 28 - oversized body cannot leak provider content or trigger retry
+  ---
+  duration_ms: 0.6787
+  ...
+# Subtest: read-only transport retains existing 20-second request deadline
+ok 29 - read-only transport retains existing 20-second request deadline
+  ---
+  duration_ms: 4.0566
+  ...
+# (node:33304) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+# (Use `node --trace-deprecation ...` to show where the warning was created)
+# Subtest: exact recorded signature uses only three explicit read-only RPC calls
+ok 30 - exact recorded signature uses only three explicit read-only RPC calls
+  ---
+  duration_ms: 115.424
+  ...
+# Subtest: null observation stays unresolved without a transaction query
+ok 31 - null observation stays unresolved without a transaction query
+  ---
+  duration_ms: 7.9846
+  ...
+# Subtest: processed observation stays unresolved without a transaction query
+ok 32 - processed observation stays unresolved without a transaction query
+  ---
+  duration_ms: 9.1529
+  ...
+# Subtest: confirmed observation stays unresolved without a transaction query
+ok 33 - confirmed observation stays unresolved without a transaction query
+  ---
+  duration_ms: 9.7552
+  ...
+# Subtest: finalized status with pruned/missing transaction remains unresolved
+ok 34 - finalized status with pruned/missing transaction remains unresolved
+  ---
+  duration_ms: 8.7182
+  ...
+# Subtest: reject no record before any RPC
+ok 35 - reject no record before any RPC
+  ---
+  duration_ms: 7.4634
+  ...
+# Subtest: reject not tracked before any RPC
+ok 36 - reject not tracked before any RPC
+  ---
+  duration_ms: 5.5821
+  ...
+# Subtest: reject foreign signature before any RPC
+ok 37 - reject foreign signature before any RPC
+  ---
+  duration_ms: 5.7659
+  ...
+# Subtest: reject source promotion before any RPC
+ok 38 - reject source promotion before any RPC
+  ---
+  duration_ms: 6.0116
+  ...
+# Subtest: reject plan source promotion before any RPC
+ok 39 - reject plan source promotion before any RPC
+  ---
+  duration_ms: 7.6724
+  ...
+# Subtest: reject unknown venue before any RPC
+ok 40 - reject unknown venue before any RPC
+  ---
+  duration_ms: 5.674
+  ...
+# Subtest: reject Devnet before any RPC
+ok 41 - reject Devnet before any RPC
+  ---
+  duration_ms: 6.257
+  ...
+# Subtest: reject EVM network before any RPC
+ok 42 - reject EVM network before any RPC
+  ---
+  duration_ms: 7.4797
+  ...
+# Subtest: reject zero context before any RPC
+ok 43 - reject zero context before any RPC
+  ---
+  duration_ms: 6.0446
+  ...
+# Subtest: reject mutable plan before any RPC
+ok 44 - reject mutable plan before any RPC
+  ---
+  duration_ms: 5.1584
+  ...
+# Subtest: reject mutable intent before any RPC
+ok 45 - reject mutable intent before any RPC
+  ---
+  duration_ms: 5.0646
+  ...
+# Subtest: reject zero signature before any RPC
+ok 46 - reject zero signature before any RPC
+  ---
+  duration_ms: 6.0434
+  ...
+# Subtest: reject short signature before any RPC
+ok 47 - reject short signature before any RPC
+  ---
+  duration_ms: 5.0229
+  ...
+# Subtest: reject invalid signature before any RPC
+ok 48 - reject invalid signature before any RPC
+  ---
+  duration_ms: 6.9743
+  ...
+# Subtest: reject wrong genesis without retry or additional queries
+ok 49 - reject wrong genesis without retry or additional queries
+  ---
+  duration_ms: 9.3636
+  ...
+# Subtest: reject missing status context without retry or additional queries
+ok 50 - reject missing status context without retry or additional queries
+  ---
+  duration_ms: 5.6493
+  ...
+# Subtest: reject multiple status without retry or additional queries
+ok 51 - reject multiple status without retry or additional queries
+  ---
+  duration_ms: 5.6924
+  ...
+# Subtest: reject undefined status without retry or additional queries
+ok 52 - reject undefined status without retry or additional queries
+  ---
+  duration_ms: 6.0551
+  ...
+# Subtest: reject unknown commitment without retry or additional queries
+ok 53 - reject unknown commitment without retry or additional queries
+  ---
+  duration_ms: 4.893
+  ...
+# Subtest: reject status slot beyond bank without retry or additional queries
+ok 54 - reject status slot beyond bank without retry or additional queries
+  ---
+  duration_ms: 4.4282
+  ...
+# Subtest: reject old finalized slot without retry or additional queries
+ok 55 - reject old finalized slot without retry or additional queries
+  ---
+  duration_ms: 2.3339
+  ...
+# Subtest: reject finalized confirmations without retry or additional queries
+ok 56 - reject finalized confirmations without retry or additional queries
+  ---
+  duration_ms: 4.1593
+  ...
+# Subtest: reject missing status error without retry or additional queries
+ok 57 - reject missing status error without retry or additional queries
+  ---
+  duration_ms: 4.4042
+  ...
+# Subtest: reject invalid status error without retry or additional queries
+ok 58 - reject invalid status error without retry or additional queries
+  ---
+  duration_ms: 4.6047
+  ...
+# Subtest: reject missing transaction without retry or additional queries
+ok 59 - reject missing transaction without retry or additional queries
+  ---
+  duration_ms: 4.8003
+  ...
+# Subtest: reject wrong transaction slot without retry or additional queries
+ok 60 - reject wrong transaction slot without retry or additional queries
+  ---
+  duration_ms: 5.6015
+  ...
+# Subtest: reject legacy version without retry or additional queries
+ok 61 - reject legacy version without retry or additional queries
+  ---
+  duration_ms: 4.1537
+  ...
+# Subtest: reject missing meta without retry or additional queries
+ok 62 - reject missing meta without retry or additional queries
+  ---
+  duration_ms: 4.4167
+  ...
+# Subtest: reject missing landed error without retry or additional queries
+ok 63 - reject missing landed error without retry or additional queries
+  ---
+  duration_ms: 4.1474
+  ...
+# Subtest: reject mismatched error without retry or additional queries
+ok 64 - reject mismatched error without retry or additional queries
+  ---
+  duration_ms: 3.0081
+  ...
+# Subtest: reject missing blocktime without retry or additional queries
+ok 65 - reject missing blocktime without retry or additional queries
+  ---
+  duration_ms: 3.4884
+  ...
+# Subtest: reject negative blocktime without retry or additional queries
+ok 66 - reject negative blocktime without retry or additional queries
+  ---
+  duration_ms: 3.9015
+  ...
+# Subtest: reject parsed encoding without retry or additional queries
+ok 67 - reject parsed encoding without retry or additional queries
+  ---
+  duration_ms: 4.2188
+  ...
+# Subtest: reject unsigned landed bytes without retry or additional queries
+ok 68 - reject unsigned landed bytes without retry or additional queries
+  ---
+  duration_ms: 3.5179
+  ...
+# Subtest: reject trailing transaction bytes without retry or additional queries
+ok 69 - reject trailing transaction bytes without retry or additional queries
+  ---
+  duration_ms: 3.4874
+  ...
+# Subtest: reject broken crypto without retry or additional queries
+ok 70 - reject broken crypto without retry or additional queries
+  ---
+  duration_ms: 14.4649
+  ...
+# Subtest: reject changed signed bytes without retry or additional queries
+ok 71 - reject changed signed bytes without retry or additional queries
+  ---
+  duration_ms: 6.5364
+  ...
+# Subtest: matching finalized failure is transported for fee-only effect qualification
+ok 72 - matching finalized failure is transported for fee-only effect qualification
+  ---
+  duration_ms: 18.2717
+  ...
+# Subtest: RPC failures are sanitized, do not retry and expose no provider secrets
+ok 73 - RPC failures are sanitized, do not retry and expose no provider secrets
+  ---
+  duration_ms: 19.7035
+  ...
+# Subtest: throwing error accessors/proxy never bypass fixed sanitized RPC error
+ok 74 - throwing error accessors/proxy never bypass fixed sanitized RPC error
+  ---
+  duration_ms: 8.4697
+  ...
+# Subtest: capture record and status before dependency awaits; results do not alias RPC objects
+ok 75 - capture record and status before dependency awaits; results do not alias RPC objects
+  ---
+  duration_ms: 9.4048
+  ...
+# Subtest: constructor rejects missing dependency and unsupported source; default is fixture
+ok 76 - constructor rejects missing dependency and unsupported source; default is fixture
+  ---
+  duration_ms: 0.3491
+  ...
+# Subtest: ON_CHAIN cannot read a fixture record even when explicitly selected
+ok 77 - ON_CHAIN cannot read a fixture record even when explicitly selected
+  ---
+  duration_ms: 1.9575
+  ...
+# (node:32940) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# (node:32940) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+# Subtest: actual decoder and finalized oracle prove exact mint/creator/metadata and full signed bytes
+ok 78 - actual decoder and finalized oracle prove exact mint/creator/metadata and full signed bytes
+  ---
+  duration_ms: 504.2309
+  ...
+# Subtest: confirmation rejects corruption, missing context, wrong event/mint and incomplete accounting
+ok 79 - confirmation rejects corruption, missing context, wrong event/mint and incomplete accounting
+  ---
+  duration_ms: 2350.2486
+  ...
+# Subtest: actual M4 revalidation retains reviewed blockhash and rejects expired/cost/rent/context changes
+ok 80 - actual M4 revalidation retains reviewed blockhash and rejects expired/cost/rent/context changes
+  ---
+  duration_ms: 350.2168
+  ...
+# (node:2812) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# (node:2812) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+# Subtest: exact target, zero buy, valid mint partial signature and no owner key persisted
+ok 81 - exact target, zero buy, valid mint partial signature and no owner key persisted
+  ---
+  duration_ms: 383.6231
+  ...
+# Subtest: one approval and single send survive ambiguity and restart; duplicate submits cannot send
+ok 82 - one approval and single send survive ambiguity and restart; duplicate submits cannot send
+  ---
+  duration_ms: 438.1446
+  ...
+# Subtest: rejection consumes M4, expiry refuses prompt and changed transaction never broadcasts
+ok 83 - rejection consumes M4, expiry refuses prompt and changed transaction never broadcasts
+  ---
+  duration_ms: 491.9936
+  ...
+# Subtest: pre-send persistence failure cannot reach sender; signed expiry is permanently quarantined
+ok 84 - pre-send persistence failure cannot reach sender; signed expiry is permanently quarantined
+  ---
+  duration_ms: 505.3209
+  ...
+# Subtest: M4 allowlist remains exact-target only; broad operations and unconfigured runtime stay denied
+ok 85 - M4 allowlist remains exact-target only; broad operations and unconfigured runtime stay denied
+  ---
+  duration_ms: 1.2151
+  ...
+# Subtest: two independent controller instances cannot both claim wallet approval
+ok 86 - two independent controller instances cannot both claim wallet approval
+  ---
+  duration_ms: 212.4678
+  ...
+# {"event":"UNSIGNED_SIMULATION_DIAGNOSTIC_PERSISTED","requestId":"58894be5-67ff-4ac7-9ea6-50154d413749","transactionSha256":"467de96cf50920954dd2ca2083386e1816547a3d20b471e643b0ae1c6e543994","simulationSlot":450677557}
+# (node:15900) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+# (Use `node --trace-deprecation ...` to show where the warning was created)
+# Subtest: failure diagnostics persist BEFORE unexpected debit guard, privately and without signature or secret fields
+ok 87 - failure diagnostics persist BEFORE unexpected debit guard, privately and without signature or secret fields
+  ---
+  duration_ms: 269.5599
+  ...
+# {"event":"UNSIGNED_SIMULATION_DIAGNOSTIC_PERSISTED","requestId":"97b79981-5fca-4a21-abbe-5972cc0b419d","transactionSha256":"6c820ea8750e3d48c2565278a09c3d8c5038a5e0e5501749cc10327112a7e5d2","simulationSlot":450677556}
+# {"event":"UNSIGNED_SIMULATION_DIAGNOSTIC_PERSISTED","requestId":"97b79981-5fca-4a21-abbe-5972cc0b419d","transactionSha256":"6c820ea8750e3d48c2565278a09c3d8c5038a5e0e5501749cc10327112a7e5d2","simulationSlot":450677556}
+# {"event":"UNSIGNED_SIMULATION_DIAGNOSTIC_PERSISTED","requestId":"97b79981-5fca-4a21-abbe-5972cc0b419d","transactionSha256":"6c820ea8750e3d48c2565278a09c3d8c5038a5e0e5501749cc10327112a7e5d2","simulationSlot":450677556}
+# Subtest: M3.1 producer decodes actual fixture CPI and enforces fresh total/reserve review with no signing
+ok 88 - M3.1 producer decodes actual fixture CPI and enforces fresh total/reserve review with no signing
+  ---
+  duration_ms: 228.0688
+  ...
+# Subtest: distinct same-slot revalidation diagnostics never collide or overwrite earlier evidence
+ok 89 - distinct same-slot revalidation diagnostics never collide or overwrite earlier evidence
+  ---
+  duration_ms: 114.1778
+  ...
+# Subtest: unsigned construction reuses pinned Pump builder/policy; replay deduplicates without mint signing
+ok 90 - unsigned construction reuses pinned Pump builder/policy; replay deduplicates without mint signing
+  ---
+  duration_ms: 112.1166
+  ...
+# Subtest: completed request binding survives restart and expiry; refresh needs a new ID
+ok 91 - completed request binding survives restart and expiry; refresh needs a new ID
+  ---
+  duration_ms: 355.7184
+  ...
+# Subtest: in-memory completed request cannot silently rebuild after expiry
+ok 92 - in-memory completed request cannot silently rebuild after expiry
+  ---
+  duration_ms: 39.2569
+  ...
+# Subtest: legacy request reuse is refused without rewriting or contacting RPC
+ok 93 - legacy request reuse is refused without rewriting or contacting RPC
+  ---
+  duration_ms: 13.0119
+  ...
+# Subtest: minimum-slot lag retries identical read/simulation and refuses other failures or weaker context
+ok 94 - minimum-slot lag retries identical read/simulation and refuses other failures or weaker context
+  ---
+  duration_ms: 1.5394
+  ...
+# Subtest: private preparation evidence verifies unsigned bytes, idempotent file and linked-file denial; no public asset/receipt
+ok 95 - private preparation evidence verifies unsigned bytes, idempotent file and linked-file denial; no public asset/receipt
+  ---
+  duration_ms: 133.7512
+  ...
+# Subtest: wrong genesis stops before construction/simulation; failed simulation has no payable debit claim
+ok 96 - wrong genesis stops before construction/simulation; failed simulation has no payable debit claim
+  ---
+  duration_ms: 35.6322
+  ...
+# Subtest: closed transport rejects value-moving/history RPC and unqualified public origins without network
+ok 97 - closed transport rejects value-moving/history RPC and unqualified public origins without network
+  ---
+  duration_ms: 6.3629
+  ...
+# Subtest: M3 allowlist is explicit and default off; launch/sign/submit/funding/Real remain denied
+ok 98 - M3 allowlist is explicit and default off; launch/sign/submit/funding/Real remain denied
+  ---
+  duration_ms: 0.957
+  ...
+# (node:32400) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# (node:32400) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+# Subtest: real verifier in disposable fixture: immutable owner binding, foreign/session/receipt guards; no receipt write
+ok 99 - real verifier in disposable fixture: immutable owner binding, foreign/session/receipt guards; no receipt write
+  ---
+  duration_ms: 634.3683
+  ...
+1..99
+# tests 99
+# suites 0
+# pass 99
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 5791.59
