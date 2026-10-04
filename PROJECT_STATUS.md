@@ -1,5 +1,31 @@
 # CURRENT — M4 Phase 1 verified; WAITING_FOR_HUMAN financial gate
 
+4October2026 22:51WIB safe checkpoint (started22:39; target23:09). M6 independent
+reader engineering DONE locally: unmounted existing-signature finality DI supplies
+only genesis/status/finalized base64 reads; strict tracked UNKNOWN/plan/intent/source/
+slot/error/canonical message/signature checks. No network/send/sign/store fallback,
+automatic retry or registration. Real adapter + pure effects + SQLite restart test
+now goes through this reader: pruned/null/RPC failure/bad effects preserve UNKNOWN
+and reserves, exact subsequent proof settles once as LOCAL_FIXTURE. 176focused
+regressionsPASS; independent reader48PASS/reviewPASS. Reviewer-found error accessor/
+proxy sanitization defect repaired and retested. No real Mainnet lookup this batch.
+Canonical client build25.27s from previous verified checkpoint unchanged; server
+syntax checked. No UI/client, staging deployment, restart, production or wallet changes.
+Remaining M6 source/trust qualification: bounded trusted transport mounting, explicit
+BACKEND_RPC_READ-to-ON_CHAIN boundary, raw mutable state, nonzero buyback arithmetic,
+PumpSwap/provisioning/rent, actual M4 receipt/Agent-wallet and separate financial gate.
+Pinned official sources do not prove buyback base/fee semantics/rounding/remainder;
+guard remains BUYBACK_SPLIT_UNQUALIFIED. No guessed attribution or whitelist.
+M9 full restricted consistent snapshot/isolated restore is operator qualification,
+not a new source defect; original key/marker/SQLite/journal/state must be preserved.
+Actual staging22:47:50WIB: HTTPShealth200/DBquick_checkOK, same expired review,
+approvalopenedfalse/ownerSignedfalse/broadcastfalse/receipt0. Stage43919/15,
+prod10722/0 and10893/0 online and unchanged. Fresh owner browser22:49 reuses same
+connected/authenticated session and saved aaaaada/ret3ED; expired Approve disabled.
+Screenshot artifacts/m9-runtime/reader-owner-handoff.png; runtime reader-state.json;
+tests reader-regressions.tap. M4 still WAITING_FOR_HUMAN, no new preparation or
+financial authorization. M5 real binding awaits M4; M6/M7/M10 not PASS.
+
 4October2026 22:37WIB checkpoint (safe batch started22:22; target22:52, finished early).
 Independent M6 engineering PARTIAL/REVIEWED: pure unmounted curve effect verifier
 now binds signed landed bytes/signature to the canonical prepared policy, exact ABI

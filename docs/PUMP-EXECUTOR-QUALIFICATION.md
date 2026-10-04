@@ -1,5 +1,26 @@
 # Pump Executor Qualification Contract
 
+CURRENT 2026-10-04: `pump-finalized-reader.js` now provides an unmounted read-only
+DI reader for an existing UNKNOWN bonding-curve ledger signature. Only genesis,
+signature status and finalized base64 transaction calls are permitted by its code;
+no retries, signing, broadcast, environment/config fallback or storage. It checks
+immutable plan/intent, source, Mainnet, exact status/transaction slot/error, canonical
+signed bytes and cryptographic payer. Missing/pruned/nonfinalized evidence stays
+unresolved. Sanitized provider failure preserves UNKNOWN/reservations through the
+existing adapter/executor. JSON-reloaded expired policy still reconciles only the
+same signature; fixture evidence remains fixture. RPC deadline/transport trust are
+caller responsibilities; this module is not registered or execution-qualified.
+See official [getTransaction](https://solana.com/docs/rpc/http/gettransaction) and
+[getSignatureStatuses](https://solana.com/docs/rpc/http/getsignaturestatuses).
+
+Nonzero buyback remains PENDING_EXTERNAL_SPECIFICATION: the pinned official IDL
+and recipient docs define fields/ordering but not the fee base, gross-versus-retained
+event fee, rounding or remainder destination. SDK protocol/creator calculations do
+not prove that split. Keep `BUYBACK_SPLIT_UNQUALIFIED`; an observed recipient credit
+alone is not permission to settle normal-curve trades. Required primary evidence:
+version-bound handler/math specification plus genuine authorized corroborating
+atomic event/CPI/balance evidence. No extra transaction lookup was performed.
+
 CURRENT 2026-10-04: `pump-finalized-effects.js` supplies a pure, unmounted accounting
 verifier for the zero-buyback bonding-curve subset. The canonical adapter persists a
 DERIVED effect policy in the existing immutable plan: pinned SDK/IDL, ordered ABI
@@ -9,10 +30,10 @@ cryptographic signature, canonical serialized landed bytes, atomic native/token
 metadata, Pump self-CPI event, balanced invocation logs, transfer CPIs, ceil fees,
 budget/minimum output and reserve. Historical finality never rebuilds an expired
 quote. Failed finalized transactions require fee-only effects; rejected/unknown
-evidence retains its hold. No reader, signer, sender, route or default qualification
-is supplied. LOCAL_FIXTURE stays LOCAL_FIXTURE through durable restart/settlement.
+evidence retains its hold. No signer, sender, route or default qualification is
+supplied. LOCAL_FIXTURE stays LOCAL_FIXTURE through durable restart/settlement.
 
-Qualification still requires a trusted finalized Mainnet reader, authoritative M4
+Qualification still requires trusted bounded Mainnet transport integration, authoritative M4
 receipt and Agent-wallet/account binding, and full mutable program/account-state
 qualification. `getTransaction.meta` cannot prove raw curve/volume-account state.
 Nonzero buyback split semantics, sharing/cashback/rewards, PumpSwap, account creation,
@@ -31,8 +52,9 @@ and unmounted-adapter descriptions describe the decision093 snapshot, not curren
 The existing controlled CPMM exact-debit paths remain unchanged. Default Pump routes
 have no signing/broadcast ports; no production adapter or worker is installed.
 readSnapshot, simulateUnsigned, readFinalized and verifyFinalizedEffects are explicit
-dependencies in pump-runtime-adapter.js. Actual finalized reader and complete
-pool/program/state effect qualification remain absent/unqualified. Local DI accounting is
+dependencies in pump-runtime-adapter.js. The new read-only reader is unmounted;
+actual transport integration and complete pool/program/state effect qualification
+remain unqualified. Local DI accounting is
 DERIVED/LOCAL_FIXTURE and creates no qualified production position or receipt.
 Historical program/global account reads do not qualify an associated mint or pool.
 

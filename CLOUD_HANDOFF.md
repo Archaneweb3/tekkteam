@@ -1,5 +1,26 @@
 # TEKKTEAM manager handoff
 
+22:51WIB latest: exact existing UNKNOWN-signature reader added as unmounted DI source;
+only read-only genesis/status/finalized base64 transaction. 176focused regressionsPASS,
+reader48 independentlyPASS/source reviewPASS; accessor/proxy provider error leak
+fixed and retested. Integrated genuine pure accounting + durable SQLite restart
+preserves UNKNOWN reservations on null/pruned/RPC failure/rejected effects, then
+same signature settles LOCAL_FIXTURE once. No real RPC/reader mounting/qualification,
+UI, staging deployment/restart or financial action. Existing CPMM/custody unchanged.
+M6 still needs trusted bounded transport/source bridge/raw mutable-state qualification,
+nonzero buyback primary math specification, PumpSwap/provisioning/rent and actual
+M4/Agent-wallet relationship plus separate financial gate. Buyback guard stays closed.
+M9 full consistent restricted isolated restore remains UNVERIFIED/operator-gated.
+Read-only staging22:47:50WIB confirms same expired8e47534a review, approvalfalse,
+ownerSignedfalse/broadcastfalse/receipt0, DBOK/APIHTTPS200, PM2stage43919/15,
+production10722/0 and10893/0 unchanged. No processes stopped or configuration read.
+Browser fresh Edge3 owner tab448 connected/authenticated; saved target reopened,
+expired review and disabled Approve shown. Terminal409 healthy/staging root; both
+handoff marked. Old restored tab438 CDP timeout; fresh tab worked without reconnect.
+Evidence artifacts/m9-runtime/{reader-state,reader-checkpoint}.json,
+reader-regressions.tap, reader-owner-handoff.png. Source and docs committed/pushed
+together; verify HEAD/origin. M4 financial gate remains pending, no approval assumed.
+
 22:37WIB latest: new pure curve finalized-accounting verifier + persisted canonical
 effectPolicy via existing adapter, default off;128focused tests/syntax/two independent
 reviewsPASS. Signed message serialization, planDigest/fingerprint, atomic balances,

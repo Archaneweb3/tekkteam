@@ -1,5 +1,24 @@
 # M4 — WAITING_FOR_HUMAN; Phase 1 reviewed, financial execution pending
 
+22:51WIB safe reader batch complete before23:09 target: unmounted read-only exact
+existing-signature reader, integrated through existing fixture adapter/restart test,
+176regressionsPASS; independent reviewPASS (48reader tests independently). Sanitized
+RPC error accessor/proxy fix included. No runtime activation/RPC/financial action.
+Staging22:47health200/DBOK/expired review/receipt0/production unchanged; browser22:49
+connected owner and disabled expired approval. Pending financial question unchanged.
+Next M4 action only after human readiness: regenerate fresh complete review, show
+economics/digest/expiry, then manual owner Phantom approval for ONE launch. No stale
+review reuse. Independent M6 normal-buyback semantics and mutable-state/PumpSwap/
+provisioning qualification remain blockers, not reasons to relax accounting.
+
+Safe independent batch4October2026 22:39WIB; checkpoint23:09WIB: implement an
+unmounted read-only finality reader for existing UNKNOWN curve ledger signatures,
+through the existing adapter DI. Exact finalized status/bytes/genesis/error binding;
+missing/pruned/network failures retain UNKNOWN, no retries/sign/send/runtime mount.
+Nonzero buyback primary-source split specification remains absent; keep rejection.
+Full runtime restore is an operator qualification gap, not an auth bug to bypass.
+No new financial authorization or preparation; pending human gate unchanged.
+
 22:37WIB safe batch complete ahead of22:52 target: pure curve finalized-effects
 accounting subset and canonical immutable policy integrated through existing local
 adapter;128focused regressions/syntax/two independent reviewsPASS. No runtime mounting,

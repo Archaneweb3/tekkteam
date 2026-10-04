@@ -14,6 +14,7 @@ import {buildOfflinePumpEnvelope} from '../server/dex/pump-offline-envelope.js';
 import {createPumpRuntimeAdapter} from '../server/dex/pump-runtime-adapter.js';
 import {createPumpRuntimeLedger} from '../server/dex/pump-runtime-ledger.js';
 import {createPumpRuntimeExecutor} from '../server/dex/pump-runtime-executor.js';
+import {createPumpFinalizedReader} from '../server/dex/pump-finalized-reader.js';
 import {GENESIS} from '../src/pump-readiness.js';
 import {digest,SOL_MINT} from '../server/dex/intent.js';
 
@@ -80,10 +81,15 @@ test('derived policy persists in existing adapter plan without adding finality/s
 test('default-off runtime uses genuine pure verifier; restart and rejected effects retain UNKNOWN',async t=>{
  const x=await fixture(),file=path.join(mkdtempSync(path.join(tmpdir(),'tekkteam-finalized-fixture-')),'fixture.sqlite');let db=new DatabaseSync(file),ledger=createPumpRuntimeLedger(db,{now:()=>now}),clock=now; t.after(()=>db.close());
  const context={authenticated:true,owner:x.r.intent.owner,agentId:x.r.intent.agentId,agentWallet:wallet,associatedMint:x.venue.mint,network:'solana:101',genesis:GENESIS,authorityVerified:true,revision:1,paused:false,enabled:true,killSwitch:false,emergencyStop:false,liveEnabled:false,broadcastEnabled:false};
- const adapter=createPumpRuntimeAdapter({now:()=>clock,readSnapshot:async()=>({...x.options,accounts:pumpWalletFixture(x.venue,wallet),feeCapLamports:'10000'}),simulateUnsigned:async p=>({source:'LOCAL_FIXTURE',messageHash:p.messageHash,success:true,err:null}),readFinalized:async()=>x.o,verifyFinalizedEffects:verifyFinalizedPumpCurveEffects});
+ let missing=false,rpcFailure=false;const calls=[];
+ const readFinalized=createPumpFinalizedReader({rpc:async(method,params)=>{calls.push({method,params});if(rpcFailure)throw Error('synthetic unavailable');if(method==='getGenesisHash')return GENESIS;if(method==='getSignatureStatuses')return {context:{slot:102},value:[{slot:x.o.slot,confirmations:null,confirmationStatus:'finalized',err:x.o.error}]};if(method==='getTransaction')return missing?null:{slot:x.o.slot,version:0,blockTime:null,transaction:[x.o.transaction,'base64'],meta:x.o.meta};throw Error('FORBIDDEN_RPC');}});
+ const adapter=createPumpRuntimeAdapter({now:()=>clock,readSnapshot:async()=>({...x.options,accounts:pumpWalletFixture(x.venue,wallet),feeCapLamports:'10000'}),simulateUnsigned:async p=>({source:'LOCAL_FIXTURE',messageHash:p.messageHash,success:true,err:null}),readFinalized,verifyFinalizedEffects:verifyFinalizedPumpCurveEffects});
  const engine=()=>createPumpRuntimeExecutor({ledger,adapter,readContext:()=>structuredClone(context),riskPolicy:{version:'fixture-policy',maxSnapshotAgeMs:10000,maxSlippageBps:100,maxBuyLamports:'100000000',maxNetworkFeeLamports:'10000',minReserveLamports:'2000000',futureSellFeeLamports:'10000',reconciliationMarginLamports:'10000'},now:()=>clock});
  const r=await engine().prepare({}, {...x.r.intent,requestKey:'finalized-effects-fixture-001'});assert.equal(r.plan.effectPolicy.messageHash,x.r.plan.effectPolicy.messageHash);await engine().trackPending({},r.id,x.o.transaction);
  db.close();db=new DatabaseSync(file);ledger=createPumpRuntimeLedger(db,{now:()=>now});clock=now+60000;context.paused=true;context.killSwitch=true;
+ missing=true;assert.equal((await engine().reconcile({},r.id)).status,'UNKNOWN');assert.equal(ledger.reservation(r.id).status,'UNKNOWN');assert.equal(ledger.receipt(r.id),null);missing=false;
+ rpcFailure=true;await assert.rejects(engine().reconcile({},r.id),/RPC_UNAVAILABLE/);assert.equal(ledger.reservation(r.id).status,'UNKNOWN');assert.equal(ledger.position(r.intent.agentId,x.venue.mint),null);rpcFailure=false;
  const old=x.o.meta.postBalances[0];x.o.meta.postBalances[0]++;await assert.rejects(engine().reconcile({},r.id));assert.equal(ledger.get(r.id).status,'UNKNOWN');assert.equal(ledger.receipt(r.id),null);assert.equal(ledger.reservation(r.id).status,'UNKNOWN');x.o.meta.postBalances[0]=old;
  assert.equal((await engine().reconcile({},r.id)).status,'CONFIRMED');assert.equal(ledger.receipt(r.id).actualChainVerified,false);assert.equal(ledger.position(r.intent.agentId,x.venue.mint).source,'LOCAL_FIXTURE');assert.equal((await engine().reconcile({},r.id)).status,'CONFIRMED');
+ assert(calls.every(c=>!['getSignatureStatuses','getTransaction'].includes(c.method)||JSON.stringify(c.params).includes(x.r.signature)));assert(calls.every(c=>['getGenesisHash','getSignatureStatuses','getTransaction'].includes(c.method)));
 });
