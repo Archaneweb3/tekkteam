@@ -1,4 +1,5 @@
 import test from 'node:test';
+import {fixtureGeneralTarget} from './dex-target-authority-fixture.mjs';
 import assert from 'node:assert/strict';
 import {DatabaseSync} from 'node:sqlite';
 import {Keypair,PublicKey,VersionedTransaction} from '@solana/web3.js';
@@ -48,7 +49,7 @@ function harness(t){
   async readFinalized(signature,r){if(!state.finalized)return null;return {signature:state.reconciliationMismatch?'wrong-signature':signature,finalized:true,slot:123,error:state.onChainError?{InstructionError:[2,'Custom']}:null,transaction:state.sent.get(signature),networkFeeLamports:'5000'};},
   async verifiedEffects(r){const p=r.validationPolicy,q=cpmmEnvelopeContext(p).q,input=BigInt(r.intent.inputAmount),output=q.output,fee=5000n,rent=r.intent.direction==='BUY'&&state.tokenBalance==='0'?BigInt(captured.ataRentLamports):0n;return {actualInput:input.toString(),actualOutput:output.toString(),networkFeeLamports:fee.toString(),rentLamports:rent.toString(),agentSolDelta:(r.intent.direction==='BUY'?-input-fee-rent:output-fee-rent).toString(),agentTokenDelta:(r.intent.direction==='BUY'?output:-input).toString()};}
  };
- const port=createAutonomousExecutionPort({ledger,adapter,flags:()=>state.flags,network:{verify:async()=>({network:'solana:mainnet',verified:state.networkVerified})},now:()=>state.now});
+ const port=createAutonomousExecutionPort({ledger,adapter,assertTarget:fixtureGeneralTarget({id:'agent',creator:'owner'}),flags:()=>state.flags,network:{verify:async()=>({network:'solana:mainnet',verified:state.networkVerified})},now:()=>state.now});
  const agent={agentId:'agent',owner:'owner',agentWallet:address,mode:'LIVE_AUTONOMOUS',enabled:true,paused:false,vaultVerified:true,strategy:'momentum'};
  const ledgerState=(direction,quantity='0')=>({openPositions:direction==='BUY'?0:1,positionQuantity:quantity,unknown:false,unresolved:false,reservationConflict:false,consecutiveFailures:0,pausedByBreaker:false,cooldownUntil:0,dailyTurnoverLamports:'0'});
  const run=async(direction,amount,key)=>{const marketQuote=fixtureMarket(state.now),provenance=direction==='BUY'?await fixtureProvenance(marketQuote,address,state.now):null;const intent={mode:'LIVE_AUTONOMOUS',network:'solana:mainnet',agentId:'agent',owner:'owner',agentWallet:address,direction,inputMint:direction==='BUY'?SOL_MINT:CONTROLLED_USDC_MINT,outputMint:direction==='BUY'?CONTROLLED_USDC_MINT:SOL_MINT,inputAmount:amount,slippageBps:100,pool:CONTROLLED_CPMM_POOL,marketBinding:provenance?.binding,requestKey:key,strategyVersion:0};return port.execute({agent,intent,venue:{kind:'RAYDIUM_CPMM',pool:CONTROLLED_CPMM_POOL,tokenMint:CONTROLLED_USDC_MINT},risk:{allowed:true},marketQuote,ledgerState:ledgerState(direction,amount)});};

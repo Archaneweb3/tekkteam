@@ -349,7 +349,7 @@ function drawX(tx) {
 }
 
 // ─────────────── the office ───────────────
-export function createOffice(host, { onAction } = {}) {
+export function createOffice(host, { onAction, composition = 'default' } = {}) {
   const canvas = document.createElement('canvas');
   canvas.className = 'office-gl';
   canvas.setAttribute('aria-hidden', 'true');
@@ -624,6 +624,9 @@ export function createOffice(host, { onAction } = {}) {
   let yaw = -0.62, yawTarget = -0.62, pitch = 0.58;
   const center = [5.45, 0.72, 4.1];
   function fit() {
+    // A steeper mobile hero view gives the map more height without cropping
+    // its footprint or separating action markers from their hit targets.
+    pitch = composition === 'hero' && cssW < 640 ? 0.92 : 0.58;
     const eye = [center[0] + Math.sin(yaw) * Math.cos(pitch) * 30, center[1] + Math.sin(pitch) * 30, center[2] + Math.cos(yaw) * Math.cos(pitch) * 30];
     view = lookAt(eye, center);
     const pts = [];
@@ -635,7 +638,7 @@ export function createOffice(host, { onAction } = {}) {
     // Keep the complete office footprint visible inside the reference hero column.
     const narrow = cssW < 640;
     // Fit the complete office bounds with breathing room on every viewport.
-    let zoom = 1.08;
+    let zoom = composition === 'hero' ? 1.03 : 1.08;
     let hw = cw / 2 * zoom, hh = ch / 2 * zoom;
     if (hw / hh > aspect) hh = hw / aspect; else hw = hh * aspect;
     const mx = (l + r) / 2 + (narrow ? 0 : 0.1), my = (b + t) / 2 + (narrow ? 0 : 0.05);
@@ -917,15 +920,16 @@ export function createOffice(host, { onAction } = {}) {
     else running = false;
   }
 
+  let disposed = false;
   function start() {
-    if (raf) return;
+    if (disposed || raf) return;
     running = true;
     last = performance.now();
     raf = requestAnimationFrame(frame);
   }
   resize();
   start();
-  if (reduce) setInterval(() => { if (dirty || Math.abs(night - nightTarget) > 0.01) { night = nightTarget; start(); } }, 500);
+  const reducedMotionTimer = reduce ? setInterval(() => { if (dirty || Math.abs(night - nightTarget) > 0.01) { night = nightTarget; start(); } }, 500) : null;
 
   return {
     setData({ trades = [], tokens = [], coins = [] } = {}) {
@@ -949,6 +953,8 @@ export function createOffice(host, { onAction } = {}) {
       }
     },
     destroy() {
+      disposed = true;
+      if (reducedMotionTimer !== null) clearInterval(reducedMotionTimer);
       running = false; if (raf) cancelAnimationFrame(raf);
       ro.disconnect(); io.disconnect(); mo.disconnect();
       document.removeEventListener('visibilitychange', onVis);

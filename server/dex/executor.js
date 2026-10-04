@@ -7,15 +7,17 @@ import {classifyQuoteFailure} from './quote-diagnostics.js';
 
 // Dependency boundary: production supplies NO route adapter/signer/broadcaster.
 // Fixture adapters exercise this orchestration, but cannot certify a Jupiter ABI.
-export function createControlledExecutor({ledger,provider,adapter,authorize,flags,oneShot,now=Date.now,riskPolicy=DEFAULT_RISK_POLICY,requireSimulation=false,reviewLifetimeMs=30000}){
+export function createControlledExecutor({ledger,provider,adapter,authorize,flags,oneShot,assertTarget=()=>reject('REAL_TARGET_AUTHORITY_UNAVAILABLE'),now=Date.now,riskPolicy=DEFAULT_RISK_POLICY,requireSimulation=false,reviewLifetimeMs=30000}){
  const context=async actor=>{const c=await authorize(actor);if(!c?.authenticated||!c.owner||!c.agentWallet)reject('OWNER_AUTH_REQUIRED');return c;};
  const owned=async(actor,id)=>{const c=await context(actor),r=ledger.get(id);if(!r||r.intent.owner!==c.owner||r.intent.agentId!==c.agentId||r.intent.agentWallet!==c.agentWallet)reject('EXECUTION_OWNERSHIP_MISMATCH');return {c,r};};
+ const target=intent=>{const result=assertTarget(intent);if(result?.available!==true||result?.then)reject('REAL_TARGET_AUTHORITY_UNAVAILABLE');};
+ const targetOwned=async(actor,id)=>{const result=await owned(actor,id);target(result.r.intent);return result;};
  const gate=(c,r,phase='PREPARE',approval)=>{if(!adapter)reject('UNVERIFIED_ROUTE_ADAPTER');return authorizeRealExecution({mode:EXECUTION_MODES.CONTROLLED_REAL,flags:flags(),context:c,record:r,phase,confirmation:approval,reservation:phase==='CONFIRM'?ledger.reservation(r.id):undefined,now});};
  const quoteMatches=(r)=>{assertQuoteFresh(r.quote,now());if(r.intent.expiresAt<=now())reject('INTENT_EXPIRED');if(r.quoteDigest!==digest(r.quote))reject('QUOTE_MUTATION');for(const k of ['inputMint','outputMint','inputAmount','slippageBps'])if(r.quote[k]!==r.intent[k])reject('QUOTE_INTENT_MISMATCH');if(integer(r.quote.minimumOutput)>integer(r.quote.estimatedOutput)||integer(r.quote.minimumOutput)<integer(r.quote.estimatedOutput)*BigInt(10000-r.intent.slippageBps)/10000n)reject('SLIPPAGE_VIOLATION');};
  const policy=async(r)=>({...await adapter.validationPolicy(r),intent:r.intent,quote:r.quote,blockhash:r.blockhash,expectedMessageHash:r.messageHash});
  const armChecks=async(actor,id)=>{
   if(!oneShot)reject('ONE_SHOT_ARMING_UNAVAILABLE');
-  const {c,r}=await owned(actor,id);gate(c,r);
+  const {c,r}=await targetOwned(actor,id);gate(c,r);
   if(r.status!=='PREPARED'||r.signature||r.broadcastAttemptedAt)reject('ONE_SHOT_RECORD_INVALID');
   if(requireSimulation&&(!r.simulation?.success||r.simulation.messageHash!==r.messageHash))reject('UNSIMULATED_MESSAGE');
   quoteMatches(r);
@@ -27,20 +29,21 @@ export function createControlledExecutor({ledger,provider,adapter,authorize,flag
   if(risk.policyVersion!==r.risk.policyVersion||snapshot.networkFeeLamports!==r.review.networkFeeLamports||snapshot.ataRentLamports!==r.review.ataRentLamports||(snapshot.netRentLamports??snapshot.ataRentLamports)!==r.review.netRentLamports||risk.reserveAfterLamports!==r.review.reserveAfterLamports)reject('REVIEW_ECONOMICS_CHANGED');
   const decoded=validateDexTransaction(r.transaction,await policy(r));
   if(decoded.messageBytes.toString('base64')!==r.message||decoded.messageHash!==r.messageHash||r.risk.intentHash!==digest(r.intent))reject('MESSAGE_OR_RISK_MUTATION');
-  await adapter.assertCustody(r.intent);await owned(actor,id);gate(c,r);quoteMatches(r);
+  await adapter.assertCustody(r.intent);await targetOwned(actor,id);gate(c,r);quoteMatches(r);
   if(r.capabilityExpiresAt<=now()||risk.expiresAt<=now()||await adapter.blockHeight()>r.lastValidBlockHeight)reject('ARMING_EXPIRED');
+  const current=await targetOwned(actor,id);gate(current.c,current.r);quoteMatches(current.r);
   return {r,reservation};
  };
  return {
   async quote(actor,body){
    const c=await context(actor),canonical=canonicalIntent(body,c,now(),reviewLifetimeMs);
-   const reservation=ledger.reserve(canonical);if(reservation.existing)return reservation.record;
+   target(canonical.intent);const reservation=ledger.reserve(canonical);if(reservation.existing)return reservation.record;
    const r=reservation.record;
-   try{const q=await provider.quote(r.intent);const candidate={...r,quote:q,quoteDigest:digest(q)};quoteMatches(candidate);return ledger.transition(r.id,['QUOTED'],'QUOTED',{quote:q,quoteDigest:candidate.quoteDigest});}
+   try{const q=await provider.quote(r.intent);await targetOwned(actor,r.id);const candidate={...r,quote:q,quoteDigest:digest(q)};quoteMatches(candidate);return ledger.transition(r.id,['QUOTED'],'QUOTED',{quote:q,quoteDigest:candidate.quoteDigest});}
    catch(e){ledger.transition(r.id,['QUOTED'],'REJECTED_BEFORE_SIGNING',{reason:'QUOTE_UNAVAILABLE',quoteDiagnostic:{...classifyQuoteFailure(e),pool:r.intent.pool??'7JuwJuNU88gurFnyWeiyGKbFmExMWcmRZntn9imEzdny',inputMint:r.intent.inputMint,outputMint:r.intent.outputMint,inputAmount:r.intent.inputAmount,observedAt:now()}});throw e;}
   },
   async prepare(actor,id){
-   const {c,r}=await owned(actor,id);gate(c,r);if(r.status!=='QUOTED')return r;
+   const {c,r}=await targetOwned(actor,id);gate(c,r);if(r.status!=='QUOTED')return r;
    ledger.transition(id,['QUOTED'],'PREPARING',{preparingAt:now()});
    try{
     quoteMatches(r);
@@ -71,7 +74,7 @@ export function createControlledExecutor({ledger,provider,adapter,authorize,flag
      const after=validateDexTransaction(plan.transaction,await policy(pending));
      if(after.messageHash!==simulation.messageHash||!after.messageBytes.equals(decoded.messageBytes))reject('SIMULATED_MESSAGE_CHANGED');
     }
-    await owned(actor,id);gate(c,r);quoteMatches(r);if(risk.expiresAt<=now())reject('RISK_EXPIRED');
+    await targetOwned(actor,id);gate(c,r);quoteMatches(r);if(risk.expiresAt<=now())reject('RISK_EXPIRED');
     const prepared={...r,transaction:plan.transaction,blockhash:plan.blockhash,lastValidBlockHeight:plan.lastValidBlockHeight,validationPolicy:plan.validationPolicy,stateDigest:plan.stateDigest,snapshotSlot:plan.snapshotSlot,message:decoded.messageBytes.toString('base64'),messageHash:decoded.messageHash,pool:plan.pool,routePolicyVersion:plan.routePolicyVersion,risk,simulation,review:{networkFeeLamports:snapshot.networkFeeLamports,ataRentLamports:snapshot.ataRentLamports,netRentLamports:snapshot.netRentLamports??snapshot.ataRentLamports,reserveAfterLamports:risk.reserveAfterLamports},preparedAt:now()};
     const {token,...capability}=issueConfirmationCapability(prepared,{now,lifetimeMs:reviewLifetimeMs});
     const persisted=ledger.transition(id,['PREPARING'],'PREPARED',{transaction:prepared.transaction,blockhash:prepared.blockhash,lastValidBlockHeight:prepared.lastValidBlockHeight,validationPolicy:prepared.validationPolicy,stateDigest:prepared.stateDigest,snapshotSlot:prepared.snapshotSlot,message:prepared.message,messageHash:prepared.messageHash,pool:prepared.pool,routePolicyVersion:prepared.routePolicyVersion,risk,simulation,review:prepared.review,preparedAt:prepared.preparedAt,...capability});
@@ -80,14 +83,15 @@ export function createControlledExecutor({ledger,provider,adapter,authorize,flag
   },
   async arm(actor,id){
    const {r,reservation}=await armChecks(actor,id);
+   target(r.intent);
    return oneShot.stage(r,reservation);
   },
   async armEligibility(actor,id){
-   try{await armChecks(actor,id);const armed=oneShot.status();if(armed?.status==='ARMED'||armed?.consumed)return {executionId:id,eligible:false,reason:'ONE_SHOT_UNAVAILABLE'};return {executionId:id,eligible:true,reason:null};}
+   try{const {r}=await armChecks(actor,id);target(r.intent);const armed=oneShot.status();if(armed?.status==='ARMED'||armed?.consumed)return {executionId:id,eligible:false,reason:'ONE_SHOT_UNAVAILABLE'};return {executionId:id,eligible:true,reason:null};}
    catch(e){return {executionId:id,eligible:false,reason:e.code??'ARM_UNAVAILABLE'};}
   },
   async confirm(actor,id,approval){
-   const {c,r}=await owned(actor,id);gate(c,r);
+   const {c,r}=await targetOwned(actor,id);gate(c,r);
    if(r.status!=='PREPARED')return r; // Never resend SIGNED, SUBMITTED or UNKNOWN.
    if(r.capabilityExpiresAt<=now()||r.quote?.expiresAt<=now()||r.intent.expiresAt<=now()){
     const expired=ledger.transition(id,['PREPARED'],'EXPIRED',{reason:'CONFIRMATION_EXPIRED'});oneShot?.settle(expired);
@@ -111,7 +115,7 @@ export function createControlledExecutor({ledger,provider,adapter,authorize,flag
     ledger.transition(id,['PREPARED'],'UNKNOWN',{reason:'SIGNING_CLAIMED',authorizedMessageHash:r.messageHash});
     let signed;
     try{
-     signed=await adapter.signExactMessage(r,decoded);
+     target(r.intent);signed=await adapter.signExactMessage(r,decoded);
      const verified=validateDexTransaction(signed,{...p,requireSignature:true});
      if(verified.messageBytes.toString('base64')!==r.message)reject('SIGNED_MESSAGE_MUTATION');
      const signature=bs58.encode(verified.transaction.signatures[0]);
@@ -120,11 +124,11 @@ export function createControlledExecutor({ledger,provider,adapter,authorize,flag
     const current=ledger.get(id);
     // Signing does not authorize submission after revocation/expiry. Preserve the
     // signed intent for reconciliation, never sign or send a replacement.
-    try{if(await adapter.blockHeight()>r.lastValidBlockHeight)reject('BLOCKHASH_EXPIRED');await owned(actor,id);gate(c,r);quoteMatches(r);if(risk.expiresAt<=now())reject('RISK_EXPIRED');}
+    try{if(await adapter.blockHeight()>r.lastValidBlockHeight)reject('BLOCKHASH_EXPIRED');await targetOwned(actor,id);gate(c,r);quoteMatches(r);if(risk.expiresAt<=now())reject('RISK_EXPIRED');}
     catch{ledger.transition(id,['SIGNED'],'UNKNOWN',{reason:'SIGNED_NOT_BROADCAST'});return ledger.get(id);}
     oneShot?.assertClaimed(r);
     ledger.transition(id,['SIGNED'],'SUBMITTED',{broadcastAttemptedAt:now()});
-    try{const signature=await adapter.broadcastOnce(signed,{maxRetries:0,skipPreflight:false},r);if(signature!==current.signature)reject('BROADCAST_SIGNATURE_MISMATCH');}
+    try{target(r.intent);const signature=await adapter.broadcastOnce(signed,{maxRetries:0,skipPreflight:false},r);if(signature!==current.signature)reject('BROADCAST_SIGNATURE_MISMATCH');}
     catch{ledger.transition(id,['SUBMITTED'],'UNKNOWN',{reason:'BROADCAST_OUTCOME_UNKNOWN'});}
     return ledger.get(id);
    }catch(e){if(ledger.get(id)?.status==='PREPARED'){const rejected=ledger.transition(id,['PREPARED'],'REJECTED_BEFORE_SIGNING',{reason:'PRE_BROADCAST_VALIDATION_REJECTED'});oneShot?.settle(rejected);}throw e;}

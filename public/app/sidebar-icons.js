@@ -1,5 +1,6 @@
 const navAssets={
  overview:'home',
+ launch:'tokens',
  agents:'agents',
  tokens:'tokens',
  market:'market',

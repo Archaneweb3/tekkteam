@@ -11,17 +11,17 @@ const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;',
 const status = a => ({DRAFT:'Draft',PREPARED:'Ready to sign',SUBMITTED:'Confirming',DEVNET_LIVE:'Devnet minted',FAILED:'Test failed'}[a.status] || a.status);
 // Reuse the original office renderer independently of the legacy status panels.
 export function renderWorkspaceMap(page,{onAction}) {
-  page.innerHTML=`<div class="workforce-visual"><div class="hero-city" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div><div class="desk-office"><div id="tw-office"></div></div></div>
-  <header class="desk-heading"><div class="glass-hero-copy"><span class="desk-kicker">SOLANA MAINNET · YOUR AGENT WORKFORCE</span><h1>Build your agent.<br><strong>Let it do the work.</strong></h1><p>Launch a token with your approval. Read Mainnet signals and test deterministic strategies in Paper mode. Live trading stays locked.</p><div class="glass-hero-actions"><a class="tw-button primary" href="#/agents/new"><span class="hero-cta-content">${launchGlyph}<span>Create Agent</span></span><svg class="hero-cta-chevron" viewBox="0 0 16 24" aria-hidden="true"><path d="m4 4 8 8-8 8" fill="none" stroke="currentColor" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/></svg></a><a class="tw-button" href="#/agents"><span class="hero-cta-content">${workforceGlyph}<span>View Workforce</span></span></a></div></div></header>
+  page.innerHTML=`<div class="tt-map-hero"><div class="workforce-visual"><div class="desk-office"><div id="tw-office"></div></div></div>
+  <header class="desk-heading"><div class="glass-hero-copy"><span class="desk-kicker">AI AGENT LAUNCHPAD · SOLANA</span><h1>Launch your coin.<br><strong>Give it an agent.</strong></h1><p>Launch on Pump.fun with an Agent and explicit wallet approval.</p><div class="glass-hero-actions"><a class="tw-button primary" href="#/launch"><span class="hero-cta-content">${launchGlyph}<span>Launch Coin + Agent</span></span><svg class="hero-cta-chevron" viewBox="0 0 16 24" aria-hidden="true"><path d="m4 4 8 8-8 8" fill="none" stroke="currentColor" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/></svg></a><a class="tw-button" href="#/agents"><span class="hero-cta-content">${workforceGlyph}<span>View Agents</span></span></a></div></div></header><div class="tt-map-status"><span></span>Interactive workspace <small>Live trading stays OFF</small></div></div>
   <div class="workforce-roles" aria-label="Workforce capabilities">${[
-    ['Launcher','frank',launchGlyph,'Create your coin.<br>You approve the launch.'],
+    ['Launcher','frank',launchGlyph,'Launch on Pump.fun.<br>You approve the launch.'],
     ['Analyst','fomy',analystGlyph,'Reads market data<br>and finds opportunities.'],
     ['Paper Trader','cupsey',traderGlyph,'Tests your strategy<br>with simulated funds.']
   ].map(([title,id,glyph,description])=>`<article><img class="role-character" src="${characterPortraitUrl(id)}" alt="" aria-hidden="true"><span class="role-emblem">${glyph}</span><div><h2>${title}</h2><p>${description}</p></div></article>`).join('')}</div>`;
-  const office=createOffice(page.querySelector('#tw-office'),{onAction});
+  const office=createOffice(page.querySelector('#tw-office'),{onAction,composition:'hero'});
   page.querySelectorAll('#tw-office .ob').forEach(control=>control.classList.add('spatial-glass'));
   const material=mountLiquidMaterial(page.querySelectorAll('.glass-hero-actions .tw-button,#tw-office .ob'));
-  return {updateActivity(){},destroy(){material.destroy();office.destroy();}};
+  return {destroy(){material.destroy();office.destroy();}};
 }
 export function renderOverview(page, { state, openWallet, activity, onAction }) {
   const signedIn = !!state.session;

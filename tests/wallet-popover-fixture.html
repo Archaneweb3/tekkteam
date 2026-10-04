@@ -1,5 +1,15 @@
 <!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Wallet menu clipping regression fixture</title></head><body><div class="tw-drawer-open"><div class="tw-shell"><header class="tw-header spatial-glass"><a class="tw-brand">TEKKTEAM</a><nav><p>Isolated wallet menu test</p><p>No real session or wallet requests</p></nav><div style="min-height:220px"></div><button id="tw-wallet" class="tw-button wallet spatial-glass"></button><div class="tw-sidebar-character"></div></header><main><h1>Wallet menu regression</h1><p id="result">Not disconnected</p></main></div></div><script type="module">
 import {mountWalletBalance} from '../public/app/wallet-balance.js';
+import createElement from '../node_modules/lucide/dist/esm/createElement.mjs';
+import Close from '../node_modules/lucide/dist/esm/icons/x.mjs';
+import Copy from '../node_modules/lucide/dist/esm/icons/copy.mjs';
+import Refresh from '../node_modules/lucide/dist/esm/icons/refresh-cw.mjs';
+import Logout from '../node_modules/lucide/dist/esm/icons/log-out.mjs';
+import Check from '../node_modules/lucide/dist/esm/icons/check.mjs';
+window.TekkworkIcon=name=>createElement(({close:Close,copy:Copy,refresh:Refresh,logout:Logout,check:Check})[name]||Close,{class:'tw-icon',width:18,height:18,'stroke-width':1.8}).outerHTML;
 const html=await(await fetch('/index.html')).text();const source=new DOMParser().parseFromString(html,'text/html');await Promise.all([...source.querySelectorAll('link[rel=stylesheet]')].map(link=>new Promise(resolve=>{const copy=link.cloneNode();copy.onload=resolve;copy.onerror=resolve;document.head.append(copy);})));window.TekkworkDemo={};
-mountWalletBalance(document.querySelector('#tw-wallet'),{owner:'So11111111111111111111111111111111111111112',onConnect:()=>{},onDisconnect:async()=>{document.querySelector('#result').textContent='Disconnect callback reached';}});
+document.documentElement.classList.add('tt-product');
+document.querySelector('h1').textContent='LOCAL UI FIXTURE — not a real wallet session';
+const pending=new URLSearchParams(location.search).get('state')==='pending';
+mountWalletBalance(document.querySelector('#tw-wallet'),{owner:'So11111111111111111111111111111111111111112',provider:{name:'Phantom'},readOnly:pending,onAuthenticate:()=>{document.querySelector('#result').textContent='Authentication callback reached (fixture only; no signature)';},onConnect:()=>{},onDisconnect:async()=>{document.querySelector('#result').textContent='Disconnect callback reached';}});
 </script></body></html>

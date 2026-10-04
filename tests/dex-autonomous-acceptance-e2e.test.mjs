@@ -1,4 +1,5 @@
 import test from 'node:test';
+import {fixtureGeneralTarget,fixtureGeneralScope} from './dex-target-authority-fixture.mjs';
 import assert from 'node:assert/strict';
 import express from 'express';
 import {DatabaseSync} from 'node:sqlite';
@@ -47,7 +48,7 @@ test('production owner route to worker, port, custody claims, chain receipts, po
   }
  };
  const app=express();app.use(express.json());const auth=(req,res,next)=>{if(req.headers['x-owner']!==C.owner)return res.sendStatus(401);req.session={address:C.owner};next();};
- const installed=installControlledDex(app,{db,auth,sessionValid:req=>req.headers['x-owner']===C.owner,owned:req=>({agent:{id:req.params.id,tradingWallet:wallet}}),store:{unseal:()=>Uint8Array.from(signer.secretKey)},realMoney:{connection,productionRpcConfigured:true,verify:async()=>({networkConsistent:true})},acceptanceCandidate:C,now:()=>S.time});
+ const installed=installControlledDex(app,{db,readLaunchpadScope:fixtureGeneralScope(db,[{id:C.agentId,creator:C.owner,tradingWallet:wallet}]),auth,sessionValid:req=>req.headers['x-owner']===C.owner,owned:req=>({agent:{id:req.params.id,tradingWallet:wallet}}),store:{unseal:()=>Uint8Array.from(signer.secretKey)},realMoney:{connection,productionRpcConfigured:true,verify:async()=>({networkConsistent:true})},acceptanceCandidate:C,now:()=>S.time});
  const server=app.listen(0,'127.0.0.1');await new Promise(resolve=>server.once('listening',resolve));t.after(()=>server.close());
  const url=`http://127.0.0.1:${server.address().port}/api/agents/${C.agentId}/autonomous-acceptance`;
  const start=await fetch(url+'/start',{method:'POST',headers:{'x-owner':C.owner,'Content-Type':'application/json'},body:'{}'});assert.equal(start.status,200);const cycle=await start.json();assert.equal(cycle.status,'ARMED');
@@ -55,7 +56,7 @@ test('production owner route to worker, port, custody claims, chain receipts, po
  const claim=createAutonomousClaim({db,ledger:installed.ledger,flags:()=>({liveAutonomousEnabled:false,autonomousKillSwitch:true,realMoneyEmergencyStop:true}),acceptance:installed.acceptance});
  const adapter=createCpmmProductionAdapter({connection,db,store:{unseal:()=>{S.signs++;return Uint8Array.from(signer.secretKey);}},autonomousClaim:claim,assertNetwork:async()=>assert.equal(await connection.getGenesisHash(),snapshot.genesis),now:()=>S.time});
  const agent={agentId:C.agentId,owner:C.owner,agentWallet:wallet,vaultVerified:true,strategy:'momentum',strategyConfigVersion:0};
- const port=createAutonomousExecutionPort({ledger:installed.ledger,adapter,flags:()=>({liveAutonomousEnabled:false,autonomousKillSwitch:true,realMoneyEmergencyStop:true}),network,currentAgent:async()=>agent,acceptance:installed.acceptance,now:()=>S.time});
+ const port=createAutonomousExecutionPort({ledger:installed.ledger,adapter,assertTarget:fixtureGeneralTarget({id:C.agentId,creator:C.owner}),flags:()=>({liveAutonomousEnabled:false,autonomousKillSwitch:true,realMoneyEmergencyStop:true}),network,currentAgent:async()=>agent,acceptance:installed.acceptance,now:()=>S.time});
  const worker=createAutonomousAcceptanceWorker({acceptance:installed.acceptance,ledger:installed.ledger,port,adapter,agentContext:async()=>agent,network,marketRead:async()=>({...fixtureMarket(S.time),volume5m:0,change5m:null,buys5m:0,sells5m:0}),resolveProvenance:args=>fixtureProvenance(args.snapshot,args.agentWallet,S.time),actualTokenBalance:async()=>S.token,now:()=>S.time});
  const buy=await worker.tick();assert.equal(buy.status,'CONFIRMED');assert.equal(installed.acceptance.read().status,'POSITION_OPEN');assert.equal(installed.acceptance.read().strategyResult.side,'HOLD');
  const entry=installed.ledger.activePosition(C.agentId);assert.equal(entry.acceptanceCycleId,cycle.cycleId);S.token=entry.quantity;S.sol+=Number(BigInt(installed.ledger.get(buy.executionId).confirmedEffects.agentSolDelta));

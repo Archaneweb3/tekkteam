@@ -1,0 +1,12 @@
+// Source template only. Start ecosystem.wallet-test.json; PM2 treats this .cjs name as a script.
+// Deployment template only; configure reviewed absolute paths before running.
+module.exports={apps:[{
+ name:'tekkteam-staging-api',
+ cwd:'/var/www/tekkteam-staging',
+ script:'server/index.js',
+ args:'--wallet-test --config /etc/tekkteam-staging/wallet-test.json',
+ instances:1,exec_mode:'fork',autorestart:true,max_restarts:5,
+ out_file:'/var/log/tekkteam-staging/api.stdout.log',
+ error_file:'/var/log/tekkteam-staging/api.stderr.log',
+ env:{NODE_ENV:'production'}
+}]};

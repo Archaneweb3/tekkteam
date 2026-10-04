@@ -7,13 +7,10 @@ export function mountGlassNavigation(root,{config={}}={}){
  if(!header||!shell)return {destroy(){}};
  header.classList.add('spatial-glass');
  const nav=header.querySelector('nav');
- for(const [id,label]of [['traders','Trading'],['leaderboard','Leaderboard'],['payroll','Payroll']]){
-  const link=document.createElement('a');link.href=`#/${id}`;link.dataset.nav=id;link.textContent=label;nav.insertBefore(link,nav.querySelector('[data-nav="how"]'));
- }
- const walletLink=document.createElement('a');walletLink.href='#/wallet';walletLink.dataset.nav='wallet';walletLink.textContent='Wallet';nav.querySelector('[data-nav="how"]')?.after(walletLink);
  for(const link of nav.querySelectorAll('a')){link.querySelector('svg')?.remove();link.insertAdjacentHTML('afterbegin',sidebarIcon(link.dataset.nav));}
  const mark=header.querySelector('.tw-mark');if(mark)mark.innerHTML=sidebarIcon('crown');
  const material=mountLiquidMaterial([...nav.querySelectorAll('a'),...header.querySelectorAll('#tw-wallet')],{nav});
+ const note=document.createElement('aside');note.className='tt-sidebar-note';note.innerHTML='<img src="/assets/characters/portraits/frank.webp" alt=""><strong>Your coin. Your agent.</strong><p>Build your team on Solana.</p>';header.insertBefore(note,header.querySelector('#tw-wallet'));
  const media=matchMedia('(max-width:900px)'),wallet=header.querySelector('#tw-wallet');
  wallet?.classList.add('spatial-glass');
  const dock=document.createElement('div');dock.className='tw-utility-dock';dock.setAttribute('aria-label','Workspace utilities');
@@ -26,6 +23,8 @@ export function mountGlassNavigation(root,{config={}}={}){
  header.id='tw-workspace-navigation';
  const bar=document.createElement('div');bar.className='tw-mobile-nav';
  bar.innerHTML=`<a href="#/overview" class="tw-mobile-wordmark">tekkteam</a><button type="button" class="tw-icon-button" aria-label="Open navigation" aria-controls="tw-workspace-navigation" aria-expanded="false">${icon('more')}</button>`;
+  const mobileLinks=document.createElement('nav');mobileLinks.className='tt-mobile-links';mobileLinks.setAttribute('aria-label','Quick navigation');
+  for(const source of nav.querySelectorAll('a')){const link=document.createElement('a');link.href=source.getAttribute('href');link.textContent=source.textContent;link.dataset.nav=source.dataset.nav;mobileLinks.append(link);}bar.append(mobileLinks);
  shell.prepend(bar);
  const toggle=bar.querySelector('button'),close=document.createElement('button');close.type='button';close.className='tw-icon-button tw-drawer-close';close.setAttribute('aria-label','Close navigation');close.innerHTML=icon('close');header.prepend(close);
  const scrim=document.createElement('button');scrim.className='tw-nav-scrim';scrim.type='button';scrim.tabIndex=-1;scrim.setAttribute('aria-label','Close navigation');shell.append(scrim);

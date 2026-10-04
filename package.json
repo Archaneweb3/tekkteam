@@ -12,11 +12,19 @@
     "dev": "vite --host 127.0.0.1",
     "build": "vite build",
     "preview": "vite preview --host 127.0.0.1",
-    "test": "npm run test:backend && node --test tests/wallet-transfers.test.mjs && node tests/workspace.mjs && node tests/workspace-auth.mjs && node tests/confirmation-ui.mjs && node tests/character-bounds.mjs && node tests/wallet-intent-browser.mjs && node tests/wallet-workspace.mjs && node tests/agent-settings-visual.mjs && node tests/agent-delete-browser.mjs"
+    "test": "node tests/run-suite.mjs"
   },
   "dependencies": {
+    "@pump-fun/pump-sdk": "2.0.0",
+    "@pump-fun/pump-swap-sdk": "1.20.0",
+    "@reown/appkit": "1.8.24",
+    "@solana-mobile/wallet-standard-mobile": "0.6.0",
     "@solana/spl-token": "^0.4.15",
+    "@solana/spl-token-metadata": "0.1.6",
     "@solana/web3.js": "^1.98.4",
+    "@wallet-standard/wallet": "1.1.1",
+    "@walletconnect/universal-provider": "2.23.7",
+    "bn.js": "5.2.5",
     "bs58": "^6.0.0",
     "buffer": "^6.0.3",
     "dotenv": "^18.0.4",

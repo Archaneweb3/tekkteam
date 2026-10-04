@@ -1,18 +1,10 @@
-import 'dotenv/config';
-import { resolve } from 'node:path';
-import { createServer } from './app.js';
-import { backendNetwork } from '../src/networks.js';
-import {runtime,logError} from './runtime.js';
-const config=runtime();
-const selected = backendNetwork(process.env);
-const instance = createServer({ dbPath: resolve(process.env.DATA_DIR || (selected.network === 'mainnet' ? 'server/data/mainnet-safety' : 'server/data'), 'tekkwork.sqlite'), vaultKey: process.env.VAULT_KEY_BASE64, origins: (process.env.APP_ORIGINS || 'http://127.0.0.1:5188,http://localhost:5188').split(','), network: selected.network, rpc: selected.rpc, mainnetSafetyMode:selected.safetyMode, production: process.env.NODE_ENV === 'production' });
-try{await instance.realMoney.verify();}catch(e){console.error('Real-money network unavailable:',e.code||'NETWORK_VERIFICATION_FAILED');}
-const server = instance.app.listen(config.port, config.host, () => console.log(JSON.stringify({service:'api',status:'ready',port:config.port,liveTrading:false})));
-const reconciliation = setInterval(() => instance.reconcilePending().catch(() => console.error('Reconciliation unavailable; will retry')), 15000);
-const walletReconciliation=setInterval(()=>instance.walletReconcile().catch(e=>logError('wallet-reconciliation',e)),15000);
-const paperTrading=setInterval(()=>instance.paperTick().catch(e=>logError('paper-worker',e)),15000);
-const collectAnalytics=()=>{try{instance.analyticsTick();}catch(e){logError('paper-analytics',e);}};
-collectAnalytics();
-const analytics=setInterval(collectAnalytics,60000);
-const close = () => { clearInterval(walletReconciliation);clearInterval(analytics); clearInterval(reconciliation);clearInterval(paperTrading); server.close(() => process.exit(0)); };
-process.on('SIGINT', close); process.on('SIGTERM', close);
+// The explicit local mode is selected before dotenv or product side effects load.
+if(process.argv.includes('--wallet-test')){
+ const {startWalletTest}=await import('./wallet-test-startup.js');
+ await startWalletTest();
+}else if(process.argv.includes('--http-only')){
+ const {startHttpOnly}=await import('./http-only-startup.js');
+ await startHttpOnly('api');
+}else{
+ await import('./operational-api.js');
+}

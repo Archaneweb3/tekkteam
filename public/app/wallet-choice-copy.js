@@ -1,7 +1,7 @@
 // Presentation only. Wallet capability and authentication decisions stay in backend.js.
 export function walletSelectionStatus(wallet){
  if(wallet.selectable)return '';
- if(wallet.capabilityState==='NOT_INSTALLED'||wallet.installUrl)return 'Not installed';
+ if(wallet.capabilityState==='NOT_INSTALLED'||wallet.installUrl)return 'Not detected in this browser';
  if(wallet.capabilityState==='SOLANA_ACCOUNT_UNAVAILABLE'||wallet.capabilityState==='SOLANA_SIGNING_UNSUPPORTED')return 'Solana unavailable';
  return 'Unavailable';
 }

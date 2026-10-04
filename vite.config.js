@@ -1,2 +1,3 @@
 import { defineConfig } from 'vite';
-export default defineConfig({ server: { proxy: { '/api/pump-launch': {target:'http://127.0.0.1:4193',changeOrigin:true,rewrite:path=>path.replace(/^\/api/,'')}, '/pump-launch': {target:'http://127.0.0.1:4193',changeOrigin:true}, '/mainnet-rpc': 'http://127.0.0.1:4191', '/api': 'http://127.0.0.1:4190' } } });
+import { readFileSync } from 'node:fs';
+export default defineConfig({ plugins: [{name:'tekkteam-public-schema',generateBundle(){this.emitFile({type:'asset',fileName:'src/token-draft-schema.js',source:readFileSync(new URL('./src/token-draft-schema.js',import.meta.url),'utf8')});}}], resolve: { alias: [{find: /^buffer$/, replacement: 'buffer/'}] }, server: { proxy: { '/api/pump-launch': {target:'http://127.0.0.1:4193',changeOrigin:true,rewrite:path=>path.replace(/^\/api/,'')}, '/pump-launch': {target:'http://127.0.0.1:4193',changeOrigin:true}, '/mainnet-rpc': 'http://127.0.0.1:4191', '/api': 'http://127.0.0.1:4190' } } });

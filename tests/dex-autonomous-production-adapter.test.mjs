@@ -1,4 +1,5 @@
 import test from 'node:test';
+import {fixtureGeneralTarget} from './dex-target-authority-fixture.mjs';
 import assert from 'node:assert/strict';
 import {DatabaseSync} from 'node:sqlite';
 import {Keypair,PublicKey,VersionedTransaction} from '@solana/web3.js';
@@ -51,7 +52,7 @@ test('real CPMM production adapter accepts only durable autonomous claim; fixtur
  const flags=()=>({liveAutonomousEnabled:true,autonomousKillSwitch:false,realMoneyEmergencyStop:false});
  const claim=createAutonomousClaim({db,ledger,flags});
  const adapter=createCpmmProductionAdapter({connection,db,store:{unseal:()=>Uint8Array.from(signer.secretKey)},autonomousClaim:claim,assertNetwork:async()=>assert.equal(await connection.getGenesisHash(),snapshot.genesis),now:()=>fixed});
- const port=createAutonomousExecutionPort({ledger,adapter,flags,network:{verify:async()=>({network:'solana:mainnet',verified:true})},now:()=>fixed});
+ const port=createAutonomousExecutionPort({ledger,adapter,assertTarget:fixtureGeneralTarget({id:'agent',creator:'owner'}),flags,network:{verify:async()=>({network:'solana:mainnet',verified:true})},now:()=>fixed});
  const agent={agentId:'agent',owner:'owner',agentWallet:wallet,mode:'LIVE_AUTONOMOUS',enabled:true,paused:false,vaultVerified:true};
  const execute=async(direction,inputAmount,requestKey)=>{const marketQuote=fixtureMarket(fixed),provenance=direction==='BUY'?await fixtureProvenance(marketQuote,wallet,fixed):null;const intent={mode:'LIVE_AUTONOMOUS',network:'solana:mainnet',agentId:'agent',owner:'owner',agentWallet:wallet,direction,inputMint:direction==='BUY'?SOL_MINT:CONTROLLED_USDC_MINT,outputMint:direction==='BUY'?CONTROLLED_USDC_MINT:SOL_MINT,inputAmount,slippageBps:100,pool:CONTROLLED_CPMM_POOL,marketBinding:provenance?.binding,requestKey,strategyVersion:0};return port.execute({agent,intent,venue:{kind:'RAYDIUM_CPMM',pool:CONTROLLED_CPMM_POOL},risk:{allowed:true},marketQuote,ledgerState:{openPositions:direction==='BUY'?0:1,positionQuantity:inputAmount,unknown:false,unresolved:false,reservationConflict:false,consecutiveFailures:0,pausedByBreaker:false,cooldownUntil:0,dailyTurnoverLamports:'0'}});};
  const buy=await execute('BUY','100000','adapter-real-buy-fixture');assert.equal(buy.status,'CONFIRMED');assert.equal(state.sendCount,1);

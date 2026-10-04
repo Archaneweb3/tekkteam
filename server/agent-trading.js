@@ -12,6 +12,7 @@ import {randomUUID} from 'node:crypto';
 import {createDecisionStore,decisionSnapshot,unavailableSnapshot,radarState,quoteProblem} from './market-radar.js';
 import {canonicalEvent,projectTrading,aggregateTrading,rankTraders} from './trading-projection.js';
 import {defaultStrategyConfig,strategyConfigFor,validateStrategyConfig,configEqual} from '../public/app/strategy-config.js';
+import {resolveAssociatedCoinPaperPolicy} from './associated-coin-paper-policy.js';
 
 const fail=message=>{throw Object.assign(Error(message),{status:409});};
 const checkQuote=(q,mint,now)=>{if(q.network!=='solana:101'||q.mint!==mint||![q.priceUsd,q.solUsd,q.liquidityUsd].every(n=>Number.isFinite(n)&&n>0)||!Number.isFinite(q.observedAt)||now-q.observedAt>30000||q.observedAt>now+1000)fail('Invalid or stale Mainnet market data');};
@@ -21,7 +22,7 @@ export function launchReceipt(agent,journal=resolve(process.env.DATA_DIR||'serve
  if(!r||r.agentId!==agent.id||r.owner!==agent.creator||r.network!=='solana:101'||!r.confirmed||r.status!=='Success'||!r.signature||!r.mint)return null;
  new PublicKey(r.mint);return r;
 }
-export function installAgentTrading(app,{store,auth,owned,now=Date.now,market=createMarketFeed({now}),discovery=createMarketDiscovery({market,now}),receipt=launchReceipt,balance,sessionValid,realMoney}={}){
+export function installAgentTrading(app,{store,auth,owned,now=Date.now,market=createMarketFeed({now}),discovery=createMarketDiscovery({market,now}),receipt=launchReceipt,readLaunchpadScope,balance,sessionValid,realMoney}={}){
  const {db}=store;const locks=new Set();let ticking=false,autonomousTick=null;
  const connection=realMoney?.connection??new Connection(process.env.MAINNET_RPC_URL||'https://api.mainnet-beta.solana.com',{commitment:'confirmed',disableRetryOnRateLimit:true});
  const verifyNetwork=realMoney?.verify??(async()=>{if(await connection.getGenesisHash()!==GENESIS)fail('Mainnet assertion failed');});
@@ -36,6 +37,22 @@ export function installAgentTrading(app,{store,auth,owned,now=Date.now,market=cr
  const analytics=createAnalyticsStore(db,now);
  app.get('/api/agents/:id/analytics',auth,(req,res)=>res.json(analytics.read(owned(req).agent)));
  const get=id=>{const row=db.prepare('SELECT data FROM paper_states WHERE agent_id=?').get(id);return row?JSON.parse(row.data):null;};
+ const paperPolicy=(a,s)=>{try{const scope=readLaunchpadScope?.(a);let r=null;if(scope?.scoped===true||s?.targetPolicy==='ASSOCIATED_COIN')r=receipt(a);return resolveAssociatedCoinPaperPolicy({agent:a,paperState:s,receipt:r,scope});}catch{return {kind:'UNAVAILABLE',mint:null,available:false,reason:'PAPER_AUTHORITY_UNAVAILABLE'};}};
+ const enforce=(a,s,{body=null,mint=null,discoveryMode=false,configuredState=false}={})=>{
+  const p=paperPolicy(a,s);if(!p.available)fail(p.reason);
+  if(body&&Object.hasOwn(body,'targetPolicy')&&body.targetPolicy!==p.kind)fail('Paper target policy cannot be changed through trading requests');
+  if(p.kind==='ASSOCIATED_COIN'){
+   if(discoveryMode||s?.discoveryMode===true||body?.discovery===true)fail('Associated coin Paper cannot use discovery');
+   if((mint!==null&&mint!==p.mint)||(body&&Object.hasOwn(body,'tokenMint')&&body.tokenMint!==p.mint)||(configuredState&&s?.mint!==p.mint))fail('Paper mint must match the confirmed associated coin');
+  }
+  return p;
+ };
+ const samePolicy=(before,after)=>{if(before.kind!==after.kind||before.mint!==after.mint)fail('Paper authority changed during market read');};
+ const assertCanEnterLaunchpadScope=id=>{
+  if(typeof id!=='string'||!id||locks.has(id))fail('Paper operation in progress or unavailable');
+  let s;try{s=get(id);if(db.prepare('SELECT data FROM paper_states WHERE agent_id=?').get(id)&&!s)fail('Paper state unavailable');}catch{fail('Paper state unavailable');}
+  if(s&&(typeof s!=='object'||Array.isArray(s)||s.agentId!==id||s.mode!=='paper'||typeof s.enabled!=='boolean'||s.enabled||s.position!=null||(s.targetPolicy!==undefined&&!['GENERAL','ASSOCIATED_COIN'].includes(s.targetPolicy))))fail('Pause Paper and resolve any open position before Launchpad entry');
+ };
  const save=s=>{s.updatedAt=now();db.prepare('INSERT OR REPLACE INTO paper_states VALUES(?,?)').run(s.agentId,JSON.stringify(s));};
  const log=(id,data)=>{db.prepare('INSERT INTO paper_history(agent_id,data) VALUES(?,?)').run(id,JSON.stringify(data));db.prepare("DELETE FROM paper_history WHERE agent_id=? AND id IN (SELECT id FROM paper_history WHERE agent_id=? AND json_extract(data,'$.type') IN ('SIGNAL_DETECTED','SIGNAL_SKIPPED','RISK_REJECTED') ORDER BY id DESC LIMIT -1 OFFSET 200)").run(id,id);};
  const history=id=>db.prepare('SELECT id,data FROM paper_history WHERE agent_id=? ORDER BY id DESC').all(id).map(x=>({...JSON.parse(x.data),id:'paper:'+x.id}));
@@ -45,9 +62,9 @@ export function installAgentTrading(app,{store,auth,owned,now=Date.now,market=cr
  const valid=a=>{const r=receipt(a);if(!r)fail('A confirmed Mainnet token launch is required');return r;};
  const transfers=installFunding(app,{db,store,auth,owned,connection,verifyNetwork,now,sessionValid});
  function snapshot(a){
-  const wallet=db.prepare('SELECT address FROM agent_wallets WHERE agent_id=?').get(a.id),s=get(a.id),r=receipt(a);
+  const wallet=db.prepare('SELECT address FROM agent_wallets WHERE agent_id=?').get(a.id),s=get(a.id),paperTargetPolicy=paperPolicy(a,s);let r=null;try{r=receipt(a);}catch{}
   const position=s?.position?{...s.position,marketValueUsd:s.position.quantity*(s.market?.priceUsd??s.position.entryPriceUsd)}:null;
-  return {...projection(a),discoveryMode:s?.discoveryMode??false,mode:'paper',liveLocked:true,fundingLocked:process.env.FUNDING_ENABLED!=='true',tokenLive:!!r,agentId:a.id,wallet:wallet?{address:wallet.address,balanceLamports:s?.walletBalanceLamports??null,balanceCheckedAt:s?.balanceCheckedAt??null}:null,enabled:s?.enabled??false,strategy:s?.strategy??a.strategy,limits:LIMITS,profiles:Object.keys(PROFILES),paperCashUsd:s?.cashUsd??null,paperCapitalUsd:s?.initialUsd??null,realizedPnlUsd:s?.realizedUsd??0,totalPnlUsd:s?.initialUsd!=null?s.cashUsd+(position?.marketValueUsd??0)-s.initialUsd:0,position,market:s?.market??null,health:s?.health??'Not checked',decision:s?.decision??null,defaultTokenMint:r?.mint??null};
+  return {...projection(a),paperTargetPolicy,discoveryMode:s?.discoveryMode??false,mode:'paper',liveLocked:true,fundingLocked:process.env.FUNDING_ENABLED!=='true',tokenLive:!!r,agentId:a.id,wallet:wallet?{address:wallet.address,balanceLamports:s?.walletBalanceLamports??null,balanceCheckedAt:s?.balanceCheckedAt??null}:null,enabled:s?.enabled??false,strategy:s?.strategy??a.strategy,limits:LIMITS,profiles:Object.keys(PROFILES),paperCashUsd:s?.cashUsd??null,paperCapitalUsd:s?.initialUsd??null,realizedPnlUsd:s?.realizedUsd??0,totalPnlUsd:s?.initialUsd!=null?s.cashUsd+(position?.marketValueUsd??0)-s.initialUsd:0,position,market:s?.market??null,health:s?.health??'Not checked',decision:s?.decision??null,defaultTokenMint:r?.mint??null};
  }
  app.get('/api/agents/:id/trading/radar',auth,(req,res)=>{const a=owned(req).agent;res.json(radarState(a,get(a.id),now(),locks.has(a.id)));});
  app.get('/api/agents/:id/trading/decisions',auth,(req,res)=>{const a=owned(req).agent,filter=req.query.filter??'all';if(!['all','trades','skipped','risk'].includes(filter))return res.status(400).json({error:'Invalid decision filter'});res.json({agentId:a.id,mode:'paper',decisions:decisions.list(a.id,filter),retention:{maximum:500,days:30}});});
@@ -78,14 +95,19 @@ export function installAgentTrading(app,{store,auth,owned,now=Date.now,market=cr
  app.get('/api/agents/:id/trading',auth,(req,res)=>res.json(snapshot(owned(req).agent)));
  app.post('/api/agents/:id/trading/configure',auth,async(req,res)=>{
   const a=owned(req).agent,old=get(a.id);if(old?.enabled||locks.has(a.id))fail('Pause before changing trading configuration');
+  if(req.body.mode&&req.body.mode!=='paper')fail('Live trading is locked');
+  const policy=enforce(a,old,{body:req.body});
   if(!Object.hasOwn(PROFILES,req.body.strategy))fail('Choose a valid strategy');
   let mint;try{mint=new PublicKey(req.body.tokenMint).toBase58();}catch{fail('Enter a valid Mainnet market mint');}
+  enforce(a,old,{body:req.body,mint});
   if(old?.position&&old.mint!==mint)fail('Cannot change market while a position remains open');
   const revision=old?.revision??0;locks.add(a.id);
   try{const quote=await market(mint);checkQuote(quote,mint,now());owned(req);const current=get(a.id);if(current?.enabled||(current?.revision??0)!==revision)fail('Trading state changed during configuration');
+   samePolicy(policy,enforce(owned(req).agent,current,{body:req.body,mint}));
    if(current?.position&&!current.position.strategyConfig){current.position.strategyConfig=strategyConfigFor(current);current.position.strategyConfigVersion=current.strategyConfigVersion??0;}
    const s={...current,agentId:a.id,mode:'paper',enabled:false,strategyConfig:current?.strategy===req.body.strategy?strategyConfigFor(current):defaultStrategyConfig(req.body.strategy),strategyConfigVersion:(current?.strategyConfigVersion??0)+(current?.strategy===req.body.strategy?0:1),strategy:req.body.strategy,mint,tokenSymbol:quote.tokenSymbol??quote.symbol??null,market:quote,revision:revision+1,health:'Healthy',decision:'Configured for Paper Trading'};
    s.discoveryMode=false;s.scan=null;
+   if(policy.kind==='ASSOCIATED_COIN')s.targetPolicy='ASSOCIATED_COIN';
    if(current?.mint!==mint){s.radar=null;s.radarFingerprint=null;}
    save(s);a.strategy=s.strategy;db.prepare('UPDATE agents SET data=? WHERE id=?').run(JSON.stringify(a),a.id);res.json(snapshot(a));
   }finally{locks.delete(a.id);}
@@ -105,18 +127,22 @@ export function installAgentTrading(app,{store,auth,owned,now=Date.now,market=cr
  });
  app.post('/api/agents/:id/trading/enable',auth,async(req,res)=>{
   const a=owned(req).agent;if(req.body.mode!=='paper')fail('Live trading is locked');
+  const policy=enforce(a,get(a.id),{body:req.body});
   if(!Object.hasOwn(PROFILES,req.body.strategy))fail('Choose Balanced, Selective or Momentum');
   if(locks.has(a.id))fail('Trading operation in progress');
   const prior=get(a.id);if(prior?.strategyConfig&&req.body.strategy!==prior.strategyConfig.strategy)fail('Save the selected strategy before starting');const discoveryMode=req.body.discovery===true||prior?.discoveryMode===true;const revision=prior?.revision??0,mint=discoveryMode?(prior?.position?.mint??SOL_MINT):configured(a,prior);if(prior?.enabled)fail('Paper trading already working');locks.add(a.id);
   try{
+   enforce(a,prior,{body:req.body,mint,discoveryMode,configuredState:policy.kind==='ASSOCIATED_COIN'});
    const quote=await market(mint);
    checkQuote(quote,mint,now());
    const current=get(a.id);if((current?.revision??0)!==revision)fail('Trading was paused during preparation');owned(req);
+   samePolicy(policy,enforce(owned(req).agent,current,{body:req.body,mint,discoveryMode,configuredState:policy.kind==='ASSOCIATED_COIN'}));
    const s=current?.initialUsd!=null?current:{...current,agentId:a.id,mode:'paper',initialSol:LIMITS.paperCapitalSol,cashSol:LIMITS.paperCapitalSol,realizedSol:0,initialSolUsd:quote.solUsd,cashUsd:LIMITS.paperCapitalSol*quote.solUsd,initialUsd:LIMITS.paperCapitalSol*quote.solUsd,realizedUsd:0,position:null,dailyDate:'',dailySpentSol:0,lastTradeAt:0};
    const available=Number.isFinite(s.cashSol)?s.cashSol:s.cashUsd/quote.solUsd;
    if(available<strategyConfigFor({...s,strategy:req.body.strategy}).risk.maxSolPerTrade*(1+LIMITS.feeBps/10000)+LIMITS.networkFeeSol&&!s.position)fail('Insufficient paper balance');
    if(!discoveryMode&&s.mint&&s.mint!==mint)fail('Token identity changed');
    s.discoveryMode=discoveryMode;
+   if(policy.kind==='ASSOCIATED_COIN')s.targetPolicy='ASSOCIATED_COIN';
    const resumed=!!s.everStarted||prior?.initialUsd!=null;
    Object.assign(s,{enabled:true,everStarted:true,startedAt:s.startedAt??now(),revision:revision+1,strategy:req.body.strategy,mint,tokenSymbol:quote.tokenSymbol??quote.symbol??null,market:quote,health:'Healthy',decision:'Waiting for next market tick'});save(s);record(a,s,{type:resumed?'RESUMED':'TRADING_STARTED',reason:resumed?'Resumed by owner':'Paper trading started by owner'});res.json(snapshot(a));
   }finally{locks.delete(a.id);}
@@ -132,17 +158,21 @@ export function installAgentTrading(app,{store,auth,owned,now=Date.now,market=cr
    locks.add(row.agent_id);
    try{
     const agentRow=db.prepare('SELECT data FROM agents WHERE id=?').get(row.agent_id);if(!agentRow)continue;const a=JSON.parse(agentRow.data);
+    const policy=enforce(a,initial,{discoveryMode:initial.discoveryMode===true,configuredState:true});
     if(initial.discoveryMode){
      const inputs=await scanAgent(initial,{discovery,market,now});const s=get(a.id);
      if(!s?.enabled||s.revision!==initial.revision)continue;
+     samePolicy(policy,enforce(a,s,{discoveryMode:true,configuredState:true}));
      s.paperKillSwitch=process.env.PAPER_TRADING_KILL_SWITCH==='true';
      db.exec('BEGIN IMMEDIATE');try{evaluateScan(s,inputs,now(),{capture:(state,d)=>decisions.capture(state,d),event:(state,e)=>record(a,state,e)});save(s);db.exec('COMMIT');}catch(e){db.exec('ROLLBACK');throw e;}continue;
     }
     const mint=configured(a,initial),quote=await market(mint);
-    const s=get(a.id);if(!s?.enabled)continue;if(s.mint!==mint)fail('Token identity changed');
+    const s=get(a.id);if(!s?.enabled||s.revision!==initial.revision)continue;if(s.mint!==mint)fail('Token identity changed');
+    samePolicy(policy,enforce(a,s,{mint,configuredState:true}));
     const problem=quoteProblem(quote,mint,now());if(problem){s.health='Unavailable';const snap=unavailableSnapshot(s,quote,problem,now());s.decision=snap.reason.summary;db.exec('BEGIN IMMEDIATE');try{const changed=decisions.capture(s,snap);save(s);if(changed)record(a,s,{type:'SIGNAL_SKIPPED',reason:s.decision,decisionId:snap.id});db.exec('COMMIT');}catch(e){db.exec('ROLLBACK');throw e;}continue;}
     checkQuote(quote,mint,now());
     const intent=strategyIntent(s,quote,now());s.market=quote;s.tokenSymbol=quote.tokenSymbol??quote.symbol??null;s.health='Healthy';s.decision=intent.reason;s.paperKillSwitch=process.env.PAPER_TRADING_KILL_SWITCH==='true';
+    if(intent.side!=='HOLD')samePolicy(policy,enforce(a,s,{mint:intent.mint,configuredState:true}));
     if(intent.side!=='HOLD'){
      const result=executePaper(s,intent,quote,now());s.decision=result.risk.allowed?intent.reason:result.risk.reason;
      db.exec('BEGIN IMMEDIATE');try{const snap=decisionSnapshot(s,intent,result,now()),changed=decisions.capture(s,snap);save(s);if(changed)record(a,s,{...intent,riskResult:result.risk,type:'SIGNAL_DETECTED'});if(result.receipt){const r=result.receipt;if(r.side==='BUY')record(a,s,{...r,strategy:intent.strategy,strategyConfig:intent.strategyConfig,strategyConfigVersion:intent.strategyConfigVersion,signals:intent.signals,riskResult:result.risk,type:'POSITION_OPENED'});if(r.positionClosed)record(a,s,{...r,strategy:intent.strategy,strategyConfig:intent.strategyConfig,strategyConfigVersion:intent.strategyConfigVersion,signals:intent.signals,riskResult:result.risk,type:'POSITION_CLOSED',pnlSol:r.closedPositionPnlSol});record(a,s,{...r,strategy:intent.strategy,strategyConfig:intent.strategyConfig,strategyConfigVersion:intent.strategyConfigVersion,signals:intent.signals,riskResult:result.risk,type:r.side});}else if(changed)record(a,s,{...intent,type:'RISK_REJECTED',riskResult:result.risk,requestedSizeSol:intent.sol,reason:result.risk.reason});db.exec('COMMIT');}catch(e){db.exec('ROLLBACK');throw e;}
@@ -152,5 +182,5 @@ export function installAgentTrading(app,{store,auth,owned,now=Date.now,market=cr
   }}finally{ticking=false;}
  }
  tick.setAutonomousTick=fn=>{if(autonomousTick||typeof fn!=='function')throw Error('AUTONOMOUS_WORKER_ALREADY_BOUND');autonomousTick=fn;};
- return {tick,snapshot,projection,walletReconcile:transfers.reconcilePending,analyticsTick:analytics.recordAll,setStrategy:(id,strategy)=>{if(!Object.hasOwn(PROFILES,strategy))fail('Invalid paper strategy');const s=get(id);if(locks.has(id)||s?.enabled)fail('Pause trading before changing strategy');if(s){if(s.position&&!s.position.strategyConfig){s.position.strategyConfig=strategyConfigFor(s);s.position.strategyConfigVersion=s.strategyConfigVersion??0;}s.strategyConfig=defaultStrategyConfig(strategy);s.strategyConfigVersion=(s.strategyConfigVersion??0)+1;s.strategy=strategy;s.revision=(s.revision??0)+1;save(s);}},removeDraft:id=>{if(locks.has(id)||get(id)?.enabled)fail('Pause trading before deleting draft');if(db.prepare('SELECT 1 FROM agent_wallets WHERE agent_id=?').get(id))fail('Agent wallet exists; normal draft deletion is blocked');decisions.remove(id);db.prepare('DELETE FROM paper_states WHERE agent_id=?').run(id);db.prepare('DELETE FROM paper_history WHERE agent_id=?').run(id);}};
+ return {tick,snapshot,projection,assertCanEnterLaunchpadScope,walletReconcile:transfers.reconcilePending,analyticsTick:analytics.recordAll,setStrategy:(id,strategy)=>{if(!Object.hasOwn(PROFILES,strategy))fail('Invalid paper strategy');const s=get(id);if(locks.has(id)||s?.enabled)fail('Pause trading before changing strategy');if(s){if(s.position&&!s.position.strategyConfig){s.position.strategyConfig=strategyConfigFor(s);s.position.strategyConfigVersion=s.strategyConfigVersion??0;}s.strategyConfig=defaultStrategyConfig(strategy);s.strategyConfigVersion=(s.strategyConfigVersion??0)+1;s.strategy=strategy;s.revision=(s.revision??0)+1;save(s);}},removeDraft:id=>{if(locks.has(id)||get(id)?.enabled)fail('Pause trading before deleting draft');if(db.prepare('SELECT 1 FROM agent_wallets WHERE agent_id=?').get(id))fail('Agent wallet exists; normal draft deletion is blocked');decisions.remove(id);db.prepare('DELETE FROM paper_states WHERE agent_id=?').run(id);db.prepare('DELETE FROM paper_history WHERE agent_id=?').run(id);}};
 }

@@ -2,6 +2,7 @@ import { DatabaseSync } from 'node:sqlite';
 import { mkdirSync, existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { randomBytes, createCipheriv, createDecipheriv } from 'node:crypto';
+import {ensureIdentitySchema} from './identity-schema.js';
 
 export function openStore(path, suppliedKey, production = false) {
   mkdirSync(dirname(path), { recursive: true });
@@ -32,11 +33,11 @@ export function openStore(path, suppliedKey, production = false) {
     CREATE TABLE IF NOT EXISTS submissions (agent_id TEXT PRIMARY KEY, payload TEXT NOT NULL);
     CREATE TABLE IF NOT EXISTS challenges (id TEXT PRIMARY KEY, address TEXT NOT NULL, message TEXT NOT NULL, expires INTEGER NOT NULL);
     CREATE TABLE IF NOT EXISTS sessions (hash TEXT PRIMARY KEY, address TEXT NOT NULL, expires INTEGER NOT NULL);
-    CREATE TABLE IF NOT EXISTS agents (no INTEGER PRIMARY KEY AUTOINCREMENT, id TEXT UNIQUE NOT NULL, owner TEXT NOT NULL, data TEXT NOT NULL, secret TEXT NOT NULL);
+    CREATE TABLE IF NOT EXISTS agents (no INTEGER PRIMARY KEY AUTOINCREMENT, id TEXT UNIQUE NOT NULL, owner TEXT NOT NULL, data TEXT NOT NULL, secret TEXT NULL);
     CREATE TABLE IF NOT EXISTS events (id INTEGER PRIMARY KEY AUTOINCREMENT, agent_id TEXT NOT NULL, owner TEXT NOT NULL, type TEXT NOT NULL, message TEXT NOT NULL, created_at INTEGER NOT NULL);
     CREATE TABLE IF NOT EXISTS requests (owner TEXT NOT NULL, key TEXT NOT NULL, fingerprint TEXT NOT NULL, agent_id TEXT NOT NULL, PRIMARY KEY(owner,key));`);
   const check = db.prepare('SELECT value FROM settings WHERE key=?').get('vault_check');
   if (check) unseal(check.value, 'vault-check');
   else db.prepare('INSERT INTO settings VALUES (?,?)').run('vault_check', seal(Buffer.from('TEKKWORK'), 'vault-check'));
-  return { db, seal, unseal, close: () => db.close() };
+  return { db, seal, unseal, ensureIdentitySchema:()=>ensureIdentitySchema(db), close: () => db.close() };
 }

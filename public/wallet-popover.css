@@ -4,7 +4,7 @@
 .tw-header .tw-utility-dock #tw-wallet .tw-connected-label small{display:flex;align-items:center;gap:5px;color:#71eab4}
 .tw-connected-label i,.tw-owner-provider small i{display:inline-block;width:6px;height:6px;border-radius:50%;background:#43e5a1;box-shadow:0 0 0 3px #43e5a11c}
 body>.tw-wallet-popover.tw-owner-popover{position:fixed!important;inset:auto;z-index:160;width:344px;max-width:calc(100vw - 24px);max-height:calc(100dvh - 24px);overflow-y:auto;box-sizing:border-box;padding:20px!important;background:linear-gradient(160deg,#172f5c,#0a1832 72%)!important;border:1px solid #5476ae!important;border-radius:16px!important;box-shadow:0 22px 70px #020816b8,inset 0 1px #9cb8ed22!important;color:#eef4ff;animation:tw-wallet-enter .17s ease-out both}
-@media(min-width:901px){body>.tw-wallet-popover.tw-owner-popover{left:calc(var(--rail) + 12px)!important}}
+/* Desktop position is calculated from the actual wallet button and viewport. */
 @keyframes tw-wallet-enter{from{opacity:0;transform:translateY(6px) scale(.985)}to{opacity:1;transform:none}}
 .tw-owner-popover header{display:flex;align-items:center;justify-content:space-between;padding-bottom:16px;border-bottom:1px solid #6184b244;color:#8dbbff;font:900 10px 'Nunito Sans',sans-serif;letter-spacing:.16em}
 .tw-owner-popover button{cursor:pointer;font-family:'Nunito Sans',sans-serif}
@@ -37,3 +37,83 @@ body>.tw-wallet-popover.tw-owner-popover{position:fixed!important;inset:auto;z-i
 .tw-owner-popover :focus-visible{outline:2px solid #ffe279;outline-offset:3px}
 @media(max-width:900px){body.tw-wallet-sheet-open:before{content:'';position:fixed;inset:0;z-index:159;background:#020815a8}body>.tw-wallet-popover.tw-owner-popover{left:12px!important;right:12px!important;top:auto!important;bottom:max(12px,env(safe-area-inset-bottom))!important;width:auto;max-width:none;border-radius:18px!important}}
 @media(prefers-reduced-motion:reduce){body>.tw-wallet-popover.tw-owner-popover{animation:none}.tw-owner-actions .is-loading svg{animation:none}}
+
+/* Wallet identity leads; pending authentication is a normal state, not an error. */
+body>.tw-wallet-popover.tw-owner-popover{width:390px;padding:24px!important}
+.tw-header .tw-utility-dock #tw-wallet .tw-connected-label strong{font-size:17px;line-height:1.3}
+.tw-header .tw-utility-dock #tw-wallet .tw-connected-label small{font:900 12px/1.4 'Nunito Sans',sans-serif;color:#b1e5ff;letter-spacing:.08em}
+.tw-connected-label i,.tw-owner-provider small i{width:8px;height:8px;background:#71cce9;box-shadow:0 0 0 3px #71cce914}
+.tw-owner-popover header{font-size:12px;letter-spacing:.1em}
+.tw-owner-provider{gap:14px;margin:22px 0 18px}
+.tw-owner-provider-icon{width:54px;height:54px;border-radius:14px}
+.tw-owner-provider strong{font-size:24px;line-height:1.2}
+.tw-owner-provider small{font-size:12px;color:#b1e5ff;background:#143a59;border:1px solid #477d9e;border-radius:6px;padding:5px 8px;letter-spacing:.08em;width:fit-content}
+.tw-owner-address{padding:12px 12px 12px 15px;gap:12px}
+.tw-owner-address span{font-size:18px;line-height:1.5}
+.tw-owner-popover header button,.tw-owner-address button{min-width:44px;min-height:44px;flex:none}
+.tw-owner-popover button svg{width:20px;height:20px}
+.tw-owner-copy-feedback{font-size:12px;min-height:18px}
+.tw-owner-balance{gap:8px;padding:12px 0 16px}
+.tw-owner-balance strong{font:900 20px/1.3 'Nunito Sans',sans-serif;letter-spacing:0}
+.tw-owner-popover[data-balance-state=ready] .tw-owner-balance strong{font:400 30px/1.2 'Lilita One',sans-serif}
+.tw-owner-balance span{font-size:11px;letter-spacing:.1em}
+.tw-owner-balance p{margin:0;color:#afc7e6;font:600 13px/1.55 'Nunito Sans',sans-serif}
+.tw-owner-network{font-size:11px;line-height:1.4;letter-spacing:.06em}
+.tw-owner-network[data-state=verified]{border-color:#477d9e;background:#143a59;color:#b1e5ff}
+.tw-owner-actions{display:grid;gap:10px;margin-top:18px}
+.tw-owner-actions button{min-height:48px;font-size:14px}
+.tw-owner-actions [data-authenticate]{background:linear-gradient(#ffe478,#ffce39);border-color:#efd365;border-bottom-color:#96711f;color:#14264a}
+.tw-owner-actions [hidden]{display:none!important}
+.tw-owner-actions button:disabled{opacity:.5;cursor:not-allowed}
+.tw-owner-popover[data-balance-state=auth] [data-refresh]{background:transparent;border:1px solid #456697;font-size:12px}
+.tw-owner-disconnect button{min-height:46px;font-size:14px}
+@media(max-width:900px){body>.tw-wallet-popover.tw-owner-popover{width:auto;padding:20px!important}.tw-owner-address span{font-size:17px}}
+
+/* Mobile wallet navigation remains a full-size sheet, not a scaled desktop card. */
+.tt-product .tw-mobile-wallet-choice{display:flex;align-items:center;gap:12px;text-decoration:none;min-height:68px;width:100%;box-sizing:border-box;padding:14px;text-align:left}
+.tt-product .tw-mobile-wallet-choice>span:not(.tw-wallet-choice-arrow){min-width:0}
+.tt-product .tw-mobile-wallet-choice strong,.tt-product .tw-mobile-wallet-choice small{display:block;white-space:normal;overflow-wrap:anywhere}
+.tt-product .tw-mobile-wallet-choice .tw-wallet-choice-arrow{margin-left:auto;flex:none}
+@media(max-width:600px){
+ .tt-product .tw-dialog.tw-connect-dialog{box-sizing:border-box;width:calc(100vw - 24px);max-width:430px!important;max-height:calc(100dvh - 24px);padding:18px!important;overflow-x:hidden;overscroll-behavior:contain}
+ .tt-product .tw-connect-dialog>.tw-close{position:sticky;top:0;float:right;right:auto;margin:0 0 4px 8px;z-index:2;min-width:44px;min-height:44px;background:#10294f!important;border:1px solid #426497;border-radius:10px}
+ .tt-product .tw-connect-dialog>.tw-eyebrow{display:block;padding-top:12px}
+ .tt-product .tw-connect-dialog h2{font-size:25px!important}
+ .tt-product .tw-connect-dialog .tw-wallet-choice{min-height:64px;width:100%;box-sizing:border-box}
+ .tt-product .tw-connect-dialog .tw-wallet-choice strong{font-size:17px}
+ .tt-product .tw-connect-dialog .tw-wallet-choice small{font-size:13px;line-height:1.4}
+ .tt-product .tw-connect-dialog .tw-wallet-list{clear:both;gap:16px}
+ .tt-product .tw-connect-dialog .tw-mobile-wallet-note{font-size:12px!important;line-height:1.5!important;margin:8px 2px 0}
+ .tt-product .tw-connect-dialog .tw-wallet-choice img,.tt-product .tw-connect-dialog .tw-wallet-icon-fallback{flex:none;width:36px;height:36px}
+}
+.tt-product .tw-mobile-wallet-switch{width:100%;min-height:44px;margin-top:14px}
+.tt-product .tw-mobile-wallet-switch[hidden]{display:none}
+.tt-product .tw-wallet-group{margin:16px 0 0;font-size:12px;font-weight:700;line-height:1.4;letter-spacing:.08em;color:#aab7d0;text-transform:uppercase}
+.tt-product .tw-more-wallets{margin-top:18px}
+.tt-product .tw-more-wallets .tw-button{width:100%;min-height:44px}
+.tt-product .tw-more-wallets p{font-size:12px;line-height:1.5;color:#aab7d0;margin:8px 0}
+/* Curated wallet selector: fixed header/footer, one scrollable list. */
+.tt-product .tw-dialog.tw-connect-dialog{padding:0!important;width:min(440px,calc(100vw - 24px));max-height:calc(100dvh - 24px);overflow:hidden}
+.tt-product .tw-dialog.tw-connect-dialog[open]{display:flex;flex-direction:column}
+.tw-connect-dialog .tw-wallet-selector-header{position:relative;flex:none;padding:22px 22px 12px}
+.tt-product .tw-connect-dialog .tw-wallet-selector-header .tw-close{position:absolute;top:12px;right:12px;float:none;margin:0;min-width:44px;min-height:44px;z-index:2;background:#10294f!important;border-radius:10px}
+.tw-connect-dialog .tw-wallet-selector-header h2{margin:8px 42px 10px 0}
+.tw-connect-dialog .tw-wallet-selector-header>p{margin:0;line-height:1.5}
+.tw-connect-dialog .tw-wallet-selector-body{min-height:0;overflow-y:auto;overflow-x:hidden;padding:0 22px 16px;overscroll-behavior:contain;scrollbar-gutter:stable;-webkit-overflow-scrolling:touch}
+.tt-product .tw-connect-dialog .tw-wallet-list{margin:0;gap:10px;clear:none}
+.tt-product .tw-connect-dialog .tw-wallet-group{margin:10px 0 0}
+.tt-product .tw-connect-dialog .tw-wallet-choice{display:grid;grid-template-columns:40px minmax(0,1fr) auto;gap:12px;min-height:66px;padding:9px 12px;box-sizing:border-box;text-decoration:none}
+.tt-product .tw-connect-dialog .tw-wallet-choice img{width:40px;height:40px;padding:0;object-fit:contain;background:transparent;border-radius:10px}
+.tt-product .tw-connect-dialog .tw-wallet-choice strong{font-size:16px}
+.tt-product .tw-connect-dialog .tw-wallet-choice small{font-size:11px;line-height:1.35;overflow-wrap:anywhere}
+.tt-product .tw-connect-dialog .tw-wallet-choice-arrow{font-size:13px;font-weight:900;color:#ffda48}
+.tw-connect-dialog .tw-wallet-availability{opacity:1;cursor:pointer}
+.tw-connect-dialog .tw-wallet-availability[aria-disabled=true]{cursor:default}
+.tw-connect-dialog .tw-wallet-app-help{font-size:11px;color:#b2c7e5;margin:6px 3px 0}
+.tw-connect-dialog .tw-wallet-app-help summary{cursor:pointer}
+.tw-connect-dialog .tw-wallet-app-help p{line-height:1.45;margin:6px 0}
+.tt-product .tw-connect-dialog .tw-more-wallets{margin-top:14px}
+.tw-connect-dialog [hidden]{display:none!important}
+.tw-connect-dialog .tw-connect-progress:empty{display:none}
+.tt-product .tw-connect-dialog .tw-wallet-selector-footer{flex:none;margin:0;padding:12px 22px 16px;background:#0c234c;font-size:10px!important;line-height:1.5;letter-spacing:.05em}
+@media(max-width:600px){.tw-connect-dialog .tw-wallet-selector-header{padding:18px 18px 10px}.tw-connect-dialog .tw-wallet-selector-body{padding:0 18px 14px}.tt-product .tw-connect-dialog .tw-wallet-selector-footer{padding:10px 18px 14px}.tt-product .tw-connect-dialog .tw-wallet-selector-header h2{font-size:25px!important}.tt-product .tw-connect-dialog .tw-wallet-selector-header>p{font-size:12px!important}}

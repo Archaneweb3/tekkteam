@@ -1,3 +1,5 @@
+import {createAssociatedCoinRealGuard} from '../associated-coin-real-policy.js';
+import {installPumpRuntimeRoutes} from './pump-runtime-routes.js';
 import {createDexLedger} from './ledger.js';
 import {createJupiterQuoteProvider} from './quote.js';
 import {createControlledExecutor} from './executor.js';
@@ -26,12 +28,15 @@ import {resolveMarketProvenance} from './market-provenance.js';
 
 // No custody or sending dependency is reachable from this production installer.
 // Enabling an environment flag cannot bypass the unverified adapter gate.
-export function installControlledDex(app,{db,store,auth,owned,sessionValid,now=Date.now,provider=createJupiterQuoteProvider({apiKey:process.env.JUPITER_API_KEY||'',now}),productionAdapter,productionProvider,productionFlags,realMoney,acceptanceCandidate=ENGINE_ACCEPTANCE}){
+export function installControlledDex(app,{db,store,auth,owned,sessionValid,now=Date.now,provider=createJupiterQuoteProvider({apiKey:process.env.JUPITER_API_KEY||'',now}),productionAdapter,productionProvider,productionFlags,realMoney,acceptanceCandidate=ENGINE_ACCEPTANCE,readLaunchpadScope,readReceiptAuthority,pumpRuntimeDependencies}){
  const ledger=createDexLedger(db);
  const flags=()=>({controlledEnabled:process.env.CONTROLLED_REAL_ENABLED==='true',liveEnabled:process.env.LIVE_TRADING_ENABLED==='true',killSwitch:process.env.GLOBAL_TRADING_KILL_SWITCH!=='false',realMoneyEmergencyStop:process.env.REAL_MONEY_EMERGENCY_STOP!=='false'});
  const authorize=req=>{if(!sessionValid(req))reject('OWNER_AUTH_REQUIRED');const {agent}=owned(req);const w=db.prepare('SELECT address FROM agent_wallets WHERE agent_id=?').get(agent.id);if(!w||agent.tradingWallet!==w.address)reject('AGENT_WALLET_UNAVAILABLE');return {authenticated:true,agentId:agent.id,owner:req.session.address,agentWallet:w.address,configReference:'controlled-policy-v1'};};
+ const assertTarget=createAssociatedCoinRealGuard({readAgent:id=>{const row=db.prepare('SELECT owner,data FROM agents WHERE id=?').get(id);if(!row)return null;const agent=JSON.parse(row.data);if(agent.id!==id||agent.creator!==row.owner)return null;return agent;},readLaunchpadScope,readReceiptAuthority});
+ const requestTarget=(c,body)=>assertTarget({...body,agentId:c.agentId,owner:c.owner});
+ installPumpRuntimeRoutes(app,{db,auth,owned,sessionValid,assertTarget,now,dependencies:pumpRuntimeDependencies});
  const directAdapter=createDisabledCpmmAdapter();
- const engine=createControlledExecutor({ledger,provider,adapter:directAdapter,authorize,flags,now});
+ const engine=createControlledExecutor({ledger,provider,adapter:directAdapter,authorize,flags,assertTarget,now});
  // The production dependency is wired but physically disarmed in this phase.
  // Test injection exercises these exact HTTP handlers with fixture custody.
  const connection=productionAdapter?null:realMoney?.connection??new Connection(process.env.MAINNET_RPC_URL||'https://api.mainnet-beta.solana.com',{commitment:'confirmed',disableRetryOnRateLimit:true});
@@ -42,14 +47,14 @@ export function installControlledDex(app,{db,store,auth,owned,sessionValid,now=D
  // A prepare-only acceptance gate may pass PREPARE authorization while the
  // global emergency stop and the physical signer/send latch stay closed.
  const controlledFlags=productionFlags??(()=>{const f=flags();return prepareRequested?{...f,controlledEnabled:true,realMoneyEmergencyStop:false}:f;});
- const controlledEngine=createControlledExecutor({ledger,provider:productionProvider??{quote:i=>controlledAdapter.quote(i)},adapter:controlledAdapter,authorize,flags:controlledFlags,oneShot,now,riskPolicy:{...DEFAULT_RISK_POLICY,maxSnapshotAgeMs:prepareRequested?300000:30000},requireSimulation:!productionAdapter,reviewLifetimeMs:prepareRequested?300000:30000});
+ const controlledEngine=createControlledExecutor({ledger,provider:productionProvider??{quote:i=>controlledAdapter.quote(i)},adapter:controlledAdapter,authorize,flags:controlledFlags,oneShot,assertTarget,now,riskPolicy:{...DEFAULT_RISK_POLICY,maxSnapshotAgeMs:prepareRequested?300000:30000},requireSimulation:!productionAdapter,reviewLifetimeMs:prepareRequested?300000:30000});
  // Construct the separate production port but never schedule or invoke it from
  // this HTTP installer. All three real-money switches default closed.
  const autonomousFlags=()=>({liveAutonomousEnabled:process.env.LIVE_AUTONOMOUS_ENABLED==='true'&&process.env.LIVE_TRADING_ENABLED==='true',autonomousKillSwitch:process.env.AUTONOMOUS_KILL_SWITCH!=='false'||process.env.GLOBAL_TRADING_KILL_SWITCH!=='false',realMoneyEmergencyStop:process.env.REAL_MONEY_EMERGENCY_STOP!=='false'});
  const acceptance=createAutonomousAcceptance(db,{activationConfigured:!productionAdapter,now,candidate:acceptanceCandidate});
  const autonomousClaim=productionAdapter?null:createAutonomousClaim({db,ledger,flags:autonomousFlags,acceptance});
  const autonomousAdapter=productionAdapter?null:createCpmmProductionAdapter({connection,db,store,autonomousClaim,assertNetwork:verifyNetwork,now});
- const autonomousPort=autonomousAdapter?createAutonomousExecutionPort({ledger,adapter:autonomousAdapter,flags:autonomousFlags,network:{verify:async()=>{const result=await verifyNetwork();return {network:'solana:mainnet',verified:result.networkConsistent===true};}},currentAgent:id=>liveAgent(id),acceptance,now}):null;
+ const autonomousPort=autonomousAdapter?createAutonomousExecutionPort({ledger,adapter:autonomousAdapter,flags:autonomousFlags,network:{verify:async()=>{const result=await verifyNetwork();return {network:'solana:mainnet',verified:result.networkConsistent===true};}},currentAgent:id=>liveAgent(id),acceptance,assertTarget,now}):null;
  const autonomousHealth=createAutonomousHealth(db,{now});
  db.exec('CREATE TABLE IF NOT EXISTS dex_autonomous_runtime_events(seq INTEGER PRIMARY KEY AUTOINCREMENT,agent_id TEXT NOT NULL,event TEXT NOT NULL,execution_id TEXT,data TEXT NOT NULL,created_at INTEGER NOT NULL)');
  const liveEvent=(agentId,event,executionId=null,reason=null)=>{
@@ -75,11 +80,11 @@ export function installControlledDex(app,{db,store,auth,owned,sessionValid,now=D
    async riskState(id){const records=ledger.list(id).filter(r=>r.intent.mode==='LIVE_AUTONOMOUS');const start=Math.floor(now()/86400000)*86400000;const daily=records.filter(r=>r.status==='CONFIRMED'&&r.confirmedAt>=start).reduce((sum,r)=>sum+(r.intent.direction==='BUY'?BigInt(r.intent.inputAmount):0n)+BigInt(r.confirmedEffects?.networkFeeLamports??'0'),0n);const recent=records.find(r=>r.status==='CONFIRMED');return {unknown:false,unresolved:false,reservationConflict:false,cooldownUntil:recent?recent.confirmedAt+60000:0,dailyTurnoverLamports:daily.toString()};}
   };
   const orchestrator=createAutonomousOrchestrator({discovery,
-   market:{async sellQuote(position){const agent=await liveAgent(position.agentId),intent={mode:'LIVE_AUTONOMOUS',network:'solana:mainnet',agentId:agent.agentId,owner:agent.owner,agentWallet:agent.agentWallet,direction:'SELL',inputMint:position.mint,outputMint:SOL_MINT,inputAmount:position.quantity,slippageBps:100,pool:position.pool};const quote=await autonomousAdapter.quote(intent);return {...quote,verified:true,direction:'SELL',observedAt:quote.createdAt};}},
+   market:{async sellQuote(position){const agent=await liveAgent(position.agentId),intent={mode:'LIVE_AUTONOMOUS',network:'solana:mainnet',agentId:agent.agentId,owner:agent.owner,agentWallet:agent.agentWallet,direction:'SELL',inputMint:position.mint,outputMint:SOL_MINT,inputAmount:position.quantity,slippageBps:100,pool:position.pool};assertTarget(intent);const quote=await autonomousAdapter.quote(intent);assertTarget(intent);return {...quote,verified:true,direction:'SELL',observedAt:quote.createdAt};}},
    positions,executions:{list:id=>ledger.list(id)},health:autonomousHealth,executionPort:autonomousPort,network:autonomousNetwork,agentContext:liveAgent,flags:autonomousFlags,
    resolveProvenance:args=>resolveMarketProvenance({...args,connection,now}),
    decision:(id,result)=>{if(result.action==='CANDIDATE')liveEvent(id,'AUTONOMOUS_CANDIDATE',null,{tokenMint:result.mint,discoveryMarket:result.marketIdentity?.pair??null,reportedVenue:result.marketIdentity?.venue??null,executionSupport:'UNSUPPORTED'});else if(result.action==='BUY_INTENT')liveEvent(id,'AUTONOMOUS_BUY_INTENT',null,{tokenMint:result.mint,discoveryMarket:result.marketIdentity?.market??null,verifiedVenue:result.verifiedVenue,verifiedPool:result.verifiedPool,executionSupport:'SUPPORTED',marketBinding:result.marketBinding});else if(result.action==='EXIT_TRIGGERED')liveEvent(id,'AUTONOMOUS_EXIT_TRIGGERED',null,result.reason);else if(result.status==='CONFIRMED'&&result.action==='BUY'){liveEvent(id,'AUTONOMOUS_BUY_CONFIRMED',result.executionId);liveEvent(id,'REAL_POSITION_OPENED',result.executionId);}else if(result.status==='CONFIRMED'&&result.action==='SELL'){liveEvent(id,'AUTONOMOUS_SELL_CONFIRMED',result.executionId);liveEvent(id,'REAL_POSITION_CLOSED',result.executionId);}else if(result.reason==='UNRESOLVED_EXECUTION')liveEvent(id,'AUTONOMOUS_UNKNOWN');else if(result.reason==='AUTONOMOUS_CIRCUIT_OPEN')liveEvent(id,'AUTONOMOUS_CIRCUIT_BREAKER');else if(result.reason==='UNSUPPORTED_EXECUTION_VENUE')liveEvent(id,'AUTONOMOUS_SKIPPED',null,{tokenMint:result.mint??null,discoveryMarket:result.marketIdentity?.market??null,verifiedVenue:null,verifiedPool:null,executionSupport:'UNSUPPORTED',reason:result.provenanceReason??result.reason});},
-   risk:{async evaluate({intent}){const full={...intent,createdAt:now(),expiresAt:now()+30000};const quote=await autonomousAdapter.quote(full);const pre=await autonomousAdapter.reservePlan({intent:full,quote});return evaluateAutonomousRisk(full,pre.snapshot,DEFAULT_RISK_POLICY,now());}},now});
+   risk:{async evaluate({intent}){assertTarget(intent);const full={...intent,createdAt:now(),expiresAt:now()+30000};const quote=await autonomousAdapter.quote(full);assertTarget(intent);const pre=await autonomousAdapter.reservePlan({intent:full,quote});assertTarget(intent);return evaluateAutonomousRisk(full,pre.snapshot,DEFAULT_RISK_POLICY,now());}},now});
   autonomousScheduler=createAutonomousScheduler(db,{orchestrator,executions:{list:id=>ledger.list(id)},executionPort:autonomousPort,flags:autonomousFlags,network:autonomousNetwork,
    vault:{verify:async id=>{try{await liveAgent(id);return true;}catch{return false;}}},
    balance:{verify:async id=>{const a=await liveAgent(id);await verifyNetwork();const lamports=await connection.getBalance(new PublicKey(a.agentWallet),'confirmed');return BigInt(lamports)>=BigInt(DEFAULT_RISK_POLICY.minReserveLamports)+BigInt(DEFAULT_RISK_POLICY.futureSellFeeLamports)+BigInt(DEFAULT_RISK_POLICY.reconciliationMarginLamports);}},
@@ -186,7 +191,7 @@ export function installControlledDex(app,{db,store,auth,owned,sessionValid,now=D
  // Read-only production path: no ledger write, capability, reservation or
  // custody dependency. It cannot become a prepared operation by replay.
  app.post(controlledBase+'/dry-run',auth,safe(async(req,res)=>{
-  const c=authorize(req),body=req.body;if(!connection)reject('DRY_RUN_UNAVAILABLE');await verifyNetwork();
+  const c=authorize(req),body=req.body;requestTarget(c,body);if(!connection)reject('DRY_RUN_UNAVAILABLE');await verifyNetwork();
   if(!body||Object.keys(body).some(k=>!['direction','inputMint','outputMint','inputAmount','slippageBps','pool'].includes(k))||body.direction!=='BUY'||body.inputMint!==SOL_MINT||body.outputMint!==CONTROLLED_USDC_MINT||body.pool!==CONTROLLED_CPMM_POOL||body.inputAmount!=='100000'||!Number.isSafeInteger(body.slippageBps)||body.slippageBps<0||body.slippageBps>100)reject('DRY_RUN_POLICY_MISMATCH');
   assertFirstBuyAcceptance(body,c,{adapterKind:controlledAdapter.kind,history:ledger.acceptanceHistory(c.agentId)});
   const intent={mode:'CONTROLLED_REAL',network:'solana:mainnet',version:1,agentId:c.agentId,owner:c.owner,agentWallet:c.agentWallet,direction:body.direction,inputMint:body.inputMint,outputMint:body.outputMint,inputAmount:body.inputAmount,slippageBps:body.slippageBps,createdAt:now(),expiresAt:now()+10000};
@@ -200,7 +205,7 @@ export function installControlledDex(app,{db,store,auth,owned,sessionValid,now=D
   res.json({readOnly:true,notPrepared:true,noSigner:true,noBroadcast:true,review:cpmmReview(p),risk:{allowed:risk.allowed,policyVersion:risk.policyVersion,reserveAfterLamports:risk.reserveAfterLamports},messageHash:p.validation.messageHash,lastValidBlockHeight:p.lastValidBlockHeight,reviewExpiresAt:intent.expiresAt,simulation});
  }));
  app.post(controlledBase+'/prepare',auth,safe(async(req,res)=>{
-  const c=authorize(req);const f=controlledFlags();if(!f.controlledEnabled||f.liveEnabled!==false||f.realMoneyEmergencyStop!==false||(controlledAdapter.prepareEnabled!==true&&controlledAdapter.enabled!==true))reject('CONTROLLED_REAL_DISABLED');await verifyNetwork();
+  const c=authorize(req);requestTarget(c,req.body);const f=controlledFlags();if(!f.controlledEnabled||f.liveEnabled!==false||f.realMoneyEmergencyStop!==false||(controlledAdapter.prepareEnabled!==true&&controlledAdapter.enabled!==true))reject('CONTROLLED_REAL_DISABLED');await verifyNetwork();
   if(!productionAdapter){assertFirstBuyAcceptance(req.body,c,{adapterKind:controlledAdapter.kind,history:ledger.acceptanceHistory(c.agentId)});await controlledAdapter.assertCustody(c);}
   const q=await controlledEngine.quote(req,req.body);let r;
   try{r=await controlledEngine.prepare(req,q.id);}catch(e){const latest=ledger.get(q.id);if(latest?.status==='REJECTED_BEFORE_SIGNING')audit(latest,'CONTROLLED_REJECTED');throw e;}
@@ -217,9 +222,9 @@ export function installControlledDex(app,{db,store,auth,owned,sessionValid,now=D
   const c=authorize(req);
   if(Object.keys(req.body||{}).length)reject('UNEXPECTED_FIELD');
   if(!oneShot||controlledAdapter.prepareEnabled!==true||controlledFlags().liveEnabled!==false)reject('ONE_SHOT_ARMING_UNAVAILABLE');
-  await verifyNetwork();
   const record=ledger.get(req.params.executionId);
   if(!record||record.intent.agentId!==c.agentId)reject('EXECUTION_OWNERSHIP_MISMATCH');
+  assertTarget(record.intent);await verifyNetwork();assertTarget(record.intent);
   assertFirstBuyAcceptance({...record.intent,requestKey:record.requestKey,pool:record.pool},c,{adapterKind:controlledAdapter.kind,history:ledger.acceptanceHistory(c.agentId)});
   const armed=await controlledEngine.arm(req,record.id);
   res.json(armed);

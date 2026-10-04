@@ -1,0 +1,5 @@
+/* Same world surfaces; guard owner-provided names and full receipt mint wrapping. */
+.tw-world-launchpad .tw-agent h3,.tw-world-launchpad .tw-agent p{overflow-wrap:anywhere;line-height:1.5}
+.tw-world-launchpad .tw-world-section>p{color:var(--text-secondary);line-height:1.6}
+.tw-world-launchpad .tw-token-mint{word-break:break-all}
+.tw-world-launchpad .tw-world-card-action{min-height:44px;display:flex;align-items:center}

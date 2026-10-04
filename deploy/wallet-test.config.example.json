@@ -1,0 +1,6 @@
+{
+  "origin": "https://wallet-test.example.invalid",
+  "dataDir": "/var/lib/tekkteam-wallet-test",
+  "port": 4395,
+  "rpcUrl": "https://replace-with-approved-mainnet-rpc.invalid"
+}

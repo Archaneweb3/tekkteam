@@ -1,0 +1,397 @@
+TAP version 13
+# Subtest: missing journal requires explicit initialization; corrupt/version/owner/state fail closed
+ok 1 - missing journal requires explicit initialization; corrupt/version/owner/state fail closed
+  ---
+  duration_ms: 38.689
+  ...
+# Subtest: commit survives restart, stores only public receipt and reports Windows durability honestly
+ok 2 - commit survives restart, stores only public receipt and reports Windows durability honestly
+  ---
+  duration_ms: 34.5602
+  ...
+# Subtest: failure before open leaves canonical bytes unchanged and permits safe retry
+ok 3 - failure before open leaves canonical bytes unchanged and permits safe retry
+  ---
+  duration_ms: 42.8437
+  ...
+# Subtest: failure before write leaves canonical bytes unchanged and permits safe retry
+ok 4 - failure before write leaves canonical bytes unchanged and permits safe retry
+  ---
+  duration_ms: 50.778
+  ...
+# Subtest: failure before file-sync leaves canonical bytes unchanged and permits safe retry
+ok 5 - failure before file-sync leaves canonical bytes unchanged and permits safe retry
+  ---
+  duration_ms: 51.4334
+  ...
+# Subtest: failure before close leaves canonical bytes unchanged and permits safe retry
+ok 6 - failure before close leaves canonical bytes unchanged and permits safe retry
+  ---
+  duration_ms: 51.8056
+  ...
+# Subtest: failure before rename leaves canonical bytes unchanged and permits safe retry
+ok 7 - failure before rename leaves canonical bytes unchanged and permits safe retry
+  ---
+  duration_ms: 48.0948
+  ...
+# Subtest: uncertain post-rename directory-sync fences writer, restart observes committed latch
+ok 8 - uncertain post-rename directory-sync fences writer, restart observes committed latch
+  ---
+  duration_ms: 36.3271
+  ...
+# Subtest: uncertain post-rename verify fences writer, restart observes committed latch
+ok 9 - uncertain post-rename verify fences writer, restart observes committed latch
+  ---
+  duration_ms: 29.7135
+  ...
+# Subtest: cooperating stale writer and read disagreement cannot overwrite another commit
+ok 10 - cooperating stale writer and read disagreement cannot overwrite another commit
+  ---
+  duration_ms: 57.7668
+  ...
+# Subtest: exclusive lock is never cleared by contender
+ok 11 - exclusive lock is never cleared by contender
+  ---
+  duration_ms: 20.9088
+  ...
+# Subtest: oversized aggregate is rejected before replacing canonical journal
+ok 12 - oversized aggregate is rejected before replacing canonical journal
+  ---
+  duration_ms: 68.1193
+  ...
+# Subtest: Phantom selected Solana provider signs only, rejects account change/disconnect
+ok 13 - Phantom selected Solana provider signs only, rejects account change/disconnect
+  ---
+  duration_ms: 31.4423
+  ...
+# Subtest: Solflare selected Solana provider signs only, rejects account change/disconnect
+ok 14 - Solflare selected Solana provider signs only, rejects account change/disconnect
+  ---
+  duration_ms: 15.9199
+  ...
+# Subtest: MetaMask selected Solana provider signs only, rejects account change/disconnect
+ok 15 - MetaMask selected Solana provider signs only, rejects account change/disconnect
+  ---
+  duration_ms: 15.6577
+  ...
+# Subtest: Phantom injected provider rejects replacement, missing signer and late disconnect
+ok 16 - Phantom injected provider rejects replacement, missing signer and late disconnect
+  ---
+  duration_ms: 15.9236
+  ...
+# Subtest: Solflare injected provider rejects replacement, missing signer and late disconnect
+ok 17 - Solflare injected provider rejects replacement, missing signer and late disconnect
+  ---
+  duration_ms: 14.3762
+  ...
+# (node:29864) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# (node:29864) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+# Subtest: write/serialization/fallback failures never escape or interrupt lifecycle cleanup
+ok 18 - write/serialization/fallback failures never escape or interrupt lifecycle cleanup
+  ---
+  duration_ms: 3.9663
+  ...
+# Subtest: unknown paths/query/headers/body and denied methods never enter diagnostics
+ok 19 - unknown paths/query/headers/body and denied methods never enter diagnostics
+  ---
+  duration_ms: 1.5064
+  ...
+# Subtest: aborted responses emit correlated event and logger failure remains safe
+ok 20 - aborted responses emit correlated event and logger failure remains safe
+  ---
+  duration_ms: 0.3329
+  ...
+# Subtest: actual disposable in-memory state remains200 and APIerrors/denials stay500/403 despite REQUEST/finish write failures
+ok 21 - actual disposable in-memory state remains200 and APIerrors/denials stay500/403 despite REQUEST/finish write failures
+  ---
+  duration_ms: 139.7964
+  ...
+# (node:30848) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+# (Use `node --trace-deprecation ...` to show where the warning was created)
+# Subtest: fresh review binds total budget/reserve/contexts and exact unsigned owner request without authority
+ok 22 - fresh review binds total budget/reserve/contexts and exact unsigned owner request without authority
+  ---
+  duration_ms: 259.5118
+  ...
+# Subtest: atomic model tolerates external shared-vault drift but rejects real atomic debit and incomplete/mismatched evidence
+ok 23 - atomic model tolerates external shared-vault drift but rejects real atomic debit and incomplete/mismatched evidence
+  ---
+  duration_ms: 784.974
+  ...
+# Subtest: fee/rent changes and unexpected payer/nonpayer debit fail closed
+ok 24 - fee/rent changes and unexpected payer/nonpayer debit fail closed
+  ---
+  duration_ms: 310.7945
+  ...
+# Subtest: balance floor retains Mainnet reserve and includes full ceiling rather than estimate
+ok 25 - balance floor retains Mainnet reserve and includes full ceiling rather than estimate
+  ---
+  duration_ms: 54.8181
+  ...
+# Subtest: slow RPC, expiry, stale/invalid contexts and invalid blockhash are rejected
+ok 26 - slow RPC, expiry, stale/invalid contexts and invalid blockhash are rejected
+  ---
+  duration_ms: 362.8735
+  ...
+# Subtest: every material byte/metadata/identity/cost/context mutation invalidates accepted digest
+ok 27 - every material byte/metadata/identity/cost/context mutation invalidates accepted digest
+  ---
+  duration_ms: 1086.1063
+  ...
+# Subtest: durable review survives restart but corrupted digest and old requests are never upgraded
+ok 28 - durable review survives restart but corrupted digest and old requests are never upgraded
+  ---
+  duration_ms: 181.8842
+  ...
+# Subtest: immediate wallet-review boundary requires fresh same-byte simulation and rejects changed costs/context
+ok 29 - immediate wallet-review boundary requires fresh same-byte simulation and rejects changed costs/context
+  ---
+  duration_ms: 594.1552
+  ...
+# Subtest: accepted review expiring during fresh RPC cannot be renewed silently
+ok 30 - accepted review expiring during fresh RPC cannot be renewed silently
+  ---
+  duration_ms: 134.0322
+  ...
+# (node:31700) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# (node:31700) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+# Subtest: actual decoder and finalized oracle prove exact mint/creator/metadata and full signed bytes
+ok 31 - actual decoder and finalized oracle prove exact mint/creator/metadata and full signed bytes
+  ---
+  duration_ms: 473.1624
+  ...
+# Subtest: confirmation rejects corruption, missing context, wrong event/mint and incomplete accounting
+ok 32 - confirmation rejects corruption, missing context, wrong event/mint and incomplete accounting
+  ---
+  duration_ms: 2111.5896
+  ...
+# Subtest: actual M4 revalidation retains reviewed blockhash and rejects expired/cost/rent/context changes
+ok 33 - actual M4 revalidation retains reviewed blockhash and rejects expired/cost/rent/context changes
+  ---
+  duration_ms: 382.9409
+  ...
+# (node:416) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# (node:416) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+# Subtest: exact target, zero buy, valid mint partial signature and no owner key persisted
+ok 34 - exact target, zero buy, valid mint partial signature and no owner key persisted
+  ---
+  duration_ms: 384.3737
+  ...
+# Subtest: one approval and single send survive ambiguity and restart; duplicate submits cannot send
+ok 35 - one approval and single send survive ambiguity and restart; duplicate submits cannot send
+  ---
+  duration_ms: 401.4823
+  ...
+# Subtest: rejection consumes M4, expiry refuses prompt and changed transaction never broadcasts
+ok 36 - rejection consumes M4, expiry refuses prompt and changed transaction never broadcasts
+  ---
+  duration_ms: 413.2617
+  ...
+# Subtest: pre-send persistence failure cannot reach sender; signed expiry is permanently quarantined
+ok 37 - pre-send persistence failure cannot reach sender; signed expiry is permanently quarantined
+  ---
+  duration_ms: 516.3158
+  ...
+# Subtest: M4 allowlist remains exact-target only; broad operations and unconfigured runtime stay denied
+ok 38 - M4 allowlist remains exact-target only; broad operations and unconfigured runtime stay denied
+  ---
+  duration_ms: 0.7801
+  ...
+# Subtest: two independent controller instances cannot both claim wallet approval
+ok 39 - two independent controller instances cannot both claim wallet approval
+  ---
+  duration_ms: 198.1423
+  ...
+# {"event":"UNSIGNED_SIMULATION_DIAGNOSTIC_PERSISTED","requestId":"f001ac1f-2161-4790-a287-3850d8e69fce","transactionSha256":"58c81a246c9c5ecf961b5d0a1da89d95700861389bb1637fbce1a62a70e3d2c9","simulationSlot":450677557}
+# (node:13728) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+# (Use `node --trace-deprecation ...` to show where the warning was created)
+# Subtest: failure diagnostics persist BEFORE unexpected debit guard, privately and without signature or secret fields
+ok 40 - failure diagnostics persist BEFORE unexpected debit guard, privately and without signature or secret fields
+  ---
+  duration_ms: 238.523
+  ...
+# {"event":"UNSIGNED_SIMULATION_DIAGNOSTIC_PERSISTED","requestId":"96f393a5-5dde-4cfa-ba40-45e77f72b77b","transactionSha256":"5471faca225777305b3645f9c8d9638cc86a3b79b0560738f46a14c6b9bd076b","simulationSlot":450677556}
+# {"event":"UNSIGNED_SIMULATION_DIAGNOSTIC_PERSISTED","requestId":"96f393a5-5dde-4cfa-ba40-45e77f72b77b","transactionSha256":"5471faca225777305b3645f9c8d9638cc86a3b79b0560738f46a14c6b9bd076b","simulationSlot":450677556}
+# {"event":"UNSIGNED_SIMULATION_DIAGNOSTIC_PERSISTED","requestId":"96f393a5-5dde-4cfa-ba40-45e77f72b77b","transactionSha256":"5471faca225777305b3645f9c8d9638cc86a3b79b0560738f46a14c6b9bd076b","simulationSlot":450677556}
+# Subtest: M3.1 producer decodes actual fixture CPI and enforces fresh total/reserve review with no signing
+ok 41 - M3.1 producer decodes actual fixture CPI and enforces fresh total/reserve review with no signing
+  ---
+  duration_ms: 169.3233
+  ...
+# Subtest: distinct same-slot revalidation diagnostics never collide or overwrite earlier evidence
+ok 42 - distinct same-slot revalidation diagnostics never collide or overwrite earlier evidence
+  ---
+  duration_ms: 67.1559
+  ...
+# Subtest: unsigned construction reuses pinned Pump builder/policy; replay deduplicates without mint signing
+ok 43 - unsigned construction reuses pinned Pump builder/policy; replay deduplicates without mint signing
+  ---
+  duration_ms: 110.19
+  ...
+# Subtest: completed request binding survives restart and expiry; refresh needs a new ID
+ok 44 - completed request binding survives restart and expiry; refresh needs a new ID
+  ---
+  duration_ms: 280.4626
+  ...
+# Subtest: in-memory completed request cannot silently rebuild after expiry
+ok 45 - in-memory completed request cannot silently rebuild after expiry
+  ---
+  duration_ms: 34.4435
+  ...
+# Subtest: legacy request reuse is refused without rewriting or contacting RPC
+ok 46 - legacy request reuse is refused without rewriting or contacting RPC
+  ---
+  duration_ms: 12.9183
+  ...
+# Subtest: minimum-slot lag retries identical read/simulation and refuses other failures or weaker context
+ok 47 - minimum-slot lag retries identical read/simulation and refuses other failures or weaker context
+  ---
+  duration_ms: 1.0961
+  ...
+# Subtest: private preparation evidence verifies unsigned bytes, idempotent file and linked-file denial; no public asset/receipt
+ok 48 - private preparation evidence verifies unsigned bytes, idempotent file and linked-file denial; no public asset/receipt
+  ---
+  duration_ms: 108.7556
+  ...
+# Subtest: wrong genesis stops before construction/simulation; failed simulation has no payable debit claim
+ok 49 - wrong genesis stops before construction/simulation; failed simulation has no payable debit claim
+  ---
+  duration_ms: 36.8936
+  ...
+# Subtest: closed transport rejects value-moving/history RPC and unqualified public origins without network
+ok 50 - closed transport rejects value-moving/history RPC and unqualified public origins without network
+  ---
+  duration_ms: 6.1058
+  ...
+# Subtest: M3 allowlist is explicit and default off; launch/sign/submit/funding/Real remain denied
+ok 51 - M3 allowlist is explicit and default off; launch/sign/submit/funding/Real remain denied
+  ---
+  duration_ms: 1.0264
+  ...
+# (node:31252) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# (node:31252) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+# Subtest: real verifier in disposable fixture: immutable owner binding, foreign/session/receipt guards; no receipt write
+ok 52 - real verifier in disposable fixture: immutable owner binding, foreign/session/receipt guards; no receipt write
+  ---
+  duration_ms: 558.6247
+  ...
+# (node:31100) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+# (Use `node --trace-deprecation ...` to show where the warning was created)
+# Subtest: dedicated HTTPS origin and exact wallet-only routes; EVM/transaction API never reachable
+ok 53 - dedicated HTTPS origin and exact wallet-only routes; EVM/transaction API never reachable
+  ---
+  duration_ms: 2.4907
+  ...
+# Subtest: real product verifier binds HTTPS origin; Secure cookie survives restart; non-wallet writes denied
+ok 54 - real product verifier binds HTTPS origin; Secure cookie survives restart; non-wallet writes denied
+  ---
+  duration_ms: 4138.5174
+  ...
+# Subtest: explicit M3 profile preserves M2 store and exposes only off-chain owner writes and validated public assets
+ok 55 - explicit M3 profile preserves M2 store and exposes only off-chain owner writes and validated public assets
+  ---
+  duration_ms: 3607.7915
+  ...
+# Subtest: rejected bootstrap retains shell/navigation and discards stale owner state
+ok 56 - rejected bootstrap retains shell/navigation and discards stale owner state
+  ---
+  duration_ms: 8.0071
+  ...
+# Subtest: all ten routes and creation/detail deep links remain safely unavailable
+ok 57 - all ten routes and creation/detail deep links remain safely unavailable
+  ---
+  duration_ms: 5.9739
+  ...
+# Subtest: non-JSON error-shaped and malformed successful responses fail closed
+ok 58 - non-JSON error-shaped and malformed successful responses fail closed
+  ---
+  duration_ms: 13.6009
+  ...
+# Subtest: failed retry then valid success restores actual identity-only owner data
+ok 59 - failed retry then valid success restores actual identity-only owner data
+  ---
+  duration_ms: 5.0862
+  ...
+# Subtest: busy retry prevents concurrent state reads and always reenables after failure
+ok 60 - busy retry prevents concurrent state reads and always reenables after failure
+  ---
+  duration_ms: 2.417
+  ...
+# Subtest: ordinary successful boot preserves owner mount and single existing polling interval
+ok 61 - ordinary successful boot preserves owner mount and single existing polling interval
+  ---
+  duration_ms: 2.9539
+  ...
+# Subtest: poll preserves spanless Mainnet safety banner on successful and failed refresh
+ok 62 - poll preserves spanless Mainnet safety banner on successful and failed refresh
+  ---
+  duration_ms: 5.0687
+  ...
+# Subtest: poll tolerates removed shell and does not overwrite controlled launch status
+ok 63 - poll tolerates removed shell and does not overwrite controlled launch status
+  ---
+  duration_ms: 8.9282
+  ...
+# Subtest: route changes dispose scenes while unavailable without mounting domain handlers
+ok 64 - route changes dispose scenes while unavailable without mounting domain handlers
+  ---
+  duration_ms: 2.8171
+  ...
+# Subtest: API failure retains public address connect/disconnect while owner account events do no work
+ok 65 - API failure retains public address connect/disconnect while owner account events do no work
+  ---
+  duration_ms: 3.0354
+  ...
+# Subtest: current local/devnet/mainnet API and actual bootstrap demo envelopes recover
+ok 66 - current local/devnet/mainnet API and actual bootstrap demo envelopes recover
+  ---
+  duration_ms: 7.7473
+  ...
+# Subtest: isolated fixture uses accepted demo contract without changing actual empty data or enabling owner actions
+ok 67 - isolated fixture uses accepted demo contract without changing actual empty data or enabling owner actions
+  ---
+  duration_ms: 5.8524
+  ...
+# Subtest: missing/malformed/contradictory context never restores owner controls, domain mounts or polling
+ok 68 - missing/malformed/contradictory context never restores owner controls, domain mounts or polling
+  ---
+  duration_ms: 121.7338
+  ...
+# Subtest: successful retry uses latest route with validated context
+ok 69 - successful retry uses latest route with validated context
+  ---
+  duration_ms: 2.459
+  ...
+# Subtest: rejected context on pending retry retains latest unavailable route
+ok 70 - rejected context on pending retry retains latest unavailable route
+  ---
+  duration_ms: 2.1668
+  ...
+# Subtest: malformed detail URL retains shell and gives a safe navigation message
+ok 71 - malformed detail URL retains shell and gives a safe navigation message
+  ---
+  duration_ms: 2.1273
+  ...
+# Subtest: owner invalidation rejects an old state response and masks future stale cookie data
+ok 72 - owner invalidation rejects an old state response and masks future stale cookie data
+  ---
+  duration_ms: 2.2445
+  ...
+# Subtest: in-page anchor scrolls to its section without replacing the SPA route
+ok 73 - in-page anchor scrolls to its section without replacing the SPA route
+  ---
+  duration_ms: 2.0936
+  ...
+1..73
+# tests 73
+# suites 0
+# pass 73
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 9923.8737

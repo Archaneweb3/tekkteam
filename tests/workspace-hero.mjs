@@ -15,7 +15,7 @@ try{
   assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
   assert.ok(await page.evaluate(()=>document.querySelector('.workforce-visual').getBoundingClientRect().bottom<=document.querySelector('.desk-heading').getBoundingClientRect().top));
   assert.equal(await page.locator('.tw-header').evaluate(el=>getComputedStyle(el).backdropFilter),'none');
-  assert.equal(await page.locator('.glass-hero-actions a.primary').getAttribute('href'),'#/agents/new');
+  assert.equal(await page.locator('.glass-hero-actions a.primary').getAttribute('href'),'#/launch');
   assert.equal(await page.locator('.glass-hero-actions a:not(.primary)').getAttribute('href'),'#/agents');
   await page.screenshot({path:`artifacts/solid-hero/empty-${width}.png`,fullPage:true});
   // Only the presentation adapter is exercised with fixtures; no engine or trading calls.

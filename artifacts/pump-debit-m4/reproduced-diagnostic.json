@@ -1,0 +1,988 @@
+{
+  "formatVersion": 1,
+  "evidence": "UNSIGNED_SIMULATION_DIAGNOSTIC",
+  "authorizationGranted": false,
+  "transactionsSigned": 0,
+  "broadcasts": 0,
+  "requestId": "cbe3360f-6b41-4f06-8550-46a1e519c48f",
+  "createdAt": "2026-10-04T14:37:12.506Z",
+  "owner": "C2nddai75FJZWWkNdUF7csEBryRCMikJyTTZZqYcMiBv",
+  "agentId": "8fc6fe77-16a0-4fed-8ca0-ddd1f6ef9fa7",
+  "tokenDraftRevision": 1,
+  "network": "solana:101",
+  "genesis": "5eykt4UsFv8P8NJdTREpY1vzqKqZKvdpKuc147dw2N9d",
+  "programId": "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P",
+  "mint": "HJRV68PUEDjdA8S7TsUAU7aWiXbP8n3KVroMaCr4HkaX",
+  "transactionSha256": "4ceef8e9d2e990d26c4f27c0d718bff794a84ee02c8a59181cdb51c862a84a7f",
+  "transactionSize": 840,
+  "initialBuyLamports": 0,
+  "context": {
+    "latestSlot": 453285403,
+    "feeSlot": 453285405,
+    "preReadSlot": 453285406,
+    "simulationSlot": 453285409,
+    "postReadSlot": 453285410,
+    "validitySlot": 453285412
+  },
+  "atomicBalancesAvailable": true,
+  "accounts": [
+    {
+      "pubkey": "HJRV68PUEDjdA8S7TsUAU7aWiXbP8n3KVroMaCr4HkaX",
+      "role": "mint",
+      "writable": true,
+      "signer": true,
+      "compiledAccountIndex": 1,
+      "preLamports": 0,
+      "postLamports": 2667000,
+      "postAccountReturned": true,
+      "preSol": "0.000000000",
+      "postSol": "0.002667000",
+      "externalDeltaLamports": 2667000,
+      "externalDeltaSol": "0.002667000",
+      "atomicPreLamports": 0,
+      "atomicPostLamports": 2667000,
+      "atomicDeltaLamports": 2667000,
+      "atomicPostMatchesReturnedAccount": true,
+      "afterReadLamports": 0,
+      "ownerProgram": {
+        "pre": null,
+        "post": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+        "afterRead": null
+      },
+      "executable": {
+        "pre": null,
+        "post": false
+      },
+      "token": {
+        "pre": null,
+        "post": {
+          "decode": "UNRESOLVED"
+        },
+        "afterRead": null
+      },
+      "classification": null,
+      "expectedness": "NO_NEGATIVE_DELTA",
+      "simulationSlot": 453285409,
+      "preReadSlot": 453285406,
+      "postReadSlot": 453285410,
+      "transactionSha256": "4ceef8e9d2e990d26c4f27c0d718bff794a84ee02c8a59181cdb51c862a84a7f"
+    },
+    {
+      "pubkey": "TSLvdd1pWpHVjahSpsvCXUbgwsL3JAcvokwaKt1eokM",
+      "role": "mint_authority",
+      "writable": false,
+      "signer": false,
+      "compiledAccountIndex": 15,
+      "preLamports": 1020235880,
+      "postLamports": 1020235880,
+      "postAccountReturned": true,
+      "preSol": "1.020235880",
+      "postSol": "1.020235880",
+      "externalDeltaLamports": 0,
+      "externalDeltaSol": "0.000000000",
+      "atomicPreLamports": 1020235880,
+      "atomicPostLamports": 1020235880,
+      "atomicDeltaLamports": 0,
+      "atomicPostMatchesReturnedAccount": true,
+      "afterReadLamports": 1020235880,
+      "ownerProgram": {
+        "pre": "11111111111111111111111111111111",
+        "post": "11111111111111111111111111111111",
+        "afterRead": "11111111111111111111111111111111"
+      },
+      "executable": {
+        "pre": false,
+        "post": false
+      },
+      "token": {
+        "pre": null,
+        "post": null,
+        "afterRead": null
+      },
+      "classification": null,
+      "expectedness": "NO_NEGATIVE_DELTA",
+      "simulationSlot": 453285409,
+      "preReadSlot": 453285406,
+      "postReadSlot": 453285410,
+      "transactionSha256": "4ceef8e9d2e990d26c4f27c0d718bff794a84ee02c8a59181cdb51c862a84a7f"
+    },
+    {
+      "pubkey": "44xp9X2qTJ7BWSiSSSU28vHHXAoU3DJWtvxuNWFQPYiL",
+      "role": "bonding_curve",
+      "writable": true,
+      "signer": false,
+      "compiledAccountIndex": 4,
+      "preLamports": 0,
+      "postLamports": 1366520,
+      "postAccountReturned": true,
+      "preSol": "0.000000000",
+      "postSol": "0.001366520",
+      "externalDeltaLamports": 1366520,
+      "externalDeltaSol": "0.001366520",
+      "atomicPreLamports": 0,
+      "atomicPostLamports": 1366520,
+      "atomicDeltaLamports": 1366520,
+      "atomicPostMatchesReturnedAccount": true,
+      "afterReadLamports": 0,
+      "ownerProgram": {
+        "pre": null,
+        "post": "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P",
+        "afterRead": null
+      },
+      "executable": {
+        "pre": null,
+        "post": false
+      },
+      "token": {
+        "pre": null,
+        "post": null,
+        "afterRead": null
+      },
+      "classification": null,
+      "expectedness": "NO_NEGATIVE_DELTA",
+      "simulationSlot": 453285409,
+      "preReadSlot": 453285406,
+      "postReadSlot": 453285410,
+      "transactionSha256": "4ceef8e9d2e990d26c4f27c0d718bff794a84ee02c8a59181cdb51c862a84a7f"
+    },
+    {
+      "pubkey": "2RdVhi8mEfdbaNx8naHFMYk76kWHU1zUti76WBLVYcuR",
+      "role": "associated_bonding_curve",
+      "writable": true,
+      "signer": false,
+      "compiledAccountIndex": 3,
+      "preLamports": 0,
+      "postLamports": 1513840,
+      "postAccountReturned": true,
+      "preSol": "0.000000000",
+      "postSol": "0.001513840",
+      "externalDeltaLamports": 1513840,
+      "externalDeltaSol": "0.001513840",
+      "atomicPreLamports": 0,
+      "atomicPostLamports": 1513840,
+      "atomicDeltaLamports": 1513840,
+      "atomicPostMatchesReturnedAccount": true,
+      "afterReadLamports": 0,
+      "ownerProgram": {
+        "pre": null,
+        "post": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+        "afterRead": null
+      },
+      "executable": {
+        "pre": null,
+        "post": false
+      },
+      "token": {
+        "pre": null,
+        "post": {
+          "mint": "HJRV68PUEDjdA8S7TsUAU7aWiXbP8n3KVroMaCr4HkaX",
+          "authority": "44xp9X2qTJ7BWSiSSSU28vHHXAoU3DJWtvxuNWFQPYiL",
+          "amount": "1000000000000000",
+          "initialized": true,
+          "frozen": false
+        },
+        "afterRead": null
+      },
+      "classification": null,
+      "expectedness": "NO_NEGATIVE_DELTA",
+      "simulationSlot": 453285409,
+      "preReadSlot": 453285406,
+      "postReadSlot": 453285410,
+      "transactionSha256": "4ceef8e9d2e990d26c4f27c0d718bff794a84ee02c8a59181cdb51c862a84a7f"
+    },
+    {
+      "pubkey": "4wTV1YmiEkRvAtNtsSGPtUrqRYQMe5SKy2uB4Jjaxnjf",
+      "role": "global",
+      "writable": false,
+      "signer": false,
+      "compiledAccountIndex": 10,
+      "preLamports": 4089837831,
+      "postLamports": 4089837831,
+      "postAccountReturned": true,
+      "preSol": "4.089837831",
+      "postSol": "4.089837831",
+      "externalDeltaLamports": 0,
+      "externalDeltaSol": "0.000000000",
+      "atomicPreLamports": 4089837831,
+      "atomicPostLamports": 4089837831,
+      "atomicDeltaLamports": 0,
+      "atomicPostMatchesReturnedAccount": true,
+      "afterReadLamports": 4089837831,
+      "ownerProgram": {
+        "pre": "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P",
+        "post": "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P",
+        "afterRead": "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P"
+      },
+      "executable": {
+        "pre": false,
+        "post": false
+      },
+      "token": {
+        "pre": null,
+        "post": null,
+        "afterRead": null
+      },
+      "classification": null,
+      "expectedness": "NO_NEGATIVE_DELTA",
+      "simulationSlot": 453285409,
+      "preReadSlot": 453285406,
+      "postReadSlot": 453285410,
+      "transactionSha256": "4ceef8e9d2e990d26c4f27c0d718bff794a84ee02c8a59181cdb51c862a84a7f"
+    },
+    {
+      "pubkey": "C2nddai75FJZWWkNdUF7csEBryRCMikJyTTZZqYcMiBv",
+      "role": "user",
+      "writable": true,
+      "signer": true,
+      "compiledAccountIndex": 0,
+      "preLamports": 182999717,
+      "postLamports": 177442357,
+      "postAccountReturned": true,
+      "preSol": "0.182999717",
+      "postSol": "0.177442357",
+      "externalDeltaLamports": -5557360,
+      "externalDeltaSol": "-0.005557360",
+      "atomicPreLamports": 182999717,
+      "atomicPostLamports": 177442357,
+      "atomicDeltaLamports": -5557360,
+      "atomicPostMatchesReturnedAccount": true,
+      "afterReadLamports": 182999717,
+      "ownerProgram": {
+        "pre": "11111111111111111111111111111111",
+        "post": "11111111111111111111111111111111",
+        "afterRead": "11111111111111111111111111111111"
+      },
+      "executable": {
+        "pre": false,
+        "post": false
+      },
+      "token": {
+        "pre": null,
+        "post": null,
+        "afterRead": null
+      },
+      "classification": "EXPECTED_OWNER_DEBIT",
+      "expectedness": "OWNER_CPI_FUNDING_PLUS_QUOTED_FEE",
+      "simulationSlot": 453285409,
+      "preReadSlot": 453285406,
+      "postReadSlot": 453285410,
+      "transactionSha256": "4ceef8e9d2e990d26c4f27c0d718bff794a84ee02c8a59181cdb51c862a84a7f"
+    },
+    {
+      "pubkey": "11111111111111111111111111111111",
+      "role": "system_program",
+      "writable": false,
+      "signer": false,
+      "compiledAccountIndex": 8,
+      "preLamports": 1,
+      "postLamports": 1,
+      "postAccountReturned": true,
+      "preSol": "0.000000001",
+      "postSol": "0.000000001",
+      "externalDeltaLamports": 0,
+      "externalDeltaSol": "0.000000000",
+      "atomicPreLamports": 1,
+      "atomicPostLamports": 1,
+      "atomicDeltaLamports": 0,
+      "atomicPostMatchesReturnedAccount": true,
+      "afterReadLamports": 1,
+      "ownerProgram": {
+        "pre": "NativeLoader1111111111111111111111111111111",
+        "post": "NativeLoader1111111111111111111111111111111",
+        "afterRead": "NativeLoader1111111111111111111111111111111"
+      },
+      "executable": {
+        "pre": true,
+        "post": true
+      },
+      "token": {
+        "pre": null,
+        "post": null,
+        "afterRead": null
+      },
+      "classification": null,
+      "expectedness": "NO_NEGATIVE_DELTA",
+      "simulationSlot": 453285409,
+      "preReadSlot": 453285406,
+      "postReadSlot": 453285410,
+      "transactionSha256": "4ceef8e9d2e990d26c4f27c0d718bff794a84ee02c8a59181cdb51c862a84a7f"
+    },
+    {
+      "pubkey": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+      "role": "token_program",
+      "writable": false,
+      "signer": false,
+      "compiledAccountIndex": 14,
+      "preLamports": 70228638,
+      "postLamports": 70228638,
+      "postAccountReturned": true,
+      "preSol": "0.070228638",
+      "postSol": "0.070228638",
+      "externalDeltaLamports": 0,
+      "externalDeltaSol": "0.000000000",
+      "atomicPreLamports": 70228638,
+      "atomicPostLamports": 70228638,
+      "atomicDeltaLamports": 0,
+      "atomicPostMatchesReturnedAccount": true,
+      "afterReadLamports": 70228638,
+      "ownerProgram": {
+        "pre": "BPFLoaderUpgradeab1e11111111111111111111111",
+        "post": "BPFLoaderUpgradeab1e11111111111111111111111",
+        "afterRead": "BPFLoaderUpgradeab1e11111111111111111111111"
+      },
+      "executable": {
+        "pre": true,
+        "post": true
+      },
+      "token": {
+        "pre": null,
+        "post": null,
+        "afterRead": null
+      },
+      "classification": null,
+      "expectedness": "NO_NEGATIVE_DELTA",
+      "simulationSlot": 453285409,
+      "preReadSlot": 453285406,
+      "postReadSlot": 453285410,
+      "transactionSha256": "4ceef8e9d2e990d26c4f27c0d718bff794a84ee02c8a59181cdb51c862a84a7f"
+    },
+    {
+      "pubkey": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
+      "role": "associated_token_program",
+      "writable": false,
+      "signer": false,
+      "compiledAccountIndex": 12,
+      "preLamports": 3388612899,
+      "postLamports": 3388612899,
+      "postAccountReturned": true,
+      "preSol": "3.388612899",
+      "postSol": "3.388612899",
+      "externalDeltaLamports": 0,
+      "externalDeltaSol": "0.000000000",
+      "atomicPreLamports": 3388612899,
+      "atomicPostLamports": 3388612899,
+      "atomicDeltaLamports": 0,
+      "atomicPostMatchesReturnedAccount": true,
+      "afterReadLamports": 3388612899,
+      "ownerProgram": {
+        "pre": "BPFLoader2111111111111111111111111111111111",
+        "post": "BPFLoader2111111111111111111111111111111111",
+        "afterRead": "BPFLoader2111111111111111111111111111111111"
+      },
+      "executable": {
+        "pre": true,
+        "post": true
+      },
+      "token": {
+        "pre": null,
+        "post": null,
+        "afterRead": null
+      },
+      "classification": null,
+      "expectedness": "NO_NEGATIVE_DELTA",
+      "simulationSlot": 453285409,
+      "preReadSlot": 453285406,
+      "postReadSlot": 453285410,
+      "transactionSha256": "4ceef8e9d2e990d26c4f27c0d718bff794a84ee02c8a59181cdb51c862a84a7f"
+    },
+    {
+      "pubkey": "MAyhSmzXzV1pTf7LsNkrNwkWKTo4ougAJ1PPg47MD4e",
+      "role": "mayhem_program_id",
+      "writable": true,
+      "signer": false,
+      "compiledAccountIndex": 7,
+      "preLamports": 11149834,
+      "postLamports": 11149834,
+      "postAccountReturned": true,
+      "preSol": "0.011149834",
+      "postSol": "0.011149834",
+      "externalDeltaLamports": 0,
+      "externalDeltaSol": "0.000000000",
+      "atomicPreLamports": 11149834,
+      "atomicPostLamports": 11149834,
+      "atomicDeltaLamports": 0,
+      "atomicPostMatchesReturnedAccount": true,
+      "afterReadLamports": 11149834,
+      "ownerProgram": {
+        "pre": "BPFLoaderUpgradeab1e11111111111111111111111",
+        "post": "BPFLoaderUpgradeab1e11111111111111111111111",
+        "afterRead": "BPFLoaderUpgradeab1e11111111111111111111111"
+      },
+      "executable": {
+        "pre": true,
+        "post": true
+      },
+      "token": {
+        "pre": null,
+        "post": null,
+        "afterRead": null
+      },
+      "classification": null,
+      "expectedness": "NO_NEGATIVE_DELTA",
+      "simulationSlot": 453285409,
+      "preReadSlot": 453285406,
+      "postReadSlot": 453285410,
+      "transactionSha256": "4ceef8e9d2e990d26c4f27c0d718bff794a84ee02c8a59181cdb51c862a84a7f"
+    },
+    {
+      "pubkey": "13ec7XdrjF3h3YcqBTFDSReRcUFwbCnJaAQspM4j6DDJ",
+      "role": "global_params",
+      "writable": false,
+      "signer": false,
+      "compiledAccountIndex": 9,
+      "preLamports": 3104160,
+      "postLamports": 3104160,
+      "postAccountReturned": true,
+      "preSol": "0.003104160",
+      "postSol": "0.003104160",
+      "externalDeltaLamports": 0,
+      "externalDeltaSol": "0.000000000",
+      "atomicPreLamports": 3104160,
+      "atomicPostLamports": 3104160,
+      "atomicDeltaLamports": 0,
+      "atomicPostMatchesReturnedAccount": true,
+      "afterReadLamports": 3104160,
+      "ownerProgram": {
+        "pre": "MAyhSmzXzV1pTf7LsNkrNwkWKTo4ougAJ1PPg47MD4e",
+        "post": "MAyhSmzXzV1pTf7LsNkrNwkWKTo4ougAJ1PPg47MD4e",
+        "afterRead": "MAyhSmzXzV1pTf7LsNkrNwkWKTo4ougAJ1PPg47MD4e"
+      },
+      "executable": {
+        "pre": false,
+        "post": false
+      },
+      "token": {
+        "pre": null,
+        "post": null,
+        "afterRead": null
+      },
+      "classification": null,
+      "expectedness": "NO_NEGATIVE_DELTA",
+      "simulationSlot": 453285409,
+      "preReadSlot": 453285406,
+      "postReadSlot": 453285410,
+      "transactionSha256": "4ceef8e9d2e990d26c4f27c0d718bff794a84ee02c8a59181cdb51c862a84a7f"
+    },
+    {
+      "pubkey": "BwWK17cbHxwWBKZkUYvzxLcNQ1YVyaFezduWbtm2de6s",
+      "role": "sol_vault",
+      "writable": true,
+      "signer": false,
+      "compiledAccountIndex": 6,
+      "preLamports": 59744708716021,
+      "postLamports": 59743147736222,
+      "postAccountReturned": true,
+      "preSol": "59744.708716021",
+      "postSol": "59743.147736222",
+      "externalDeltaLamports": -1560979799,
+      "externalDeltaSol": "-1.560979799",
+      "atomicPreLamports": 59743147736222,
+      "atomicPostLamports": 59743147736222,
+      "atomicDeltaLamports": 0,
+      "atomicPostMatchesReturnedAccount": true,
+      "afterReadLamports": 59743154229499,
+      "ownerProgram": {
+        "pre": "11111111111111111111111111111111",
+        "post": "11111111111111111111111111111111",
+        "afterRead": "11111111111111111111111111111111"
+      },
+      "executable": {
+        "pre": false,
+        "post": false
+      },
+      "token": {
+        "pre": null,
+        "post": null,
+        "afterRead": null
+      },
+      "classification": null,
+      "expectedness": "NO_NEGATIVE_DELTA",
+      "simulationSlot": 453285409,
+      "preReadSlot": 453285406,
+      "postReadSlot": 453285410,
+      "transactionSha256": "4ceef8e9d2e990d26c4f27c0d718bff794a84ee02c8a59181cdb51c862a84a7f"
+    },
+    {
+      "pubkey": "2ENdpYQVgFP9UQuZ2CpDc9EJ8W6oYUUxa2QF6nZUACQq",
+      "role": "mayhem_state",
+      "writable": true,
+      "signer": false,
+      "compiledAccountIndex": 2,
+      "preLamports": 0,
+      "postLamports": 0,
+      "postAccountReturned": true,
+      "preSol": "0.000000000",
+      "postSol": "0.000000000",
+      "externalDeltaLamports": 0,
+      "externalDeltaSol": "0.000000000",
+      "atomicPreLamports": 0,
+      "atomicPostLamports": 0,
+      "atomicDeltaLamports": 0,
+      "atomicPostMatchesReturnedAccount": true,
+      "afterReadLamports": 0,
+      "ownerProgram": {
+        "pre": null,
+        "post": "11111111111111111111111111111111",
+        "afterRead": null
+      },
+      "executable": {
+        "pre": null,
+        "post": false
+      },
+      "token": {
+        "pre": null,
+        "post": null,
+        "afterRead": null
+      },
+      "classification": null,
+      "expectedness": "NO_NEGATIVE_DELTA",
+      "simulationSlot": 453285409,
+      "preReadSlot": 453285406,
+      "postReadSlot": 453285410,
+      "transactionSha256": "4ceef8e9d2e990d26c4f27c0d718bff794a84ee02c8a59181cdb51c862a84a7f"
+    },
+    {
+      "pubkey": "8SbHW9D6Gm8dHkS2ApitDGaAVNh9SF8Ertg3VbPfqeEG",
+      "role": "mayhem_token_vault",
+      "writable": true,
+      "signer": false,
+      "compiledAccountIndex": 5,
+      "preLamports": 0,
+      "postLamports": 0,
+      "postAccountReturned": true,
+      "preSol": "0.000000000",
+      "postSol": "0.000000000",
+      "externalDeltaLamports": 0,
+      "externalDeltaSol": "0.000000000",
+      "atomicPreLamports": 0,
+      "atomicPostLamports": 0,
+      "atomicDeltaLamports": 0,
+      "atomicPostMatchesReturnedAccount": true,
+      "afterReadLamports": 0,
+      "ownerProgram": {
+        "pre": null,
+        "post": "11111111111111111111111111111111",
+        "afterRead": null
+      },
+      "executable": {
+        "pre": null,
+        "post": false
+      },
+      "token": {
+        "pre": null,
+        "post": null,
+        "afterRead": null
+      },
+      "classification": null,
+      "expectedness": "NO_NEGATIVE_DELTA",
+      "simulationSlot": 453285409,
+      "preReadSlot": 453285406,
+      "postReadSlot": 453285410,
+      "transactionSha256": "4ceef8e9d2e990d26c4f27c0d718bff794a84ee02c8a59181cdb51c862a84a7f"
+    },
+    {
+      "pubkey": "Ce6TQqeHC9p8KetsN6JsjHK7UTZk7nasjjnr7XxXp9F1",
+      "role": "event_authority",
+      "writable": false,
+      "signer": false,
+      "compiledAccountIndex": 13,
+      "preLamports": 168261611,
+      "postLamports": 168261611,
+      "postAccountReturned": true,
+      "preSol": "0.168261611",
+      "postSol": "0.168261611",
+      "externalDeltaLamports": 0,
+      "externalDeltaSol": "0.000000000",
+      "atomicPreLamports": 168261611,
+      "atomicPostLamports": 168261611,
+      "atomicDeltaLamports": 0,
+      "atomicPostMatchesReturnedAccount": true,
+      "afterReadLamports": 168261611,
+      "ownerProgram": {
+        "pre": "11111111111111111111111111111111",
+        "post": "11111111111111111111111111111111",
+        "afterRead": "11111111111111111111111111111111"
+      },
+      "executable": {
+        "pre": false,
+        "post": false
+      },
+      "token": {
+        "pre": null,
+        "post": null,
+        "afterRead": null
+      },
+      "classification": null,
+      "expectedness": "NO_NEGATIVE_DELTA",
+      "simulationSlot": 453285409,
+      "preReadSlot": 453285406,
+      "postReadSlot": 453285410,
+      "transactionSha256": "4ceef8e9d2e990d26c4f27c0d718bff794a84ee02c8a59181cdb51c862a84a7f"
+    },
+    {
+      "pubkey": "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P",
+      "role": "program",
+      "writable": false,
+      "signer": false,
+      "compiledAccountIndex": 11,
+      "preLamports": 9296912471,
+      "postLamports": 9296912471,
+      "postAccountReturned": true,
+      "preSol": "9.296912471",
+      "postSol": "9.296912471",
+      "externalDeltaLamports": 0,
+      "externalDeltaSol": "0.000000000",
+      "atomicPreLamports": 9296912471,
+      "atomicPostLamports": 9296912471,
+      "atomicDeltaLamports": 0,
+      "atomicPostMatchesReturnedAccount": true,
+      "afterReadLamports": 9296912471,
+      "ownerProgram": {
+        "pre": "BPFLoaderUpgradeab1e11111111111111111111111",
+        "post": "BPFLoaderUpgradeab1e11111111111111111111111",
+        "afterRead": "BPFLoaderUpgradeab1e11111111111111111111111"
+      },
+      "executable": {
+        "pre": true,
+        "post": true
+      },
+      "token": {
+        "pre": null,
+        "post": null,
+        "afterRead": null
+      },
+      "classification": null,
+      "expectedness": "NO_NEGATIVE_DELTA",
+      "simulationSlot": 453285409,
+      "preReadSlot": 453285406,
+      "postReadSlot": 453285410,
+      "transactionSha256": "4ceef8e9d2e990d26c4f27c0d718bff794a84ee02c8a59181cdb51c862a84a7f"
+    }
+  ],
+  "feeLamports": 10000,
+  "simulationFeeLamports": 10000,
+  "policy": {
+    "allowed": true,
+    "reasons": [],
+    "warnings": [
+      "PRESTATE_NOT_SAME_BANK",
+      "READONLY_ACCOUNT_CHANGED",
+      "UNEXPECTED_NONPAYER_DEBIT",
+      "DEBIT_NOT_RECONCILED_WITH_FEE_AND_ACCOUNT_EFFECTS",
+      "RPC_MIN_CONTEXT_SLOT_RETRIED"
+    ],
+    "validatedOverheadLamports": 5557360,
+    "estimatedPayerDebitLamports": 5557360
+  },
+  "simulationError": null,
+  "logs": [
+    "Program 6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P invoke [1]",
+    "Program log: Instruction: CreateV2",
+    "Program 11111111111111111111111111111111 invoke [2]",
+    "Program 11111111111111111111111111111111 success",
+    "Program TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb invoke [2]",
+    "Program log: MetadataPointerInstruction::Initialize",
+    "Program TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb consumed 925 of 187660 compute units",
+    "Program TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb success",
+    "Program TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb invoke [2]",
+    "Program log: Instruction: InitializeMint2",
+    "Program TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb consumed 1772 of 185072 compute units",
+    "Program TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb success",
+    "Program 11111111111111111111111111111111 invoke [2]",
+    "Program 11111111111111111111111111111111 success",
+    "Program ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL invoke [2]",
+    "Program log: Create",
+    "Program TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb invoke [3]",
+    "Program log: Instruction: GetAccountDataSize",
+    "Program TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb consumed 1447 of 165195 compute units",
+    "Program return: TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb qgAAAAAAAAA=",
+    "Program TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb success",
+    "Program 11111111111111111111111111111111 invoke [3]",
+    "Program 11111111111111111111111111111111 success",
+    "Program log: Initialize the associated token account",
+    "Program TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb invoke [3]",
+    "Program log: Instruction: InitializeImmutableOwner",
+    "Program TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb consumed 736 of 158926 compute units",
+    "Program TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb success",
+    "Program TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb invoke [3]",
+    "Program log: Instruction: InitializeAccount3",
+    "Program TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb consumed 1969 of 155854 compute units",
+    "Program TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb success",
+    "Program ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL consumed 16947 of 170528 compute units",
+    "Program ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL success",
+    "Program 11111111111111111111111111111111 invoke [2]",
+    "Program 11111111111111111111111111111111 success",
+    "Program TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb invoke [2]",
+    "Program log: TokenMetadataInstruction: Initialize",
+    "Program TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb consumed 3391 of 128951 compute units",
+    "Program TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb success",
+    "Program TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb invoke [2]",
+    "Program log: TokenMetadataInstruction: UpdateAuthority",
+    "Program TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb consumed 3719 of 123310 compute units",
+    "Program TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb success",
+    "Program TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb invoke [2]",
+    "Program log: Instruction: MintTo",
+    "Program TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb consumed 1714 of 117399 compute units",
+    "Program TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb success",
+    "Program TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb invoke [2]",
+    "Program log: Instruction: SetAuthority",
+    "Program TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb consumed 1044 of 113749 compute units",
+    "Program TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb success",
+    "Program data: G3KpTd7rY3YDAAAAcmV0AwAAADNFREkAAABodHRwczovL3N0YWdpbmcudGVra3RlYW0udGVjaC90ekNvSkF6aDEtLXdoZ2lMY3Nhc1BnQTQxV3ZpckZYbUhfSG8yTHRGTDFn8jGMjhC62W7xmxt2OMlrBJoDMHJMUhzfCgHJneKPLTQtluk5Fp14J9bDt4mjjnUlkqR42zFklqNfYC2iKCwzGaPlu5b/2vS871Q9nd28DDd7sZipFd34N2+F89HYEGfto+W7lv/a9LzvVD2d3bwMN3uxmKkV3fg3b4Xz0dgQZ+2PZMJqAAAAAAAQ2EfjzwMAAKwj/AYAAAAAeMX7UdECAACAxqR+jQMABt324e51j94YQl285GzN2rYa/E2DuQ0n/r35KNihi/wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKwj/AYAAAAAAAAAAAAAAAA=",
+    "Program 6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P invoke [2]",
+    "Program 6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P consumed 2164 of 106397 compute units",
+    "Program 6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P success",
+    "Program 6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P consumed 97148 of 200000 compute units",
+    "Program 6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P success"
+  ],
+  "innerInstructions": [
+    {
+      "index": 0,
+      "instructions": [
+        {
+          "parsed": {
+            "info": {
+              "lamports": 1838960,
+              "newAccount": "HJRV68PUEDjdA8S7TsUAU7aWiXbP8n3KVroMaCr4HkaX",
+              "owner": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+              "source": "C2nddai75FJZWWkNdUF7csEBryRCMikJyTTZZqYcMiBv",
+              "space": 234
+            },
+            "type": "createAccount"
+          },
+          "program": "system",
+          "programId": "11111111111111111111111111111111",
+          "stackHeight": 2
+        },
+        {
+          "parsed": {
+            "info": {
+              "metadataAddress": "HJRV68PUEDjdA8S7TsUAU7aWiXbP8n3KVroMaCr4HkaX",
+              "mint": "HJRV68PUEDjdA8S7TsUAU7aWiXbP8n3KVroMaCr4HkaX"
+            },
+            "type": "initializeMetadataPointer"
+          },
+          "program": "spl-token",
+          "programId": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+          "stackHeight": 2
+        },
+        {
+          "parsed": {
+            "info": {
+              "decimals": 6,
+              "mint": "HJRV68PUEDjdA8S7TsUAU7aWiXbP8n3KVroMaCr4HkaX",
+              "mintAuthority": "TSLvdd1pWpHVjahSpsvCXUbgwsL3JAcvokwaKt1eokM"
+            },
+            "type": "initializeMint2"
+          },
+          "program": "spl-token",
+          "programId": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+          "stackHeight": 2
+        },
+        {
+          "parsed": {
+            "info": {
+              "lamports": 1366520,
+              "newAccount": "44xp9X2qTJ7BWSiSSSU28vHHXAoU3DJWtvxuNWFQPYiL",
+              "owner": "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P",
+              "source": "C2nddai75FJZWWkNdUF7csEBryRCMikJyTTZZqYcMiBv",
+              "space": 141
+            },
+            "type": "createAccount"
+          },
+          "program": "system",
+          "programId": "11111111111111111111111111111111",
+          "stackHeight": 2
+        },
+        {
+          "parsed": {
+            "info": {
+              "account": "2RdVhi8mEfdbaNx8naHFMYk76kWHU1zUti76WBLVYcuR",
+              "mint": "HJRV68PUEDjdA8S7TsUAU7aWiXbP8n3KVroMaCr4HkaX",
+              "source": "C2nddai75FJZWWkNdUF7csEBryRCMikJyTTZZqYcMiBv",
+              "systemProgram": "11111111111111111111111111111111",
+              "tokenProgram": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+              "wallet": "44xp9X2qTJ7BWSiSSSU28vHHXAoU3DJWtvxuNWFQPYiL"
+            },
+            "type": "create"
+          },
+          "program": "spl-associated-token-account",
+          "programId": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
+          "stackHeight": 2
+        },
+        {
+          "parsed": {
+            "info": {
+              "extensionTypes": [
+                "immutableOwner"
+              ],
+              "mint": "HJRV68PUEDjdA8S7TsUAU7aWiXbP8n3KVroMaCr4HkaX"
+            },
+            "type": "getAccountDataSize"
+          },
+          "program": "spl-token",
+          "programId": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+          "stackHeight": 3
+        },
+        {
+          "parsed": {
+            "info": {
+              "lamports": 1513840,
+              "newAccount": "2RdVhi8mEfdbaNx8naHFMYk76kWHU1zUti76WBLVYcuR",
+              "owner": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+              "source": "C2nddai75FJZWWkNdUF7csEBryRCMikJyTTZZqYcMiBv",
+              "space": 170
+            },
+            "type": "createAccount"
+          },
+          "program": "system",
+          "programId": "11111111111111111111111111111111",
+          "stackHeight": 3
+        },
+        {
+          "parsed": {
+            "info": {
+              "account": "2RdVhi8mEfdbaNx8naHFMYk76kWHU1zUti76WBLVYcuR"
+            },
+            "type": "initializeImmutableOwner"
+          },
+          "program": "spl-token",
+          "programId": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+          "stackHeight": 3
+        },
+        {
+          "parsed": {
+            "info": {
+              "account": "2RdVhi8mEfdbaNx8naHFMYk76kWHU1zUti76WBLVYcuR",
+              "mint": "HJRV68PUEDjdA8S7TsUAU7aWiXbP8n3KVroMaCr4HkaX",
+              "owner": "44xp9X2qTJ7BWSiSSSU28vHHXAoU3DJWtvxuNWFQPYiL"
+            },
+            "type": "initializeAccount3"
+          },
+          "program": "spl-token",
+          "programId": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+          "stackHeight": 3
+        },
+        {
+          "parsed": {
+            "info": {
+              "destination": "HJRV68PUEDjdA8S7TsUAU7aWiXbP8n3KVroMaCr4HkaX",
+              "lamports": 828040,
+              "source": "C2nddai75FJZWWkNdUF7csEBryRCMikJyTTZZqYcMiBv"
+            },
+            "type": "transfer"
+          },
+          "program": "system",
+          "programId": "11111111111111111111111111111111",
+          "stackHeight": 2
+        },
+        {
+          "parsed": {
+            "info": {
+              "metadata": "HJRV68PUEDjdA8S7TsUAU7aWiXbP8n3KVroMaCr4HkaX",
+              "mint": "HJRV68PUEDjdA8S7TsUAU7aWiXbP8n3KVroMaCr4HkaX",
+              "mintAuthority": "TSLvdd1pWpHVjahSpsvCXUbgwsL3JAcvokwaKt1eokM",
+              "name": "ret",
+              "symbol": "3ED",
+              "updateAuthority": "TSLvdd1pWpHVjahSpsvCXUbgwsL3JAcvokwaKt1eokM",
+              "uri": "https://staging.tekkteam.tech/tzCoJAzh1--whgiLcsasPgA41WvirFXmH_Ho2LtFL1g"
+            },
+            "type": "initializeTokenMetadata"
+          },
+          "program": "spl-token",
+          "programId": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+          "stackHeight": 2
+        },
+        {
+          "parsed": {
+            "info": {
+              "metadata": "HJRV68PUEDjdA8S7TsUAU7aWiXbP8n3KVroMaCr4HkaX",
+              "newAuthority": null,
+              "updateAuthority": "TSLvdd1pWpHVjahSpsvCXUbgwsL3JAcvokwaKt1eokM"
+            },
+            "type": "updateTokenMetadataAuthority"
+          },
+          "program": "spl-token",
+          "programId": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+          "stackHeight": 2
+        },
+        {
+          "parsed": {
+            "info": {
+              "account": "2RdVhi8mEfdbaNx8naHFMYk76kWHU1zUti76WBLVYcuR",
+              "amount": "1000000000000000",
+              "mint": "HJRV68PUEDjdA8S7TsUAU7aWiXbP8n3KVroMaCr4HkaX",
+              "mintAuthority": "TSLvdd1pWpHVjahSpsvCXUbgwsL3JAcvokwaKt1eokM"
+            },
+            "type": "mintTo"
+          },
+          "program": "spl-token",
+          "programId": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+          "stackHeight": 2
+        },
+        {
+          "parsed": {
+            "info": {
+              "authority": "TSLvdd1pWpHVjahSpsvCXUbgwsL3JAcvokwaKt1eokM",
+              "authorityType": "mintTokens",
+              "mint": "HJRV68PUEDjdA8S7TsUAU7aWiXbP8n3KVroMaCr4HkaX",
+              "newAuthority": null
+            },
+            "type": "setAuthority"
+          },
+          "program": "spl-token",
+          "programId": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+          "stackHeight": 2
+        },
+        {
+          "accounts": [
+            "Ce6TQqeHC9p8KetsN6JsjHK7UTZk7nasjjnr7XxXp9F1"
+          ],
+          "data": "cFyQpzSt8pmPQ8ukHJCgBXkkALB5QsPiBD48vMfu26MYpNc6qBfRCMcPvan9Rg6LfHmM3RFzVuWr9t3X3f2ks5EC9N7G9F4rrMVto55jKoL2Q7ABJZZN1ZW1kyupwNc5wjtMv4iZo4XHnTQMFFAg9qF7u9F92wT7QvhRrQQ7xpDodEtE9buR7mSfYZKjrWduncsrrK3KESnNeoWML1wCMG9ZMThjKMUPHmAbGBHkyNfuZB7hkvCQfoUzHVDyLeY4KJ2vHLXhtPzw7fcqvZP9fqMrmNhPoLyt6AAT4wmkqEtPWsqvfnX68yvpB3NSYgz71y3Nr9pnutso3BtyttByC2cBXCumUMSXpjpavEEc282r21ex5FxuYfjDhhteuvN7HteBxJJQKed7rBWFecwPx46dedtiKjySAdg2ni8Gb3BDKqdQvUsZXB5Mfm2SJy2aZWtqyoMRLtqHiVtpyUqUPpJLeup8hoNedXxVK5Sis",
+          "programId": "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P",
+          "stackHeight": 2
+        }
+      ]
+    }
+  ],
+  "tokenBalances": {
+    "pre": [],
+    "post": [
+      {
+        "accountIndex": 3,
+        "mint": "HJRV68PUEDjdA8S7TsUAU7aWiXbP8n3KVroMaCr4HkaX",
+        "owner": "44xp9X2qTJ7BWSiSSSU28vHHXAoU3DJWtvxuNWFQPYiL",
+        "programId": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+        "uiTokenAmount": {
+          "amount": "1000000000000000",
+          "decimals": 6,
+          "uiAmount": 1000000000,
+          "uiAmountString": "1000000000"
+        }
+      }
+    ]
+  },
+  "rentAccounts": [
+    {
+      "name": "mint",
+      "address": "HJRV68PUEDjdA8S7TsUAU7aWiXbP8n3KVroMaCr4HkaX",
+      "dataLength": 397,
+      "fundedLamports": 2667000,
+      "minimumRentExemptionLamports": 2667000
+    },
+    {
+      "name": "bonding_curve",
+      "address": "44xp9X2qTJ7BWSiSSSU28vHHXAoU3DJWtvxuNWFQPYiL",
+      "dataLength": 141,
+      "fundedLamports": 1366520,
+      "minimumRentExemptionLamports": 1366520
+    },
+    {
+      "name": "associated_bonding_curve",
+      "address": "2RdVhi8mEfdbaNx8naHFMYk76kWHU1zUti76WBLVYcuR",
+      "dataLength": 170,
+      "fundedLamports": 1513840,
+      "minimumRentExemptionLamports": 1513840
+    }
+  ]
+}

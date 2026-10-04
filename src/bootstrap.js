@@ -2,12 +2,13 @@ import { Buffer } from 'buffer';
 import { Transaction } from '@solana/web3.js';
 import bs58 from 'bs58';
 import {inspectFundingReview} from './wallet-transfer.js';
-import '../public/agent-wallet.css';
-import '../public/wallet-workspace.css';
+import './wallet-mobile-bootstrap.js';
+import './reown-bootstrap.js';
 import {createElement,LayoutDashboard,Users,Coins,Shapes,BookOpen,Search,Plus,Minus,X,ArrowLeft,Check,Ellipsis,Trash2,ExternalLink,Wallet,Box,ChartNoAxesCombined,Rocket,Crosshair,Copy,RefreshCw,LogOut,LockKeyhole} from 'lucide';
 import { publicConfig } from '../server/config.js';
 // Static client presentations must never pretend a local API is publicly hosted.
 window.TekkworkApiBase=import.meta.env.VITE_API_BASE||'/api';
+Object.defineProperty(window,'TekkworkWalletTestOnly',{value:import.meta.env.VITE_WALLET_TEST_ONLY==='true',writable:false,configurable:false});
 if (import.meta.env.PROD && import.meta.env.VITE_BACKEND_ENABLED!=='true') window.TekkworkDemo = {
   config: { ...publicConfig('demo'), preview:true, backendOnline:false, capabilities:{walletAuth:false,persistentAgents:false,devnetMint:false,pumpfun:false,autonomousTrading:false} },
   session:null, agents:[], events:[], coins:[], feed:[], tokens:[], bonded:[],
@@ -23,10 +24,20 @@ window.mountWorkspacePhone = async host => {
   return host.isConnected ? mountWorkspacePhone(host) : null;
 };
 window.mountPumpLaunch = async (host,options) => {
+  if(options.preparationOnly&&options.getM4Wallet){
+    const response=await fetch('/api/runtime-capabilities');if(!response.ok)throw Error('Runtime capabilities unavailable');const capability=await response.json();
+    if(capability.mode==='M4_CONTROLLED_SINGLE_LAUNCH'){
+      const {mountM4Launch}=await import('./pump-m4-ui.js');
+      if(host.isConnected)mountM4Launch(host,{...options,capability});return;
+    }
+  }
   const {mountPumpLaunch}=await import('./pump-launch-ui.js');
   if(host.isConnected)mountPumpLaunch(host,options);
 };
 const workspaceScript = document.createElement('script');
 workspaceScript.type = 'module';
-workspaceScript.src = '/app/workspace.js';
+// A deployment revision keeps the whole relative module graph on fresh URLs.
+// Unversioned modules may remain fresh in mobile/WebView caches after a release.
+const appRevision=import.meta.env.VITE_APP_REVISION;
+workspaceScript.src = appRevision ? '/app/'+encodeURIComponent(appRevision)+'/workspace.js' : '/app/workspace.js';
 document.body.appendChild(workspaceScript);

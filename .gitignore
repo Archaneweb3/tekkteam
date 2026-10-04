@@ -1,4 +1,5 @@
 node_modules/
+.dot/
 .reference/
 server/data/
 dist/
@@ -13,3 +14,12 @@ dist/
 *.webp
 *.log
 !public/**
+artifacts/mobile-wallet-m2b/site/
+artifacts/
+migration-output/
+tekkteam-migration/
+*.sqlite
+*.sqlite-wal
+*.sqlite-shm
+vault.key
+*.pem

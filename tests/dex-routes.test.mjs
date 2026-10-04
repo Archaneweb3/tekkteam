@@ -1,4 +1,5 @@
 import test from 'node:test';
+import {fixtureGeneralScope} from './dex-target-authority-fixture.mjs';
 import assert from 'node:assert/strict';
 import express from 'express';
 import {DatabaseSync} from 'node:sqlite';
@@ -12,7 +13,7 @@ test('controlled production HTTP surface: auth, quote idempotency, explicit canc
  const saved={CONTROLLED_REAL_ENABLED:process.env.CONTROLLED_REAL_ENABLED,GLOBAL_TRADING_KILL_SWITCH:process.env.GLOBAL_TRADING_KILL_SWITCH,LIVE_TRADING_ENABLED:process.env.LIVE_TRADING_ENABLED};
  process.env.CONTROLLED_REAL_ENABLED='true';process.env.GLOBAL_TRADING_KILL_SWITCH='false';process.env.LIVE_TRADING_ENABLED='false';
  const app=express();app.use(express.json());const auth=(req,res,next)=>{if(req.headers['x-fixture-owner']!==owner)return res.sendStatus(401);req.session={address:owner};next();};
- installControlledDex(app,{db,auth,sessionValid:req=>req.headers['x-expired']!=='yes',owned:req=>{if(req.params.id!=='fixture-agent')throw Object.assign(Error('Agent not found'),{status:404});return {agent:{id:'fixture-agent',tradingWallet:wallet}};},now:()=>1000,provider:{quote:async i=>({provider:'FIXTURE_ONLY',...i,estimatedOutput:'100',minimumOutput:'99',createdAt:1000,expiresAt:16000,reference:'fixture-ref'})}});
+ installControlledDex(app,{db,readLaunchpadScope:fixtureGeneralScope(db,[{id:'fixture-agent',creator:owner,tradingWallet:wallet}]),auth,sessionValid:req=>req.headers['x-expired']!=='yes',owned:req=>{if(req.params.id!=='fixture-agent')throw Object.assign(Error('Agent not found'),{status:404});return {agent:{id:'fixture-agent',tradingWallet:wallet}};},now:()=>1000,provider:{quote:async i=>({provider:'FIXTURE_ONLY',...i,estimatedOutput:'100',minimumOutput:'99',createdAt:1000,expiresAt:16000,reference:'fixture-ref'})}});
  const server=app.listen(0,'127.0.0.1');await new Promise(r=>server.once('listening',r));t.after(()=>{server.close();db.close();for(const [k,v] of Object.entries(saved)){if(v===undefined)delete process.env[k];else process.env[k]=v;}});
  const base='http://127.0.0.1:'+server.address().port+'/api/agents/fixture-agent/controlled-swap';
  const call=async(path='',body,headers={})=>{const response=await fetch(base+path,{method:body?'POST':'GET',headers:{'Content-Type':'application/json','x-fixture-owner':owner,...headers},...(body?{body:JSON.stringify(body)}:{})});return {status:response.status,data:await response.text()};};

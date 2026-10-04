@@ -25,7 +25,11 @@ try {
     const response=await route.fetch({url:backend+url.pathname,headers:{...route.request().headers(),origin:base}});
     await route.fulfill({response});
   });
-  await page.goto(base+'/#/agents/new'); await page.locator('#tw-new-connect').click();
+  await page.goto(base+'/#/agents/new');
+  await page.locator('#tw-new-connect').waitFor({state:'visible'});
+  assert.equal(await page.evaluate(()=>!!window.TekkworkDemo),false,'Authentication fixture requires backend-enabled app, not the auth-disabled production client demo. Use npm test or a Vite development server.');
+  await page.locator('#tw-new-connect').click();
+  await page.locator('.tw-connect-dialog').waitFor({state:'visible'});
   await page.locator('[data-wallet="phantom"]').click(); await page.locator('dialog').waitFor({state:'detached'});
   await page.getByRole('button',{name:'Open navigation'}).click();
   const wallet=page.locator('#tw-wallet');

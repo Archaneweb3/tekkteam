@@ -101,7 +101,7 @@ test('connected wallet lacking Mainnet account fails before backend challenge',a
  const devnet={address:owner,chains:['solana:devnet']};let requests=0;
  const wallet={name:'Solflare',chains:['solana:mainnet'],accounts:[],features:{'standard:connect':{connect:async()=>({accounts:[devnet]})},'solana:signMessage':{signMessage:async()=>{throw Error('must not sign');}}}};
  environment(wallet);globalThis.fetch=async()=>{requests++;throw Error('must not request challenge');};
- try{const backend=await import('../public/app/backend.js?mainnet-account-fixture');const row=backend.wallets()[0];assert.equal(row.status,'Connect to verify Solana account');await assert.rejects(backend.connect(row.id),e=>e.walletAuthCode==='SOLANA_ACCOUNT_UNAVAILABLE');assert.equal(requests,0);}
+ try{const backend=await import('../public/app/backend.js?mainnet-account-fixture');const row=backend.wallets().find(w=>w.name==='Solflare');assert.equal(row.status,'Connect to verify Solana account');await assert.rejects(backend.connect(row.id),e=>e.walletAuthCode==='SOLANA_ACCOUNT_UNAVAILABLE');assert.equal(requests,0);}
  finally{Object.assign(globalThis,original);}
 });
 
@@ -139,9 +139,9 @@ test('Solflare connect failure is isolated before authentication',async()=>{
  }finally{Object.assign(globalThis,original);}
 });
 
-test('Solflare not installed has one official install row and Trust is absent',async()=>{
+test('Solflare not installed has one official install row and Trust is explicitly unavailable without a provider',async()=>{
  environment();
- try{const backend=await import('../public/app/backend.js?solflare-install-fixture');const rows=backend.wallets();const row=rows.find(wallet=>wallet.brand==='Solflare');assert.equal(row.status,'Not installed');assert.equal(row.selectable,false);assert.equal(row.installUrl,'https://www.solflare.com/download/');assert.ok(row.icon.startsWith('https://www.solflare.com/'));assert.equal(rows.some(wallet=>/trust/i.test(wallet.name)),false);}
+ try{const backend=await import('../public/app/backend.js?solflare-install-fixture');const rows=backend.wallets();const row=rows.find(wallet=>wallet.brand==='Solflare');assert.equal(row.status,'Not installed');assert.equal(row.selectable,false);assert.equal(row.installUrl,'https://www.solflare.com/download/');assert.equal(row.icon,null);assert.equal(rows.find(wallet=>wallet.name==='Trust Wallet').selectable,false);}
  finally{Object.assign(globalThis,original);}
 });
 

@@ -1,8 +1,8 @@
 import { networkConfig } from '../src/networks.js';
 export const strategies = [
   { id: 'balanced', name: 'Balanced', description: 'A measured profile with conservative position limits.', maxPositionPct: 10 },
-  { id: 'momentum', name: 'Momentum', description: 'Follow established movement with a defined risk budget.', maxPositionPct: 15 },
-  { id: 'selective', name: 'Selective', description: 'Prioritize fewer opportunities and smaller exposure.', maxPositionPct: 5 },
+  { id: 'momentum', name: 'Momentum', description: 'Broader movement and activity filters; shared position limits.', maxPositionPct: 10 },
+  { id: 'selective', name: 'Selective', description: 'Stricter activity and liquidity filters; shared position limits.', maxPositionPct: 10 },
 ];
 export const characters = [
   { id: 'frank', name: 'Felix Builder', role: 'Build with intention', color: '#548dff' },

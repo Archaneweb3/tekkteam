@@ -39,7 +39,7 @@ async function service(t,options={}){
  MintLayout.encode({mintAuthorityOption:0,mintAuthority:PublicKey.default,supply:1000000000000000n,decimals:6,isInitialized:true,freezeAuthorityOption:0,freezeAuthority:PublicKey.default},mintData);
  const connection={getGenesisHash:async()=>GENESIS,getBlockHeight:async()=>e.lastValidBlockHeight-100,getSignatureStatuses:async()=>({value:[{err:null,confirmationStatus:'confirmed'}]}),getAccountInfo:async()=>({data:mintData,owner:TOKEN_2022_PROGRAM_ID,executable:false,lamports:2702560}),getTransaction:async()=>({meta:{err:null,preBalances:[17664446],postBalances:[12152806],fee:10000},transaction:{message:{accountKeys:[new PublicKey(PAYER)]}}}),...options.connection};
  const send=async bytes=>{calls.sent++;if(options.sendError)throw Error('Timeout');const tx=Transaction.from(bytes);return (await import('bs58')).default.encode(tx.signature);};
- const app=createPumpLaunch({journal,prepare:async()=>e,connection,send,getAgent:async id=>({...agent,id}),publishMetadata:async()=>launch.metadataUri,...options.adapters});
+ const app=createPumpLaunch({journal,initializeJournal:true,prepare:async()=>e,connection,send,getAgent:async id=>({...agent,id}),publishMetadata:async()=>launch.metadataUri,...options.adapters});
  const server=app.listen(0,'127.0.0.1');await new Promise(r=>server.once('listening',r));t.after(()=>server.close());
  const request=(path,body)=>new Promise((resolve,reject)=>{if(body)body={agentId:identity.agentId,agent:identity,...body};if(!body&&!path.includes('?'))path+='?agentId='+identity.agentId;const req=http.request(`http://127.0.0.1:${server.address().port}/pump-launch/${path}`,{method:body?'POST':'GET',headers:{host:'127.0.0.1:4193',origin:'http://127.0.0.1:5188','Content-Type':'application/json'}},res=>{let data='';res.on('data',b=>data+=b);res.on('end',()=>resolve({code:res.statusCode,data:JSON.parse(data)}));});req.on('error',reject);req.end(body?JSON.stringify(body):undefined);});
  return {e,calls,request,journal,connection};
@@ -66,12 +66,49 @@ test('unsigned/rejected request and altered message never broadcast',async t=>{
  assert.equal((await s.request('submit',{id:p.data.id,transaction:tx.serialize({requireAllSignatures:false,verifySignatures:false}).toString('base64')})).code,400);
  assert.equal(s.calls.sent,0);
 });
+test('pre-send persistence failure returns unavailable and never broadcasts',async t=>{
+ let fail=false;
+ const s=await service(t,{adapters:{journalOptions:{checkpoint:phase=>{if(fail&&phase==='write')throw Error('injected write failure');}}}});
+ const p=await s.request('prepare',{payer:PAYER});assert.equal(p.code,200);fail=true;
+ const tx=Transaction.from(Buffer.from(s.e.walletTransactionBase64,'base64'));tx.addSignature(new PublicKey(PAYER),Buffer.alloc(64,8));
+ t.mock.method(Transaction.prototype,'verifySignatures',()=>true);t.mock.method(Transaction.prototype,'_getMessageSignednessErrors',()=>undefined);
+ const body={id:p.data.id,transaction:tx.serialize({verifySignatures:false}).toString('base64')};
+ assert.equal((await s.request('submit',body)).code,503);assert.equal(s.calls.sent,0);
+ assert.equal(JSON.parse(readFileSync(s.journal)).receipts[identity.agentId].status,'Prepared');
+ fail=false;assert.equal((await s.request('submit',body)).code,200);assert.equal(s.calls.sent,1);
+});
+test('uncertain post-send commit fences HTTP retries but restart retains the exact signature',async t=>{
+ let writes=0,fail=false;
+ const s=await service(t,{adapters:{journalOptions:{checkpoint:phase=>{if(fail&&phase==='verify'&&++writes===2)throw Error('injected acknowledgement loss');}}}});
+ const p=await s.request('prepare',{payer:PAYER});assert.equal(p.code,200);fail=true;
+ const tx=Transaction.from(Buffer.from(s.e.walletTransactionBase64,'base64'));tx.addSignature(new PublicKey(PAYER),Buffer.alloc(64,8));
+ t.mock.method(Transaction.prototype,'verifySignatures',()=>true);t.mock.method(Transaction.prototype,'_getMessageSignednessErrors',()=>undefined);
+ const body={id:p.data.id,transaction:tx.serialize({verifySignatures:false}).toString('base64')};
+ assert.equal((await s.request('submit',body)).code,503);assert.equal(s.calls.sent,1);
+ assert.equal((await s.request('submit',body)).code,503);assert.equal(s.calls.sent,1);
+ const receipt=JSON.parse(readFileSync(s.journal)).receipts[identity.agentId];assert.equal(receipt.broadcastAttempted,true);assert.ok(receipt.signature);
+ const restarted=await service(t,{adapters:{journal:s.journal,initializeJournal:false}});
+ assert.equal((await restarted.request('submit',body)).code,409);assert.equal(restarted.calls.sent,0);
+ const recovered=await restarted.request('status');assert.equal(recovered.data.signature,receipt.signature);assert.equal(recovered.data.status,'Success');assert.equal(restarted.calls.sent,0);
+});
 test('ambiguous network send is latched; confirmation check never resends',async t=>{
  const s=await service(t,{sendError:true}),p=await s.request('prepare',{payer:PAYER});
  const tx=Transaction.from(Buffer.from(s.e.walletTransactionBase64,'base64'));tx.addSignature(new PublicKey(PAYER),Buffer.alloc(64,8));t.mock.method(Transaction.prototype,'verifySignatures',()=>true);t.mock.method(Transaction.prototype,'_getMessageSignednessErrors',()=>undefined);
  const body={id:p.data.id,transaction:tx.serialize({verifySignatures:false}).toString('base64')};
  const result=await s.request('submit',body);assert.match(result.data.notice,/unknown/);
  await s.request('status');await s.request('submit',body);assert.equal(s.calls.sent,1);
+});
+test('deferred status serializes reconciliation and prevents preparation or review overwrites',async t=>{
+ let release,entered;const started=new Promise(r=>entered=r),blocked=new Promise(r=>release=r);
+ const s=await service(t,{connection:{getSignatureStatuses:async()=>{entered();await blocked;return {value:[{err:null,confirmationStatus:'confirmed'}]};}}});
+ const p=await s.request('prepare',{payer:PAYER});
+ const tx=Transaction.from(Buffer.from(s.e.walletTransactionBase64,'base64'));tx.addSignature(new PublicKey(PAYER),Buffer.alloc(64,8));
+ t.mock.method(Transaction.prototype,'verifySignatures',()=>true);t.mock.method(Transaction.prototype,'_getMessageSignednessErrors',()=>undefined);
+ assert.equal((await s.request('submit',{id:p.data.id,transaction:tx.serialize({verifySignatures:false}).toString('base64')})).code,200);
+ const pending=s.request('status');await started;
+ try{assert.equal((await s.request('status')).code,409);assert.equal((await s.request('prepare',{payer:PAYER})).code,409);
+ assert.equal((await s.request('review',{id:p.data.id})).code,409);}finally{release();}
+ assert.equal((await pending).data.status,'Success');assert.equal((await s.request('status')).data.status,'Success');assert.equal(s.calls.sent,1);
 });
 
 test('prepare failures persist exact first stage without creating a launch receipt',async t=>{
@@ -106,6 +143,21 @@ test('explicit reprepare invalidates old ID; review latches against replacement'
  assert.equal((await s.request('review',{id:b.data.id,initialBuy:'0.1'})).code,400);
  assert.equal((await s.request('review',{id:b.data.id,initialBuy:'0'})).code,200);
  assert.equal((await s.request('prepare',{payer:PAYER,replacePreparationId:b.data.id})).code,409);assert.equal(s.calls.sent,0);
+});
+
+test('expired unsigned approval recovers explicitly and rejects the old preparation',async t=>{
+ let expired=false,mintExists=false,fail=false;
+ const first=evidence(),fresh={...first,lastValidBlockHeight:first.lastValidBlockHeight+1000};
+ const s=await service(t,{connection:{getBlockHeight:async()=>first.lastValidBlockHeight+(expired?1:-100),getAccountInfo:async()=>mintExists?{}:null},adapters:{prepare:async()=>expired?fresh:first,journalOptions:{checkpoint:phase=>{if(fail&&phase==='write')throw Error('injected write failure');}}}});
+ const p=await s.request('prepare',{payer:PAYER});assert.equal(p.code,200);
+ assert.equal((await s.request('review',{id:p.data.id,initialBuy:'0'})).code,200);
+ const replace={payer:PAYER,replacePreparationId:p.data.id};
+ const blocked=await s.request('prepare',replace);assert.equal(blocked.code,409);assert.equal(blocked.data.attempt.status,'FAILED');assert.equal(blocked.data.attempt.failureCode,'APPROVAL_RECOVERY_NOT_SAFE');
+ expired=true;mintExists=true;assert.equal((await s.request('prepare',replace)).code,409);
+ mintExists=false;fail=true;assert.equal((await s.request('prepare',replace)).code,503);
+ assert.equal(JSON.parse(readFileSync(s.journal)).receipts[identity.agentId].status,'Awaiting approval');assert.equal(s.calls.sent,0);
+ fail=false;const next=await s.request('prepare',replace);assert.equal(next.code,200);assert.notEqual(next.data.id,p.data.id);
+ assert.equal((await s.request('submit',{id:p.data.id,transaction:first.walletTransactionBase64})).code,409);assert.equal(s.calls.sent,0);
 });
 
 test('agent parameterization preserves instruction structure and rejects identity substitution',()=>{

@@ -11,6 +11,7 @@ const sol=value=>value==null?'Unavailable':`${number(Number(value)/1e9,9)} SOL`;
 const time=value=>value&&Number.isFinite(new Date(value).getTime())?new Date(value).toLocaleString():'Time unavailable';
 const paperStatus=value=>({WORKING:'Scanning markets',PAUSED:'Paused',READY:'Ready to start',DRAFT:'Not configured'})[value]??'Status unavailable';
 const TABS=[['overview','Overview'],['trading','Trading'],['performance','Performance'],['activity','Activity'],['settings','Settings']];
+const matched=(result,id)=>result.status==='fulfilled'&&result.value!==null&&typeof result.value==='object'&&!Array.isArray(result.value)&&result.value.agentId===id?result.value:null;
 const position=p=>p?`<dl class="ad-position"><div><dt>Token</dt><dd>${esc(p.tokenSymbol||p.tokenMint||'Unknown')}</dd></div><div><dt>Entry</dt><dd>${number(p.entryPriceUsd,8)} USD</dd></div><div><dt>Current price</dt><dd>${number(p.currentPriceUsd,8)} USD</dd></div><div><dt>Position value</dt><dd>${number(p.marketValueSol,9)} SOL</dd></div><div><dt>Floating PnL</dt><dd>${number(p.pnlSol,9)} SOL</dd></div><div><dt>Take profit</dt><dd>${p.takeProfitPercent==null?'Set in strategy':number(p.takeProfitPercent,2)+'%'}</dd></div><div><dt>Stop loss</dt><dd>${p.stopLossPercent==null?'Set in strategy':number(p.stopLossPercent,2)+'%'}</dd></div><div><dt>Holding time</dt><dd>${p.openedAt?Math.max(0,Math.floor((Date.now()-new Date(p.openedAt).getTime())/60000))+' min':'—'}</dd></div></dl>`:'<p class="ad-empty">No open position.<br>Your agent is scanning for opportunities.</p>';
 const chart=points=>{
  const samples=(points??[]).filter(p=>Number.isFinite(p.portfolioValueSol)).slice(-24);
@@ -20,7 +21,7 @@ const chart=points=>{
 };
 function heading(title,eyebrow='AGENT WORKSPACE'){return `<header class="ad-section-head"><div><p>${eyebrow}</p><h2>${title}</h2></div></header>`;}
 
-export function mountAgentDetailTabs(host,agent,{isCurrent=()=>true,mountLaunch=()=>Promise.resolve(),onTradingState=()=>{}}={}){
+export function mountAgentDetailTabs(host,agent,{isCurrent=()=>true,mountLaunch=()=>Promise.resolve(),onTradingState=()=>{},loadContract=id=>request('/agents/'+encodeURIComponent(id)+'/contract')}={}){
  let active='overview',controller=null,dead=false,version=0;
  host.className='tw-agent-tabs';
  host.innerHTML=`<nav class="ad-tablist" role="tablist" aria-label="Agent Detail sections">${TABS.map(([key,label])=>`<button type="button" role="tab" data-agent-tab="${key}" aria-selected="${key==='overview'}" tabindex="${key==='overview'?'0':'-1'}">${label}</button>`).join('')}</nav><div class="ad-tab-panel" role="tabpanel" id="tw-agent-tab-panel" aria-label="Overview"></div>`;
@@ -34,7 +35,7 @@ export function mountAgentDetailTabs(host,agent,{isCurrent=()=>true,mountLaunch=
   panel.innerHTML='<p role="status" class="ad-loading">Loading '+esc(tab)+'…</p>';
   const current=version;
   const valid=()=>!dead&&isCurrent()&&version===current;
-  controller=({overview:overviewTab,trading:tradingTab,performance:performanceTab,activity:activityTab,settings:settingsTab})[tab](panel,agent,valid,{select,mountLaunch,onTradingState});
+  controller=({overview:overviewTab,trading:tradingTab,performance:performanceTab,activity:activityTab,settings:settingsTab})[tab](panel,agent,valid,{select,mountLaunch,onTradingState,loadContract});
  }
  host.querySelector('.ad-tablist').addEventListener('click',event=>{const button=event.target.closest('[data-agent-tab]');if(button)select(button.dataset.agentTab);});
  host.querySelector('.ad-tablist').addEventListener('keydown',event=>{
@@ -47,7 +48,7 @@ export function mountAgentDetailTabs(host,agent,{isCurrent=()=>true,mountLaunch=
  return {select,destroy(){dead=true;version++;controller?.destroy?.();host.innerHTML='';}};
 }
 
-function overviewTab(host,agent,valid,{select,onTradingState}){
+function overviewTab(host,agent,valid,{select,onTradingState,loadContract}){
  let busy=false,snapshot=null;const base='/agents/'+encodeURIComponent(agent.id);
  host.addEventListener('click',event=>{const action=event.target.closest('[data-overview-action]')?.dataset.overviewAction;if(action)select(action);});
  const chartPointer=event=>{const stage=event.target.closest?.('.ao-chart-stage');if(!stage)return;const svg=stage.querySelector('.ao-sparkline'),samples=[...stage.querySelectorAll('[data-ao-sample]')];if(!svg||!samples.length)return;const rect=svg.getBoundingClientRect(),chartWidth=svg.viewBox.baseVal.width,cursor=(event.clientX-rect.left)/rect.width*chartWidth,nearest=samples.reduce((best,node)=>Math.abs(Number(node.dataset.x)-cursor)<Math.abs(Number(best.dataset.x)-cursor)?node:best,samples[0]),x=Number(nearest.dataset.x),y=Number(nearest.dataset.y),value=Number(nearest.dataset.value),time=Number(nearest.dataset.time),rawStart=stage.closest('.ao-chart')?.dataset.startCapital,start=rawStart===''?NaN:Number(rawStart),pnl=Number.isFinite(start)?value-start:null,roi=Number.isFinite(start)&&start>0?pnl/start*100:null,tooltip=stage.querySelector('.ao-chart-tooltip'),cross=svg.querySelector('.ao-crosshair'),dot=svg.querySelector('.ao-hover-dot');if(Math.abs(x-cursor)>chartWidth*.045){tooltip.hidden=cross.hidden=dot.hidden=true;return;}const number=(n,d=6)=>Number.isFinite(n)?n.toLocaleString('en-US',{maximumFractionDigits:d}):'—';tooltip.replaceChildren();const stamp=document.createElement('time'),price=document.createElement('strong'),change=document.createElement('span');stamp.textContent=new Date(time).toLocaleString();price.textContent=number(value,9)+' SOL';change.textContent='PnL '+number(pnl,9)+(Number.isFinite(pnl)?' SOL':'')+' · ROI '+number(roi,2)+(Number.isFinite(roi)?'%':'');tooltip.append(stamp,price,change);tooltip.hidden=false;tooltip.style.left=Math.min(rect.width<500?38:75,Math.max(4,x/chartWidth*100))+'%';tooltip.style.top=Math.min(68,Math.max(5,y/2.8))+'%';cross.hidden=dot.hidden=false;cross.setAttribute('x1',x);cross.setAttribute('x2',x);dot.hidden=false;dot.setAttribute('cx',x);dot.setAttribute('cy',y);};
@@ -55,16 +56,16 @@ function overviewTab(host,agent,valid,{select,onTradingState}){
  host.addEventListener('pointermove',chartPointer);host.addEventListener('pointerdown',chartPointer);host.addEventListener('pointerleave',chartLeave,true);
  async function load(){
   if(!valid()||busy)return;busy=true;
-  const [trading,analytics,decisions]=await Promise.allSettled([request(base+'/trading'),request(base+'/analytics'),request(base+'/trading/decisions?filter=all')]);
-  if(!valid())return;busy=false;
-  const t=trading.status==='fulfilled'&&trading.value.agentId===agent.id?trading.value:null,a=analytics.status==='fulfilled'&&analytics.value.agentId===agent.id?analytics.value:null,d=decisions.status==='fulfilled'&&decisions.value.agentId===agent.id?decisions.value.decisions?.[0]:null;
+  const [trading,analytics,decisions,contract]=await Promise.allSettled([()=>request(base+'/trading'),()=>request(base+'/analytics'),()=>request(base+'/trading/decisions?filter=all'),()=>loadContract(agent.id)].map(read=>Promise.resolve().then(read)));
+  busy=false;if(!valid())return;
+  const t=matched(trading,agent.id),a=matched(analytics,agent.id),decisionData=matched(decisions,agent.id),d=Array.isArray(decisionData?.decisions)?decisionData.decisions[0]:null;
   onTradingState(t);
-  snapshot={t,a,d};paint();
+  snapshot={t,a,d,contract:contract.status==='fulfilled'?contract.value:null};paint();
  }
  function paint(){
   if(!snapshot||!valid())return;
-  const {t,a,d}=snapshot;
-  host.innerHTML=renderAgentOverview({t,a,d});
+  const {t,a,d,contract}=snapshot;
+  host.innerHTML=renderAgentOverview({t,a,d,agent,contract});
  }
  load();const timer=setInterval(load,20000);return {destroy(){clearInterval(timer);host.removeEventListener('pointermove',chartPointer);host.removeEventListener('pointerdown',chartPointer);host.removeEventListener('pointerleave',chartLeave,true);}};
 }
@@ -75,9 +76,9 @@ function tradingTab(host,agent,valid,{select,onTradingState}){
  const content=host.querySelector('[data-trading-content]');
  async function load(){
   if(!valid()||busy||content.querySelector('.at-drawer')?.open)return;busy=true;
-  const [tResult,rResult,dResult,cResult]=await Promise.allSettled([request(base),request(base+'/radar'),request(base+'/decisions?filter=all'),request(base+'/strategy-config')]);
-  if(!valid())return;busy=false;
-  const t=tResult.status==='fulfilled'?tResult.value:null,r=rResult.status==='fulfilled'?rResult.value:null,d=dResult.status==='fulfilled'?dResult.value.decisions?.[0]:null,config=cResult.status==='fulfilled'?cResult.value.config:null;
+  const [tResult,rResult,dResult,cResult]=await Promise.allSettled([()=>request(base),()=>request(base+'/radar'),()=>request(base+'/decisions?filter=all'),()=>request(base+'/strategy-config')].map(read=>Promise.resolve().then(read)));
+  busy=false;if(!valid())return;
+  const t=matched(tResult,agent.id),r=matched(rResult,agent.id),decisionData=matched(dResult,agent.id),configData=matched(cResult,agent.id),d=Array.isArray(decisionData?.decisions)?decisionData.decisions[0]:null,config=configData?.config&&typeof configData.config==='object'&&!Array.isArray(configData.config)?configData.config:null;
   onTradingState(t);
   const working=t?.status==='WORKING';
   content.innerHTML=renderAgentTrading({agent,t,r,d,config});
@@ -91,10 +92,18 @@ function tradingTab(host,agent,valid,{select,onTradingState}){
   drawer.addEventListener('click',event=>{if(event.target===drawer)drawer.close();});
   drawer.addEventListener('close',()=>opener?.focus());
   content.querySelectorAll('[data-tip]').forEach(button=>button.addEventListener('click',()=>{const was=button.getAttribute('aria-expanded')==='true';content.querySelectorAll('[data-tip]').forEach(b=>b.setAttribute('aria-expanded','false'));button.setAttribute('aria-expanded',String(!was));}));
+  content.querySelector('[data-associated-configure]')?.addEventListener('click',async()=>{
+   if(busy||!valid()||t?.paperTargetPolicy?.kind!=='ASSOCIATED_COIN'||t.paperTargetPolicy.available!==true)return;
+   busy=true;const button=content.querySelector('[data-associated-configure]');button.disabled=true;
+   try{const saved=await request(base+'/strategy-config');if(!valid())return;if(saved?.agentId!==agent.id||!saved.config?.strategy)throw Error('Paper strategy unavailable');await request(base+'/configure',{method:'POST',body:JSON.stringify({mode:'paper',strategy:saved.config.strategy,tokenMint:t.paperTargetPolicy.mint,targetPolicy:'ASSOCIATED_COIN'})});busy=false;await load();}
+   catch(error){if(valid()){content.querySelector('[data-action-error]').textContent=error.message;button.disabled=false;}}
+   finally{busy=false;}
+  });
   content.querySelector('[data-paper-action]').onclick=async()=>{
    if(busy||!valid())return;busy=true;const button=content.querySelector('[data-paper-action]');button.disabled=true;
-   try{if(working)await request(base+'/pause',{method:'POST',body:'{}'});else{const config=await request(base+'/strategy-config');await request(base+'/enable',{method:'POST',body:JSON.stringify({mode:'paper',strategy:config.config.strategy,discovery:t.discoveryMode||t.status==='DRAFT'})});}busy=false;await load();}
+   try{if(working)await request(base+'/pause',{method:'POST',body:'{}'});else{const config=await request(base+'/strategy-config');if(!valid())return;if(config?.agentId!==agent.id||!config.config?.strategy)throw Error('Paper strategy unavailable');await request(base+'/enable',{method:'POST',body:JSON.stringify({mode:'paper',strategy:config.config.strategy,discovery:t.paperTargetPolicy?.kind==='ASSOCIATED_COIN'?false:t.discoveryMode||t.status==='DRAFT'})});}busy=false;await load();}
    catch(error){busy=false;if(valid()){content.querySelector('[data-action-error]').textContent=error.message;button.disabled=false;}}
+   finally{busy=false;}
   };
  }
  load();const timer=setInterval(load,15000);return {destroy(){clearInterval(timer);}};

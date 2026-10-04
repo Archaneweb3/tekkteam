@@ -1,6 +1,12 @@
 import {resolve,join,isAbsolute} from 'node:path';
 import {dexConfiguration} from './dex/config.js';
 import {realMoneyRpc} from './real-money-network.js';
+import {resolveTokenDraftConfiguration} from './launchpad-token-configuration.js';
+export function tokenConfiguration(env=process.env){
+ const dataDir=resolve(env.DATA_DIR||'server/data');
+ return {dataDir,assetRoot:join(dataDir,'pump-metadata-site'),journalPath:join(dataDir,'pump-agent-launches.json'),publicOrigin:env.PUBLIC_METADATA_ORIGIN,publisherOrigin:env.PUBLIC_METADATA_ORIGIN};
+}
+export function tokenRuntimeOptions(env=process.env){return resolveTokenDraftConfiguration(tokenConfiguration(env));}
 export function runtime(env=process.env){
  dexConfiguration(env);
  const production=env.NODE_ENV==='production',origins=(env.APP_ORIGINS||'http://127.0.0.1:5188,http://localhost:5188').split(',').map(x=>x.trim());

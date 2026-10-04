@@ -1,4 +1,5 @@
 import test from 'node:test';
+import {fixtureGeneralScope} from './dex-target-authority-fixture.mjs';
 import assert from 'node:assert/strict';
 import express from 'express';
 import {DatabaseSync} from 'node:sqlite';
@@ -15,7 +16,7 @@ test('actual owner route creates only one fixture cycle, never signs, and emerge
  db.prepare('INSERT INTO agent_wallets VALUES(?,?,?)').run(candidate.agentId,candidate.agentWallet,'sealed-fixture');
  let sendCount=0,rpcReady=false;const connection={getBalance:async()=>6995000,sendRawTransaction:async()=>{sendCount++;throw Error('UNEXPECTED_SEND');}};
  const app=express();app.use(express.json());const auth=(req,res,next)=>{if(req.headers['x-owner']!==candidate.owner)return res.sendStatus(401);req.session={address:candidate.owner};next();};
- const installed=installControlledDex(app,{db,auth,sessionValid:req=>req.headers['x-owner']===candidate.owner,owned:req=>{if(req.params.id!==candidate.agentId)throw Object.assign(Error('NOT_FOUND'),{status:404});return {agent:{id:candidate.agentId,tradingWallet:candidate.agentWallet}};},store:{unseal:()=>Uint8Array.from(signer.secretKey)},realMoney:{connection,get productionRpcConfigured(){return rpcReady;},verify:async()=>({networkConsistent:true})},acceptanceCandidate:candidate,now:()=>1800000000000});
+ const installed=installControlledDex(app,{db,readLaunchpadScope:fixtureGeneralScope(db,[{id:candidate.agentId,creator:candidate.owner,tradingWallet:candidate.agentWallet}]),auth,sessionValid:req=>req.headers['x-owner']===candidate.owner,owned:req=>{if(req.params.id!==candidate.agentId)throw Object.assign(Error('NOT_FOUND'),{status:404});return {agent:{id:candidate.agentId,tradingWallet:candidate.agentWallet}};},store:{unseal:()=>Uint8Array.from(signer.secretKey)},realMoney:{connection,get productionRpcConfigured(){return rpcReady;},verify:async()=>({networkConsistent:true})},acceptanceCandidate:candidate,now:()=>1800000000000});
  const server=app.listen(0,'127.0.0.1');await new Promise(resolve=>server.once('listening',resolve));t.after(()=>server.close());
  const base=`http://127.0.0.1:${server.address().port}/api/agents/${candidate.agentId}/autonomous-acceptance`;
  const call=async(path='',body,headers={})=>{const r=await fetch(base+path,{method:body===undefined?'GET':'POST',headers:{'Content-Type':'application/json','x-owner':candidate.owner,...headers},...(body===undefined?{}:{body:JSON.stringify(body)})});const text=await r.text();return {status:r.status,data:JSON.parse(text.startsWith('{')?text:'{}')};};

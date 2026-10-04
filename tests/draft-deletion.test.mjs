@@ -4,7 +4,7 @@ import {mkdtempSync,writeFileSync,readFileSync,existsSync,mkdirSync} from 'node:
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {randomUUID,createHash} from 'node:crypto';
-import {Keypair} from '@solana/web3.js';
+import {Keypair,PublicKey} from '@solana/web3.js';
 import http from 'node:http';
 import {createServer} from '../server/app.js';
 import {createPumpLaunch} from '../server/pump-launch.js';
@@ -39,7 +39,7 @@ test('authenticated deletion removes only draft data; owner/state checks fail cl
 });
 test('deletion interlock preserves confirmed history, blocks races and latches tombstone',async t=>{
  const root=mkdtempSync(join(tmpdir(),'tekk-delete-launch-')),journal=join(root,'receipts.json'),owner=Keypair.generate().publicKey.toBase58();
- const receipt={agentId:'live',owner,network:'solana:101',status:'Success',confirmed:true,signature:'historical'};writeFileSync(journal,JSON.stringify({version:2,receipts:{live:receipt}}));let cleaned=0;
+ const receipt={agentId:'live',owner,network:'solana:101',status:'Success',confirmed:true,signature:'historical',mint:PublicKey.default.toBase58()};writeFileSync(journal,JSON.stringify({version:2,receipts:{live:receipt}}));let cleaned=0;
  const service=createPumpLaunch({journal,getAgent:async id=>({id,name:'Draft',creator:owner,status:'DRAFT',coin:{name:'Token',ticker:'TOK'},character:'frank'}),removeMetadata:async()=>{cleaned++;}});
  const server=service.listen(0,'127.0.0.1');await new Promise(r=>server.once('listening',r));t.after(()=>server.close());
  const call=(path,id)=>new Promise((resolve,reject)=>{const req=http.request(`http://127.0.0.1:${server.address().port}/pump-launch/${path}`,{method:'POST',headers:{host:'127.0.0.1:4193',origin:'http://127.0.0.1:5188','content-type':'application/json'}},res=>{res.resume();res.on('end',()=>resolve({status:res.statusCode}));});req.on('error',reject);req.end(JSON.stringify({agentId:id}));});

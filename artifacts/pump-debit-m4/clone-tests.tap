@@ -1,0 +1,174 @@
+TAP version 13
+# (node:33764) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+# (Use `node --trace-deprecation ...` to show where the warning was created)
+# Subtest: fresh review binds total budget/reserve/contexts and exact unsigned owner request without authority
+ok 1 - fresh review binds total budget/reserve/contexts and exact unsigned owner request without authority
+  ---
+  duration_ms: 228.3844
+  ...
+# Subtest: atomic model tolerates external shared-vault drift but rejects real atomic debit and incomplete/mismatched evidence
+ok 2 - atomic model tolerates external shared-vault drift but rejects real atomic debit and incomplete/mismatched evidence
+  ---
+  duration_ms: 639.7235
+  ...
+# Subtest: fee/rent changes and unexpected payer/nonpayer debit fail closed
+ok 3 - fee/rent changes and unexpected payer/nonpayer debit fail closed
+  ---
+  duration_ms: 327.6171
+  ...
+# Subtest: balance floor retains Mainnet reserve and includes full ceiling rather than estimate
+ok 4 - balance floor retains Mainnet reserve and includes full ceiling rather than estimate
+  ---
+  duration_ms: 52.1668
+  ...
+# Subtest: slow RPC, expiry, stale/invalid contexts and invalid blockhash are rejected
+ok 5 - slow RPC, expiry, stale/invalid contexts and invalid blockhash are rejected
+  ---
+  duration_ms: 321.61
+  ...
+# Subtest: every material byte/metadata/identity/cost/context mutation invalidates accepted digest
+ok 6 - every material byte/metadata/identity/cost/context mutation invalidates accepted digest
+  ---
+  duration_ms: 1062.6445
+  ...
+# Subtest: durable review survives restart but corrupted digest and old requests are never upgraded
+ok 7 - durable review survives restart but corrupted digest and old requests are never upgraded
+  ---
+  duration_ms: 175.1999
+  ...
+# Subtest: immediate wallet-review boundary requires fresh same-byte simulation and rejects changed costs/context
+ok 8 - immediate wallet-review boundary requires fresh same-byte simulation and rejects changed costs/context
+  ---
+  duration_ms: 555.1896
+  ...
+# Subtest: accepted review expiring during fresh RPC cannot be renewed silently
+ok 9 - accepted review expiring during fresh RPC cannot be renewed silently
+  ---
+  duration_ms: 135.1659
+  ...
+# (node:30632) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# (node:30632) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+# Subtest: actual decoder and finalized oracle prove exact mint/creator/metadata and full signed bytes
+ok 10 - actual decoder and finalized oracle prove exact mint/creator/metadata and full signed bytes
+  ---
+  duration_ms: 466.2724
+  ...
+# Subtest: confirmation rejects corruption, missing context, wrong event/mint and incomplete accounting
+ok 11 - confirmation rejects corruption, missing context, wrong event/mint and incomplete accounting
+  ---
+  duration_ms: 1945.9866
+  ...
+# Subtest: actual M4 revalidation retains reviewed blockhash and rejects expired/cost/rent/context changes
+ok 12 - actual M4 revalidation retains reviewed blockhash and rejects expired/cost/rent/context changes
+  ---
+  duration_ms: 322.7755
+  ...
+# (node:31492) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# (node:31492) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+# Subtest: exact target, zero buy, valid mint partial signature and no owner key persisted
+ok 13 - exact target, zero buy, valid mint partial signature and no owner key persisted
+  ---
+  duration_ms: 416.0403
+  ...
+# Subtest: one approval and single send survive ambiguity and restart; duplicate submits cannot send
+ok 14 - one approval and single send survive ambiguity and restart; duplicate submits cannot send
+  ---
+  duration_ms: 344.3801
+  ...
+# Subtest: rejection consumes M4, expiry refuses prompt and changed transaction never broadcasts
+ok 15 - rejection consumes M4, expiry refuses prompt and changed transaction never broadcasts
+  ---
+  duration_ms: 380.7433
+  ...
+# Subtest: pre-send persistence failure cannot reach sender; signed expiry is permanently quarantined
+ok 16 - pre-send persistence failure cannot reach sender; signed expiry is permanently quarantined
+  ---
+  duration_ms: 471.4451
+  ...
+# Subtest: M4 allowlist remains exact-target only; broad operations and unconfigured runtime stay denied
+ok 17 - M4 allowlist remains exact-target only; broad operations and unconfigured runtime stay denied
+  ---
+  duration_ms: 1.0401
+  ...
+# Subtest: two independent controller instances cannot both claim wallet approval
+ok 18 - two independent controller instances cannot both claim wallet approval
+  ---
+  duration_ms: 168.2522
+  ...
+# {"event":"UNSIGNED_SIMULATION_DIAGNOSTIC_PERSISTED","requestId":"2b185dbe-1d82-4e3f-bb79-c3b0c7801776","transactionSha256":"da5c37329b0a9f1c278ccd7fbcdb180eb384370ea40f53ccbf3e98e29bf17f27","simulationSlot":450677557}
+# (node:30064) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+# (Use `node --trace-deprecation ...` to show where the warning was created)
+# Subtest: failure diagnostics persist BEFORE unexpected debit guard, privately and without signature or secret fields
+ok 19 - failure diagnostics persist BEFORE unexpected debit guard, privately and without signature or secret fields
+  ---
+  duration_ms: 183.1364
+  ...
+# {"event":"UNSIGNED_SIMULATION_DIAGNOSTIC_PERSISTED","requestId":"771ad265-aa7d-4a65-b6a7-106d65d9db40","transactionSha256":"e96286d4ffd1f464ccb004e3d2261789b041a9ab40d14e737b18f85b3e4bc0ad","simulationSlot":450677556}
+# {"event":"UNSIGNED_SIMULATION_DIAGNOSTIC_PERSISTED","requestId":"771ad265-aa7d-4a65-b6a7-106d65d9db40","transactionSha256":"e96286d4ffd1f464ccb004e3d2261789b041a9ab40d14e737b18f85b3e4bc0ad","simulationSlot":450677556}
+# {"event":"UNSIGNED_SIMULATION_DIAGNOSTIC_PERSISTED","requestId":"771ad265-aa7d-4a65-b6a7-106d65d9db40","transactionSha256":"e96286d4ffd1f464ccb004e3d2261789b041a9ab40d14e737b18f85b3e4bc0ad","simulationSlot":450677556}
+# Subtest: M3.1 producer decodes actual fixture CPI and enforces fresh total/reserve review with no signing
+ok 20 - M3.1 producer decodes actual fixture CPI and enforces fresh total/reserve review with no signing
+  ---
+  duration_ms: 186.3094
+  ...
+# Subtest: distinct same-slot revalidation diagnostics never collide or overwrite earlier evidence
+ok 21 - distinct same-slot revalidation diagnostics never collide or overwrite earlier evidence
+  ---
+  duration_ms: 68.437
+  ...
+# Subtest: unsigned construction reuses pinned Pump builder/policy; replay deduplicates without mint signing
+ok 22 - unsigned construction reuses pinned Pump builder/policy; replay deduplicates without mint signing
+  ---
+  duration_ms: 107.2633
+  ...
+# Subtest: completed request binding survives restart and expiry; refresh needs a new ID
+ok 23 - completed request binding survives restart and expiry; refresh needs a new ID
+  ---
+  duration_ms: 238.6048
+  ...
+# Subtest: in-memory completed request cannot silently rebuild after expiry
+ok 24 - in-memory completed request cannot silently rebuild after expiry
+  ---
+  duration_ms: 31.314
+  ...
+# Subtest: legacy request reuse is refused without rewriting or contacting RPC
+ok 25 - legacy request reuse is refused without rewriting or contacting RPC
+  ---
+  duration_ms: 12.3065
+  ...
+# Subtest: minimum-slot lag retries identical read/simulation and refuses other failures or weaker context
+ok 26 - minimum-slot lag retries identical read/simulation and refuses other failures or weaker context
+  ---
+  duration_ms: 0.9112
+  ...
+# Subtest: private preparation evidence verifies unsigned bytes, idempotent file and linked-file denial; no public asset/receipt
+ok 27 - private preparation evidence verifies unsigned bytes, idempotent file and linked-file denial; no public asset/receipt
+  ---
+  duration_ms: 86.0087
+  ...
+# Subtest: wrong genesis stops before construction/simulation; failed simulation has no payable debit claim
+ok 28 - wrong genesis stops before construction/simulation; failed simulation has no payable debit claim
+  ---
+  duration_ms: 43.6035
+  ...
+# Subtest: closed transport rejects value-moving/history RPC and unqualified public origins without network
+ok 29 - closed transport rejects value-moving/history RPC and unqualified public origins without network
+  ---
+  duration_ms: 6.7319
+  ...
+# Subtest: M3 allowlist is explicit and default off; launch/sign/submit/funding/Real remain denied
+ok 30 - M3 allowlist is explicit and default off; launch/sign/submit/funding/Real remain denied
+  ---
+  duration_ms: 1.1789
+  ...
+1..30
+# tests 30
+# suites 0
+# pass 30
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 4717.3884

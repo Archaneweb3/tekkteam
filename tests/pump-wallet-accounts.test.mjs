@@ -1,0 +1,26 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {PublicKey,SystemProgram} from '@solana/web3.js';
+import {AccountLayout,ExtensionType,NATIVE_MINT,TOKEN_PROGRAM_ID,TOKEN_2022_PROGRAM_ID,getAssociatedTokenAddressSync} from '@solana/spl-token';
+import {pumpAccountFixture} from './pump-account-fixture.mjs';
+import {decodePumpVenueBundle} from '../server/dex/pump-account-decoder.js';
+import {inspectOfflinePumpWalletAccounts} from '../server/dex/pump-wallet-accounts.js';
+const now=1800000000000,wallet=new PublicKey('1111111QLbz7JHiBTspS962RLKV8GndWFwiEaqKM');
+function raw(address,program,data,lamports){return {address:address.toBase58(),owner:program.toBase58(),data,lamports,slot:100,exists:true,executable:false};}
+function token(mint,program,amount,native=false){const data=Buffer.alloc(AccountLayout.span);AccountLayout.encode({mint,owner:wallet,amount,delegateOption:0,delegate:PublicKey.default,state:1,isNativeOption:native?1:0,isNative:native?2039280n:0n,delegatedAmount:0n,closeAuthorityOption:0,closeAuthority:PublicKey.default},data);return raw(getAssociatedTokenAddressSync(mint,wallet,false,program),program,data,native?Number(amount)+2039280:2039280);}
+async function fixture(migrated=false,side='BUY'){
+ const b=await pumpAccountFixture({migrated});b.context.observedAt=now;const venue=decodePumpVenueBundle(b);
+ return {venue,executionWallet:wallet.toBase58(),now,networkFeeLamports:'5000',accounts:{wallet:raw(wallet,SystemProgram.programId,Buffer.alloc(0),200000000),base:token(new PublicKey(venue.mint),TOKEN_2022_PROGRAM_ID,2000000000n),quote:token(NATIVE_MINT,TOKEN_PROGRAM_ID,150000000n,true)},intent:{agentId:venue.agentId,owner:venue.owner,network:'solana:101',side,inputMint:side==='BUY'?venue.quoteMint:venue.mint,outputMint:side==='BUY'?venue.mint:venue.quoteMint,inputAmount:side==='BUY'?'100000000':'1000000000',slippageBps:100,expiresAt:now+10000}};
+}
+for(const migrated of [false,true])for(const side of ['BUY','SELL'])test(`existing accounts cover offline ${migrated} ${side} without wrap`,async()=>{const result=inspectOfflinePumpWalletAccounts(await fixture(migrated,side));assert.equal(result.executable,false);assert.equal(result.ownershipAuthorized,false);assert.equal(result.solWrapIncluded,false);});
+for(const [name,mutate]of [
+ ['wrong token owner',x=>wallet.toBuffer().fill(0).copy(x.accounts.base.data,32)],['frozen account',x=>x.accounts.base.data[108]=2],['delegate',x=>x.accounts.base.data.writeUInt32LE(1,72)],['close authority',x=>x.accounts.base.data.writeUInt32LE(1,129)],['wrong ATA',x=>x.accounts.base.address=x.executionWallet],['mixed slot',x=>x.accounts.base.slot=101],['missing ATA',x=>delete x.accounts.base],['unsynced WSOL',x=>x.accounts.quote.lamports++],['insufficient WSOL',x=>x.intent.inputAmount='150000001'],['fee overflow',x=>x.networkFeeLamports='10000001'],['foreign wallet program',x=>x.accounts.wallet.owner=TOKEN_PROGRAM_ID.toBase58()],
+])test(`wallet inspection rejects ${name}`,async()=>{const x=await fixture(true);mutate(x);assert.throws(()=>inspectOfflinePumpWalletAccounts(x));});
+test('SELL cannot spend untracked balance',async()=>{const x=await fixture(true,'SELL');x.intent.inputAmount='2000000001';assert.throws(()=>inspectOfflinePumpWalletAccounts(x),/BALANCE_INSUFFICIENT/);});
+test('native curve budget leaves fee coverage',async()=>{const x=await fixture();x.accounts.wallet.lamports=100004999;assert.throws(()=>inspectOfflinePumpWalletAccounts(x),/BALANCE_INSUFFICIENT/);});
+for(const [name,mutate]of [['unsafe lamports',x=>x.accounts.wallet.lamports=Number.MAX_SAFE_INTEGER+1],['wallet data',x=>x.accounts.wallet.data=Buffer.from([1])],['wrong mint',x=>NATIVE_MINT.toBuffer().copy(x.accounts.base.data,0)],['wrong program',x=>x.accounts.base.owner=TOKEN_PROGRAM_ID.toBase58()],['non-native WSOL',x=>x.accounts.quote.data.writeUInt32LE(0,109)],['fee SOL shortage',x=>x.accounts.wallet.lamports=4999]])test(`wallet rejects ${name}`,async()=>{const x=await fixture(true);mutate(x);assert.throws(()=>inspectOfflinePumpWalletAccounts(x));});
+const immutable=()=>{const b=Buffer.alloc(4);b.writeUInt16LE(ExtensionType.ImmutableOwner);return b;};
+test('Token-2022 immutable owner extension is supported without trading permission',async()=>{const x=await fixture(true);x.accounts.base.data=Buffer.concat([x.accounts.base.data,Buffer.from([2]),immutable()]);assert.equal(inspectOfflinePumpWalletAccounts(x).executable,false);});
+test('duplicate account extension is not a canonical proof',async()=>{const x=await fixture(true);x.accounts.base.data=Buffer.concat([x.accounts.base.data,Buffer.from([2]),immutable(),immutable()]);assert.throws(()=>inspectOfflinePumpWalletAccounts(x));});
+test('classic WSOL cannot claim Token-2022 extensions',async()=>{const x=await fixture(true);x.accounts.quote.data=Buffer.concat([x.accounts.quote.data,Buffer.from([2]),immutable()]);assert.throws(()=>inspectOfflinePumpWalletAccounts(x));});
+for(const [name,tlv]of [['nonzero immutable payload',Buffer.from([7,0,1,0,1])],['truncated immutable payload',Buffer.from([7,0,1,0])],['trailing TLV fragment',Buffer.from([7,0,0,0,1])]])test(`wallet rejects ${name}`,async()=>{const x=await fixture(true);x.accounts.base.data=Buffer.concat([x.accounts.base.data,Buffer.from([2]),tlv]);assert.throws(()=>inspectOfflinePumpWalletAccounts(x));});

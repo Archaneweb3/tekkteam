@@ -17,7 +17,11 @@ export function mountWorkspacePhone(host){
  const observer=new IntersectionObserver(entries=>{visible=entries[0].isIntersecting;if(visible)render();});observer.observe(host);
  document.addEventListener('visibilitychange',render);
  const dispose=object=>object?.traverse(node=>{node.geometry?.dispose();for(const material of[node.material].flat().filter(Boolean)){for(const value of Object.values(material))if(value?.isTexture)value.dispose();material.dispose();}});
- new GLTFLoader().load('/assets/models/tekkwork-smartphone.glb',gltf=>{
+ // Embedded GLB textures are images, not network connections. Use the image
+ // loader so the existing img-src blob: policy works without broadening connect-src.
+ const loader=new GLTFLoader();
+ loader.register(parser=>{parser.textureLoader=new THREE.TextureLoader(parser.options.manager);return {name:'TEKKTEAM_image_textures'};});
+ loader.load('/assets/models/tekkwork-smartphone.glb',gltf=>{
   if(dead){dispose(gltf.scene);return;}model=gltf.scene;
   model.traverse(node=>{if(!node.isMesh)return;for(const material of[node.material].flat()){material.metalness=.18;material.roughness=.65;material.roughnessMap?.dispose();material.roughnessMap=null;material.normalScale?.set(.3,.3);material.emissive?.set(0x061433);material.emissiveIntensity=.18;material.needsUpdate=true;}});
   const bounds=new THREE.Box3().setFromObject(model),size=bounds.getSize(new THREE.Vector3()),center=bounds.getCenter(new THREE.Vector3());

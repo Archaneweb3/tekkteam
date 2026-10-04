@@ -12,12 +12,14 @@ const canonical=i=>Object.fromEntries(['mode','network','agentId','owner','agent
 // exact simulation, custody signing, single sending and chain effect reading.
 // This port supplies an independent autonomous authorization and durable state
 // machine; it never accepts an owner-browser capability.
-export function createAutonomousExecutionPort({ledger,adapter,flags,network,currentAgent,acceptance,now=Date.now,riskPolicy=DEFAULT_RISK_POLICY}){
+export function createAutonomousExecutionPort({ledger,adapter,flags,network,currentAgent,acceptance,assertTarget=()=>reject('REAL_TARGET_AUTHORITY_UNAVAILABLE'),now=Date.now,riskPolicy=DEFAULT_RISK_POLICY}){
  if(!ledger||!adapter||!flags||!network?.verify)throw Error('AUTONOMOUS_PORT_DEPENDENCY_MISSING');
  const requireAdapter=()=>{if(adapter.kind!=='CPMM_CLASSIC_WSOL_USDC_V1'||adapter.autonomousCustodyBound!==true)reject('AUTONOMOUS_EXECUTION_PORT_UNAVAILABLE');};
+ const target=intent=>{const result=assertTarget(intent);if(result?.available!==true||result?.then)reject('REAL_TARGET_AUTHORITY_UNAVAILABLE');};
  const policy=async r=>({...await adapter.validationPolicy(r),intent:r.intent,quote:r.quote,blockhash:r.blockhash,expectedMessageHash:r.messageHash});
  const quoteValid=r=>{assertQuoteFresh(r.quote,now());if(now()>=r.intent.expiresAt)reject('INTENT_EXPIRED');if(r.quoteDigest!==digest(r.quote)||r.quote.pool!==r.intent.pool||r.quote.inputAmount!==r.intent.inputAmount||r.quote.inputMint!==r.intent.inputMint||r.quote.outputMint!==r.intent.outputMint)reject('QUOTE_INTENT_MISMATCH');};
  const authorize=async({agent,intent,marketQuote,ledgerState,risk,executionId})=>{
+  target(intent);
   if(intent.mode!=='AUTONOMOUS_ACCEPTANCE_TEST')return authorizeAutonomousV1({flags:flags(),network:await network.verify(),agent:currentAgent?await currentAgent(intent.agentId):agent,intent,market:marketQuote,ledger:{...ledgerState,riskPass:risk?.allowed===true},now:now()});
   if(!acceptance)reject('ACCEPTANCE_PORT_DISARMED');
   const n=await network.verify(),a=currentAgent?await currentAgent(intent.agentId):agent;
@@ -54,12 +56,12 @@ export function createAutonomousExecutionPort({ledger,adapter,flags,network,curr
   provenProductionBoundary:true,
   reconcile:readReceipt,
   async execute({agent,intent,venue,risk,marketQuote,ledgerState}){
-   requireAdapter();
+   target(intent);requireAdapter();
    const resolved=resolveAutonomousVenue({mint:intent.direction==='BUY'?intent.outputMint:intent.inputMint,direction:intent.direction,pool:intent.pool});
    if(!['LIVE_AUTONOMOUS','AUTONOMOUS_ACCEPTANCE_TEST'].includes(intent.mode)||intent.mode==='AUTONOMOUS_ACCEPTANCE_TEST'&&!acceptance||venue?.kind!==resolved.kind||venue?.pool!==resolved.pool||!risk?.allowed)reject('AUTONOMOUS_INTENT_OR_RISK_INVALID');
    if(intent.direction==='BUY')assertMarketBinding(intent.marketBinding,marketQuote,intent);
    await authorize({agent,intent,marketQuote,ledgerState,risk});
-   await adapter.assertCustody(intent);
+   target(intent);await adapter.assertCustody(intent);target(intent);
    const core=canonical(intent),fingerprint=digest(core);
    if(typeof intent.requestKey!=='string'||intent.requestKey.length<16||intent.requestKey.length>100)reject('INVALID_IDEMPOTENCY_KEY');
    const started=now(),fullIntent={...core,createdAt:started,expiresAt:started+30000};
@@ -98,12 +100,12 @@ export function createAutonomousExecutionPort({ledger,adapter,flags,network,curr
     if(before.messageBytes.toString('base64')!==r.message||before.messageHash!==r.messageHash||r.simulation.messageHash!==r.messageHash)reject('MESSAGE_OR_SIMULATION_MISMATCH');
     r=ledger.transition(id,['PREPARED'],'UNKNOWN',{reason:'SIGNING_CLAIMED',authorizedMessageHash:r.messageHash});
     let signed,signature;
-    try{signed=await adapter.signExactMessage(r,before);const verified=validateDexTransaction(signed,{...await policy(r),requireSignature:true});if(verified.messageBytes.toString('base64')!==r.message)reject('SIGNED_MESSAGE_MUTATION');signature=bs58.encode(verified.transaction.signatures[0]);r=ledger.transition(id,['UNKNOWN'],'SIGNED',{signature,reason:null});}
+    try{target(r.intent);signed=await adapter.signExactMessage(r,before);const verified=validateDexTransaction(signed,{...await policy(r),requireSignature:true});if(verified.messageBytes.toString('base64')!==r.message)reject('SIGNED_MESSAGE_MUTATION');signature=bs58.encode(verified.transaction.signatures[0]);r=ledger.transition(id,['UNKNOWN'],'SIGNED',{signature,reason:null});}
     catch(e){const failed=ledger.transition(id,['UNKNOWN'],'FAILED',{reason:'SIGNATURE_OR_CUSTODY_REJECTED_BEFORE_BROADCAST'});if(intent.mode==='AUTONOMOUS_ACCEPTANCE_TEST')acceptance.terminalFailure(failed);throw e;}
     try{await authorize({agent,intent,marketQuote,ledgerState,risk,executionId:id});quoteValid(r);if(await adapter.blockHeight()>r.lastValidBlockHeight)reject('BLOCKHASH_EXPIRED');}
     catch{const unknown=ledger.transition(id,['SIGNED'],'UNKNOWN',{reason:'SIGNED_NOT_BROADCAST'});if(intent.mode==='AUTONOMOUS_ACCEPTANCE_TEST')acceptance.markUnknown(unknown);return unknown;}
     r=ledger.transition(id,['SIGNED'],'SUBMITTED',{broadcastAttemptedAt:now()});
-    try{const sent=await adapter.broadcastOnce(signed,{maxRetries:0,skipPreflight:false},r);if(sent!==signature)reject('BROADCAST_SIGNATURE_MISMATCH');}
+    try{target(r.intent);const sent=await adapter.broadcastOnce(signed,{maxRetries:0,skipPreflight:false},r);if(sent!==signature)reject('BROADCAST_SIGNATURE_MISMATCH');}
     catch{const unknown=ledger.transition(id,['SUBMITTED'],'UNKNOWN',{reason:'BROADCAST_OUTCOME_UNKNOWN'});if(intent.mode==='AUTONOMOUS_ACCEPTANCE_TEST')acceptance.markUnknown(unknown);return unknown;}
     return await readReceipt(id);
    }catch(e){const latest=ledger.get(id);if(['QUOTED','PREPARING','PREPARED'].includes(latest?.status)){const failed=ledger.transition(id,[latest.status],'REJECTED_BEFORE_SIGNING',{reason:e.code??'PRE_BROADCAST_REJECTED',...(e.snapshotDiagnostic?{snapshotDiagnostic:e.snapshotDiagnostic}:{}),...(e.retryDiagnostics?{stateReadAttempts:e.retryDiagnostics}:{})});if(intent.mode==='AUTONOMOUS_ACCEPTANCE_TEST'){if(acceptance.read()?.execution?.id===id)acceptance.terminalFailure(failed);else acceptance.failUnbound(failed);}}else if(['SIGNED','SUBMITTED'].includes(latest?.status)){const unknown=ledger.transition(id,[latest.status],'UNKNOWN',{reason:'RECONCILIATION_UNCERTAIN'});if(intent.mode==='AUTONOMOUS_ACCEPTANCE_TEST')acceptance.markUnknown(unknown);return unknown;}else if(latest?.status==='UNKNOWN')return latest;throw e;}

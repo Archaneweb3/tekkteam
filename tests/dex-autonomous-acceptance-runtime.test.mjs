@@ -1,4 +1,5 @@
 import test from 'node:test';
+import {fixtureGeneralTarget} from './dex-target-authority-fixture.mjs';
 import assert from 'node:assert/strict';
 import {DatabaseSync} from 'node:sqlite';
 import {Keypair,PublicKey,VersionedTransaction} from '@solana/web3.js';
@@ -40,7 +41,7 @@ function harness(t){
   async readFinalized(signature){if(!state.finalized)return null;return {signature,finalized:true,slot:123,error:null,transaction:state.sent.get(signature),networkFeeLamports:'5000'};},
   async verifiedEffects(r){const q=cpmmEnvelopeContext(r.validationPolicy).q,input=BigInt(r.intent.inputAmount),output=q.output,fee=5000n,rent=r.intent.direction==='BUY'&&state.tokenBalance==='0'?BigInt(captured.ataRentLamports):0n;if(r.intent.direction==='BUY')state.tokenBalance=output.toString();else state.tokenBalance='0';return {actualInput:input.toString(),actualOutput:output.toString(),networkFeeLamports:fee.toString(),rentLamports:rent.toString(),agentSolDelta:(r.intent.direction==='BUY'?-input-fee-rent:output-fee-rent).toString(),agentTokenDelta:(r.intent.direction==='BUY'?output:-input).toString()};}
  };
- const port=createAutonomousExecutionPort({ledger,adapter,flags:()=>({liveAutonomousEnabled:false,autonomousKillSwitch:true,realMoneyEmergencyStop:true}),network,currentAgent:async()=>agent,acceptance,now:()=>state.now});
+ const port=createAutonomousExecutionPort({ledger,adapter,assertTarget:fixtureGeneralTarget({id:'agent',creator:'owner'}),flags:()=>({liveAutonomousEnabled:false,autonomousKillSwitch:true,realMoneyEmergencyStop:true}),network,currentAgent:async()=>agent,acceptance,now:()=>state.now});
  const worker=()=>createAutonomousAcceptanceWorker({acceptance,ledger,port,adapter,agentContext:async()=>({...agent,vaultVerified:state.vaultVerified}),network,marketRead:async()=>({...fixtureMarket(state.now),volume5m:0,change5m:null,buys5m:0,sells5m:0}),resolveProvenance:args=>fixtureProvenance(args.snapshot,args.agentWallet,state.now),actualTokenBalance:async()=>state.tokenBalance,now:()=>state.now});
  return {db,ledger,state,acceptance,context,port,claim,worker};
 }

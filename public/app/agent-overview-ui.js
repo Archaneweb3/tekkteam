@@ -61,11 +61,28 @@ function activity(events){
  return `<div class="aw-activity-head" aria-hidden="true"><span>TIME</span><span>ACTION</span><span>TOKEN</span><span>REASON</span></div><ol class="aw-activity-list">${rows}</ol>`;
 }
 
-export function renderAgentOverview({t,a}){
+export function renderAssociatedCoin({agent,contract,t}={}){
+ const bound=!!agent?.creator&&contract?.id===agent.id&&contract.owner===agent.creator&&contract.lifecycle?.agent?.id===agent.id;
+ const lifecycle=bound?contract.lifecycle:null,launch=lifecycle?.launch,token=lifecycle?.token;
+ const confirmed=launch?.state==='CONFIRMED'&&token?.state==='CONFIRMED'&&launch.network==='solana:101'&&typeof launch.signature==='string'&&launch.signature.trim()&&typeof token.mint==='string'&&/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(token.mint);
+ const state=bound?launch?.state??'UNAVAILABLE':'UNAVAILABLE';
+ const labels={NOT_CONFIGURED:'TOKEN NOT CONFIGURED',CONFIGURED_NOT_LAUNCHED:'TOKEN CONFIGURED · NOT LAUNCHED',PREPARED:'LAUNCH PREPARED',AWAITING_OWNER_APPROVAL:'AWAITING OWNER APPROVAL',RECONCILIATION_REQUIRED:'RECONCILIATION REQUIRED',FAILED:'LAUNCH FAILED',UNAVAILABLE:'RECEIPT STATUS UNAVAILABLE'};
+ const label=confirmed?'LAUNCH CONFIRMED':labels[state]??'RECEIPT STATUS UNAVAILABLE';
+ const known=Object.hasOwn(labels,state)&&state!=='UNAVAILABLE';
+ const coherent=bound&&!!token&&!!launch&&(confirmed||known&&['CONFIGURED','NOT_CONFIGURED'].includes(token.state)&&(!launch.network||launch.network==='solana:101'));
+ const provenance=coherent?'BACKEND VERIFIED':'UNAVAILABLE';
+ const name=bound?contract.coin?.name??(confirmed?'Token metadata unavailable':'No token configured'):'Token information unavailable';
+ const policy=t?.paperTargetPolicy;
+ const policyCopy=policy?.kind==='ASSOCIATED_COIN'?(policy.available===true?'Associated coin only':`Associated coin unavailable: ${policy.reason??'receipt verification required'}`):policy?.kind==='GENERAL'?'General Paper market configuration':'Paper target policy unavailable';
+ return `<section class="aw-position tw-overview-panel" aria-label="Associated coin"><h2>ASSOCIATED COIN</h2><h3>${esc(name)}</h3><p>${esc(label)}</p><p>${provenance} · Mainnet receipt projection</p>${confirmed?`<dl class="aw-position-details"><div><dt>MINT / CA</dt><dd style="overflow-wrap:anywhere">${esc(token.mint)}</dd></div><div><dt>RECEIPT SIGNATURE</dt><dd style="overflow-wrap:anywhere">${esc(launch.signature)}</dd></div></dl><a class="at-text-link" href="https://pump.fun/coin/${encodeURIComponent(token.mint)}" target="_blank" rel="noopener noreferrer">VIEW ASSOCIATED COIN</a>`:'<p>A confirmed Mainnet receipt is required before showing a mint or market link.</p>'}<p>Paper · ${esc(t?.status??'STATUS UNAVAILABLE')} · ${esc(policyCopy)}</p><p>Launch confirmation does not authorize trading. Real trading remains separately gated.</p><a class="at-text-link" href="#/tokens/${encodeURIComponent(agent?.id??'')}">VIEW TOKEN LIFECYCLE</a></section>`;
+}
+
+export function renderAgentOverview({t,a,agent,contract}){
  const summary=a?.summary??t??{},position=t?.openPositions?.[0],portfolio=summary.portfolioValueSol,roi=summary.roiPercent;
  const status=t?.status==='PAUSED'&&position?'PAUSED · POSITION OPEN':t?.status==='WORKING'&&position?'POSITION OPEN':t?.status==='WORKING'?'RUNNING':t?.status||'STATUS UNAVAILABLE';
  const description=!t?'Agent state unavailable':position&&t.status==='PAUSED'?'Scanner paused. Position monitoring continues.':position&&t.status==='WORKING'?'Position open. Scanner remains active.':position?'Position open.':t.status==='WORKING'?'Scanning markets for an entry.':'No active market scan.';
  return `<div class="ao-overview aw-overview">
+ ${agent?renderAssociatedCoin({agent,contract,t}):''}
  <section class="aw-status" aria-label="Agent status"><div><span class="tw-world-eyebrow">AGENT STATUS</span><h2>${esc(status)}</h2><p>${esc(description)}</p></div><div class="aw-status-update"><span>LAST UPDATE</span><strong>${t?.lastUpdated?esc(clock(t.lastUpdated)):'—'}</strong></div></section>
  ${!t||!a?'<p class="aw-unavailable" role="status">Some Paper values are unavailable.</p>':''}
  <div class="aw-primary-grid">${positionView(position,t)}<section class="aw-performance tw-overview-panel" aria-labelledby="aw-performance-title"><h2 id="aw-performance-title">PERFORMANCE</h2><div class="aw-performance-value"><strong title="${esc(number(portfolio,9))} SOL">${finite(portfolio)?number(portfolio,6)+' SOL':'—'}</strong><span class="${tone(roi)}">${percent(roi)}</span></div><div class="aw-performance-pnl"><span>TOTAL PNL</span><strong class="${tone(summary.totalPnlSol)}">${sol(summary.totalPnlSol,true)}</strong></div><div class="aw-chart ao-chart" data-start-capital="${finite(summary.paperStartingCapitalSol)?summary.paperStartingCapitalSol:''}">${chart(a?.portfolioHistory??[],summary.paperStartingCapitalSol)}</div>${link('VIEW PERFORMANCE','performance')}</section></div>

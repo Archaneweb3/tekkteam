@@ -1,4 +1,5 @@
 import test from 'node:test';
+import {fixtureGeneralTarget} from './dex-target-authority-fixture.mjs';
 import assert from 'node:assert/strict';
 import {DatabaseSync} from 'node:sqlite';
 import {Keypair,VersionedTransaction,TransactionMessage,TransactionInstruction,ComputeBudgetProgram} from '@solana/web3.js';
@@ -29,11 +30,21 @@ function fixture(t,{requireSimulation=false}={}){
   readFinalized:async signature=>state.finalized?{signature,finalized:true,slot:123,error:null,transaction:state.stored.get(signature).signed,networkFeeLamports:'5000'}:null,
   verifiedEffects:async r=>({actualInput:r.intent.inputAmount,actualOutput:r.intent.direction==='BUY'?'100':'700000',networkFeeLamports:'5000',rentLamports:'0',agentSolDelta:r.intent.direction==='BUY'?'-1005000':'695000',agentTokenDelta:r.intent.direction==='BUY'?'100':'-50'})
  };
- const deps={ledger,provider,adapter,authorize:async()=>ctx(),flags:()=>state.flags,now:()=>state.now,requireSimulation};const engine=createControlledExecutor(deps);
+ const deps={ledger,provider,adapter,assertTarget:fixtureGeneralTarget({id:'fixture-agent',creator:owner.publicKey.toBase58()}),authorize:async()=>ctx(),flags:()=>state.flags,now:()=>state.now,requireSimulation};const engine=createControlledExecutor(deps);
  const prepare=async(b=body())=>{const q=await engine.quote({},b);return engine.prepare({},q.id);};
  const confirm=r=>engine.confirm({},r.id,{confirm:true,messageHash:r.messageHash,quoteReference:r.quote.reference,confirmationToken:r.confirmationToken});
  return {db,ledger,state,adapter,engine,deps,prepare,confirm,ctx};
 }
+
+for(const method of ['arm','armEligibility'])for(const revocation of ['target','owner','emergency'])test(method+' rejects authority revoked during final block-height await: '+revocation,async t=>{
+ const f=fixture(t),r=await f.prepare();let available=true,calls=0,stages=0;
+ f.adapter.blockHeight=async()=>{if(++calls===2){if(revocation==='target')available=false;else if(revocation==='owner')f.state.owner=kp(8).publicKey.toBase58();else f.state.flags.realMoneyEmergencyStop=true;}return 100;};
+ const engine=createControlledExecutor({...f.deps,assertTarget:intent=>{if(!available)throw Object.assign(Error('REAL_TARGET_AUTHORITY_UNAVAILABLE'),{code:'REAL_TARGET_AUTHORITY_UNAVAILABLE'});return f.deps.assertTarget(intent);},oneShot:{stage(){stages++;return {status:'ARMED'};},status(){return null;}}});
+ const reason=revocation==='target'?'REAL_TARGET_AUTHORITY_UNAVAILABLE':revocation==='owner'?'EXECUTION_OWNERSHIP_MISMATCH':'REAL_MONEY_EMERGENCY_STOP';
+ if(method==='arm')await assert.rejects(engine.arm({},r.id),new RegExp(reason));
+ else assert.deepEqual(await engine.armEligibility({},r.id),{executionId:r.id,eligible:false,reason});
+ assert.equal(calls,2);assert.equal(stages,0);assert.equal(f.state.signCalls,0);assert.equal(f.state.broadcastCalls,0);assert.equal(f.state.flags.liveEnabled,false);
+});
 
 test('BUY exact reviewed message -> one broadcast -> finalized immutable real receipt',async t=>{const f=fixture(t),r=await f.prepare();assert.equal(r.status,'PREPARED');assert.equal(f.ledger.position('fixture-agent',token).quantity,'0');await f.confirm(r);assert.equal(f.state.broadcastCalls,1);assert.equal((await f.engine.reconcile({},r.id)).status,'SUBMITTED');f.state.finalized=true;assert.equal((await f.engine.reconcile({},r.id)).status,'CONFIRMED');assert.equal(f.ledger.position('fixture-agent',token).costBasisLamports,'1005000');assert.equal(f.ledger.position('fixture-agent',token).quantity,'100');assert.throws(()=>f.db.prepare('UPDATE dex_receipts SET signature=?').run('tamper'),/Immutable/);await f.confirm(r);await f.engine.reconcile({},r.id);assert.equal(f.state.signCalls,1);assert.equal(f.state.broadcastCalls,1);assert.equal(f.ledger.position('fixture-agent',token).quantity,'100');});
 test('SELL fixture reconciles actual net proceeds and isolated cost basis',async t=>{const f=fixture(t),buy=await f.prepare();await f.confirm(buy);f.state.finalized=true;await f.engine.reconcile({},buy.id);const sell=await f.prepare(body({direction:'SELL',inputMint:token,outputMint:SOL_MINT,inputAmount:'50',requestKey:'fixture-operation-key-0002'}));await f.confirm(sell);await f.engine.reconcile({},sell.id);assert.deepEqual(f.ledger.position('fixture-agent',token),{agentId:'fixture-agent',mint:token,mode:'REAL',quantity:'50',costBasisLamports:'502500',realizedPnlLamports:'192500',rentPaidLamports:'0',updatedAt:1000});assert.equal(f.db.prepare("SELECT COUNT(*) n FROM sqlite_master WHERE name LIKE 'paper_%'").get().n,0);});
@@ -80,7 +91,7 @@ test('overlapping concurrent prepares: exactly one atomic hold, loser fails befo
  let builds=0;
  f.adapter.reservePlan=async r=>({snapshot:await f.adapter.snapshot(r)});
  f.adapter.buildReserved=async r=>{builds++;return originalBuild(r);};
- const second=createControlledExecutor({...f.deps,authorize:async()=>({...f.ctx(),agentId:'other-agent'})});
+ const second=createControlledExecutor({...f.deps,assertTarget:fixtureGeneralTarget({id:'other-agent',creator:owner.publicKey.toBase58()}),authorize:async()=>({...f.ctx(),agentId:'other-agent'})});
  const q1=await f.engine.quote({},body({requestKey:'concurrent-operation-one'}));
  const q2=await second.quote({},body({requestKey:'concurrent-operation-two'}));
  const results=await Promise.allSettled([f.engine.prepare({},q1.id),second.prepare({},q2.id)]);

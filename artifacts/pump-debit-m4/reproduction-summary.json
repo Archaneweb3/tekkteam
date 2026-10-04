@@ -1,0 +1,98 @@
+{
+  "file": "/var/lib/tekkteam-staging/pump-metadata-site/preparation-diagnostics/6f9d72b01005ab1de5cc84dbbf7c241317269a16784f3f4c7355b9971cca38b9.json",
+  "id": "cbe3360f-6b41-4f06-8550-46a1e519c48f",
+  "digest": "4ceef8e9d2e990d26c4f27c0d718bff794a84ee02c8a59181cdb51c862a84a7f",
+  "context": {
+    "latestSlot": 453285403,
+    "feeSlot": 453285405,
+    "preReadSlot": 453285406,
+    "simulationSlot": 453285409,
+    "postReadSlot": 453285410,
+    "validitySlot": 453285412
+  },
+  "atomic": true,
+  "postMatches": true,
+  "fee": 10000,
+  "simulationFee": 10000,
+  "negative": [
+    {
+      "pubkey": "C2nddai75FJZWWkNdUF7csEBryRCMikJyTTZZqYcMiBv",
+      "role": "user",
+      "writable": true,
+      "signer": true,
+      "compiledAccountIndex": 0,
+      "preLamports": 182999717,
+      "postLamports": 177442357,
+      "postAccountReturned": true,
+      "preSol": "0.182999717",
+      "postSol": "0.177442357",
+      "externalDeltaLamports": -5557360,
+      "externalDeltaSol": "-0.005557360",
+      "atomicPreLamports": 182999717,
+      "atomicPostLamports": 177442357,
+      "atomicDeltaLamports": -5557360,
+      "atomicPostMatchesReturnedAccount": true,
+      "afterReadLamports": 182999717,
+      "ownerProgram": {
+        "pre": "11111111111111111111111111111111",
+        "post": "11111111111111111111111111111111",
+        "afterRead": "11111111111111111111111111111111"
+      },
+      "executable": {
+        "pre": false,
+        "post": false
+      },
+      "token": {
+        "pre": null,
+        "post": null,
+        "afterRead": null
+      },
+      "classification": "EXPECTED_OWNER_DEBIT",
+      "expectedness": "OWNER_CPI_FUNDING_PLUS_QUOTED_FEE",
+      "simulationSlot": 453285409,
+      "preReadSlot": 453285406,
+      "postReadSlot": 453285410,
+      "transactionSha256": "4ceef8e9d2e990d26c4f27c0d718bff794a84ee02c8a59181cdb51c862a84a7f"
+    },
+    {
+      "pubkey": "BwWK17cbHxwWBKZkUYvzxLcNQ1YVyaFezduWbtm2de6s",
+      "role": "sol_vault",
+      "writable": true,
+      "signer": false,
+      "compiledAccountIndex": 6,
+      "preLamports": 59744708716021,
+      "postLamports": 59743147736222,
+      "postAccountReturned": true,
+      "preSol": "59744.708716021",
+      "postSol": "59743.147736222",
+      "externalDeltaLamports": -1560979799,
+      "externalDeltaSol": "-1.560979799",
+      "atomicPreLamports": 59743147736222,
+      "atomicPostLamports": 59743147736222,
+      "atomicDeltaLamports": 0,
+      "atomicPostMatchesReturnedAccount": true,
+      "afterReadLamports": 59743154229499,
+      "ownerProgram": {
+        "pre": "11111111111111111111111111111111",
+        "post": "11111111111111111111111111111111",
+        "afterRead": "11111111111111111111111111111111"
+      },
+      "executable": {
+        "pre": false,
+        "post": false
+      },
+      "token": {
+        "pre": null,
+        "post": null,
+        "afterRead": null
+      },
+      "classification": null,
+      "expectedness": "NO_NEGATIVE_DELTA",
+      "simulationSlot": 453285409,
+      "preReadSlot": 453285406,
+      "postReadSlot": 453285410,
+      "transactionSha256": "4ceef8e9d2e990d26c4f27c0d718bff794a84ee02c8a59181cdb51c862a84a7f"
+    }
+  ],
+  "error": null
+}
