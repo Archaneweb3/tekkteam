@@ -3,6 +3,7 @@ import {REGISTRY_VERSION,presetDisplayName} from './strategy-registry.js';
 import {readReceiptJournal} from './launch-receipt-journal.js';
 import {resolve} from 'node:path';
 import {normalizeTokenDraft} from '../src/token-draft-schema.js';
+import {confirmedReceiptDetails} from '../public/app/launch-receipt-summary.js';
 
 // Pure projections: no reconciliation, state mutation, RPC, custody or execution.
 export function readLaunchEvidence(agent,path=resolve(process.env.DATA_DIR||'server/data','pump-agent-launches.json')){
@@ -34,7 +35,7 @@ export function lifecycleProjection(agent,{receipt=null,available=true,operation
   else if(r.signature||r.broadcastAttempted)state='RECONCILIATION_REQUIRED';
   else state=({'Prepared':'PREPARED','Awaiting approval':'AWAITING_OWNER_APPROVAL','Failed':'FAILED','Deleted':'NOT_CONFIGURED','Idle':agent.coin?'CONFIGURED_NOT_LAUNCHED':'NOT_CONFIGURED'})[r.status]??'UNAVAILABLE';
  }
- return {agent:{id:agent.id,state:'CREATED'},token:{state:state==='CONFIRMED'?'CONFIRMED':agent.coin?'CONFIGURED':'NOT_CONFIGURED',mint:state==='CONFIRMED'?r.mint:null},launch:{state,...launchWorkflow(r,available,state),receiptId:r?.id??null,signature:r?.signature??null,network:r?.network??null,reviewValidity:['PREPARED','AWAITING_OWNER_APPROVAL'].includes(state)?'UNVERIFIED':null,authorizationGranted:false},operation:{state:operation?.status??'PAUSED',mode:operation?.mode??null}};
+ return {agent:{id:agent.id,state:'CREATED'},token:{state:state==='CONFIRMED'?'CONFIRMED':agent.coin?'CONFIGURED':'NOT_CONFIGURED',mint:state==='CONFIRMED'?r.mint:null},launch:{state,...launchWorkflow(r,available,state),receiptId:r?.id??null,signature:r?.signature??null,network:r?.network??null,receiptDetails:state==='CONFIRMED'?confirmedReceiptDetails(r,agent.id):null,reviewValidity:['PREPARED','AWAITING_OWNER_APPROVAL'].includes(state)?'UNVERIFIED':null,authorizationGranted:false},operation:{state:operation?.status??'PAUSED',mode:operation?.mode??null}};
 }
 export function operatingPlan(agent,paper=null){
  let c;try{c=strategyConfigFor(paper??agent);}catch{return {agentId:agent.id,available:false,reason:'CONFIGURATION_UNAVAILABLE',authorizationGranted:false};}

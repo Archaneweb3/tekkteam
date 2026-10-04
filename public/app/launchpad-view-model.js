@@ -1,4 +1,5 @@
 // Owner-scoped pure projection of the CURRENT /agents/:id/contract read DTO.
+import {confirmedReceiptDetails} from './launch-receipt-summary.js';
 const text=value=>typeof value==='string'?value:'';
 const mint=value=>typeof value==='string'&&/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(value)?value:null;
 const states=new Set(['NOT_CONFIGURED','CONFIGURED_NOT_LAUNCHED','PREPARED','AWAITING_OWNER_APPROVAL','CONFIRMED','FAILED','RECONCILIATION_REQUIRED','UNAVAILABLE']);
@@ -29,7 +30,7 @@ export function launchpadUnit(agent,contractResult){
  if(confirmed&&(token?.state!=='CONFIRMED'||!mint(token.mint)||!text(launch.signature)||launch.network!=='solana:101'))return unit;
  if(!confirmed&&(!token||!['CONFIGURED','NOT_CONFIGURED'].includes(token.state)))return unit;
  const scope=dto.launchpadScope;if(scope?.available===true&&typeof scope.scoped==='boolean'&&scope.reason===null)unit.scope={available:true,scoped:scope.scoped,reason:null};
- unit.available=true;unit.launch={state:launch.state,confirmed,signature:confirmed?launch.signature:null,network:confirmed?launch.network:null,provenance:'BACKEND VERIFIED',workflow:workflowProjection(launch)};
+ unit.available=true;unit.launch={state:launch.state,confirmed,signature:confirmed?launch.signature:null,network:confirmed?launch.network:null,receiptDetails:confirmed?confirmedReceiptDetails(launch.receiptDetails,unit.agentId):null,provenance:'BACKEND VERIFIED',workflow:workflowProjection(launch)};
  if(confirmed)unit.token.mint=token.mint;
  unit.operation={state:text(lifecycle.operation?.state)||'UNAVAILABLE',mode:text(lifecycle.operation?.mode)||null};
  return unit;

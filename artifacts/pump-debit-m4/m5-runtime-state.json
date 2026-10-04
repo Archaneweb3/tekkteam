@@ -1,0 +1,54 @@
+{
+  "dataDir": "/var/lib/tekkteam-staging",
+  "db": "wallet-test.sqlite",
+  "quickCheck": {
+    "quick_check": "ok"
+  },
+  "agent": {
+    "id": "8fc6fe77-16a0-4fed-8ca0-ddd1f6ef9fa7",
+    "name": "aaaaada",
+    "owner": "C2nddai75FJZWWkNdUF7csEBryRCMikJyTTZZqYcMiBv",
+    "coin": "ret",
+    "ticker": "3ED",
+    "mint": null
+  },
+  "drafts": 1,
+  "execution": {
+    "id": "8e47534a-5948-4777-97fc-76b3c3acb23e",
+    "status": "READY_FOR_REVIEW",
+    "expired": true,
+    "walletApprovalOpened": false,
+    "ownerSigned": false,
+    "broadcastAttempted": false
+  },
+  "receipts": 0,
+  "lifecycle": {
+    "agent": {
+      "id": "8fc6fe77-16a0-4fed-8ca0-ddd1f6ef9fa7",
+      "state": "CREATED"
+    },
+    "token": {
+      "state": "CONFIGURED",
+      "mint": null
+    },
+    "launch": {
+      "state": "CONFIGURED_NOT_LAUNCHED",
+      "receiptStatus": null,
+      "signatureRecorded": false,
+      "deliveryStatus": "UNVERIFIED",
+      "finality": "UNAVAILABLE",
+      "workflowProvenance": "BACKEND VERIFIED",
+      "provenanceReason": "NO_LAUNCH_RECEIPT",
+      "receiptId": null,
+      "signature": null,
+      "network": null,
+      "receiptDetails": null,
+      "reviewValidity": null,
+      "authorizationGranted": false
+    },
+    "operation": {
+      "state": "PAUSED",
+      "mode": null
+    }
+  }
+}

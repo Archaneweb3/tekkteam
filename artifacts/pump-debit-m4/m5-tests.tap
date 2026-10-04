@@ -1,0 +1,337 @@
+TAP version 13
+# (node:30640) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+# (Use `node --trace-deprecation ...` to show where the warning was created)
+# Subtest: confirmed owner receipt allowlist exposes binding without draft mutation or private bytes
+ok 1 - confirmed owner receipt allowlist exposes binding without draft mutation or private bytes
+  ---
+  duration_ms: 2.5642
+  ...
+# Subtest: unknown/unconfirmed and wrong owner Agent or network expose no confirmed summary
+ok 2 - unknown/unconfirmed and wrong owner Agent or network expose no confirmed summary
+  ---
+  duration_ms: 1.0027
+  ...
+# Subtest: legacy confirmed fields remain nullable and never infer M4 provenance or revision
+ok 3 - legacy confirmed fields remain nullable and never infer M4 provenance or revision
+  ---
+  duration_ms: 1.465
+  ...
+# Subtest: unsafe URLs, invalid slot and out of range dates are unavailable and cannot break rendering
+ok 4 - unsafe URLs, invalid slot and out of range dates are unavailable and cannot break rendering
+  ---
+  duration_ms: 1.1763
+  ...
+# Subtest: LAUNCHED label follows matching Agent ID and next action only navigates existing Agent
+ok 5 - LAUNCHED label follows matching Agent ID and next action only navigates existing Agent
+  ---
+  duration_ms: 2.7512
+  ...
+# Subtest: confirmed selector remains enabled without draft read and only navigates existing Agent
+ok 6 - confirmed selector remains enabled without draft read and only navigates existing Agent
+  ---
+  duration_ms: 7.5254
+  ...
+# Subtest: disposable journal reload derives receipt relation without rewriting immutable draft
+ok 7 - disposable journal reload derives receipt relation without rewriting immutable draft
+  ---
+  duration_ms: 23.0488
+  ...
+# (node:8416) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# (node:8416) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+# Subtest: operator-inventoried production V2 schema needs no rebuild or relationship/history rewrite
+ok 8 - operator-inventoried production V2 schema needs no rebuild or relationship/history rewrite
+  ---
+  duration_ms: 17.8212
+  ...
+# Subtest: registry truthful presets, fixed exposure and planned exclusion
+ok 9 - registry truthful presets, fixed exposure and planned exclusion
+  ---
+  duration_ms: 0.787
+  ...
+# Subtest: operating plan derives saved configuration without mutation or permission
+ok 10 - operating plan derives saved configuration without mutation or permission
+  ---
+  duration_ms: 0.638
+  ...
+# Subtest: canonical lifecycle maps bound receipts and never promotes unknown or Devnet
+ok 11 - canonical lifecycle maps bound receipts and never promotes unknown or Devnet
+  ---
+  duration_ms: 0.7822
+  ...
+# Subtest: public opt-in + allowlist and owner safe projection exclude private material
+ok 12 - public opt-in + allowlist and owner safe projection exclude private material
+  ---
+  duration_ms: 0.5697
+  ...
+# Subtest: legacy nullable upgrade preserves data/FK/index/sequence; V2 repeat no-op
+ok 13 - legacy nullable upgrade preserves data/FK/index/sequence; V2 repeat no-op
+  ---
+  duration_ms: 1.2456
+  ...
+# Subtest: Mainnet identity-only write isolated from issuance, custody, Paper and execution
+ok 14 - Mainnet identity-only write isolated from issuance, custody, Paper and execution
+  ---
+  duration_ms: 301.275
+  ...
+# Subtest: empty legacy table retains historical autoincrement after nullable upgrade
+ok 15 - empty legacy table retains historical autoincrement after nullable upgrade
+  ---
+  duration_ms: 0.9673
+  ...
+# (node:22388) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+# (Use `node --trace-deprecation ...` to show where the warning was created)
+# Subtest: Launchpad review control requires owner metadata and verified lifecycle; no automatic launch
+ok 16 - Launchpad review control requires owner metadata and verified lifecycle; no automatic launch
+  ---
+  duration_ms: 2.8842
+  ...
+# Subtest: confirmed owner-bound projection alone exposes mint/Pump link and provenance
+ok 17 - confirmed owner-bound projection alone exposes mint/Pump link and provenance
+  ---
+  duration_ms: 0.9307
+  ...
+# Subtest: wrong ID/owner/network/missing proof never becomes confirmed
+ok 18 - wrong ID/owner/network/missing proof never becomes confirmed
+  ---
+  duration_ms: 0.5076
+  ...
+# Subtest: draft/prepared/approval/failed/unknown states never promote a prepared mint
+ok 19 - draft/prepared/approval/failed/unknown states never promote a prepared mint
+  ---
+  duration_ms: 0.8774
+  ...
+# Subtest: identity-only, missing and invalid lifecycle evidence remain truthful
+ok 20 - identity-only, missing and invalid lifecycle evidence remain truthful
+  ---
+  duration_ms: 0.2752
+  ...
+# Subtest: visitor/demo/empty-Mainnet/local CTAs match actual availability
+ok 21 - visitor/demo/empty-Mainnet/local CTAs match actual availability
+  ---
+  duration_ms: 0.4658
+  ...
+# Subtest: owner requests are read-only contracts and lifecycle failure shows unavailable
+ok 22 - owner requests are read-only contracts and lifecycle failure shows unavailable
+  ---
+  duration_ms: 10.6334
+  ...
+# Subtest: unowned roster makes zero reads; visitor connect requires explicit click
+ok 23 - unowned roster makes zero reads; visitor connect requires explicit click
+  ---
+  duration_ms: 0.7593
+  ...
+# Subtest: destroyed/stale page ignores asynchronous lifecycle response
+ok 24 - destroyed/stale page ignores asynchronous lifecycle response
+  ---
+  duration_ms: 6.581
+  ...
+# Subtest: owner-provided text escaped and private contract fields not projected
+ok 25 - owner-provided text escaped and private contract fields not projected
+  ---
+  duration_ms: 1.3953
+  ...
+# Subtest: actual route wires owner-only contract reads and stale/read-failure guards
+ok 26 - actual route wires owner-only contract reads and stale/read-failure guards
+  ---
+  duration_ms: 4.4903
+  ...
+# Subtest: completed Tokens module consumes actual shared projector without fabricating identity metadata
+ok 27 - completed Tokens module consumes actual shared projector without fabricating identity metadata
+  ---
+  duration_ms: 5.2956
+  ...
+# Subtest: actual Tokens route decodes Agent relation and injects read adapter/disposal
+ok 28 - actual Tokens route decodes Agent relation and injects read adapter/disposal
+  ---
+  duration_ms: 2.0646
+  ...
+# Subtest: scoped identity retries same intent/key and validates server authority before refresh
+ok 29 - scoped identity retries same intent/key and validates server authority before refresh
+  ---
+  duration_ms: 1.7904
+  ...
+# Subtest: entry is explicit, retry idempotent, no navigation on invalid/stale scope
+ok 30 - entry is explicit, retry idempotent, no navigation on invalid/stale scope
+  ---
+  duration_ms: 0.3704
+  ...
+# Subtest: invalid identity response never refreshes and synchronous contract faults settle unavailable
+ok 31 - invalid identity response never refreshes and synchronous contract faults settle unavailable
+  ---
+  duration_ms: 2.3933
+  ...
+# Subtest: scope display requires matching authoritative contract and explicit supported entry
+ok 32 - scope display requires matching authoritative contract and explicit supported entry
+  ---
+  duration_ms: 0.2837
+  ...
+# Subtest: token envelope preserves omission, normalizes scalars and rejects missing/mutually exclusive/invalid image
+ok 33 - token envelope preserves omission, normalizes scalars and rejects missing/mutually exclusive/invalid image
+  ---
+  duration_ms: 1.6591
+  ...
+# Subtest: first-token controller defaults unavailable and never infers readiness from owner
+ok 34 - first-token controller defaults unavailable and never infers readiness from owner
+  ---
+  duration_ms: 0.6489
+  ...
+# Subtest: repeated token save clicks coalesce to one immutable offchain intent
+ok 35 - repeated token save clicks coalesce to one immutable offchain intent
+  ---
+  duration_ms: 0.8887
+  ...
+# Subtest: lost response retries exact same token intent even if first-save readiness now bound
+ok 36 - lost response retries exact same token intent even if first-save readiness now bound
+  ---
+  duration_ms: 1.0547
+  ...
+# Subtest: token request adapter cannot mutate the remembered retry payload
+ok 37 - token request adapter cannot mutate the remembered retry payload
+  ---
+  duration_ms: 0.6234
+  ...
+# Subtest: owner change, auth loss and stale navigation prevent token writes/late success
+ok 38 - owner change, auth loss and stale navigation prevent token writes/late success
+  ---
+  duration_ms: 0.895
+  ...
+# Subtest: wrong Agent, altered metadata, foreign asset and delivery claims never become token success
+ok 39 - wrong Agent, altered metadata, foreign asset and delivery claims never become token success
+  ---
+  duration_ms: 1.3878
+  ...
+# Subtest: form reviews supported coin fields before distinct save, no prepare/sign/automatic navigation
+ok 40 - form reviews supported coin fields before distinct save, no prepare/sign/automatic navigation
+  ---
+  duration_ms: 33.1183
+  ...
+# Subtest: form validation preserves editing state and makes no save request
+ok 41 - form validation preserves editing state and makes no save request
+  ---
+  duration_ms: 1.6335
+  ...
+# Subtest: form lost response shows safe retry, no private diagnostics or changed intent
+ok 42 - form lost response shows safe retry, no private diagnostics or changed intent
+  ---
+  duration_ms: 1.8335
+  ...
+# Subtest: form auth rejection disables retry and never opens a wallet/signs automatically
+ok 43 - form auth rejection disables retry and never opens a wallet/signs automatically
+  ---
+  duration_ms: 1.6037
+  ...
+# Subtest: form known 400/409/503 states remain rejection/conflict/unavailable, never save or launch success
+ok 44 - form known 400/409/503 states remain rejection/conflict/unavailable, never save or launch success
+  ---
+  duration_ms: 2.3947
+  ...
+# Subtest: stale or destroyed form never paints late save or invokes saved callback
+ok 45 - stale or destroyed form never paints late save or invokes saved callback
+  ---
+  duration_ms: 2.1296
+  ...
+# Subtest: readiness absence and legacy/configured/uncertain Agents never gain token write controls
+ok 46 - readiness absence and legacy/configured/uncertain Agents never gain token write controls
+  ---
+  duration_ms: 1.0956
+  ...
+# Subtest: review escapes untrusted metadata text, leaves optional omission visible and cannot expose private fields
+ok 47 - review escapes untrusted metadata text, leaves optional omission visible and cannot expose private fields
+  ---
+  duration_ms: 0.2871
+  ...
+# Subtest: version1 owner capability is required; missing/mismatched/contradictory fields cannot authorize save
+ok 48 - version1 owner capability is required; missing/mismatched/contradictory fields cannot authorize save
+  ---
+  duration_ms: 4.8024
+  ...
+# Subtest: immutable saved metadata preserves omission with incomplete image read-only, never grants save or fake launch state
+ok 49 - immutable saved metadata preserves omission with incomplete image read-only, never grants save or fake launch state
+  ---
+  duration_ms: 1.1262
+  ...
+# Subtest: owner saved-draft projection rejects invalid scalars and never leaks unknown draft fields
+ok 50 - owner saved-draft projection rejects invalid scalars and never leaks unknown draft fields
+  ---
+  duration_ms: 0.3141
+  ...
+# Subtest: metadata replay after confirmed or uncertain launch cannot assert an unlaunched or launched fact
+ok 51 - metadata replay after confirmed or uncertain launch cannot assert an unlaunched or launched fact
+  ---
+  duration_ms: 0.93
+  ...
+# Subtest: mounted replay success message confirms metadata only and directs to current receipt
+ok 52 - mounted replay success message confirms metadata only and directs to current receipt
+  ---
+  duration_ms: 2.1926
+  ...
+# Subtest: definite noncommitting rejection permits corrected intent with a new key
+ok 53 - definite noncommitting rejection permits corrected intent with a new key
+  ---
+  duration_ms: 1.1262
+  ...
+# Subtest: ambiguous outcomes and prior lost responses never unlock editing
+ok 54 - ambiguous outcomes and prior lost responses never unlock editing
+  ---
+  duration_ms: 0.9044
+  ...
+# Subtest: rejection edit respects pending, changed owner, stale page and lost capability
+ok 55 - rejection edit respects pending, changed owner, stale page and lost capability
+  ---
+  duration_ms: 0.6214
+  ...
+# Subtest: mounted definite rejection edits and saves corrected metadata without remount
+ok 56 - mounted definite rejection edits and saves corrected metadata without remount
+  ---
+  duration_ms: 2.4831
+  ...
+# Subtest: malformed accessor and proxy errors latch uncertainty before inspection
+ok 57 - malformed accessor and proxy errors latch uncertainty before inspection
+  ---
+  duration_ms: 1.1659
+  ...
+# Subtest: mounted malformed error renders safe unknown outcome and retains same retry intent
+ok 58 - mounted malformed error renders safe unknown outcome and retains same retry intent
+  ---
+  duration_ms: 4.1415
+  ...
+# Subtest: owner read workflow distinguishes recorded signed phases from delivery/finality proof
+ok 59 - owner read workflow distinguishes recorded signed phases from delivery/finality proof
+  ---
+  duration_ms: 1.1746
+  ...
+# Subtest: confirmed/failed finality remains backend receipt evidence with delivery unverified
+ok 60 - confirmed/failed finality remains backend receipt evidence with delivery unverified
+  ---
+  duration_ms: 0.463
+  ...
+# Subtest: no receipt and unsigned preparation do not invent a signature or confirmed finality
+ok 61 - no receipt and unsigned preparation do not invent a signature or confirmed finality
+  ---
+  duration_ms: 0.4573
+  ...
+# Subtest: workflow fields fail closed independently of compatible canonical lifecycle
+ok 62 - workflow fields fail closed independently of compatible canonical lifecycle
+  ---
+  duration_ms: 2.1457
+  ...
+# Subtest: legacy lifecycle-only contracts retain canonical behavior while workflow unavailable; loading reveals no old proof
+ok 63 - legacy lifecycle-only contracts retain canonical behavior while workflow unavailable; loading reveals no old proof
+  ---
+  duration_ms: 0.8123
+  ...
+# Subtest: mounted workflow reads are passive and related-Agent link remains the recovery destination
+ok 64 - mounted workflow reads are passive and related-Agent link remains the recovery destination
+  ---
+  duration_ms: 3.6708
+  ...
+1..64
+# tests 64
+# suites 0
+# pass 64
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1662.6699

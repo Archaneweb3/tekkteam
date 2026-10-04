@@ -1,4 +1,50 @@
-# CURRENT — M4 debit blocker resolved; controlled execution awaits human gate
+# CURRENT — M4 Phase 1 verified; WAITING_FOR_HUMAN financial gate
+
+4October2026 22:09WIB continuation: safe M5 presentation engineering DONE/REVIEWED,
+actual M5 remains WAITING_FOR_CONFIRMED_M4. Owner-only confirmed receipt DTO now
+allowlists metadata, confirmed slot/time, exact Pump provenance and immutable draft
+binding. Missing legacy fields stay UNAVAILABLE. Roster/selector label LAUNCHED from
+matching Agent-ID lifecycle; confirmed selection navigates to existing Agent detail,
+without opening preparation/funding/trading. No draft or receipt migration.
+64focused receipt/owner/page regressionsPASS; independent reviewPASS; canonical build
+19.61sPASS. Seven staging files installed with baseline checks/backups and verified
+hashes; HTTPShealth/API/three client modules200. Staging-only restart PID43919/15;
+production10722/0 and10893/0 unchanged. No Nginx or production edits.
+Actual owner browser reload: connected session retained, aaaaada/ret3ED still
+NOT LAUNCHED, draft1/mintnull, receipt0, expired M4 record preserved, approvalopenedfalse,
+ownerSignedfalse/broadcastfalse. DBquick_checkOK. Desktop1440/mobile360/390/412 no
+horizontal body overflow. Confirmed UI positive evidence remains local fixture only.
+Unrelated injected wallet extension logged channel errors; no TEKKTEAM app error was
+observed. Do not mislabel those extension diagnostics as a transaction broadcast.
+Financial question pending: exact one M4 launch, application ceiling0.01SOL; fresh
+review required before human signature. All current dependent real milestones wait
+on that receipt/gates; safe M8 viewport and M9 portability/backup work recorded above.
+
+4October2026 21:58WIB checkpoint (started21:27; target21:57). M4 is PARTIAL,
+not a launch. Actual connected/authenticated owner M4 preparation succeeded:
+execution8e47534a-5948-4777-97fc-76b3c3acb23e; mint
+EjKAQp2mm4fMu97CGThX6NH3KYh8FXHFZG4abZcsZUhk; finalized simulation453288474
+PASS, Mainnet/create_v2,1instruction/840bytes, initial buy0. Network fee0.000010000
++ other0.005547360 = total0.005557360SOL; ceiling0.01; projected balance0.177442357;
+reserve0.001. Metadata/image HTTP20021:52WIB. Sixteen atomic accounts reconciled;
+nonowner atomic debit0. Review class remains EXECUTION_GUARDED.
+Unsigned bytes SHA256911359741ecc1018b23e6bf8cf799da5fa6572296d6087453c1b8c6b7776f81c;
+review digest4a8e2097e8e81289df895dc113de9b44b5f371c80366844b2fc711b21d95d62a.
+EXPIRED21:51:17.200WIB: cannot approve/reuse; next financial action requires fresh
+context, mint/bytes, simulation and human-reviewed economics/digest.
+Owner signature0; broadcast0; SOLspent0; receipts0. Generated mint partial signature
+exists in the prepared transaction; it is not an owner signature or launched receipt.
+M4 row1 is READY_FOR_REVIEW historical evidence, not currently valid approval.
+Staging PID43612/restarts14; production10722/0 and10893/0 unchanged. SQLite staging
+backup quick_checkOK; production data not copied. Actual browser1440/360/390/412
+review has no horizontal overflow and usable X. This is viewport QA, not mobile-wallet
+device proof. Source checkpoint6b5bfea pushed and remote SHA verified.
+M5 real binding WAITING_FOR_CONFIRMED_M4; safe conditional receipt presentation work
+continues without inserting any receipt, association or custody wallet. M6/M7 require
+their own financial gates. No funding/trading or production deployment enabled.
+Evidence: artifacts/pump-debit-m4/controlled-review.json, https.json, responsive.json.
+
+## Previous diagnostic checkpoint
 
 4October2026 21:48WIB. Manager batch started21:27; checkpoint21:57. Goal throughM10
 active, with financial/security human gates. M4 NOT PASS: no confirmed receipt.

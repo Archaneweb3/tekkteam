@@ -1,6 +1,32 @@
 # TEKKTEAM manager handoff
 
-Current M4: diagnose EXECUTION_UNEXPECTED_ACCOUNT_DEBIT. Latest authority4October2026
+22:09WIB latest: M4 financial gate pending; no owner signature/broadcast/spending.
+Safe M5 conditional presentation implemented/tested/reviewed and staged: owner confirmed
+receipt allowlist, LAUNCHED labels, existing-Agent navigation only. No runtime receipt
+or association invented. Actual M5 WAITING_FOR_CONFIRMED_M4. 64tests/build19.61sPASS;
+7installed hashes verified; HTTPS200; stagingPID43919/restarts15, production unchanged.
+Browser owner session/Agent/draft survived reload, mintnull/receipt0; expired execution
+8e47534a-5948-4777-97fc-76b3c3acb23e approval disabled. New fresh preparation must
+replace expired bytes/mint before exact single-launch financial approval.
+Evidence artifacts/pump-debit-m4/{controlled-review,m5-runtime-state,m5-https,
+m5-responsive}.json and m5-tests.tap. Screenshots local artifact directory.
+Remaining execution branches M4/M5 real receipt, M6 roundtrip, M7 repetitive and M10
+qualification require earlier authoritative outcomes/human financial gates. M8 actual
+viewport checks and M9 safe reproducibility/secret exclusion/staging backup are recorded;
+not blanket production hardening or Real qualification. Do not request credentials in chat.
+
+Current M4: WAITING_FOR_HUMAN financial execution; debit diagnosis resolved.
+21:58WIB: actual Phase1PASS, execution8e47534a-5948-4777-97fc-76b3c3acb23e,
+simulation453288474, total0.005557360SOL, ceiling0.01, initialbuy0. Review expired
+21:51:17.200WIB; never reuse. Fresh review before manual owner Phantom signature.
+Owner signed0/broadcast0/SOLspent0/receipts0; prepared mint partial signature exists.
+Staging exact-target M4 mode restored, PID43612/restarts14. Production10722/0,
+10893/0 unchanged. M4 row1 is expired historical READY_FOR_REVIEW, not a launch.
+Checkpoint6b5bfea pushed; staged SQLite backup quick_checkOK. Browser1440/360/390/412
+review no horizontal overflow. M5 conditional presentation work can continue;
+authoritative M5 binding still WAITING_FOR_CONFIRMED_M4. No fabricated receipt.
+
+Latest authority4October2026
 autonomous manager through M10. PROJECT_STATUS current; EXECUTION_BRIEF one active
 milestone; PROJECT_PLAYBOOK standing rules. Goal active until verifiedM10/user pause.
 
@@ -10,7 +36,7 @@ config/etc/tekkteam-staging/wallet-test.json. Read config server-side only; no s
 logs/Git. Existing authenticated Hostinger web console is available locally; do not
 assume that browser access is available to a separate cloud executor.
 Production /var/www/tekkteam, tekkteam-api4190/tekkteam-launch4193 untouched.
-No VPS/production restart. Exact-target M4 capability restoring after atomic review
+No VPS/production restart. Exact-target M4 capability restored after atomic review
 repair; human approval not performed, no M4 receipt. Global trading/fundingOFF.
 
 Target C2nddai75FJZWWkNdUF7csEBryRCMikJyTTZZqYcMiBv; Agent aaaaada

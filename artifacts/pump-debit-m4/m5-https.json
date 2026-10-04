@@ -1,0 +1,63 @@
+[
+  {
+    "path": "/api/health",
+    "status": 200,
+    "contentType": "application/json; charset=utf-8",
+    "sha": "bc8849468e7cb6742b002a864dfec851174b54c8188a86e99d60b3775f4e3ca2"
+  },
+  {
+    "path": "/api/runtime-capabilities",
+    "status": 200,
+    "contentType": "application/json",
+    "sha": "679d45d69505d7d0d73ce728ccfaafd9960d5938253af5f2d7c943ba140c417c",
+    "capabilities": {
+      "mode": "M4_CONTROLLED_SINGLE_LAUNCH",
+      "network": "solana:101",
+      "auth": true,
+      "mainnetBalance": true,
+      "workers": false,
+      "signing": false,
+      "broadcast": false,
+      "launch": false,
+      "tokenCreation": false,
+      "funding": false,
+      "withdrawal": false,
+      "transfers": false,
+      "trading": false,
+      "publishing": false,
+      "launchPreparation": true,
+      "metadataPublication": true,
+      "controlledOwnerApproval": true,
+      "controlledSingleBroadcast": true,
+      "m4Target": {
+        "owner": "C2nddai75FJZWWkNdUF7csEBryRCMikJyTTZZqYcMiBv",
+        "agentId": "8fc6fe77-16a0-4fed-8ca0-ddd1f6ef9fa7",
+        "agentName": "aaaaada",
+        "name": "ret",
+        "symbol": "3ED",
+        "tokenDraftRevision": 1,
+        "initialBuyLamports": 0,
+        "ceilingLamports": 10000000
+      },
+      "guaranteeClass": "EXECUTION_GUARDED"
+    }
+  },
+  {
+    "path": "/app/m3-20261003/launch-receipt-summary.js",
+    "status": 200,
+    "contentType": "application/javascript",
+    "sha": "e917ae77ddea1ccbd280a2107860e7aa8ba9405047e7fd0856bca267123d70d3"
+  },
+  {
+    "path": "/app/m3-20261003/launchpad-page.js",
+    "status": 200,
+    "contentType": "application/javascript",
+    "sha": "e56b74a4253ec0bd9ff76d5b3d3f44912f6f2b172388e189c0f565b55086c0bf"
+  },
+  {
+    "path": "/app/m3-20261003/launchpad-view-model.js",
+    "status": 200,
+    "contentType": "application/javascript",
+    "sha": "5ee68dcc9aacd68aae48fe2f5e05ed29bd45a98d9a769111e03bd76a3818488a"
+  }
+]

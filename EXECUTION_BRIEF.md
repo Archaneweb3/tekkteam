@@ -1,4 +1,27 @@
-# M4 — Resolve unexpected debit, then fresh controlled launch review
+# M4 — WAITING_FOR_HUMAN; Phase 1 reviewed, financial execution pending
+
+22:09WIB: independent M5 conditional receipt presentation DONE/REVIEWED and deployed
+only to staging (7hashes/HTTPS200;64regressions/build19.61sPASS). No actual M5 completion
+or receipt claimed. Authenticated owner browser reload kept saved Agent/draft and
+connected wallet. M4 approval remains disabled for expired review; owner signed0,
+broadcast0/spent0. Financial gate question is pending; no routine user action asked.
+Production PIDs/restarts unchanged. Next: after specific human readiness/approval,
+fresh M4 review and manual owner Phantom signature, then authoritative confirmation.
+If uncertain never retry/create another transaction. Funding/trading require later gates.
+
+Checkpoint4October2026 21:58WIB; started21:27/target21:57. Unexpected debit cause
+resolved with strict simulation-bank evidence, independent review and73regressions.
+Actual M4 reviewPASS: execution8e47534a-5948-4777-97fc-76b3c3acb23e, Mainnet,
+initialbuy0, total0.005557360SOL <=0.01; owner balance0.182999717,
+projected0.177442357/reserve0.001. Review expired21:51:17.200WIB; refresh all
+context/bytes/economics before human manual Phantom approval. No owner signature,
+approval popup, broadcast or spending. Mint partial signature is separate.
+Dependent M4 financial branch WAITING_FOR_HUMAN. Independent minimum M5 owner
+receipt projection/labels may be implemented/tested without fake durable evidence.
+No real M5 PASS until confirmed M4. Continue safe M8/M9 work only when justified.
+Source6b5bfea pushed. No production changes, funding/trading or further launch.
+
+## Prior diagnosis brief
 
 Latest mandate 4 October 2026: autonomous manager through M10, subject to explicit
 human financial/security gates. Diagnosis started21:27WIB; checkpoint21:57WIB.
