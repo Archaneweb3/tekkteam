@@ -1,6 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {Keypair} from '@solana/web3.js';
+import {Keypair,Transaction,TransactionInstruction,SystemProgram} from '@solana/web3.js';
+import {readFileSync} from 'node:fs';
+import vm from 'node:vm';
+import {agentLaunchData,assertAgentLaunch} from '../src/agent-launch-data.js';
 import {mountM4Launch} from '../src/pump-m4-ui.js';
 
 test('failed owner pre-check restores only authoritative controls; durable approval latch stays locked',async()=>{
@@ -30,6 +33,40 @@ test('failed owner pre-check restores only authoritative controls; durable appro
    assert.equal(host.querySelector('[data-check]').hidden,false);host.isConnected=false;
   }
  }finally{globalThis.fetch=priorFetch;globalThis.document=priorDocument;}
+});
+
+test('late signed submission displays its exact refusal and never enters confirmation polling',async()=>{
+ // LOCAL_FIXTURE UI lifecycle: synthetic keys, no RPC and no transaction transport.
+ const owner=Keypair.generate(),mint=Keypair.generate(),agent={id:'late',name:'Agent',creator:owner.publicKey.toBase58(),coin:{name:'Coin',ticker:'FIX'}};
+ const tx=new Transaction({feePayer:owner.publicKey,recentBlockhash:Keypair.generate().publicKey.toBase58()}).add(new TransactionInstruction({programId:SystemProgram.programId,keys:[{pubkey:owner.publicKey,isSigner:true,isWritable:true},{pubkey:mint.publicKey,isSigner:true,isWritable:true}],data:Buffer.alloc(0)}));
+ const unsigned=tx.serialize({requireAllSignatures:false}).toString('base64');tx.partialSign(mint);const partial=tx.serialize({requireAllSignatures:false}).toString('base64');
+ const result={mint:mint.publicKey.toBase58(),transactionBase64:unsigned,simulation:{status:'PASS'},executionReview:{expiresAt:Date.now()+30000,digest:'fixture'}};
+ const node=()=>({textContent:'',disabled:false,hidden:false,style:{},append(){},replaceChildren(){}}),nodes=new Map(),host={isConnected:true,innerHTML:'',querySelector:s=>{if(!nodes.has(s))nodes.set(s,node());return nodes.get(s);}};
+ const requests=[];let signatures=0,polls=0;
+ const context={Buffer,Transaction,agentLaunchData,assertAgentLaunch,AbortSignal,crypto,Date,document:{createElement:node},clearTimeout(){},setTimeout(fn,ms){if(ms===5000||ms===2000){polls++;throw Error('A stopped execution must not poll');}return 1;},validatePreparation:async r=>{assert.equal(r,result);},fetch:async(url,options={})=>{
+  const action=url.split('/').at(-1);requests.push({action,method:options.method??'GET'});
+  if(url==='/api/agents/late')return {ok:true,json:async()=>agent};
+  if(action==='status')return {ok:true,json:async()=>({status:'READY_FOR_REVIEW',executionId:'fixture',walletApprovalOpened:false,result})};
+  if(action==='review')return {ok:true,json:async()=>({status:'AWAITING_WALLET_APPROVAL',result,walletTransactionBase64:partial})};
+  if(action==='submit')return {ok:true,json:async()=>({status:'SIGNED_NOT_BROADCAST',signature:'local-fixture-signature',error:'EXECUTION_REVIEW_EXPIRED',broadcastAttempted:false,walletApprovalOpened:true,result})};
+  throw Error('Unexpected operation');
+ }};
+ const source=readFileSync('src/pump-m4-ui.js','utf8').replace(/^import .*$/gm,'').replace(/export /g,'');vm.runInNewContext(source,context);
+ context.mountM4Launch(host,{agent,isCurrent:()=>true,getM4Wallet:()=>({assertBound(){},async signTransaction(bytes){signatures++;const signed=Transaction.from(Buffer.from(bytes,'base64'));signed.partialSign(owner);return signed.serialize().toString('base64');}}),capability:{m4Target:{owner:agent.creator,agentId:agent.id}}});
+ await new Promise(resolve=>setImmediate(resolve));await host.querySelector('[data-approve]').onclick();
+ assert.equal(signatures,1);assert.equal(polls,0);assert.equal(requests.filter(r=>r.action==='status').length,1);assert.equal(requests.filter(r=>r.action==='submit').length,1);
+ assert.match(host.querySelector('[data-status]').textContent,/Owner signed.*Broadcast prevented/);assert.equal(host.querySelector('[data-error]').textContent,'EXECUTION_REVIEW_EXPIRED');
+ assert.equal(host.querySelector('[data-prepare]').disabled,true);assert.equal(host.querySelector('[data-approve]').disabled,true);assert.equal(host.querySelector('[data-check]').hidden,false);host.isConnected=false;
+});
+
+test('non-JSON rate-limit failure reports HTTP status without transaction operations',async()=>{
+ const priorFetch=globalThis.fetch,priorDocument=globalThis.document,node=()=>({textContent:'',disabled:false,hidden:false,style:{},append(){},replaceChildren(){}}),nodes=new Map(),host={isConnected:true,innerHTML:'',querySelector:s=>{if(!nodes.has(s))nodes.set(s,node());return nodes.get(s);}};
+ try{
+  globalThis.document={createElement:node};globalThis.fetch=async(url,options={})=>{assert.equal(options.method,'GET');return {ok:false,status:429,json:async()=>{throw SyntaxError('Too many requests');}};};
+  const owner=Keypair.generate().publicKey.toBase58(),agent={id:'rate',name:'Agent',creator:owner,coin:{name:'Coin',ticker:'FIX'}};
+  mountM4Launch(host,{agent,isCurrent:()=>true,getM4Wallet:()=>{throw Error('Must not sign');},capability:{m4Target:{owner,agentId:agent.id}}});await new Promise(resolve=>setImmediate(resolve));
+  assert.equal(host.querySelector('[data-error]').textContent,'Launch service unavailable (HTTP 429)');
+ }finally{host.isConnected=false;globalThis.fetch=priorFetch;globalThis.document=priorDocument;}
 });
 
 test('expiry during an approval attempt keeps preparation locked and never claims no prompt opened',async()=>{
