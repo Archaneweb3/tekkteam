@@ -1,3 +1,77 @@
+# CURRENT — M4 fee accounting corrected; M4 PARTIAL, 05/10/2026, 21:30:03 WIB
+
+Continued2ad8a14; started5October21:04WIB, checkpoint deadline21:34WIB.
+Root sole writer; independent read-only review ACCEPTED. No broad audit/redesign,
+new Agent/draft, real wallet request, recovery grant, signature or broadcast.
+
+Historical d16d20e3 bytes:2 null signatures,840bytes,1Pumpcreate_v2,noCB,base10000,
+priority0. Actual prior Phantom normal Konfirmasi Transaksi, yellow new-domain
+advisory (not the old red blocker), fee90000. Delta80000 is observed arithmetic,
+NOT proof of added CB. Canceled request returned no message; original exact CU
+limit/price/finalfee and returned/signed hashes are UNAVAILABLE. Earlier MATCH
+means prepared==delivered only. No new wallet attempt: user's proof gate unmet.
+
+Implemented OptionB because mint secret is wiped after precomputing its signature;
+wallet message mutation would invalidate it. No key retention/new custody or relaxed
+message/signature gates. M4 selects current scoped writable-account RPC quote's
+latest20slot p75; canonical200kCU limit (original default) + exact bounded price,
+prioritycap100000lamports. Strict CBprefix before sim/review/mintsign; only signature
+fields may differ afterwards. RPCtotalfee partitions base+priority without double
+counting; full17account atomic conservation/reserve/0.01SOL/30s/one-shot/finality
+retained. Receipt-only provisioning remains. Separate owner-returned message/payload
+and fully signed payload hashes; no invented final hash for canceled requests.
+
+Sourcebba1049 deployed STAGING ONLY:19source hashes/installed hashesPASS,
+116VPScriticaltestsPASS/build12.34s (local111focused+5locksPASS/build20.98s).
+Actual RPC Mainnet unsigned simulation at21:20:48.647WIB:PASS,95948CU,
+slot453604478,quote453604502;200000CU x50000micro-lamports/CU =>10000priority.
+RPCgetFeeForMessage total20000=base10000+priority10000;other5547360;
+total5567360lamports/.005567360SOL,ceiling10000000,owner182835778,
+projected177268418,reserve1000000.3instructions,892bytes,17atomicaccounts,
+2nullsignatures. This is unsigned diagnostic preparation, NOT a persisted M4
+attempt or wallet request. Review21:20:46.586–21:21:16.586WIB already expired.
+Prepared message SHA174d91f21b30d3d538b2692b4ce635fd08562b40e35b61ca3033fd802220bcd8;
+delivered/returned/finalSigned hashesNULL. Current durable execution hash unchanged.
+
+Follow-upc337046 labels old base-only quote as historical and says wallet priority
+was not captured/no launch authorization.11local+VPSUItestsPASS,finalbuild16.80s
+local/11.81sVPS; frontend-only deployment with NO processrestart. HTTPS200 for
+index/API/backend/currentM4bundle; backend62eb1f7e2099aec54081868f20ac7c3c07d476a18c0d2abeb8574b17e52da718,
+bundleD4nPFful d573f3a982397e8f9d7e247608cbc7ec3b80377e37571101c58e41b365e596d0
+match source/localbuild. One immediate restart health502 then settled200;
+not claimed healthy until actual200 verified.
+
+Browser existing Edge owner connected; savedaaaaada/ret3ED readable after reload.
+Historical fee disclosure visible; Review/Approve disabled for USER_REJECTED.
+1440viewport scrollWidth1425;390viewport scrollWidth390/summary352; nohorizontal
+overflow. Temporary viewport restored. New explicitfee rows producer/DOMtested;
+not falsely claimed displayed in Phantom. Real wallet authenticity unchanged.
+
+Final readonly DB/Mainnet:currentd16USER_REJECTED,signatureNULL,ownerSignedfalse,
+broadcastfalse,submittedAtNULL,receipt0,mintabsent atfinalized453605697;
+owner182835778lamports/.182835778SOL unchanged,ourSOLspent0,quickcheckOK.
+TargetAgent1 (legacytry preserved),agent_wallets0,bindingtableNOT_CREATED.
+Metadata/imageHTTP200. Config and original DBexecution payload byte-hash unchanged.
+ProductionPM2tekkteam-api PID10722/restart0 andtekkteam-launch PID10893/restart0
+unchanged/online. StagingPID52581/restart21; only stagingbackend restarted for
+fee source, noVPS/Nginx/prod restart. Trading/funding/generalbroadcast/LiveOFF.
+
+Blocker: original Phantom final message was never returned and cannot be recovered
+from the fee display. Official auto-fee conditions demonstrate eligibility, not
+the actual historical mutation. Do not renew d16/oldgrant or open another wallet
+request under the conditional permission. To verify future wallet-side fee, a new
+explicit one-attempt permission accepting this historical evidence limit is needed;
+manual owner approval remains required. No credential/auth/reconnect request.
+No M4PASS, receipt, launchedCA, Agent wallet, binding or trading claimed.
+
+Evidence: artifacts/m4-fee-reconciliation/original-fee-evidence.json,
+unsigned-mainnet.png (remoteprivate unsigned-summary/preparation JSON),
+public-verification.json, deployment.png, final-safety.png,fee-panel1440/390,
+tests/buildlogs, manifests/scripts; decision095. Backups under
+/var/backups/tekkteam-staging/fee-bba1049 andfee-ui-c337046 private0700/0600.
+
+Historical handoff below:
+
 # Latest checkpoint — 5 October 2026 20:34 WIB
 
 Continue latest source5f95e06 with PROJECT_STATUS/EXECUTION_BRIEF; no broad audit.

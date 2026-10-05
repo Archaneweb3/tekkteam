@@ -1,3 +1,26 @@
+# Active milestone — M4 fee reconciliation engineering DONE; wallet qualification BLOCKED
+
+Started5October2026 21:04WIB; deadline21:34WIB; checkpoint 05/10/2026, 21:30:03 WIB.
+bba1049 +c337046 implemented/reviewed/tested/deployed STAGING ONLY. Explicit bounded
+CB before immutable multisigner review; full17-key proof, exactfee/debit/0.01SOL/
+reserve/30s/one-shot preserved. UnsignedMainnetsimPASS:base10000+priority10000,
+nonfee5547360,total5567360lamports,200kCU,892bytes. Quote expired; no wallet request.
+Old quote clearly historical. Backend/VPS116criticaltests+11updatedUItests/build/
+hashesPASS;1440/390browser nooverflow andapprovaldisabled. Owner remains connected.
+
+Currentd16USER_REJECTED unchanged,ownerSignedfalse/broadcastfalse/signaturenull/
+receipt0/spend0; targetAgent1/wallet0; production unchanged; RealtradingOFF.
+Blocker: canceled prior Phantom request has no returned/final message. Historical
+90000vs10000 delta and automaticfee eligibility do not prove its CUlimit/price.
+Next real request remains withheld by latest user's proof condition. No generic
+recoverygrant reset. Only separately explicit one-attempt authorization accepting
+the historical evidence limit can permit newwallet-side verification; human manual
+approval stillrequired. No M4PASS/newAgent/draft/M5/production/trading.
+No authorized independent engineering task remains in this narrow brief.
+Evidence artifacts/m4-fee-reconciliation/checkpoint.md; decision095.
+
+Historical checkpoint below:
+
 # Active milestone — M4 fee reconciliation; RUNNING
 
 Started 5 October 2026 21:04 WIB from 2ad8a14; checkpoint deadline 21:34 WIB.
