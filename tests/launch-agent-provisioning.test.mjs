@@ -23,6 +23,9 @@ test('confirmed binding creates one encrypted wallet, survives restart and rejec
   assert.equal(Keypair.fromSecretKey(secret).publicKey.toBase58(),first.wallet);assert.notEqual(saved.secret,Buffer.from(secret).toString('base64'));secret.fill(0);
   store.close();store=openStore(path);assert.deepEqual(provisionLaunchAgent(store,receipt),first);
   assert.throws(()=>provisionLaunchAgent(store,{...receipt,mint:Keypair.generate().publicKey.toBase58()}));
+  const other={...agent,id:'other'};store.db.prepare('INSERT INTO agents(id,owner,data) VALUES(?,?,?)').run(other.id,owner,JSON.stringify(other));
+  assert.throws(()=>provisionLaunchAgent(store,{...receipt,agentId:other.id,executionId:'other-execution'}));
+  assert.equal(store.db.prepare('SELECT count(*) n FROM launch_agent_bindings').get().n,1);
   assert.equal(store.db.prepare('SELECT count(*) n FROM agent_wallets').get().n,1);
   assert.equal(JSON.parse(store.db.prepare('SELECT data FROM agents').get().data).coin,null);
  }finally{store.close();rmSync(dir,{recursive:true,force:true});}
