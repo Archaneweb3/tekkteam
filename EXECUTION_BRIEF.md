@@ -1,3 +1,19 @@
+# Active milestone — M4 ONE authorized owner-first Phantom attempt
+
+Started5October2026 20:37WIB fromebf0826; engineering checkpoint target21:07WIB.
+User explicitly authorizes exact recovery of rejected ba5af2c9 into ONE fresh
+attempt. Root sole source writer; reviewer read-only. Existing aaaaada/ret3ED only.
+Mainnet/initialbuy0/0.01SOL/reserve/sim/30sTTL remain. Immutable old bytes never sent.
+Owner-first all-null transaction reaches Phantom; deterministic payload/message
+hashes compared before handoff. Exact rejected recovery cannot renew after review.
+Stop at clean actual Phantom transaction screen for manual approval; any blocking
+warning means no bypass/sign/broadcast and no second attempt. Actual wallet screen
+must be observed, never inferred from API/tests. Confirmed receipt alone permits
+one encrypted wallet bound to the existing Agent. Trading/funding/productionOFF.
+Current: RUNNING. No M4 PASS without finalized real receipt and verified binding.
+
+Historical checkpoint below:
+
 # Active milestone — M4 owner-first real-wallet verification; BLOCKED
 
 Started5October2026 19:51WIB from3b8ca87; first checkpoint target20:21WIB.

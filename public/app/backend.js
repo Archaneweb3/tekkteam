@@ -225,8 +225,12 @@ export function m4LaunchWallet(owner){
   const {Transaction,Buffer}=window.TekkworkSDK,partial=Transaction.from(Buffer.from(base64,'base64')),unsigned=Transaction.from(Buffer.from(current.result.transactionBase64,'base64'));
   if(partial.signature!==null||!partial.verifySignatures(false)||!partial.serializeMessage().equals(unsigned.serializeMessage()))throw Error('M4 reviewed bytes or mint signature changed');
   if(ownerFirst&&(base64!==current.result.transactionBase64||partial.signatures.some(s=>s.signature!==null)))throw Error('M4 owner-first bytes changed');
+  const fingerprint=async bytes=>Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes)),n=>n.toString(16).padStart(2,'0')).join('');
+  const reviewedPayloadSha256=await fingerprint(Buffer.from(current.result.transactionBase64,'base64')),presentedPayloadSha256=await fingerprint(partial.serialize({requireAllSignatures:false,verifySignatures:true}));
+  const reviewedMessageSha256=await fingerprint(unsigned.serializeMessage()),presentedMessageSha256=await fingerprint(partial.serializeMessage());
+  if(reviewedPayloadSha256!==current.result.transactionSha256||reviewedMessageSha256!==presentedMessageSha256||ownerFirst&&reviewedPayloadSha256!==presentedPayloadSha256)throw Error('M4 transaction fingerprint changed');
   binding.assertBound();if(typeof assertReady!=='function')throw Error('Launch dialog binding required');assertReady();const openedAt=Date.now();let remainingMs;try{remainingMs=assertM4ReviewLifetime(review.result,openedAt);}catch(error){error.walletRequestOpened=false;throw error;}m4ApprovalRequests.add(review.executionId);
-  console.info('M4 wallet transaction request',JSON.stringify({executionId:review.executionId,openedAt,reviewStartedAt:review.result.executionReview.startedAt,expiresAt:review.result.executionReview.expiresAt,remainingMs}));
+  console.info('M4 wallet transaction request',JSON.stringify({executionId:review.executionId,signingOrder:current.signingOrder,openedAt,reviewStartedAt:review.result.executionReview.startedAt,expiresAt:review.result.executionReview.expiresAt,remainingMs,reviewedPayloadSha256,presentedPayloadSha256,reviewedMessageSha256,presentedMessageSha256}));
   try{return await boundTransactionWallet(owner,ownerFirst).signTransaction(base64);}catch(error){error.walletRequestOpened=true;throw error;}
  }};
 }

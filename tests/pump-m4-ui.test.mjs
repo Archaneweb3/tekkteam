@@ -7,6 +7,11 @@ import {agentLaunchData,assertAgentLaunch} from '../src/agent-launch-data.js';
 import {mountM4Launch} from '../src/pump-m4-ui.js';
 import {assertM4ReviewLifetime} from '../src/pump-review-lifetime.js';
 
+test('rejected controls rearm only the exact separately authorized record',async()=>{
+ const priorFetch=globalThis.fetch,priorDocument=globalThis.document,node=()=>({textContent:'',disabled:false,hidden:false,style:{},append(){},replaceChildren(){}});
+ try{globalThis.document={createElement:node};for(const grant of [undefined,'different','rejected']){const nodes=new Map(),host={isConnected:true,innerHTML:'',querySelector:s=>{if(!nodes.has(s))nodes.set(s,node());return nodes.get(s);}},owner=Keypair.generate().publicKey.toBase58(),agent={id:'fixture',name:'Agent',creator:owner,coin:{name:'Coin',ticker:'FIX'}};globalThis.fetch=async()=>({ok:true,json:async()=>({executionId:'rejected',status:'USER_REJECTED',walletApprovalOpened:true,broadcastAttempted:false})});mountM4Launch(host,{agent,isCurrent:()=>true,getM4Wallet:()=>{throw Error('No automatic provider request');},capability:{m4Target:{owner,agentId:agent.id},m4RecoveryExecutionId:grant}});await new Promise(r=>setImmediate(r));assert.equal(host.querySelector('[data-approve]').disabled,grant!=='rejected');assert.equal(host.querySelector('[data-prepare]').disabled,grant!=='rejected');host.isConnected=false;}}finally{globalThis.fetch=priorFetch;globalThis.document=priorDocument;}
+});
+
 test('failed owner pre-check restores only authoritative controls; durable approval latch stays locked',async()=>{
  const priorFetch=globalThis.fetch,priorDocument=globalThis.document;
  try{

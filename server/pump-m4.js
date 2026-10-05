@@ -5,7 +5,7 @@ import {assertReviewedExecutionRequest,assertExecutionReview} from './pump-execu
 import {assertM4Target,M4_TARGET,verifyM4Signed,completeM4OwnerApproval,revalidateM4,m4Fail,sha} from './pump-m4-guard.js';
 import {confirmM4} from './pump-m4-confirmation.js';
 import {decodeM4CreationAccounts,verifyM4CreateEvent} from './pump-m4-provenance.js';
-import {proveM4ExpiredRecovery} from './pump-m4-recovery.js';
+import {proveM4ExpiredRecovery,M4_REJECTED_RECOVERY_ID} from './pump-m4-recovery.js';
 import {assertM4ReviewLifetime} from '../src/pump-review-lifetime.js';
 export function createM4Execution({db,transport,publishMetadata,journalPath,now=Date.now,prepareFactory=createPumpLaunchPreparation,revalidate=revalidateM4,confirm=confirmM4,target=M4_TARGET,verifyCreatedAccounts=decodeM4CreationAccounts,verifyEvent=verifyM4CreateEvent,captureDiagnostics,provisionAgent,recoverExecutionId=null}){
  if(!db||!transport?.submitOnce||typeof publishMetadata!=='function')throw m4Fail('M4_EXPLICIT_CAPABILITY_REQUIRED');
@@ -40,8 +40,10 @@ export function createM4Execution({db,transport,publishMetadata,journalPath,now=
     if(Object.keys(journal.read()).length)throw m4Fail('M4_PRIOR_RECEIPT_REQUIRES_RECONCILIATION');
     let recovery=null;
     if(action==='recover'){
-     const unsigned=s?.recovery?.grantExecutionId===recoverExecutionId&&s.status==='AWAITING_WALLET_APPROVAL'&&!s.signature;
+     const rejectedGrant=recoverExecutionId===M4_REJECTED_RECOVERY_ID;
+     const unsigned=rejectedGrant?s?.executionId===recoverExecutionId&&s.status==='USER_REJECTED':s?.recovery?.grantExecutionId===recoverExecutionId&&s.status==='AWAITING_WALLET_APPROVAL'&&!s.signature;
      if(!recoverExecutionId||!s||request.previousExecutionId!==s.executionId||s.executionId!==recoverExecutionId&&!unsigned)throw m4Fail('M4_RECOVERY_NOT_AUTHORIZED');
+     if(rejectedGrant&&!unsigned)throw m4Fail('M4_RECOVERY_NOT_AUTHORIZED');
      recovery={grantExecutionId:recoverExecutionId,fromExecutionId:s.executionId,proof:await proveM4ExpiredRecovery(s,identity,{transport,now,unsigned})};verifyIdentity();
     }else if(s){
      if(s.status!=='READY_FOR_REVIEW'||s.walletApprovalOpened||s.broadcastAttempted||s.signature||(s.result.expiresAt>now()&&request.replaceExecutionId!==s.executionId)||(request.replaceExecutionId!==undefined&&request.replaceExecutionId!==s.executionId))throw m4Fail('M4_AUTHORIZATION_ALREADY_CONSUMED');
@@ -51,7 +53,7 @@ export function createM4Execution({db,transport,publishMetadata,journalPath,now=
     try{
      const prepare=prepareFactory({transport,publishMetadata,executionReview:true,now,captureDiagnostics,mintFactory:()=>signer.publicKey,captureProof:(r,p)=>{verifyCreatedAccounts(r,p.simulation.value.accounts[0],p.simulation.value.accounts[2]);verifyEvent(r,p.simulation.value.logs);proof=p;const tx=Transaction.from(Buffer.from(r.transactionBase64,'base64'));tx.partialSign(signer);walletTransactionBase64=tx.serialize({requireAllSignatures:false,verifySignatures:true}).toString('base64');}});
      const result=await prepare(identity,'0',request.requestId);assertExecutionReview(result,identity,{now:now()});
-     verifyIdentity();if(archive&&(result.mint===archive.result.mint||result.transactionBase64===archive.result.transactionBase64))throw m4Fail('M4_RECOVERY_BYTES_REUSED');s={target,revision:archive?.revision??0,executionId:request.requestId,signingOrder:'OWNER_FIRST_MINT_AFTER_APPROVAL',status:'READY_FOR_REVIEW',result,proof,walletTransactionBase64,walletApprovalOpened:false,broadcastAttempted:false,...(recovery?{recovery}:archive?.recovery?{recovery:archive.recovery}:{})};verifyM4Signed(walletTransactionBase64,s,false);save(s,archive);return publicState(s);
+     verifyIdentity();if(archive&&(result.mint===archive.result.mint||result.transactionBase64===archive.result.transactionBase64||recovery?.grantExecutionId===M4_REJECTED_RECOVERY_ID&&result.recentBlockhash===archive.result.recentBlockhash))throw m4Fail('M4_RECOVERY_BYTES_REUSED');s={target,revision:archive?.revision??0,executionId:request.requestId,signingOrder:'OWNER_FIRST_MINT_AFTER_APPROVAL',status:'READY_FOR_REVIEW',result,proof,walletTransactionBase64,walletApprovalOpened:false,broadcastAttempted:false,...(recovery?{recovery}:archive?.recovery?{recovery:archive.recovery}:{})};verifyM4Signed(walletTransactionBase64,s,false);save(s,archive);return publicState(s);
     }finally{if(signer)signer.secretKey.fill(0);signer=null;}
    }
    if(action==='status'){

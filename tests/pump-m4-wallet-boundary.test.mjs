@@ -2,9 +2,10 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {Keypair,Transaction,TransactionInstruction,SystemProgram} from '@solana/web3.js';
 import bs58 from 'bs58';
+import {createHash} from 'node:crypto';
 // LOCAL_FIXTURE only: wallet-provider stub, synthetic signatures, no RPC/broadcast.
 let serial=0;
-async function fixture(t,{ownerFirst=false,injected=false,missingOwner=false,liveOrderMismatch=false}={}){
+async function fixture(t,{ownerFirst=false,injected=false,missingOwner=false,liveOrderMismatch=false,badFingerprint=false}={}){
  const saved={window:globalThis.window,fetch:globalThis.fetch,CustomEvent:globalThis.CustomEvent},originalNow=Date.now;
  t.after(()=>{Object.assign(globalThis,saved);Date.now=originalNow;});
  let clock=100000,calls=0,statusReads=0,onStatus=()=>{},resolveStatus;
@@ -12,7 +13,7 @@ async function fixture(t,{ownerFirst=false,injected=false,missingOwner=false,liv
  const tx=new Transaction({feePayer:owner.publicKey,recentBlockhash:Keypair.generate().publicKey.toBase58()}).add(new TransactionInstruction({programId:SystemProgram.programId,keys:[{pubkey:owner.publicKey,isSigner:true,isWritable:true},{pubkey:mint.publicKey,isSigner:true,isWritable:true}],data:Buffer.alloc(0)}));
  const unsigned=tx.serialize({requireAllSignatures:false}).toString('base64');tx.partialSign(mint);const partial=tx.serialize({requireAllSignatures:false}).toString('base64');
  const signingOrder=ownerFirst?'OWNER_FIRST_MINT_AFTER_APPROVAL':undefined;
- const result={launch:{owner:address,agentId:'fixture',initialBuyLamports:0},transactionBase64:unsigned,executionReview:{startedAt:100000,expiresAt:130000,ceilingLamports:10000000,digest:'fixture'}},review={status:'AWAITING_WALLET_APPROVAL',executionId:'fixture',signingOrder,result,walletTransactionBase64:ownerFirst?unsigned:partial};
+ const result={launch:{owner:address,agentId:'fixture',initialBuyLamports:0},transactionBase64:unsigned,transactionSha256:badFingerprint?'0'.repeat(64):createHash('sha256').update(Buffer.from(unsigned,'base64')).digest('hex'),executionReview:{startedAt:100000,expiresAt:130000,ceilingLamports:10000000,digest:'fixture'}},review={status:'AWAITING_WALLET_APPROVAL',executionId:'fixture',signingOrder,result,walletTransactionBase64:ownerFirst?unsigned:partial};
  const approve=tx=>{calls++;if(ownerFirst)assert.ok(tx.signatures.every(s=>s.signature===null));if(!missingOwner)tx.partialSign(owner);return tx;};
  const wallet={name:'Phantom',chains:['solana:mainnet'],accounts:[account],features:{'standard:connect':{connect:async()=>({accounts:[account]})},'standard:events':{on:()=>()=>{}},'solana:signMessage':{signMessage:async()=>[{signature:new Uint8Array(64)}]},'solana:signTransaction':{signTransaction:async input=>[{signedTransaction:Uint8Array.from(approve(Transaction.from(input.transaction)).serialize({requireAllSignatures:!ownerFirst}))}]}}};
  const provider={isPhantom:true,isConnected:false,publicKey:owner.publicKey,connect:async()=>{provider.isConnected=true;},on(){},removeListener(){},signMessage:async()=>({signature:new Uint8Array(64)}),signTransaction:async tx=>approve(tx)};
@@ -28,3 +29,4 @@ test('one fresh exact-byte request signs once; replay cannot request another wal
 for(const injected of [false,true])test('owner-first '+(injected?'injected':'standard')+' wallet sees unsigned bytes and returns only owner signature',async t=>{const f=await fixture(t,{ownerFirst:true,injected}),signed=Transaction.from(Buffer.from(await f.signer.signTransaction(f.partial,f.review,()=>{}),'base64'));assert.ok(signed.signature);assert.equal(signed.signatures[1].signature,null);assert.equal(signed.verifySignatures(false),true);assert.equal(signed.verifySignatures(true),false);assert.equal(f.calls(),1);});
 test('owner-first mode cannot be enabled by local review without live server agreement',async t=>{const f=await fixture(t,{ownerFirst:true,liveOrderMismatch:true});await assert.rejects(f.signer.signTransaction(f.partial,f.review,()=>{}),/signing order changed/);assert.equal(f.calls(),0);});
 test('owner-first wallet returning all-null signatures cannot be submitted',async t=>{const f=await fixture(t,{ownerFirst:true,missingOwner:true});await assert.rejects(f.signer.signTransaction(f.partial,f.review,()=>{}),/owner approval changed or missing/);assert.equal(f.calls(),1);});
+test('reviewed fingerprint mismatch blocks the provider before any wallet popup',async t=>{const f=await fixture(t,{ownerFirst:true,badFingerprint:true});await assert.rejects(f.signer.signTransaction(f.partial,f.review,()=>{}),/fingerprint changed/);assert.equal(f.calls(),0);});
