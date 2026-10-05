@@ -7,7 +7,7 @@ import {curveProgram,BN,pumpSdk} from '../server/dex/pump-sdk-boundary.js';
 import {encoded} from './pump-account-fixture.mjs';
 import {m4Fixture} from './pump-m4-fixture.mjs';
 import {confirmM4} from '../server/pump-m4-confirmation.js';
-import {revalidateM4,sha} from '../server/pump-m4-guard.js';
+import {revalidateM4,completeM4OwnerApproval,sha} from '../server/pump-m4-guard.js';
 import {decodeM4CreationAccounts,verifyM4CreateEvent} from '../server/pump-m4-provenance.js';
 import {GENESIS,PUMP} from '../src/pump-readiness.js';
 import {tokenMetadata} from '../src/agent-launch-data.js';
@@ -15,7 +15,7 @@ const publicEvent=JSON.parse(readFileSync(new URL('./fixtures/pump-create-event.
 const eventTemplate=curveProgram.coder.events.decode(publicEvent.programData).data;
 async function fixture(){
  const f=m4Fixture(),state=await f.controller.run('prepare',f.identity,{initialBuy:'0',requestId:crypto.randomUUID()}),request=f.request(state);await f.controller.run('review',f.identity,request);
- const record=JSON.parse(f.db.prepare('SELECT payload FROM m4_execution').get().payload),r=record.result;record.signedTransactionBase64=f.signed();const tx=Transaction.from(Buffer.from(record.signedTransactionBase64,'base64'));record.signature=(await import('bs58')).default.encode(tx.signature);record.signedDigest=sha(Buffer.from(record.signedTransactionBase64,'base64'));
+ const record=JSON.parse(f.db.prepare('SELECT payload FROM m4_execution').get().payload),r=record.result;record.signedTransactionBase64=completeM4OwnerApproval(f.signed(),record).completeBase64;const tx=Transaction.from(Buffer.from(record.signedTransactionBase64,'base64'));record.signature=(await import('bs58')).default.encode(tx.signature);record.signedDigest=sha(Buffer.from(record.signedTransactionBase64,'base64'));
  const mint=new PublicKey(r.mint),mintBytes=Buffer.alloc(MintLayout.span);MintLayout.encode({mintAuthorityOption:0,mintAuthority:PublicKey.default,supply:1000000000000000n,decimals:6,isInitialized:true,freezeAuthorityOption:0,freezeAuthority:PublicKey.default},mintBytes);
  const pointer=Buffer.alloc(MetadataPointerLayout.span);MetadataPointerLayout.encode({authority:PublicKey.default,metadataAddress:mint},pointer);const metadata=Buffer.from(packMetadata({mint,name:r.launch.name,symbol:r.launch.symbol,uri:r.metadataUri,additionalMetadata:[]}));
  const tlv=(type,bytes)=>{const h=Buffer.alloc(4);h.writeUInt16LE(type);h.writeUInt16LE(bytes.length,2);return Buffer.concat([h,bytes]);};const mintAccount={owner:TOKEN_2022_PROGRAM_ID.toBase58(),executable:false,lamports:5547360,data:[Buffer.concat([mintBytes,Buffer.alloc(83),Buffer.from([1]),tlv(ExtensionType.MetadataPointer,pointer),tlv(ExtensionType.TokenMetadata,metadata)]).toString('base64'),'base64']};

@@ -2,7 +2,7 @@ import {Keypair,Transaction} from '@solana/web3.js';
 import {createPumpLaunchPreparation} from './pump-launch-preparation.js';
 import {createReceiptJournal} from './launch-receipt-journal.js';
 import {assertReviewedExecutionRequest,assertExecutionReview} from './pump-execution-review.js';
-import {assertM4Target,M4_TARGET,verifyM4Signed,revalidateM4,m4Fail,sha} from './pump-m4-guard.js';
+import {assertM4Target,M4_TARGET,verifyM4Signed,completeM4OwnerApproval,revalidateM4,m4Fail,sha} from './pump-m4-guard.js';
 import {confirmM4} from './pump-m4-confirmation.js';
 import {decodeM4CreationAccounts,verifyM4CreateEvent} from './pump-m4-provenance.js';
 import {proveM4ExpiredRecovery} from './pump-m4-recovery.js';
@@ -17,7 +17,7 @@ export function createM4Execution({db,transport,publishMetadata,journalPath,now=
   try{if(archive){db.exec('BEGIN IMMEDIATE');db.prepare('INSERT INTO m4_execution_history(execution_id,payload) VALUES(?,?)').run(archive.executionId,JSON.stringify(archive));}const changed=revision===0?db.prepare('INSERT OR IGNORE INTO m4_execution(id,payload) VALUES(1,?)').run(JSON.stringify(s)):db.prepare("UPDATE m4_execution SET payload=? WHERE id=1 AND json_extract(payload,'$.revision')=?").run(JSON.stringify(s),revision);if(changed.changes!==1)throw m4Fail('M4_STALE_EXECUTION_WRITER');if(JSON.stringify(read())!==JSON.stringify(s))throw m4Fail('M4_PERSISTENCE_UNCERTAIN');if(archive)db.exec('COMMIT');}
   catch(error){if(archive)try{db.exec('ROLLBACK');}catch{}fenced=true;throw error;}
  };
- const publicState=s=>s?{status:s.status,executionId:s.executionId,result:s.result??null,signature:s.signature??null,signedDigest:s.signedDigest??null,submittedAt:s.submittedAt??null,confirmation:s.confirmation??null,provisioning:s.provisioning??null,error:s.error??null,walletApprovalOpened:s.walletApprovalOpened===true,broadcastAttempted:s.broadcastAttempted===true,approvalCapability:s.status==='AWAITING_WALLET_APPROVAL'&&s.walletApprovalOpened&&!s.broadcastAttempted?{mode:'M4_CONTROLLED_SINGLE_LAUNCH',controlledOwnerApproval:true,m4Target:target}:null}: {status:'NOT_STARTED'};
+ const publicState=s=>s?{status:s.status,executionId:s.executionId,signingOrder:s.signingOrder??null,result:s.result??null,signature:s.signature??null,signedDigest:s.signedDigest??null,submittedAt:s.submittedAt??null,confirmation:s.confirmation??null,provisioning:s.provisioning??null,error:s.error??null,walletApprovalOpened:s.walletApprovalOpened===true,broadcastAttempted:s.broadcastAttempted===true,approvalCapability:s.status==='AWAITING_WALLET_APPROVAL'&&s.walletApprovalOpened&&!s.broadcastAttempted?{mode:'M4_CONTROLLED_SINGLE_LAUNCH',controlledOwnerApproval:true,m4Target:target}:null}: {status:'NOT_STARTED'};
  const provision=s=>{
   if(s.status!=='LAUNCHED'||typeof provisionAgent!=='function'||s.provisioning?.status==='READY')return;
   try{
@@ -51,7 +51,7 @@ export function createM4Execution({db,transport,publishMetadata,journalPath,now=
     try{
      const prepare=prepareFactory({transport,publishMetadata,executionReview:true,now,captureDiagnostics,mintFactory:()=>signer.publicKey,captureProof:(r,p)=>{verifyCreatedAccounts(r,p.simulation.value.accounts[0],p.simulation.value.accounts[2]);verifyEvent(r,p.simulation.value.logs);proof=p;const tx=Transaction.from(Buffer.from(r.transactionBase64,'base64'));tx.partialSign(signer);walletTransactionBase64=tx.serialize({requireAllSignatures:false,verifySignatures:true}).toString('base64');}});
      const result=await prepare(identity,'0',request.requestId);assertExecutionReview(result,identity,{now:now()});
-     verifyIdentity();if(archive&&(result.mint===archive.result.mint||result.transactionBase64===archive.result.transactionBase64))throw m4Fail('M4_RECOVERY_BYTES_REUSED');s={target,revision:archive?.revision??0,executionId:request.requestId,status:'READY_FOR_REVIEW',result,proof,walletTransactionBase64,walletApprovalOpened:false,broadcastAttempted:false,...(recovery?{recovery}:archive?.recovery?{recovery:archive.recovery}:{})};verifyM4Signed(walletTransactionBase64,s,false);save(s,archive);return publicState(s);
+     verifyIdentity();if(archive&&(result.mint===archive.result.mint||result.transactionBase64===archive.result.transactionBase64))throw m4Fail('M4_RECOVERY_BYTES_REUSED');s={target,revision:archive?.revision??0,executionId:request.requestId,signingOrder:'OWNER_FIRST_MINT_AFTER_APPROVAL',status:'READY_FOR_REVIEW',result,proof,walletTransactionBase64,walletApprovalOpened:false,broadcastAttempted:false,...(recovery?{recovery}:archive?.recovery?{recovery:archive.recovery}:{})};verifyM4Signed(walletTransactionBase64,s,false);save(s,archive);return publicState(s);
     }finally{if(signer)signer.secretKey.fill(0);signer=null;}
    }
    if(action==='status'){
@@ -76,19 +76,19 @@ export function createM4Execution({db,transport,publishMetadata,journalPath,now=
    if(action==='review'){
     if(s.status!=='READY_FOR_REVIEW'||s.walletApprovalOpened||s.broadcastAttempted)throw m4Fail('M4_APPROVAL_ALREADY_OPENED');
     assertM4ReviewLifetime(s.result,now(),18000);const fresh=await revalidate(s,identity,request,{transport,now,captureDiagnostics});verifyIdentity();assertM4ReviewLifetime(s.result,now(),18000);s.reviewContext=fresh;s.status='AWAITING_WALLET_APPROVAL';s.walletApprovalOpened=true;save(s);
-    return {...publicState(s),walletTransactionBase64:s.walletTransactionBase64};
+    return {...publicState(s),walletTransactionBase64:s.signingOrder==='OWNER_FIRST_MINT_AFTER_APPROVAL'?s.result.transactionBase64:s.walletTransactionBase64};
    }
    if(action==='submit'){
     if(!s||request?.requestId!==s.executionId)throw m4Fail('M4_EXECUTION_MISMATCH');
     if(s.status!=='AWAITING_WALLET_APPROVAL'||!s.walletApprovalOpened||s.broadcastAttempted||s.signature)throw m4Fail('M4_SUBMISSION_ALREADY_CONSUMED');
     // Preserve a late valid signature as consumed, but NEVER broadcast it.
     assertReviewedExecutionRequest(s.result,identity,{...request,now:s.result.executionReview.startedAt});
-    const signed=verifyM4Signed(request.signedTransactionBase64,s,true);verifyIdentity();
-    s.status='SIGNED';s.signature=signed.signature;s.signedDigest=signed.signedDigest;s.signedTransactionBase64=request.signedTransactionBase64;s.signedAt=now();save(s);
+    const signed=completeM4OwnerApproval(request.signedTransactionBase64,s);verifyIdentity();
+    s.status='SIGNED';s.signature=signed.signature;s.signedDigest=signed.signedDigest;s.signedTransactionBase64=signed.completeBase64;s.signedAt=now();save(s);
     try{assertReviewedExecutionRequest(s.result,identity,{...request,now:now()});await revalidate(s,identity,request,{transport,now,captureDiagnostics});verifyIdentity();assertReviewedExecutionRequest(s.result,identity,{...request,now:now()});}
     catch(error){s.status='SIGNED_NOT_BROADCAST';s.error=error.code??'M4_REVALIDATION_FAILED';save(s);return publicState(s);}
     // Durable intent precedes the ONLY send call. Crash/timeout never retries it.
-    s.status='SUBMITTED';s.signature=signed.signature;s.signedDigest=signed.signedDigest;s.signedTransactionBase64=request.signedTransactionBase64;s.submittedAt=now();s.broadcastAttempted=true;save(s);
+    s.status='SUBMITTED';s.signature=signed.signature;s.signedDigest=signed.signedDigest;s.signedTransactionBase64=signed.completeBase64;s.submittedAt=now();s.broadcastAttempted=true;save(s);
     try{await transport.submitOnce(s.signedTransactionBase64,s.signature,(bytes,signature)=>{verifyIdentity();const durable=read();assertReviewedExecutionRequest(durable.result,identity,{...request,now:now()});return durable.status==='SUBMITTED'&&durable.signature===signature&&durable.signedDigest===sha(Buffer.from(bytes,'base64'))&&durable.signedTransactionBase64===bytes;});s.status='CONFIRMING';}
     catch(error){s.status='CONFIRMATION_UNKNOWN';s.error=error.code??'M4_SUBMISSION_UNCERTAIN';}
     save(s);return publicState(s);

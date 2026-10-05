@@ -4,7 +4,7 @@ import bs58 from 'bs58';
 import {GENESIS,PUMP} from '../src/pump-readiness.js';
 import {evaluateSimulation} from '../src/pump-simulation-policy.js';
 import {assertReviewedExecutionRequest,contextSlot} from './pump-execution-review.js';
-import {verifyLaunchTransaction} from '../src/pump-launch-validation.js';
+import {verifyLaunchTransaction,validateLaunchEvidence} from '../src/pump-launch-validation.js';
 import {readAtMinimumContext} from './pump-context-rpc.js';
 import {tokenMetadata} from '../src/agent-launch-data.js';
 import {decodeM4CreationAccounts,verifyM4CreateEvent} from './pump-m4-provenance.js';
@@ -22,6 +22,20 @@ export function verifyM4Signed(base64,record,requireOwner=true){
  if(!mintSignature||!trusted||!mintSignature.equals(trusted))throw m4Fail('M4_MINT_SIGNATURE_CHANGED');
  if(!requireOwner&&tx.signature!==null)throw m4Fail('M4_OWNER_SIGNATURE_PREMATURE');
  return {tx,signature:tx.signature?bs58.encode(tx.signature):null,signedDigest:sha(Buffer.from(base64,'base64'))};
+}
+// Phantom receives no pre-existing signature. Collect the stored mint signature
+// only AFTER verifying the owner approved this exact canonical reviewed message.
+// No secret retention, signature generation or message alteration occurs here.
+export function completeM4OwnerApproval(base64,record){
+ if(record.signingOrder!=='OWNER_FIRST_MINT_AFTER_APPROVAL')return {...verifyM4Signed(base64,record,true),completeBase64:base64};
+ validateLaunchEvidence(launchEvidence(record.result,record.proof));
+ const bytes=Buffer.from(base64,'base64'),tx=Transaction.from(bytes),trusted=Transaction.from(Buffer.from(record.walletTransactionBase64,'base64'));
+ if(!tx.serialize({requireAllSignatures:false,verifySignatures:false}).equals(bytes)||!tx.serializeMessage().equals(trusted.serializeMessage())||tx.feePayer.toBase58()!==record.target.owner||tx.signatures.length!==2||!tx.signature||!tx.verifySignatures(false))throw m4Fail('M4_OWNER_APPROVAL_INVALID');
+ const mint=tx.signatures.find(s=>s.publicKey.toBase58()===record.result.mint),mintSignature=trusted.signatures.find(s=>s.publicKey.toBase58()===record.result.mint)?.signature;
+ if(!mint||mint.signature!==null||!mintSignature||!trusted.verifySignatures(false)||trusted.signature!==null)throw m4Fail('M4_OWNER_FIRST_SIGNATURE_REQUIRED');
+ tx.addSignature(new PublicKey(record.result.mint),mintSignature);
+ const completeBase64=tx.serialize({requireAllSignatures:true,verifySignatures:true}).toString('base64');
+ return {...verifyM4Signed(completeBase64,record,true),completeBase64};
 }
 // Scoped M4 freshness: latest finalized hash may advance, but the reviewed hash
 // must remain valid. The accepted message/digest/30s TTL are NEVER replaced.

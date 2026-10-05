@@ -220,14 +220,17 @@ export function m4LaunchWallet(owner){
   if(capability.mode!=='M4_CONTROLLED_SINGLE_LAUNCH'||capability.controlledOwnerApproval!==true||capability.m4Target?.owner!==owner||review?.status!=='AWAITING_WALLET_APPROVAL'||review.result?.launch?.agentId!==capability.m4Target.agentId||review.result?.launch?.initialBuyLamports!==0||review.result?.executionReview?.ceilingLamports!==10000000||review.walletTransactionBase64!==base64||m4ApprovalRequests.has(review.executionId))throw Error('Single reviewed M4 approval unavailable');
   if(current.status!=='AWAITING_WALLET_APPROVAL'||current.executionId!==review.executionId||current.result?.executionReview?.digest!==review.result.executionReview.digest)throw Error('M4 review changed');
   if(current.result.transactionBase64!==review.result.transactionBase64)throw Error('M4 review changed; no wallet prompt opened');
+  if(current.signingOrder!==review.signingOrder)throw Error('M4 signing order changed');
+  const ownerFirst=current.signingOrder==='OWNER_FIRST_MINT_AFTER_APPROVAL';
   const {Transaction,Buffer}=window.TekkworkSDK,partial=Transaction.from(Buffer.from(base64,'base64')),unsigned=Transaction.from(Buffer.from(current.result.transactionBase64,'base64'));
   if(partial.signature!==null||!partial.verifySignatures(false)||!partial.serializeMessage().equals(unsigned.serializeMessage()))throw Error('M4 reviewed bytes or mint signature changed');
+  if(ownerFirst&&(base64!==current.result.transactionBase64||partial.signatures.some(s=>s.signature!==null)))throw Error('M4 owner-first bytes changed');
   binding.assertBound();if(typeof assertReady!=='function')throw Error('Launch dialog binding required');assertReady();const openedAt=Date.now();let remainingMs;try{remainingMs=assertM4ReviewLifetime(review.result,openedAt);}catch(error){error.walletRequestOpened=false;throw error;}m4ApprovalRequests.add(review.executionId);
   console.info('M4 wallet transaction request',JSON.stringify({executionId:review.executionId,openedAt,reviewStartedAt:review.result.executionReview.startedAt,expiresAt:review.result.executionReview.expiresAt,remainingMs}));
-  try{return await boundTransactionWallet(owner).signTransaction(base64);}catch(error){error.walletRequestOpened=true;throw error;}
+  try{return await boundTransactionWallet(owner,ownerFirst).signTransaction(base64);}catch(error){error.walletRequestOpened=true;throw error;}
  }};
 }
-function boundTransactionWallet(owner){
+function boundTransactionWallet(owner,ownerFirst=false){
   const selected=active||watchedSelection,current=selected?.standard?.accounts?.find(a=>a.address===owner);
   const assertBound=()=>{
     if(!selected||selected!==(active||watchedSelection)||ownerAccessDetached())throw Error('Reconnect your selected owner wallet');
@@ -250,8 +253,9 @@ function boundTransactionWallet(owner){
     }else{
       if(typeof selected.injected.signTransaction!=='function')throw Error('Transaction-only signing unavailable');
       const result=await selected.injected.signTransaction(Transaction.from(Buffer.from(base64,'base64')));
-      signed=Buffer.from(result.serialize({requireAllSignatures:true,verifySignatures:true})).toString('base64');
+      signed=Buffer.from(result.serialize({requireAllSignatures:!ownerFirst,verifySignatures:true})).toString('base64');
     }
+    if(ownerFirst){const actual=Transaction.from(Buffer.from(signed,'base64')),expected=Transaction.from(Buffer.from(base64,'base64'));if(actual.feePayer.toBase58()!==owner||actual.signatures.length!==2||!actual.signature||!actual.verifySignatures(false)||actual.signatures[1].signature!==null||!actual.serializeMessage().equals(expected.serializeMessage()))throw Error('M4 owner approval changed or missing');}
     assertBound();return signed;
   }};
 }

@@ -51,6 +51,7 @@ export function mountM4Launch(host,{agent,isCurrent,getM4Wallet,capability}){
    for(let walletTry=0;walletTry<2;walletTry++){
     const partial=Transaction.from(Buffer.from(reviewed.walletTransactionBase64,'base64')),unsigned=Transaction.from(Buffer.from(r.transactionBase64,'base64'));
     if(partial.signature!==null||!partial.verifySignatures(false)||!partial.serializeMessage().equals(unsigned.serializeMessage()))throw Error('Mint signature or reviewed message changed');
+    if(reviewed.signingOrder==='OWNER_FIRST_MINT_AFTER_APPROVAL'&&(reviewed.walletTransactionBase64!==r.transactionBase64||partial.signatures.some(s=>s.signature!==null)))throw Error('Owner-first transaction changed');
     try{
      assertLocal();try{assertM4ReviewLifetime(reviewed.result);}catch(e){e.walletRequestOpened=false;throw e;}
      await validatePreparation(reviewed.result,identity,0);assertLocal();
@@ -72,7 +73,8 @@ export function mountM4Launch(host,{agent,isCurrent,getM4Wallet,capability}){
     }
    }
    assertLocal();const signed=Transaction.from(Buffer.from(signedTransactionBase64,'base64')),unsigned=Transaction.from(Buffer.from(r.transactionBase64,'base64'));
-   if(!signed.verifySignatures(true)||!signed.serializeMessage().equals(unsigned.serializeMessage()))throw Error('Wallet changed reviewed bytes');
+   const ownerFirst=reviewed.signingOrder==='OWNER_FIRST_MINT_AFTER_APPROVAL';
+   if(!signed.signature||!signed.verifySignatures(!ownerFirst)||!signed.serializeMessage().equals(unsigned.serializeMessage())||ownerFirst&&(signed.signatures.length!==2||signed.signatures[1].signature!==null))throw Error('Wallet changed reviewed bytes');
    status('Submitting exactly once. No automatic retry.');const s=await api(identity.agentId,'submit',{...request,signedTransactionBase64});if(alive())show(s);
    for(let attempt=0;attempt<15&&alive()&&current.broadcastAttempted===true&&['SUBMITTED','CONFIRMING','CONFIRMATION_UNKNOWN'].includes(current.status);attempt++){await new Promise(ok=>setTimeout(ok,5000));const state=await api(identity.agentId,'status');if(alive())show(state);}
   }catch(e){if(awaiting&&e.walletRequestOpened===true&&(e.code===4001||/reject|denied|declin/i.test(e.message))){try{const rejected=await api(identity.agentId,'reject',{requestId:request.requestId});if(alive())show(rejected);}catch{status('Approval stopped. Reconciliation required.');}}else{status('Execution stopped. No retry or new wallet approval. Recheck state.');try{const authoritative=await api(identity.agentId,'status');if(alive())show(authoritative);}catch{status('Execution state unavailable. Recheck before any further action.');}}error(e.message);q('[data-check]').hidden=false;}

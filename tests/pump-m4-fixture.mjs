@@ -26,6 +26,6 @@ export function m4Fixture(options={}){
  const transport={submitOnce:async(bytes,sig,authorize)=>{if(!authorize(bytes,sig))throw Error('Denied');sends++;if(options.sendFails)throw Error('Lost response');return sig;}};
  const deps={db,journalPath,target,now:()=>clock,transport,publishMetadata:async()=>'',prepareFactory,verifyCreatedAccounts:()=>{},verifyEvent:()=>{},revalidate:async()=>({contextSlot:104,checkedAt:clock}),confirm:async()=>({status:'CONFIRMATION_UNKNOWN'}),...options.dependencies};
  const request=s=>({requestId:s.executionId,reviewDigest:s.result.executionReview.digest,transactionBase64:s.result.transactionBase64});
- const signed=()=>{const stored=JSON.parse(db.prepare('SELECT payload FROM m4_execution').get().payload),tx=Transaction.from(Buffer.from(stored.walletTransactionBase64,'base64'));tx.partialSign(owner);return tx.serialize().toString('base64');};
+ const signed=()=>{const stored=JSON.parse(db.prepare('SELECT payload FROM m4_execution').get().payload),tx=Transaction.from(Buffer.from(stored.signingOrder==='OWNER_FIRST_MINT_AFTER_APPROVAL'?stored.result.transactionBase64:stored.walletTransactionBase64,'base64'));tx.partialSign(owner);return tx.serialize({requireAllSignatures:stored.signingOrder!=='OWNER_FIRST_MINT_AFTER_APPROVAL'}).toString('base64');};
  return {db,root,journalPath,target,identity,owner,deps,controller:createM4Execution(deps),request,signed,advance:n=>clock+=n,sends:()=>sends,clock:()=>clock,rawProof:()=>rawProof};
 }
