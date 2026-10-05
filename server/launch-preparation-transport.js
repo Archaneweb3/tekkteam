@@ -64,7 +64,7 @@ export function createLaunchPreparationTransport({rpcUrl,origin,m4Target=null,fi
    if(method==='simulateTransaction'&&(params?.[1]?.sigVerify!==false||params?.[1]?.replaceRecentBlockhash!==false||params?.[1]?.commitment!=='finalized'))throw fail('PREPARATION_SIMULATION_OPTIONS_DENIED');
    const id=++sequence,{bytes}=await request(rpc,JSON.stringify({jsonrpc:'2.0',id,method,params}));let response;try{response=JSON.parse(bytes);}catch{throw fail('PREPARATION_RPC_RESPONSE_INVALID');}
    if(response.id!==id||response.jsonrpc!=='2.0')throw fail('PREPARATION_RPC_RESPONSE_INVALID');
-   if(response.error)throw fail('PREPARATION_RPC_ERROR',{rpcCode:Number.isInteger(response.error.code)?response.error.code:null});
+   if(response.error){const rpcCode=Number.isInteger(response.error.code)?response.error.code:null;console.warn(JSON.stringify({event:'PREPARATION_RPC_REJECTED',method,rpcCode}));throw fail('PREPARATION_RPC_ERROR',{rpcCode});}
    if(!Object.hasOwn(response,'result'))throw fail('PREPARATION_RPC_RESPONSE_INVALID');return response.result;
   },
   ...(m4Target?{submitOnce:async(base64,expectedSignature,authorize)=>{

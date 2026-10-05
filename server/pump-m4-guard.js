@@ -45,7 +45,7 @@ export async function revalidateM4(record,identity,request,{transport,now=Date.n
  const rpc=(m,p)=>readAtMinimumContext(transport,m,p),addresses=r.structure.accounts.map(a=>a.address),tx=Transaction.from(Buffer.from(r.transactionBase64,'base64'));
  if(await rpc('getGenesisHash',[])!==GENESIS)throw m4Fail('M4_WRONG_MAINNET');
  const validity=await rpc('isBlockhashValid',[r.recentBlockhash,{commitment:'finalized',minContextSlot:review.validitySlot}]);if(validity.value!==true)throw m4Fail('M4_BLOCKHASH_EXPIRED');
- const height=await transport.rpc('getBlockHeight',[{commitment:'finalized',minContextSlot:contextSlot(validity,review.validitySlot)}]);if(!Number.isSafeInteger(height)||height>r.lastValidBlockHeight)throw m4Fail('M4_BLOCKHASH_EXPIRED');
+ const height=await rpc('getBlockHeight',[{commitment:'finalized',minContextSlot:contextSlot(validity,review.validitySlot)}]);if(!Number.isSafeInteger(height)||height>r.lastValidBlockHeight)throw m4Fail('M4_BLOCKHASH_EXPIRED');
  const fee=await rpc('getFeeForMessage',[tx.serializeMessage().toString('base64'),{commitment:'finalized',minContextSlot:contextSlot(validity)}]);
  const before=await rpc('getMultipleAccounts',[addresses,{encoding:'base64',commitment:'finalized',minContextSlot:contextSlot(fee,contextSlot(validity))}]);
  const simulation=await rpc('simulateTransaction',[r.transactionBase64,{encoding:'base64',sigVerify:false,replaceRecentBlockhash:false,commitment:'finalized',minContextSlot:contextSlot(before,contextSlot(fee)),innerInstructions:true,accounts:{encoding:'base64',addresses}}]);
