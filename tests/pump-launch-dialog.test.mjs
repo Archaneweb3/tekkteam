@@ -6,9 +6,9 @@ test('shared launch dialog only mounts inspect flow, closes cleanly and drops st
  const source=readFileSync('public/app/pump-launch-dialog.js','utf8').replace(/^import .*$/gm,'').replace(/export /g,'');
  let mounted=0,closed=0,current=true,dialog;const button={},panel={textContent:''};
  const page={isConnected:true,querySelector:()=>dialog?.isConnected?dialog:null,append:d=>{dialog=d;d.isConnected=true;}};
- const context={launchWallet:()=>{},document:{createElement:()=>({open:false,isConnected:false,querySelector:s=>s==='[data-launch-close]'?button:panel,showModal(){this.open=true;},close(){this.open=false;this.onclose();},remove(){this.isConnected=false;}})}};
+ const context={launchWallet:()=>{},preparationWallet:()=>{},m4LaunchWallet:()=>{},document:{createElement:()=>({open:false,isConnected:false,querySelector:s=>s==='[data-launch-close]'?button:panel,showModal(){this.open=true;},close(){this.open=false;this.onclose();},remove(){this.isConnected=false;}})}};
  vm.runInNewContext(source,context);
- await context.openPumpLaunchDialog(page,{agent:{id:'a'},isCurrent:()=>current,onClose:()=>closed++,mount:async(host,options)=>{mounted++;assert.equal(host,panel);assert.equal(options.agent.id,'a');assert.equal(options.isCurrent(),true);assert.equal(options.getWallet,context.launchWallet);}});
+ await context.openPumpLaunchDialog(page,{agent:{id:'a'},isCurrent:()=>current,onClose:()=>closed++,mount:async(host,options)=>{mounted++;assert.equal(host,panel);assert.equal(options.agent.id,'a');assert.equal(options.isCurrent(),true);assert.equal(options.getWallet,context.launchWallet);assert.equal(options.getM4Wallet,context.m4LaunchWallet);}});
  assert.equal(mounted,1);assert.equal(await context.openPumpLaunchDialog(page),null);button.onclick();assert.equal(closed,1);assert.equal(dialog.isConnected,false);
  await context.openPumpLaunchDialog(page,{isCurrent:()=>current,mount:async()=>{current=false;throw Error('late');}});assert.equal(panel.textContent,'');
 });
