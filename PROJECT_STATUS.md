@@ -1,3 +1,43 @@
+# CURRENT — signed review expired; no broadcast, 5 October 2026 19:46 WIB
+
+Resumed 3df6566 at19:27WIB; checkpoint target19:52WIB. Existing target only:
+aaaaada /8fc6fe77-16a0-4fed-8ca0-ddd1f6ef9fa7, coin ret/3ED revision1.
+Fresh execution ee8dae70-e05c-4b06-a63e-d8b09a84b52f: Mainnet genesis verified,
+create_v2 simulationPASS slot453580131,1instruction/840bytes, initialbuy0.
+Fee10000 +other5547360 =5557360lamports (0.005557360SOL), ceiling0.01SOL;
+owner0.182835778, projected0.177278418, reserve0.001SOL. Metadata PUBLIC_VERIFIED.
+ReviewPOST200 reached AWAITING_WALLET_APPROVAL; exact reviewed transaction was
+manually signed. Popup labels/fee NOT VERIFIED: extension URL access denied and
+user later forgot wording. Cryptographic server verification proves transaction
+signing independently of that recollection. Review expired19:32:38.756WIB;
+signature received/persisted by server19:33:58.660WIB,79.904seconds late;
+Phantom's exact approval instant is unobserved. SubmitPOST200 returned
+SIGNED_NOT_BROADCAST / EXECUTION_REVIEW_EXPIRED; ownerSignedtrue,
+broadcastAttemptedfalse, submittedAtnull. One-shot remains consumed, no reset/retry.
+Signed transaction signature:
+2EYrVUpSqntCnfkDfT3raLWaCzJh51jFu7wQyRB8LqQnSeKm33ggt5fKNCA6XahRLqR2MZvjLebJbspvdd6uMvvK
+Mainnet read19:37:51.771WIB: exact signature statusnull/transactionnull, prepared
+mint accountnull, blockhash expired (431619520 >431618384), owner balance unchanged
+182835778lamports. No confirmed launch/receipt/finalized mint; this attempt spent0SOL.
+Final staging DB read19:42:43.202WIB: quick_checkOK, same signed refusal;
+targetAgent1/totalAgents2/Agentwallets0/launchbindings0/receipts0. Reload preserves
+the target/session/refusal without creating another Agent or wallet. Actual
+receipt-driven wallet provisioning and launch-success routing remain NOT VERIFIED.
+UI-only fixes0a8eccc +217dace staging-deployed: truthful expiry during approval,
+explicit signed-but-unsent refusal, no terminal polling, bounded5s pending polling,
+useful non-JSON HTTP error. Backend TTL/auth/one-shot/safety guards unchanged.
+12 focused local/VPS testsPASS; builds18.70s/11.23s; independent reviewACCEPTED.
+Public index/new M4 chunk byte-matched build. Desktop refusal/reload and390px
+mobile bounds verified (scrollWidth390); temporary viewport restored.
+Production10722/10893 restart0 and staging49311 restart16 unchanged. No VPS/PM2/
+backend/Nginx restart or production mutation. Funding/Real trading remainOFF.
+M4 PARTIAL / BLOCKED: expired signed attempt cannot be reused; an explicitly
+authorized recovery/fresh manual financial approval is required before another
+attempt. No automatic rearm, signing or broadcast. Evidence:
+artifacts/approval-handoff/checkpoint.md, api-evidence.json and screenshots.
+
+Historical context below:
+
 # CURRENT — post-approval verification, 5 October 2026 19:25 WIB
 
 Resumed a0dcd30; no broad audit, redesign or new financial execution. Actual staging

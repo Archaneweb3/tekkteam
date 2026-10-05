@@ -1,3 +1,33 @@
+# Latest resume checkpoint — 5 October 2026 19:46 WIB
+
+Resumed3df6566, source0a8eccc +217dace pushed and UI-only staging release verified.
+Fresh execution ee8dae70-e05c-4b06-a63e-d8b09a84b52f reached ReviewPOST200 then
+SubmitPOST200. Owner DID sign reviewed create_v2 bytes. Signature received/persisted
+by server at19:33:58.660WIB,79.904seconds after19:32:38.756WIB review expiry;
+Phantom's exact approval instant is unobserved. State SIGNED_NOT_BROADCAST,
+EXECUTION_REVIEW_EXPIRED, ownerSignedtrue, broadcastAttemptedfalse, submittedAtnull.
+Signature2EYrVUpSqntCnfkDfT3raLWaCzJh51jFu7wQyRB8LqQnSeKm33ggt5fKNCA6XahRLqR2MZvjLebJbspvdd6uMvvK.
+Exact read-only Mainnet reconciliation19:37:51: statusnull/transactionnull/mintnull,
+blockhash expired, owner182835778lamports unchanged; receipt0/spend0. Prepared mint
+2nTiN5VqLf74CG6Sa3qmBZZSqfQiby4m3TkbefsTMVV9 is NOT a launched CA.
+Final DB19:42:43 quick_checkOK; targetaaaaada Agent1/totalAgents2/wallet0/binding0,
+ret/3ED revision1 persisted. No receipt-driven provisioning or success routing yet.
+UI now accurately reports refusal, locks financial controls and stops terminal
+polling. Pending broadcast-only polling is5s/15 attempts; auth/TTL/one-shot unchanged.
+12 focused tests/build local+VPSPASS, read-only reviewACCEPTED, public index/chunk
+byte matched; desktop/reload/390px checked. Production10722/10893 restart0 and
+staging49311 restart16 unchanged. No backend/Nginx/PM2/VPS restart/production write.
+Real trading/fundingOFF. M4 PARTIAL/BLOCKED: old signed execution is quarantined,
+one-shot consumed. No automatic rearm/rebroadcast or second execution; fresh
+financial recovery needs explicit authorization and manual approval after review.
+Edge3 staging986478898 and Hostinger terminal986478854 retained. Extension popup
+labels/fee inaccessible by policy; user recollection withdrawn. Never circumvent.
+Evidence artifacts/approval-handoff; sanitized DB/reconciliation/build/test artifacts
+in /var/www/tekkteam-staging/releases/flow-8fb4688. DATA remains staging-only:
+/var/lib/tekkteam-staging/wallet-test.sqlite; API4395. Preserve unrelated dirtyfiles.
+
+Historical context below:
+
 # Latest resume checkpoint — 5 October 2026 19:25 WIB
 
 Resumed a0dcd30. Source repair d574845 deployed staging UI only; status9f77029.

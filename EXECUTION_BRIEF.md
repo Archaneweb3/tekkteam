@@ -1,3 +1,34 @@
+# Active milestone — M4 signed-expiry reconciliation; BLOCKED
+
+Started5October2026 19:27WIB from3df6566; checkpoint target19:52WIB;
+engineering checkpoint19:46WIB. Preserve existing aaaaada/ret/3ED; no new Agent,
+draft, redesign, broad audit, production change or Real trading.
+
+CURRENT: fresh Mainnet create_v2 simulationPASS; initialbuy0; reviewed debit
+0.005557360SOL <=0.01SOL. ReviewPOST200 opened one transaction approval flow.
+Owner signature received/persisted by server at19:33:58.660WIB,79.904seconds
+after19:32:38.756WIB expiry; Phantom's exact approval instant is unobserved.
+SubmitPOST200 safely persisted SIGNED_NOT_BROADCAST / EXECUTION_REVIEW_EXPIRED.
+ownerSignedtrue, broadcastfalse, no confirmation/receipt. Exact Mainnet reads
+show signature/transaction/mint absent, blockhash expired, owner0.182835778SOL
+unchanged. TargetAgent1, wallets0, bindings0; reload creates no duplicate.
+
+DONE: UI fixes0a8eccc/217dace deployed staging only,12 focused testsPASS local/VPS,
+buildPASS/public-byte verification/independent reviewACCEPTED. Expired approval
+remains locked; terminal refusal no longer polls into429/parser noise. Desktop
+and390px mobile bounds checked. Production/PM2 unchanged; all trading/fundingOFF.
+
+BLOCKED: this one-shot was consumed by the late signature. Do not broadcast old
+bytes, reset SQLite/approval latch, loosen freshness/debit guards, prepare another
+execution automatically or infer a launch from a signature. Further financial
+attempt requires an explicitly authorized recovery contract/fresh review and
+manual Phantom approval; receipt-dependent provisioning/flow cannot pass yet.
+Popup text was inaccessible and user forgot it; cryptographic transaction proof
+is authoritative. Stop here with honest PARTIAL, no M5/M6 activation.
+Evidence artifacts/approval-handoff/checkpoint.md and api-evidence.json.
+
+Historical context below:
+
 # Active milestone — reconcile reported launch approval and verify staging E2E
 
 Resumed checkpoint a0dcd30. First runtime evidence5October2026 19:12 WIB;
