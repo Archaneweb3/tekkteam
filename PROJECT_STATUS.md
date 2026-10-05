@@ -1,3 +1,28 @@
+# CURRENT final wording correction — 05/10/2026, 21:35:13 WIB
+
+Independent reviewer accepted f6e1264: historical final wallet message/fee unavailable;
+any priority fee change UNVERIFIED. Removes implication that Phantom actually added
+fees. Only display/test changed; immutable transaction/approval gates unchanged.
+STAGING frontend-only deployment f6e1264, no PM2/VPS/Nginx restart; all three PM2
+PID/restart counters identical. UI tests11/11 local and VPS; builds17.39s local,
+12.36sVPS. HTTPS index/API/backend/current bundle200; public backend source hash
+62eb1f7e2099aec54081868f20ac7c3c07d476a18c0d2abeb8574b17e52da718,
+new pump-m4-ui-TL8i5oDN bundle e69b249b12bd68fda7f4a6caf6f4bb1cd34627d03e59bd6323fdc743559ad2e0
+match exact pinned source and local build. Reload retains owner connection/target
+saved Agent and draft. Desktop1440 and mobile390: disclosure visible, approval
+DISABLED; mobile scrollWidth390/note350. Temporary emulation restored.
+Core116critical tests/simulation and safety evidence below remain valid.
+No new wallet attempt, owner signature, broadcast or recovery grant; targetAgent1,
+wallet0, receipt0, SOLspent0. Original fee discrepancy still NOT_PROVEN because
+canceled Phantom request returned no final bytes. M4PARTIAL / wallet qualification
+BLOCKED. No production/trading change. Review diagnostic already expired.
+Checkpoint delivered21:30 before21:34 deadline; this factual copy correction verified
+at 05/10/2026, 21:35:13 WIB. No second launch attempt authorized by the unmet historical proof gate.
+Evidence artifacts/m4-fee-reconciliation/wording-deployment.png,
+fee-panel-1440-final.png,fee-panel-390-final.png,public-verification.json.
+
+Previous checkpoint:
+
 # CURRENT — M4 fee accounting corrected; M4 PARTIAL, 05/10/2026, 21:30:03 WIB
 
 Continued2ad8a14; started5October21:04WIB, checkpoint deadline21:34WIB.
