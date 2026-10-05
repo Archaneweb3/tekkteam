@@ -1,3 +1,24 @@
+# Active milestone — M4 JIT review and one audited recovery
+
+Started5October2026 19:51WIB from3b8ca87; checkpoint target20:21WIB.
+Latest direct instruction authorizes recovery of expired signed execution
+ee8dae70-e05c-4b06-a63e-d8b09a84b52f into ONE fresh staging attempt, preserving
+the old signed bytes/signature as immutable audit evidence. Never send/reuse them.
+Root sole writer; independent reviewers read-only. Existing aaaaada/ret/3ED only.
+
+Acceptance: fresh preparation/review contiguous with explicit readiness; minimum
+remaining lifetime enforced immediately at the provider boundary; fixed30s TTL,
+Mainnet/zero-buy/0.01SOL/reserve/bytes/simulation/debit/idempotency guards retained.
+Recovery requires server-side old-blockhash expiry and signature/mint absence,
+atomic historical archive/CAS, exact default-off recovery grant; no old latch reset.
+Test relevant failure/race/restart cases; build/review; deploy staging only; verify
+public bytes/runtime; reach ONE real Phantom transaction prompt, then STOP for
+manual approval. After valid human signature, reconcile same transaction and
+receipt-only existing-Agent wallet provisioning/reload. Trading/fundingOFF;
+production unchanged. No receipt means no M4 PASS. Current work RUNNING.
+
+Historical checkpoint below:
+
 # Active milestone — M4 signed-expiry reconciliation; BLOCKED
 
 Started5October2026 19:27WIB from3df6566; checkpoint target19:52WIB;

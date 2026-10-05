@@ -5,6 +5,7 @@ import {readFileSync} from 'node:fs';
 import vm from 'node:vm';
 import {agentLaunchData,assertAgentLaunch} from '../src/agent-launch-data.js';
 import {mountM4Launch} from '../src/pump-m4-ui.js';
+import {assertM4ReviewLifetime} from '../src/pump-review-lifetime.js';
 
 test('failed owner pre-check restores only authoritative controls; durable approval latch stays locked',async()=>{
  const priorFetch=globalThis.fetch,priorDocument=globalThis.document;
@@ -40,14 +41,15 @@ test('late signed submission displays its exact refusal and never enters confirm
  const owner=Keypair.generate(),mint=Keypair.generate(),agent={id:'late',name:'Agent',creator:owner.publicKey.toBase58(),coin:{name:'Coin',ticker:'FIX'}};
  const tx=new Transaction({feePayer:owner.publicKey,recentBlockhash:Keypair.generate().publicKey.toBase58()}).add(new TransactionInstruction({programId:SystemProgram.programId,keys:[{pubkey:owner.publicKey,isSigner:true,isWritable:true},{pubkey:mint.publicKey,isSigner:true,isWritable:true}],data:Buffer.alloc(0)}));
  const unsigned=tx.serialize({requireAllSignatures:false}).toString('base64');tx.partialSign(mint);const partial=tx.serialize({requireAllSignatures:false}).toString('base64');
- const result={mint:mint.publicKey.toBase58(),transactionBase64:unsigned,simulation:{status:'PASS'},executionReview:{expiresAt:Date.now()+30000,digest:'fixture'}};
+ const startedAt=Date.now(),result={mint:mint.publicKey.toBase58(),transactionBase64:unsigned,simulation:{status:'PASS'},executionReview:{startedAt,expiresAt:startedAt+30000,digest:'fixture'}};
  const node=()=>({textContent:'',disabled:false,hidden:false,style:{},append(){},replaceChildren(){}}),nodes=new Map(),host={isConnected:true,innerHTML:'',querySelector:s=>{if(!nodes.has(s))nodes.set(s,node());return nodes.get(s);}};
  const requests=[];let signatures=0,polls=0;
- const context={Buffer,Transaction,agentLaunchData,assertAgentLaunch,AbortSignal,crypto,Date,document:{createElement:node},clearTimeout(){},setTimeout(fn,ms){if(ms===5000||ms===2000){polls++;throw Error('A stopped execution must not poll');}return 1;},validatePreparation:async r=>{assert.equal(r,result);},fetch:async(url,options={})=>{
+ const context={Buffer,Transaction,agentLaunchData,assertAgentLaunch,assertM4ReviewLifetime,AbortSignal,crypto,Date,document:{createElement:node},clearTimeout(){},setTimeout(fn,ms){if(ms===5000||ms===2000){polls++;throw Error('A stopped execution must not poll');}return 1;},validatePreparation:async r=>{assert.equal(r,result);},fetch:async(url,options={})=>{
   const action=url.split('/').at(-1);requests.push({action,method:options.method??'GET'});
   if(url==='/api/agents/late')return {ok:true,json:async()=>agent};
   if(action==='status')return {ok:true,json:async()=>({status:'READY_FOR_REVIEW',executionId:'fixture',walletApprovalOpened:false,result})};
-  if(action==='review')return {ok:true,json:async()=>({status:'AWAITING_WALLET_APPROVAL',result,walletTransactionBase64:partial})};
+  if(action==='prepare'){const body=JSON.parse(options.body);assert.equal(body.replaceExecutionId,'fixture');return {ok:true,json:async()=>({status:'READY_FOR_REVIEW',executionId:body.requestId,result,walletApprovalOpened:false})};}
+  if(action==='review')return {ok:true,json:async()=>({status:'AWAITING_WALLET_APPROVAL',executionId:JSON.parse(options.body).requestId,result,walletApprovalOpened:true,walletTransactionBase64:partial})};
   if(action==='submit')return {ok:true,json:async()=>({status:'SIGNED_NOT_BROADCAST',signature:'local-fixture-signature',error:'EXECUTION_REVIEW_EXPIRED',broadcastAttempted:false,walletApprovalOpened:true,result})};
   throw Error('Unexpected operation');
  }};
@@ -69,7 +71,7 @@ test('non-JSON rate-limit failure reports HTTP status without transaction operat
  }finally{host.isConnected=false;globalThis.fetch=priorFetch;globalThis.document=priorDocument;}
 });
 
-test('expiry during an approval attempt keeps preparation locked and never claims no prompt opened',async()=>{
+test('pending JIT owner check keeps controls locked without advancing any transaction request',async()=>{
  const priorFetch=globalThis.fetch,priorDocument=globalThis.document;
  const node=()=>({textContent:'',disabled:false,hidden:false,style:{},append(){},replaceChildren(){}});
  const nodes=new Map(),host={isConnected:true,innerHTML:'',querySelector:s=>{if(!nodes.has(s))nodes.set(s,node());return nodes.get(s);}};
@@ -83,8 +85,7 @@ test('expiry during an approval attempt keeps preparation locked and never claim
   await new Promise(resolve=>setImmediate(resolve));const approval=host.querySelector('[data-approve]').onclick();
   await new Promise(resolve=>setTimeout(resolve,150));
   assert.equal(host.querySelector('[data-prepare]').disabled,true);assert.equal(host.querySelector('[data-approve]').disabled,true);
-  assert.match(host.querySelector('[data-status]').textContent,/Review expired during approval/);assert.doesNotMatch(host.querySelector('[data-status]').textContent,/no wallet prompt opened/);
-  assert.equal(host.querySelector('[data-check]').hidden,false);releaseOwner({ok:false,status:401});await approval;
+  assert.doesNotMatch(host.querySelector('[data-status]').textContent,/AWAITING_WALLET_APPROVAL/);releaseOwner({ok:false,status:401});await approval;
   assert.ok(requests.every(method=>method==='GET'));
  }finally{releaseOwner({ok:false,status:401});host.isConnected=false;globalThis.fetch=priorFetch;globalThis.document=priorDocument;}
 });

@@ -2,6 +2,7 @@ import {walletAuthError} from './wallet-auth-errors.js';
 import {createPreviewConnection} from './preview-wallet.js';
 import {walletShortcuts,walletName,injectedWallet} from './wallet-catalog.js';
 import {normalizeTokenDraft} from '../../src/token-draft-schema.js';
+import {assertM4ReviewLifetime} from '../../src/pump-review-lifetime.js';
 const detachedKey='tekkteam:owner-detached';
 export function ownerAccessDetached(){try{return sessionStorage.getItem(detachedKey)==='1';}catch{return false;}}
 function setOwnerDetached(value){try{if(value)sessionStorage.setItem(detachedKey,'1');else sessionStorage.removeItem(detachedKey);}catch{}}
@@ -211,17 +212,19 @@ export function launchWallet(owner){
 const m4ApprovalRequests=new Set();
 export function m4LaunchWallet(owner){
  const binding=preparationWallet(owner);
- return {assertBound:binding.assertBound,async signTransaction(base64,review){
+ return {assertBound:binding.assertBound,async signTransaction(base64,review,assertReady){
   binding.assertBound();
-  const capability=await request('/runtime-capabilities');
-  if(capability.mode!=='M4_CONTROLLED_SINGLE_LAUNCH'||capability.controlledOwnerApproval!==true||capability.m4Target?.owner!==owner||review?.status!=='AWAITING_WALLET_APPROVAL'||review.result?.launch?.agentId!==capability.m4Target.agentId||review.result?.launch?.initialBuyLamports!==0||review.result?.executionReview?.ceilingLamports!==10000000||review.result?.executionReview?.expiresAt<=Date.now()||review.walletTransactionBase64!==base64||m4ApprovalRequests.has(review.executionId))throw Error('Single reviewed M4 approval unavailable or expired');
-  const current=await request('/launchpad/agents/'+encodeURIComponent(capability.m4Target.agentId)+'/execution/status');
+  // Same authenticated status read proves the live M4 capability AND exact latch.
+  // A disabled/unmounted runtime returns no approvalCapability; never use cache.
+  const current=await request('/launchpad/agents/'+encodeURIComponent(review?.result?.launch?.agentId)+'/execution/status'),capability=current.approvalCapability??{};
+  if(capability.mode!=='M4_CONTROLLED_SINGLE_LAUNCH'||capability.controlledOwnerApproval!==true||capability.m4Target?.owner!==owner||review?.status!=='AWAITING_WALLET_APPROVAL'||review.result?.launch?.agentId!==capability.m4Target.agentId||review.result?.launch?.initialBuyLamports!==0||review.result?.executionReview?.ceilingLamports!==10000000||review.walletTransactionBase64!==base64||m4ApprovalRequests.has(review.executionId))throw Error('Single reviewed M4 approval unavailable');
   if(current.status!=='AWAITING_WALLET_APPROVAL'||current.executionId!==review.executionId||current.result?.executionReview?.digest!==review.result.executionReview.digest)throw Error('M4 review changed');
-  if(current.result.transactionBase64!==review.result.transactionBase64||Date.now()>=review.result.executionReview.expiresAt)throw Error('M4 review changed or expired; no wallet prompt opened');
+  if(current.result.transactionBase64!==review.result.transactionBase64)throw Error('M4 review changed; no wallet prompt opened');
   const {Transaction,Buffer}=window.TekkworkSDK,partial=Transaction.from(Buffer.from(base64,'base64')),unsigned=Transaction.from(Buffer.from(current.result.transactionBase64,'base64'));
   if(partial.signature!==null||!partial.verifySignatures(false)||!partial.serializeMessage().equals(unsigned.serializeMessage()))throw Error('M4 reviewed bytes or mint signature changed');
-  binding.assertBound();if(Date.now()>=review.result.executionReview.expiresAt)throw Error('M4 review expired; no wallet prompt opened');m4ApprovalRequests.add(review.executionId);
-  return boundTransactionWallet(owner).signTransaction(base64);
+  binding.assertBound();if(typeof assertReady!=='function')throw Error('Launch dialog binding required');assertReady();const openedAt=Date.now();let remainingMs;try{remainingMs=assertM4ReviewLifetime(review.result,openedAt);}catch(error){error.walletRequestOpened=false;throw error;}m4ApprovalRequests.add(review.executionId);
+  console.info('M4 wallet transaction request',JSON.stringify({executionId:review.executionId,openedAt,reviewStartedAt:review.result.executionReview.startedAt,expiresAt:review.result.executionReview.expiresAt,remainingMs}));
+  try{return await boundTransactionWallet(owner).signTransaction(base64);}catch(error){error.walletRequestOpened=true;throw error;}
  }};
 }
 function boundTransactionWallet(owner){
