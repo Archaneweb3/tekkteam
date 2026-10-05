@@ -1,3 +1,34 @@
+# Latest integrated-flow checkpoint — 5 October 2026
+
+19:07 WIB checkpoint (target19:14): implemented and deployed staging only.
+Source commits8fb4688 +3b8e1b0. Existing coin composer now saves identity/draft in
+sequence and opens launch review, preserving idempotency and owner/stale guards.
+Confirmed-receipt-only Agent wallet provisioning reuses AES-GCM custody/AAD and
+agent_wallets; unique mint/signature/execution binding, rollback and restart retry.
+No real Agent wallet was created: receipt0/wallet0. Code qualification is LOCAL_FIXTURE.
+Review fees remain visible; optional Advanced details and conditional View Agent.
+61 focused tests PASS locally and on Ubuntu; final builds13.10s local/14.84s VPS.
+Eight source hashes verified; four installed server hashes PASS; three public modules
+match Git over HTTPS. Staging API49311/restarts16 healthy200. Production10722/10893
+restarts0 unchanged, no production path/config/database writes or VPS restart.
+Browser: existing Phantom connected/owner session retained, saved targets visible;
+1440 desktop,390 review,430 form show no horizontal overflow. Disclosure/close usable.
+Console errors observed from unrelated injected extension egjid...; no application
+error observed. Local5199/4291 restored HTTP200; browser localhost remains blocked.
+Fresh existing-target preparation c2113866-8448-42c9-84e8-c91c5facd03c:
+Mainnet simulationPASS slot453573835,1instruction,840bytes; initialbuy0.
+Mint3en8z1Cd51NYtk5ggJJtiuYwS3Yw6oudRKnQkb5ia9qi is PREPARED, not launched.
+Fee10000 +other5547360 =5557360lamports (0.005557360SOL),ceiling0.01SOL;
+observedowner0.182835778,projected0.177278418,reserve0.001SOL.
+Metadata/image HTTP200. Digest bd7080f287b148fb25f8a1f9a4d2e41150b1aa3452c22393d23c00c3325fddf6.
+Review expired5October19:04:35.767WIB; no stale approval allowed. Owner approvalfalse,
+ownerSignedfalse,broadcastfalse,receipt0,ourspend0. Manual wallet action requested.
+Overall PARTIAL: no confirmed real launch, no actual post-launch provisioning,
+funding/Real trading/production promotion qualification. Funding/trading stay OFF.
+Evidence artifacts/integrated-flow and artifacts/owner-flow-recovery/integrated-flow-*.
+
+Historical context below:
+
 # Current checkpoint — 5 October 2026, integrated product flow
 
 18:59 WIB: source implementation in progress. Current TEKKTEAM visuals preserved.
