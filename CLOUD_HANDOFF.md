@@ -1,3 +1,25 @@
+# Latest resume checkpoint — 5 October 2026 19:25 WIB
+
+Resumed a0dcd30. Source repair d574845 deployed staging UI only; status9f77029.
+Actual DB19:22:44 still expired READY_FOR_REVIEW, approvalfalse, ownerSignedfalse,
+broadcastfalse, signature/confirmationnull, receipt0. Last POST prepare19:04:08/200;
+no review/submit observed. Mainnet finalized453577593 prepared mint absent,
+owner182835778lamports unchanged. Current host routes to4395, HTTPS/API200.
+Reload retains targetaaaaada/ret/3ED revision1; targetAgent1/totalAgents2/wallet0/
+binding0. Actual post-launch provisioning/route NOT VERIFIED; duplicate/send/wallet
+restart proof remains LOCAL_FIXTURE. 11 focused tests/build local/VPSPASS and
+independent read-only reviewACCEPTED. Source fix reconciles status after early
+approval failure; never clears durable/unknown latch or retries a financial action.
+Production10722/10893 restart0 and staging49311 restart16 online/unchanged; no
+backend, Nginx, PM2/VPS restart, production mutation or financial transaction.
+Real trading/funding OFF. One pending user clarification: popup type or public
+transaction signature. Do not trigger a new review/approval until this discrepancy
+is resolved; reconcile exact signature first if one exists. Browser Edge3 stage
+986478882 and terminal986478854 retained. Evidence artifacts/post-approval;
+sanitized original JSON/build/test logs in VPS releases/flow-8fb4688/post-approval-*.
+
+Historical context below:
+
 # Latest integrated-flow checkpoint — 5 October 2026
 
 19:07 WIB checkpoint (target19:14): implemented and deployed staging only.
