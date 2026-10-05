@@ -1,3 +1,75 @@
+# CURRENT — M4 ONE owner-first Phantom request inspected; PARTIAL, 5 October 2026 21:00 WIB
+
+Resumed ebf0826 at20:37WIB; checkpoint target21:07WIB. User authorized exactly
+ONE fresh actual wallet request. Existing owner/aaaaada/ret3ED/revision1 unchanged.
+No Agent/draft creation, trading/funding, production changes or unsafe bypass.
+883aeb6 exact rejected recovery + byte fingerprints and3b8fa2e context-lag repair
+committed/pushed/deployed STAGING ONLY. Independent reviewer ACCEPTED both scopes.
+
+First recovery48c903c1 prepared/simulated successfully but final review returned
+HTTP503 PREPARATION_RPC_ERROR before any provider request. Original error had no
+method diagnostic, so its exact RPC method is NOT proven. A read-only transport
+probe reproduced getBlockHeight/-32016 at finalized minContextSlot453598514,
+immediately after successful validity read. Corrected bounded identical finalized
+height reads (max4total, unchanged minimum context/bytes/TTL) and added safe fixed
+method/numeric-code logging, never RPC URL/credentials. No transaction retry.
+Unopened preparations were superseded and archived without changing their evidence.
+
+Final execution d16d20e3-e3c6-418a-aa60-f35a1a6c254c; signingOrder OWNER_FIRST_MINT_AFTER_APPROVAL.
+Review created20:56:45.104WIB, expires20:57:15.104WIB; actual provider handoff
+20:56:50.284WIB with24,820ms remaining. Mainnet genesis verified; create_v2 simulation
+PASS slot453599121;1instruction/840bytes; initialbuy0; fee10000 + other5547360
+=5557360lamports/.005557360SOL; ceiling.01; projected.177278418SOL/reserve.001SOL.
+Payload SHA256 a89b4cc3c344a323295da645d4b0e616b12efba3fa6d878d753d0b10aef56bca
+Message SHA256 90c8f2e09a2b3d5171c5937510e96368d0e14615188098752b8a8133ca523842
+Both backend-reviewed and final provider handoff hashes MATCH. Canonical bytes equal;
+exactly owner+new mint signers with BOTH null signatures; one Pump instruction,
+no compute-budget/transfer/extra program instruction or silent reconstruction.
+Review digest 2927046cb67a6d9f648a99e70a48cda7e94f1555bef80ae74c35034eca1ec817
+
+Actual Windows Computer Use read Phantom sidebar in existing Edge profile.
+Screen: 'Konfirmasi Transaksi'; staging.tekkteam.tech; network label 'Solana';
+owner SOL debit preview '-0.005547 SOL'; network fee display '0.00009 SOL'.
+Yellow advisory: 'Domain ini baru. Lanjutkan hanya jika Anda mempercayai situs ini.'
+Normal Batal/Konfirmasi buttons. NO red 'Permintaan diblokir', malicious-dApp,
+signer/account/instruction warning, or unsafe 'Tetap lanjutkan' observed this time.
+Pump/Create Token action label was not shown in the wallet screen; actual reviewed
+payload is validated create_v2. Backend network is solana:101/Mainnet genesis.
+Wallet fee estimate differs from backend .000010000SOL; cause unknown. No owner
+signature was returned, so do NOT claim wallet internally retained bytes after
+approval or invent fee-mutation evidence. Before handoff, payload/message equality
+is independently verified. Phantom-first eliminates the previous pre-signed
+presentation issue; exact previous scanner reason is still unavailable.
+
+At20:57:30WIB clock check, review had expired. Agent clicked only Phantom Batal,
+never Konfirmasi, and observed popup disappear. RejectPOST200 persisted USER_REJECTED.
+ExactlyONE actual provider request; no second popup, bypass, owner sign, submit,
+broadcast or SOL spending. Expired original ee8 signed bytes remain immutable audit,
+never resent. New grant cannot recover descendants after review/rejection.
+
+Final DB/read-only Mainnet: targetAgent1, agent_wallets0, binding table not yet created,
+receipts0, quick_checkOK; current signature null/ownerSignedfalse/broadcastfalse/
+submittedAtnull; finalized slot453599749 mintabsent, owner182835778lamports unchanged.
+Current unsigned mint AWLT7LPakYNg324gb24GyBuKLCQoyMyCsM1H2hoMatC is NOT a launched CA. Metadata/image HTTP200.
+Production PM2 tekkteam-api PID10722/restart0 and tekkteam-launch PID10893/restart0
+online and unchanged after both staging-only revisions; no VPS/Nginx restart.
+
+Validation: original focused51 localPASS plus exact UI grant5PASS; canonical VPS
+52PASS/build11.51s (local build17.82s). Context/M3/M4/oracle/owner-first26localPASS,
+transport29localPASS; same combined55VPSPASS. Independent27+34fixturePASS.
+These test counts do NOT prove Mainnet launch. Real wallet screen evidence does
+prove this specific request reached normal transaction confirmation without the
+previous blocking warning. Launch/receipt/provisioning/reload/ViewAgent remain
+unverified until separately authorized fresh review/manual approval and real receipt.
+
+STOP: current attempt consumed/canceled, no new request without new authorization.
+Need reconcile the wallet fee estimate against fresh backend review before another
+approval; never weaken exact-byte, TTL, debit or wallet safety guards. M4 NOT PASS.
+No M5/M6. Evidence: artifacts/m4-clean-phantom-attempt/review-and-handoff.json,
+byte-integrity.json, phantom-approval.png, phantom-screen.txt, final-verification.png.
+
+Historical checkpoint below:
+
 # CURRENT — M4 JIT deployed; Phantom blocked fresh request, 5 October 2026 20:34 WIB
 
 Resumed 3b8ca87 at 19:51 WIB; first checkpoint target 20:21 WIB. One fresh request

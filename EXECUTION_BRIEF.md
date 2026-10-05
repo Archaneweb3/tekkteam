@@ -1,3 +1,22 @@
+# Active milestone — M4 owner-first request inspected; PARTIAL / stopped
+
+Started5October2026 20:37WIB fromebf0826; checkpoint target21:07WIB.
+One fresh actual Phantom request d16d20e3 opened20:56:50.284WIB with24.820s remaining.
+Normal 'Konfirmasi Transaksi' observed; yellow new-domain advisory, no blocking red
+warning. Wallet fee estimate .00009SOL differs from backend .00001SOL (cause unknown).
+Review expired20:57:15.104WIB during evidence inspection; canceled via Batal only.
+Current USER_REJECTED; ownerSignedfalse/broadcastfalse/signaturenull/receipt0/mintabsent.
+Real finalized owner.182835778SOL unchanged; targetAgent1/wallet0/binding0.
+883aeb6 +3b8fa2e reviewed/tested/deployed STAGING ONLY; production unchanged.
+Exact payload/message SHA equality, unsigned owner-first slots, sim/debit/securityPASS.
+No retry/new request without new authorization; no expired approve/unsafe bypass.
+Next gates: reconcile wallet fee estimate; separately authorized fresh review + manual
+owner approval. Real receipt alone permits existing-Agent wallet provisioning/binding.
+No new Agent/draft, trading/funding/production, M5/M6 or M4 PASS. STOP this attempt.
+Evidence artifacts/m4-clean-phantom-attempt/checkpoint.md.
+
+Historical checkpoint below:
+
 # Active milestone — M4 ONE authorized owner-first Phantom attempt
 
 Started5October2026 20:37WIB fromebf0826; engineering checkpoint target21:07WIB.
