@@ -1,3 +1,20 @@
+# Active milestone — ONE fresh deterministic M4 wallet attempt
+
+Started 5 October 2026 21:39 WIB; checkpoint deadline22:09 WIB.
+Latest user explicitly accepts missing historical Phantom final message and grants
+ONE fresh Mainnet attempt for existing aaaaada/8fc6fe77-16a0-4fed-8ca0-ddd1f6ef9fa7,
+ret/3ED only. Current OptionB authoritative: exact message after fee/sim/review/mint
+signing; wallet signatures only. Fresh dynamic quote, initialbuy0, total<=0.01SOL,
+reserve0.001SOL, unchanged30sTTL, target~20s at actual popup. Exact d16 rejected
+recovery grant only; preserve historical evidence, no generic reset/newAgent/draft.
+Root sole writer; reviewer read-only. Stop at normal Phantom transaction screen
+for MANUAL owner approval. No fee discrepancy/red bypass/signature mutation retry.
+After manual approval: one submit, finalized receipt then idempotent ONE encrypted
+wallet and binding for existingAgent; reload/ViewAgent evidence. Realtrading/funding/
+workers OFF; production untouched. No second wallet attempt or stale bytes.
+
+Previous checkpoint:
+
 # CURRENT final wording correction — 05/10/2026, 21:35:13 WIB
 
 Independent reviewer accepted f6e1264: historical final wallet message/fee unavailable;

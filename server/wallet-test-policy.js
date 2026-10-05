@@ -1,9 +1,9 @@
 // Explicit M2B profile; never an operational API or launch capability.
 import {M4_TARGET} from './pump-m4-guard.js';
-import {M4_EXPIRED_RECOVERY_ID,M4_REJECTED_RECOVERY_ID} from './pump-m4-recovery.js';
+import {M4_EXPIRED_RECOVERY_ID,M4_REJECTED_RECOVERY_IDS} from './pump-m4-recovery.js';
 export function walletTestConfig(input){
  if(!input||Object.keys(input).some(k=>!['origin','dataDir','port','rpcUrl','launchPreparation','m4Launch','m4RecoveryExecutionId'].includes(k))||(input.launchPreparation!==undefined&&typeof input.launchPreparation!=='boolean'))throw Error('WALLET_TEST_CONFIG_INVALID');
- if(input.m4RecoveryExecutionId!==undefined&&(!input.m4Launch||![M4_EXPIRED_RECOVERY_ID,M4_REJECTED_RECOVERY_ID].includes(input.m4RecoveryExecutionId)))throw Error('M4_EXACT_RECOVERY_CONFIG_REQUIRED');
+ if(input.m4RecoveryExecutionId!==undefined&&(!input.m4Launch||![M4_EXPIRED_RECOVERY_ID,...M4_REJECTED_RECOVERY_IDS].includes(input.m4RecoveryExecutionId)))throw Error('M4_EXACT_RECOVERY_CONFIG_REQUIRED');
  if(input.m4Launch!==undefined&&(!input.launchPreparation||!input.m4Launch||Object.keys(input.m4Launch).length!==Object.keys(M4_TARGET).length||Object.keys(M4_TARGET).some(k=>input.m4Launch[k]!==M4_TARGET[k])))throw Error('M4_EXACT_TARGET_CONFIG_REQUIRED');
  let u;try{u=new URL(input.origin);}catch{throw Error('WALLET_TEST_HTTPS_ORIGIN_REQUIRED');}
  if(u.protocol!=='https:'||u.origin!==input.origin||u.username||u.password||u.hostname.endsWith('.')||/(?:^|\.)(localhost|local|internal)$/.test(u.hostname)||!u.hostname.includes('.')||/^\d+[.:]/.test(u.hostname)||u.hostname==='tekkteam.tech'||u.hostname==='www.tekkteam.tech')throw Error('WALLET_TEST_SEPARATE_HTTPS_ORIGIN_REQUIRED');

@@ -4,6 +4,9 @@ import {verifyM4Signed,m4Fail} from './pump-m4-guard.js';
 // Exact separately authorized recovery; never a generic one-shot reset.
 export const M4_EXPIRED_RECOVERY_ID='ee8dae70-e05c-4b06-a63e-d8b09a84b52f';
 export const M4_REJECTED_RECOVERY_ID='ba5af2c9-096a-496b-a960-026fe817a1c6';
+// Separately authorized 5 October deterministic-fee attempt; never a generic reset.
+export const M4_DETERMINISTIC_RECOVERY_ID='d16d20e3-e3c6-418a-aa60-f35a1a6c254c';
+export const M4_REJECTED_RECOVERY_IDS=Object.freeze([M4_REJECTED_RECOVERY_ID,M4_DETERMINISTIC_RECOVERY_ID]);
 export async function proveM4ExpiredRecovery(record,identity,{transport,now=Date.now,unsigned=false}){
  const unsignedState=unsigned&&['AWAITING_WALLET_APPROVAL','USER_REJECTED'].includes(record.status)&&!record.signature&&!record.signedTransactionBase64&&!record.signedDigest;
  if((!unsignedState&&(record.status!=='SIGNED_NOT_BROADCAST'||record.error!=='EXECUTION_REVIEW_EXPIRED'||!record.signature||!record.signedTransactionBase64))||record.broadcastAttempted!==false||record.submittedAt!=null||record.confirmation!=null||!record.walletApprovalOpened)throw m4Fail('M4_RECOVERY_STATE_DENIED');
