@@ -1,3 +1,65 @@
+# CURRENT — M4 JIT deployed; Phantom blocked fresh request, 5 October 2026 20:34 WIB
+
+Resumed 3b8ca87 at 19:51 WIB; first checkpoint target 20:21 WIB. One fresh request
+reached Phantom at 20:19:29.020 WIB, before checkpoint. Existing target unchanged:
+owner C2nddai75FJZWWkNdUF7csEBryRCMikJyTTZZqYcMiBv; aaaaada / Agent
+8fc6fe77-16a0-4fed-8ca0-ddd1f6ef9fa7; ret / 3ED revision1; initial buy 0 SOL.
+No new Agent or draft. Source 3ebd95a (JIT/recovery), a9b7242 (public helper build),
+5f95e06 (owner-first signature collection) committed/pushed and staging deployed.
+
+Fresh attempt ba5af2c9-096a-496b-a960-026fe817a1c6: Mainnet create_v2 simulation
+PASS slot453590750; one instruction / 840 bytes. Review started20:19:24.815 WIB,
+expired20:19:54.815 WIB. Provider request opened with25,795ms remaining. ReviewPOST
+200 and final authenticated statusGET200; total5557360lamports (0.005557360SOL):
+network10000 + other5547360; ceiling10000000; projected177278418; reserve1000000;
+zero buy. Digest ec090c9a1d5595e43022ea7e4878c869cc96a415675159c20b60d818647c734c.
+Metadata/image HTTP200. Fresh unsigned mint F76K4jyXcoecEaQjrXgF49KZNFxGZRyeFmBknCm7JdW9
+is NOT a launched CA.
+
+Human screenshot20:20:03 shows Phantom 'Permintaan diblokir' / potentially malicious
+dApp warning. Wallet returned rejection; persisted state USER_REJECTED. Exact
+Phantom scanner reason is unavailable; do NOT assert a domain blacklist or false
+positive. Official Phantom docs describe this as inability to safely predict the
+transaction and advise Phantom-first collection for multisigner transactions.
+Our old path exposed a mint-partially-signed transaction; that incompatibility is
+fixed for NEW records. Real warning clearance remains NOT VERIFIED.
+https://docs.phantom.com/developer-powertools/domain-and-transaction-warnings
+
+Engineering: fixed30sTTL retained;18s backend review and15s final provider minimum;
+contiguous fresh prepare/review, exact live owner/latch/digest checks, bounded
+pre-provider renewal only. Server recovery proves old hash death + absent signature/
+transaction/mint and archives exact signed history atomically. Old ee8dae70 signed
+bytes/signature remain immutable EXPIRED AUDIT ONLY, never resent. New records
+expose original unsigned bytes to Phantom; after exact valid owner-only approval,
+server attaches the precomputed stored mint signature, then existing full validators,
+TTL/economic revalidation and single-send gates. No mint private-key retention or
+new custody system. Legacy signed/rejected records unchanged; no second popup.
+
+Final DB20:30:55 WIB: quick_checkOK, new signature null, ownerSignedfalse,
+broadcastAttemptedfalse, submittedAtnull; history contains old signed refusal;
+targetAgent1, Agentwallets0, launch binding table NOT_CREATED, receipts0. Finalized
+Mainnet slot453593338: new mint absent, owner182835778lamports (0.182835778SOL),
+unchanged; this attempt spent0SOL. Receipt-driven wallet/binding/ViewAgent success
+remain pending real confirmed receipt. Reload preserves saved target and rejected
+state without another Agent/wallet. Desktop1440 and mobile390 have no overflow.
+
+47 focused local/VPS testsPASS, builds15.67s/12.65s; independent reviewsACCEPTED.
+Public backend and active pump-m4-ui-8I8r5RZ8.js byte-match canonical staging build.
+Public helper/bootstrap delivery404 found during browser verification was corrected;
+canonical build now emits shared helper. Two staging-only API restarts for two
+backend revisions: currentPID51774/restart18. ProductionAPI10722/launch10893 remain
+online/restart0; production files, Nginx and VPS untouched. Config remains unchanged
+after owner-first correction. Persistent staging-only SQLite backups retained.
+
+M4 PARTIAL / BLOCKED at new-attempt authorization and manual wallet approval:
+USER_REJECTED is consumed; existing grant applies ONLY to old ee8dae70, not this
+rejection. Do NOT reset/rearm or reuse signed/expired bytes. A separately authorized
+fresh attempt is required to test Phantom warning clearance; if warning persists,
+use official domain/transaction review, not unsafe bypass/domain switching. No
+trading/funding/workers/transfers. Evidence artifacts/jit-launch-recovery.
+
+Historical context below:
+
 # CURRENT — signed review expired; no broadcast, 5 October 2026 19:46 WIB
 
 Resumed 3df6566 at19:27WIB; checkpoint target19:52WIB. Existing target only:

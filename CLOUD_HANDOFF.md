@@ -1,3 +1,43 @@
+# Latest checkpoint — 5 October 2026 20:34 WIB
+
+Continue latest source5f95e06 with PROJECT_STATUS/EXECUTION_BRIEF; no broad audit.
+JIT3ebd95a + packaginga9b7242 + owner-first5f95e06 deployed staging only;47 local/
+VPS tests and buildsPASS; read-only reviewsACCEPTED. Public backend/current M4chunk
+byte matched. Production10722/10893 restart0 unchanged; staging51774/restart18;
+no VPS/Nginx restart. Config /etc/tekkteam-staging/wallet-test.json unchanged after
+owner-first deploy; DATA /var/lib/tekkteam-staging/wallet-test.sqlite; API4395.
+Backups /var/backups/tekkteam-staging/jit-3ebd95a and jit-5f95e06 private0600/0700.
+
+One actual new attempt ba5af2c9-096a-496b-a960-026fe817a1c6 reviewed20:19:24.815,
+expired20:19:54.815WIB, provider request20:19:29.020 (25.795s remaining). Cost
+0.005557360SOL, initialbuy0, Mainnet simulationPASS453590750, guardsPASS. Human
+screenshot20:20:03 proves Phantom security blocked; wallet returned rejection.
+Current state USER_REJECTED, signature null, no broadcast/submission/receipt.
+Do NOT extend current grant: it scopes ONLY old ee8dae70 signed-expiry recovery.
+Old signed bytes remain archived immutable and NEVER sent/reused. No new attempt
+is currently authorized after rejection; request specific human permission once.
+
+Official Phantom multisigner guidance now implemented for new records: expose
+unsigned bytes to Phantom, verify canonical exact owner-only signature server-side,
+attach stored trusted mint signature, run all existing full signature/message/
+simulation/debit/expiry/send gates. No key retention/new custody. Legacy rejected
+record not converted; no second popup. Actual warning clearance still unverified;
+do not call it false positive or claim domain blacklist. If warning persists after
+an authorized new attempt, official Phantom domain/transaction review is external.
+
+Final DB20:30:55WIB quickcheckOK; targetAgent1/wallet0/bindingtableNOT_CREATED/
+receipt0. Mainnet finalized453593338: prepared mintF76K4jyXcoecEaQjrXgF49KZNFxGZRyeFmBknCm7JdW9
+absent, owner182835778lamports unchanged, spend0. Metadata/image200. Reload retains
+existing target/rejection. No real provisioning or ViewAgent success without receipt.
+Real trading/funding/workers/transfersOFF. M4PARTIAL/BLOCKED; no automatic M5.
+
+Edge3 staging986478915 and fresh terminal986478942/Hostinger986478936 retained;
+native apps disabled; extension URLs inaccessible. Respect policy, no workaround.
+Evidence artifacts/jit-launch-recovery incl final-state.json/png, fresh-review.json,
+local/VPS release hashes/tests and immutable archive. Preserve unrelated dirtyfiles.
+
+Historical checkpoint below:
+
 # Latest resume checkpoint — 5 October 2026 19:46 WIB
 
 Resumed3df6566, source0a8eccc +217dace pushed and UI-only staging release verified.

@@ -1,3 +1,32 @@
+# Active milestone — M4 owner-first real-wallet verification; BLOCKED
+
+Started5October2026 19:51WIB from3b8ca87; first checkpoint target20:21WIB.
+Fresh request reached wallet20:19:29.020WIB; blocked screenshot/rejection20:20.
+Final engineering checkpoint20:34WIB. JIT and documented signer-order corrections
+are tested/reviewed/deployed to staging:3ebd95a,a9b7242,5f95e06. No redesign.
+
+CURRENT: executionba5af2c9-096a-496b-a960-026fe817a1c6 USER_REJECTED;
+signaturenull/broadcastfalse/receipt0/mintabsent/spend0; targetaaaaada/ret3ED and
+owner unchanged. Old signed ee8dae70 is immutable expired audit only.47 tests/build
+local+VPSPASS; owner-first warning resolution/Mainnet launch/provisioning pending.
+
+Acceptance next: separately authorized exact fresh recovery after USER_REJECTED,
+with server proof old bytes cannot land; never reset generic one-shot. New unsigned
+mint/message/hash/review, Mainnet zero-buy0.01SOL/reserve/sim/account effects/TTL
+unchanged. Original unsigned bytes reach Phantom first; stored trusted mint signature
+collected server-side only after valid exact owner signature; full validators retained.
+Open ONE new wallet request only after explicit new-attempt permission, then human
+approval; stop for actual security warning, no unsafe bypass. Successful receipt
+alone authorizes existing-Agent encrypted wallet provisioning/reload/ViewAgent;
+no funding/trading/workers/production. No receipt means no M4 PASS.
+
+External gate: new financial attempt permission + manual Phantom transaction approval.
+Do not issue another popup automatically or enable signing on the rejected record.
+Current old recovery grant must NOT be extended by inference. Staging ready for
+code review; exact next-attempt grant is still withheld. No M5/M6.
+
+Historical checkpoint below:
+
 # Active milestone — M4 JIT review and one audited recovery
 
 Started5October2026 19:51WIB from3b8ca87; checkpoint target20:21WIB.
