@@ -21,7 +21,7 @@ export function mountM4Launch(host,{agent,isCurrent,getM4Wallet,capability}){
   if(s.broadcastAttempted){q('[data-check]').hidden=false;return;}
   if(s.status==='NOT_STARTED'){q('[data-prepare]').disabled=false;return;}
   if(s.status==='READY_FOR_REVIEW'&&!opened){
-   if(v.expiresAt>Date.now()){q('[data-approve]').disabled=false;timer=setTimeout(()=>{if(alive()){q('[data-approve]').disabled=true;q('[data-prepare]').disabled=false;status('Review expired. Prepare and inspect a fresh review; no wallet prompt opened.');}},v.expiresAt-Date.now());}
+   if(v.expiresAt>Date.now()){q('[data-approve]').disabled=false;timer=setTimeout(()=>{if(alive()){q('[data-approve]').disabled=true;q('[data-prepare]').disabled=opened;status(opened?'Review expired during approval. Do not approve the wallet request. Recheck state.':'Review expired. Prepare and inspect a fresh review; no wallet prompt opened.');if(opened)q('[data-check]').hidden=false;}},v.expiresAt-Date.now());}
    else{q('[data-prepare]').disabled=false;status('Review expired. Prepare a fresh review.');}
   }
  }
