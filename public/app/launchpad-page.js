@@ -159,9 +159,9 @@ export function createLaunchpadActions({owner,createIdentity,enterScope,isCurren
  };
 }
 export function mountLaunchpadPage(host,{agents=[],owner=null,walletConnected=false,config={},isCurrent=()=>true,loadContract=async()=>null,projectUnit=launchpadUnit,onConnect=()=>{},createIdentity,enterScope,onChanged=()=>{},onEntered=()=>{},getOwner=()=>owner,canSaveTokenDraft=()=>false,saveTokenDraft,onTokenSaved=()=>{},imageField=tokenImageField,onLaunch,identityJournal=null}={}){
- let composerCleanup=()=>{},composerReview=null;let dead=false,busy=false,showCreate=false,message='',units=[],identityDraft={},identityReview=false,identityRecovery=null,identityBlocked=false,tokenEditor=null,image=null,tokenAuthLost=false;const tokenReads=new Map();const current=()=>!dead&&isCurrent()&&(!owner||getOwner()===owner);
+ let composerCleanup=()=>{},composerReview=null,continuous=false;let dead=false,busy=false,showCreate=false,message='',units=[],identityDraft={},identityReview=false,identityRecovery=null,identityBlocked=false,tokenEditor=null,image=null,tokenAuthLost=false;const tokenReads=new Map();const current=()=>!dead&&isCurrent()&&(!owner||getOwner()===owner);
  const clean=Array.isArray(agents)&&agents.every(a=>a&&typeof a.id==='string'&&(!owner||a.creator===owner));
- const actions=createLaunchpadActions({owner,createIdentity,enterScope,isCurrent:current,onChanged:async result=>{bindConfiguredAgent(owner,result,identityDraft,composerReview);await onChanged(result);},onEntered,identityJournal});
+ const actions=createLaunchpadActions({owner,createIdentity,enterScope,isCurrent:current,onChanged:async result=>{bindConfiguredAgent(owner,result,identityDraft,composerReview);await onChanged(result,{deferRender:continuous});},onEntered,identityJournal});
  const readIdentityRecovery=()=>{try{identityRecovery=actions.pendingIdentity();if(identityRecovery?.state==='ACKNOWLEDGED'&&agents.some(a=>a.id===identityRecovery.agentId&&a.creator===owner)){identityJournal.clear(identityRecovery.key);identityRecovery=null;showCreate=false;identityReview=false;}if(identityRecovery){identityDraft=identityRecovery.input;showCreate=true;identityReview=true;}}catch{identityBlocked=true;message='Identity recovery storage is unavailable. Restore this tab storage before creating another identity; existing Agents remain readable.';}};
  readIdentityRecovery();
  const tokenReady=id=>{
@@ -175,7 +175,7 @@ export function mountLaunchpadPage(host,{agents=[],owner=null,walletConnected=fa
   const tokenSavedAvailability=Object.fromEntries(agents.map(a=>[a.id,!!tokenReads.get(a.id)?.saved]));
   if(!tokenEditor)for(const a of agents){const input=configuredCoin(owner,a.id);if(input&&tokenReady(a.id)){tokenEditor={agentId:a.id,name:a.name,character:a.character,stage:'review',input};break;}}
   composerCleanup();host.innerHTML=renderLaunchpadPage({agents:owner?agents:[],owner,walletConnected,config,units,loading,showCreate,message,busy,identityDraft,identityReview,identityRecovery,identityBlocked,tokenAvailability,tokenSavedAvailability,tokenEditor,composerCoin:composerReview?.coin??null,launchControls:typeof onLaunch==='function'});
-  composerCleanup=bindLaunchConfigurator(host,{owner,onConnect,onReview:(input,context)=>{composerReview=context;identityDraft=input;showCreate=true;identityReview=true;paint();host.querySelector('h2')?.scrollIntoView({block:'start',behavior:'smooth'});}});
+  composerCleanup=bindLaunchConfigurator(host,{owner,onConnect,onReview:(input,context)=>{if(busy||!current()||identityRecovery||identityBlocked)return;composerReview=context;identityDraft=input;launchConfigured();}});
   image=null;
   const form=host.querySelector?.('[data-launchpad-token-form]');
   if(form&&tokenEditor?.stage==='editing')image=imageField(form);
@@ -189,7 +189,22 @@ export function mountLaunchpadPage(host,{agents=[],owner=null,walletConnected=fa
   try{saved=await tokenActions.save(editor.agentId,editor.input);if(current()&&saved){tokenEditor={...editor,stage:'saved',result:saved};message='Coin draft saved. Public delivery UNVERIFIED. Check the current launch status in the related Agent receipt; this save did not request wallet approval.';}}
   catch(error){if(current()){tokenEditor={...editor,stage:tokenActions.canEditRejected(editor.agentId)?'rejected':'retry'};if(tokenErrorStatus(error)===401){tokenAuthLost=true;tokenEditor.blocked=true;message='Owner authentication expired. Reconnect and reload your Agent before any retry.';}else if(tokenEditor.stage==='rejected')message='The draft was rejected before saving. Edit the rejected draft and review again, or retry these same details. No launch was requested.';else if(tokenErrorStatus(error)===409)message='The draft conflicts with current immutable or receipt state. Inspect the related Agent; no launch was requested.';else if(tokenErrorStatus(error)===503)message='Token save authority or image configuration is unavailable. Inspect the related Agent before retrying.';else message='Draft save outcome unavailable. Retry only these same details with the same intent. Do not start a launch.';}}
   finally{busy=false;if(current())paint();}
-  if(saved&&current())try{clearConfiguredCoin();await onTokenSaved(saved);}catch{if(current()){message='Draft saved, but the workspace refresh is unavailable. Inspect the related Agent.';paint();}}
+  if(saved&&current())try{clearConfiguredCoin();await onTokenSaved(saved,{reviewLaunch:editor.reviewLaunch===true});}catch{if(current()){message='Draft saved, but the workspace refresh is unavailable. Inspect the related Agent.';paint();}}
+ };
+ const launchConfigured=async()=>{
+  if(busy||!current()||!owner||config.preview||identityBlocked||identityRecovery)return;
+  busy=true;continuous=true;message='Saving your coin and Agent before launch review...';paint();
+  try{
+   const agent=await actions.create(identityDraft);if(!agent||!current())return;
+   if(!agents.some(a=>a.id===agent.id))agents.push(agent);
+   const contract=await loadContract(agent.id);if(!current())return;
+   tokenReads.set(agent.id,tokenDraftRead(contract,agent.id,owner));
+   units=units.filter(u=>u.agentId!==agent.id).concat(projectUnit(agent,contract));
+   if(!tokenReady(agent.id))throw Error('Coin draft storage unavailable. Your Agent is saved; resume it from the saved list.');
+   tokenEditor={agentId:agent.id,name:agent.name,character:agent.character,stage:'review',input:composerReview.coin,reviewLaunch:true};
+   showCreate=false;identityReview=false;busy=false;await saveToken();
+  }catch(e){if(current())message=e.message||'Save could not be confirmed. Resume the existing saved Agent or retry the same request.';}
+  finally{continuous=false;busy=false;if(current()&&tokenEditor?.stage!=='saved'){readIdentityRecovery();paint();}}
  };
  const click=event=>{
   if(event.target.closest('[data-launchpad-selected-open]')&&current()&&owner&&!busy&&!tokenEditor){

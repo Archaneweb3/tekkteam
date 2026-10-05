@@ -8,6 +8,7 @@ import {isAbsolute,resolve,join,dirname} from 'node:path';
 import {randomBytes} from 'node:crypto';
 import {walletTestConfig,walletTestRequest,walletTestCapabilities,preparationCapabilities,m4Capabilities} from './wallet-test-policy.js';
 import {createM4Execution} from './pump-m4.js';
+import {provisionLaunchAgent} from './launch-agent-provisioning.js';
 import {readReceiptJournal} from './launch-receipt-journal.js';
 import {createMetadataPublisher} from './agent-metadata.js';
 import {createPumpLaunchPreparation} from './pump-launch-preparation.js';
@@ -54,7 +55,7 @@ export async function startWalletTest(args=process.argv.slice(2)){
   const evidence=createPreparationEvidenceWriter(tokenDraftConfiguration.assetRoot);
   const captureDiagnostics=createPreparationDiagnosticWriter(tokenDraftConfiguration.assetRoot);
   preparationOptions={tokenDraftConfiguration,launchPreparation:createPumpLaunchPreparation({transport,publishMetadata:createMetadataPublisher(tokenDraftConfiguration,{request:transport.publicRequest}),readPreparation:evidence.read,executionReview:true,captureDiagnostics}),launchPreparationEvidence:evidence};
-  if(cfg.m4Launch)preparationOptions.m4ExecutionFactory=({db})=>createM4Execution({db,transport,publishMetadata:createMetadataPublisher(tokenDraftConfiguration,{request:transport.publicRequest}),journalPath:tokenDraftConfiguration.journalPath,captureDiagnostics});
+  if(cfg.m4Launch)preparationOptions.m4ExecutionFactory=({db,store})=>createM4Execution({db,transport,publishMetadata:createMetadataPublisher(tokenDraftConfiguration,{request:transport.publicRequest}),journalPath:tokenDraftConfiguration.journalPath,captureDiagnostics,provisionAgent:receipt=>provisionLaunchAgent(store,receipt)});
  }
  for(const k of Object.keys(process.env))delete process.env[k];
  Object.assign(process.env,{NODE_ENV:'production',DATA_DIR:dir,SOLANA_NETWORK:'MAINNET',MAINNET_SAFETY_MODE:'true',REAL_MONEY_NETWORK:'MAINNET',FUNDING_ENABLED:'false',WITHDRAWAL_ENABLED:'false',LIVE_TRADING_ENABLED:'false',LIVE_AUTONOMOUS_ENABLED:'false',CONTROLLED_REAL_ENABLED:'false',CONTROLLED_BUY_PREPARE_ENABLED:'false',GLOBAL_TRADING_KILL_SWITCH:'true',AUTONOMOUS_KILL_SWITCH:'true',REAL_MONEY_EMERGENCY_STOP:'true',WALLET_TRANSFERS_PAUSED:'true',PAPER_TRADING_KILL_SWITCH:'true'});

@@ -1,3 +1,15 @@
+# Integrated launch journey — active checkpoint
+
+Started 5 October 2026 18:44 WIB; checkpoint target 19:14 WIB.
+Preserve current visuals/auth and exact one-launch guards. Connect form saves to
+launch review; provision one encrypted Agent wallet only after verified receipt;
+keep technical detail optional. Test failure/restart/idempotency and browser UI.
+No automatic signing, broadcast, funding or trading. Staging-only release after
+validation. Full acceptance still needs fresh manual financial approval and
+qualified real executor/funding; no synthetic evidence promoted to Mainnet.
+
+Previous checkpoint (historical):
+
 # M4 — WAITING_FOR_HUMAN; Phase 1 reviewed, financial execution pending
 
 23:20WIB goal BLOCKED after three consecutive confirmed impasse turns. Staging

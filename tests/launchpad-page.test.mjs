@@ -215,3 +215,20 @@ test('legacy lifecycle-only contracts retain canonical behavior while workflow u
 test('mounted workflow reads are passive and related-Agent link remains the recovery destination',async()=>{
  const h=host(),reads=[];const c=mountLaunchpadPage(h,{agents:[agent],owner:'OWNER',loadContract:async id=>{reads.push(id);return ownerAgentContract(agent,{receipt:workflowReceipt({})});}});await flush();assert.deepEqual(reads,[agent.id]);assert.match(h.innerHTML,/Reconciliation pending/);assert.match(h.innerHTML,/#\/agent\/LOCAL_FIXTURE/);assert.doesNotMatch(h.innerHTML,/data-launchpad-reconcile|data-launchpad-submit|data-launchpad-approve/);c.destroy();
 });
+
+test('coin composer continues one identity and immutable draft into review without an intervening remount',async()=>{
+ const source=readFileSync('public/app/launchpad-page.js','utf8');const code=source.slice(source.indexOf('export function mountLaunchpadPage')).replace('export function','function');
+ for(const stale of [false,true]){
+  let onReview,current=true,writes=0;const order=[],a={id:'FLOW_ID',creator:'OWNER',name:'Flow',coin:null,launchpadScope:{available:true,scoped:true,reason:null}};
+  const h=host();Object.defineProperty(h,'innerHTML',{get:()=>'',set:()=>writes++});
+  const context={createLaunchpadActions,createTokenDraftActions,tokenDraftRead,tokenDraftEnvelope,tokenErrorStatus:()=>0,tokenImageField:()=>null,launchpadUnit:()=>({agentId:a.id,available:true,scope:a.launchpadScope,launch:{state:'NOT_CONFIGURED'}}),renderLaunchpadPage:()=>'',bindLaunchConfigurator:(_h,opts)=>{onReview=opts.onReview;return()=>{};},bindConfiguredAgent:()=>{},configuredCoin:()=>null,clearConfiguredCoin:()=>{},reviseConfiguredIdentity:()=>{},crypto,structuredClone};
+  vm.runInNewContext(code+';mount=mountLaunchpadPage',context);
+  let reviewWrites;
+  const mounted=context.mount(h,{owner:'OWNER',isCurrent:()=>current,createIdentity:async()=>{order.push('identity');return a;},onChanged:async(_a,opts)=>{assert.equal(opts.deferRender,true);order.push('refresh');if(stale)current=false;},loadContract:async()=>{order.push('contract');return {id:a.id,owner:'OWNER',lifecycle:{agent:{id:a.id}},tokenDraft:emptyTokenCapability(a.id)};},canSaveTokenDraft:()=>true,saveTokenDraft:async(id,body)=>{order.push('draft');return tokenResult(id,body);},onTokenSaved:async(_r,opts)=>{assert.equal(opts.reviewLaunch,true);order.push('review');reviewWrites=writes;}});
+  onReview({name:'Flow',character:'frank',strategy:'balanced'},{coin:tokenInput()});
+  onReview({name:'Flow',character:'frank',strategy:'balanced'},{coin:tokenInput()});
+  await flush();await flush();
+  assert.deepEqual(order,stale?['identity','refresh']:['identity','refresh','contract','draft','review']);
+  if(!stale)assert.equal(writes,reviewWrites,'review dialog must not be removed by a late paint');mounted.destroy();
+ }
+});

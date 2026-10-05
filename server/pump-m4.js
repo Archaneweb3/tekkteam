@@ -5,7 +5,7 @@ import {assertReviewedExecutionRequest,assertExecutionReview} from './pump-execu
 import {assertM4Target,M4_TARGET,verifyM4Signed,revalidateM4,m4Fail,sha} from './pump-m4-guard.js';
 import {confirmM4} from './pump-m4-confirmation.js';
 import {decodeM4CreationAccounts,verifyM4CreateEvent} from './pump-m4-provenance.js';
-export function createM4Execution({db,transport,publishMetadata,journalPath,now=Date.now,prepareFactory=createPumpLaunchPreparation,revalidate=revalidateM4,confirm=confirmM4,target=M4_TARGET,verifyCreatedAccounts=decodeM4CreationAccounts,verifyEvent=verifyM4CreateEvent,captureDiagnostics}){
+export function createM4Execution({db,transport,publishMetadata,journalPath,now=Date.now,prepareFactory=createPumpLaunchPreparation,revalidate=revalidateM4,confirm=confirmM4,target=M4_TARGET,verifyCreatedAccounts=decodeM4CreationAccounts,verifyEvent=verifyM4CreateEvent,captureDiagnostics,provisionAgent}){
  if(!db||!transport?.submitOnce||typeof publishMetadata!=='function')throw m4Fail('M4_EXPLICIT_CAPABILITY_REQUIRED');
  db.exec('PRAGMA synchronous=FULL; CREATE TABLE IF NOT EXISTS m4_execution (id INTEGER PRIMARY KEY CHECK(id=1), payload TEXT NOT NULL)');
  const journal=createReceiptJournal(journalPath);let busy=false,fenced=false;
@@ -15,7 +15,16 @@ export function createM4Execution({db,transport,publishMetadata,journalPath,now=
   try{const changed=revision===0?db.prepare('INSERT OR IGNORE INTO m4_execution(id,payload) VALUES(1,?)').run(JSON.stringify(s)):db.prepare("UPDATE m4_execution SET payload=? WHERE id=1 AND json_extract(payload,'$.revision')=?").run(JSON.stringify(s),revision);if(changed.changes!==1)throw m4Fail('M4_STALE_EXECUTION_WRITER');if(JSON.stringify(read())!==JSON.stringify(s))throw m4Fail('M4_PERSISTENCE_UNCERTAIN');}
   catch(error){fenced=true;throw error;}
  };
- const publicState=s=>s?{status:s.status,executionId:s.executionId,result:s.result??null,signature:s.signature??null,signedDigest:s.signedDigest??null,submittedAt:s.submittedAt??null,confirmation:s.confirmation??null,error:s.error??null,walletApprovalOpened:s.walletApprovalOpened===true,broadcastAttempted:s.broadcastAttempted===true}: {status:'NOT_STARTED'};
+ const publicState=s=>s?{status:s.status,executionId:s.executionId,result:s.result??null,signature:s.signature??null,signedDigest:s.signedDigest??null,submittedAt:s.submittedAt??null,confirmation:s.confirmation??null,provisioning:s.provisioning??null,error:s.error??null,walletApprovalOpened:s.walletApprovalOpened===true,broadcastAttempted:s.broadcastAttempted===true}: {status:'NOT_STARTED'};
+ const provision=s=>{
+  if(s.status!=='LAUNCHED'||typeof provisionAgent!=='function'||s.provisioning?.status==='READY')return;
+  try{
+   const receipt=journal.read()[s.target.agentId];
+   if(!receipt||receipt.executionId!==s.executionId||receipt.signature!==s.signature||receipt.mint!==s.result.mint||receipt.owner!==s.target.owner)throw m4Fail('M4_RECEIPT_CONFLICT');
+   s.provisioning=provisionAgent(receipt);
+  }catch{s.provisioning={status:'RECONCILIATION_REQUIRED'};}
+  save(s);
+ };
  const bound=(s,identity,request)=>{assertM4Target(identity,target);if(!s||request?.requestId!==s.executionId)throw m4Fail('M4_EXECUTION_MISMATCH');assertReviewedExecutionRequest(s.result,identity,{...request,now:now()});};
  async function run(action,identity,request={},verifyIdentity=()=>{}){
   assertM4Target(identity,target);if(fenced)throw m4Fail('M4_WRITER_FENCED');if(busy)throw m4Fail('M4_IN_PROGRESS');busy=true;
@@ -34,7 +43,8 @@ export function createM4Execution({db,transport,publishMetadata,journalPath,now=
     }finally{if(signer)signer.secretKey.fill(0);signer=null;}
    }
    if(action==='status'){
-    if(!s||!s.broadcastAttempted||['LAUNCHED','FAILED_ON_CHAIN'].includes(s.status))return publicState(s);
+    if(s?.status==='LAUNCHED'){provision(s);return publicState(s);}
+    if(!s||!s.broadcastAttempted||s.status==='FAILED_ON_CHAIN')return publicState(s);
     try{
      const confirmation=await confirm(s,{transport,now});s.confirmation=confirmation;s.status=confirmation.status;
      if(s.status==='LAUNCHED'){
@@ -44,7 +54,7 @@ export function createM4Execution({db,transport,publishMetadata,journalPath,now=
      }
      save(s);
     }catch(error){s.status='RECONCILIATION_REQUIRED';s.error=error.code??'M4_CONFIRMATION_FAILED';save(s);}
-    return publicState(s);
+    provision(s);return publicState(s);
    }
    if(action==='reject'){
     if(!s||s.status!=='AWAITING_WALLET_APPROVAL'||request.requestId!==s.executionId)throw m4Fail('M4_REJECTION_STATE_INVALID');

@@ -1,3 +1,20 @@
+# Current checkpoint — 5 October 2026, integrated product flow
+
+18:59 WIB: source implementation in progress. Current TEKKTEAM visuals preserved.
+Coin composer now chains existing idempotent identity/draft saves into launch review.
+Confirmed M4 receipt reconciler provisions one encrypted Agent wallet using existing
+vault/table; unique mint/signature/execution binding; retry never re-broadcasts.
+Technical review details become optional; verified launch links to Agent detail.
+61 focused tests PASS; additional composer stale-owner/double-click checks PASS.
+Canonical staging build PASS (27.78s); final source rebuild and staging release pending.
+Actual VPS read: production PIDs10722/10893 restarts0, staging43919/restarts15 unchanged;
+2 Agents, expired READY_FOR_REVIEW, ownerSignedfalse/broadcastfalse. No new receipt.
+No funding/trading/production changes. localhost browser denied ERR_BLOCKED_BY_CLIENT;
+local processes restored to5199/4291, browser qualification to use staging.
+Bagwork public browser ERR_CONNECTION_TIMED_OUT; no new competitor behavior claimed.
+
+Historical checkpoints below:
+
 # CURRENT — M4 Phase 1 verified; WAITING_FOR_HUMAN financial gate
 
 4October2026 23:20WIB: goal BLOCKED awaiting human financial readiness/approval,

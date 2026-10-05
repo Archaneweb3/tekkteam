@@ -1,5 +1,12 @@
 # PROJECT_PLAYBOOK — TEKKTEAM
 
+Latest 5 October 2026: preserve the CURRENT TEKKTEAM visual design. Bagwork is
+public behavioral reference only. Implement one continuous coin + Agent journey,
+confirmed-receipt-only encrypted Agent wallet provisioning and honest operating
+capabilities. Staging first; no production mutation or financial action without
+its specific authorization and manual wallet approval. New independent source
+work is authorized; the prior no-ready-engineering checkpoint is superseded.
+
 Latest priority4October2026: persistent engineering manager through M10. Current
 M4 debit blocker must be proven, not bypassed. Commit/push verified checkpoints;
 maintain CLOUD_HANDOFF. Continue safe independent work while a branch is gated.

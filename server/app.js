@@ -112,7 +112,7 @@ export function createServer({ dbPath, vaultKey, origins = ['http://127.0.0.1:51
       tokenStore=installFirstTokenStore(db,{now,readLaunchpadScope:scopeLedger.readLaunchpadScope,readReceiptAuthority:a=>readFirstTokenReceiptAuthority(a,tokenDraftOptions.journalPath)});
     }catch(error){store.close();throw error;}
   }
-  try{m4Execution=m4ExecutionFactory?.({db});}catch(error){store.close();throw error;}
+  try{m4Execution=m4ExecutionFactory?.({db,store});}catch(error){store.close();throw error;}
   const launchEvidence=a=>readLaunchEvidence(a,tokenDraftOptions?.journalPath);
   const trading=installAgentTrading(app,{store,auth,owned,now,realMoney,...(tokenDraftOptions?{receipt:a=>launchReceipt(a,tokenDraftOptions.journalPath)}:{}),sessionValid:req=>getSession(req)?.address===req.session?.address,...tradingOptions,readLaunchpadScope:scopeLedger.readLaunchpadScope});
   const controlledDex=installControlledDex(app,{db,store,auth,owned,now,realMoney,pumpRuntimeDependencies,sessionValid:req=>getSession(req)?.address===req.session?.address,readLaunchpadScope:scopeLedger.readLaunchpadScope,readReceiptAuthority:a=>readFirstTokenReceiptAuthority(a,tokenDraftOptions?.journalPath??resolve(process.env.DATA_DIR||'server/data','pump-agent-launches.json'))});
