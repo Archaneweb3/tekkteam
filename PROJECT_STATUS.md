@@ -1,3 +1,36 @@
+# CURRENT — post-approval verification, 5 October 2026 19:25 WIB
+
+Resumed a0dcd30; no broad audit, redesign or new financial execution. Actual staging
+SQLite read 19:22:44 WIB remains READY_FOR_REVIEW, execution
+c2113866-8448-42c9-84e8-c91c5facd03c, approvalfalse/ownerSignedfalse/broadcastfalse,
+signature null, confirmation null, receipt0. Review expired19:04:35.767 WIB.
+Nginx last execution POST is prepare19:04:08 WIB/200; no review or submit observed.
+HTTPS host configuration routes API to127.0.0.1:4395; runtime-capabilities HTTP200.
+Mainnet genesis verified through configured RPC at19:20:53 WIB: prepared mint
+3en8z1Cd51NYtk5ggJJtiuYwS3Yw6oudRKnQkb5ia9qi account absent at finalized
+slot453577593; owner balance182835778lamports (0.182835778SOL), unchanged.
+This is CURRENT negative launch evidence, not a receipt or deployed token CA.
+Agent aaaaada ID8fc6fe77-16a0-4fed-8ca0-ddd1f6ef9fa7 and ret/3ED revision1
+persisted after browser reload. TargetAgent1/totalAgents2/wallets0/bindings0;
+refresh did not create another Agent/wallet. Post-launch provisioning/flow NOT VERIFIED.
+Duplicate approval/send and encrypted-wallet retry qualified only in LOCAL_FIXTURE.
+Small independent UI recovery fix d574845 deployed staging only: failed pre-approval
+checks re-read authoritative state; durable approval/unknown status stays locked.
+11 focused tests PASS locally/VPS; build15.41s local/11.52s VPS; public new M4 chunk
+and index/entry bytes match build. Read-only independent review ACCEPTED.
+Desktop1440/mobile390 review bounds checked; existing Phantom connection/session
+retained. One browser asynchronous-message-listener console error observed after
+reload; no failing app request identified from it, no transaction evidence inferred.
+PM2 production10722/10893 restart0 and staging49311 restart16 unchanged. No VPS,
+PM2, backend, Nginx, production or financial action. Real trading/funding remain OFF.
+PARTIAL / WAITING_FOR_HUMAN: user reports approval, runtime does not record it.
+One pending clarification asks popup type or public transaction signature. Do not
+repeat approval/prepare/submit while that discrepancy is unresolved. Evidence:
+artifacts/post-approval/checkpoint.md and screenshots; VPS release contains sanitized
+post-approval-mainnet-read.json / post-approval-database-read.json and build/test logs.
+
+Historical context below:
+
 # Latest integrated-flow checkpoint — 5 October 2026
 
 19:07 WIB checkpoint (target19:14): implemented and deployed staging only.

@@ -1,3 +1,28 @@
+# Active milestone — reconcile reported launch approval and verify staging E2E
+
+Resumed checkpoint a0dcd30. First runtime evidence5October2026 19:12 WIB;
+checkpoint target19:37 WIB; engineering checkpoint19:25 WIB. No redesign/audit.
+Keep Real trading OFF and production unchanged; no new wallet approval/broadcast
+until reported approval is reconciled. Existing expired review is not authorization.
+
+CURRENT: runtime19:22:44 remains READY_FOR_REVIEW, ownerSignedfalse, broadcastfalse,
+no signature/confirmation/receipt. Last POST prepare19:04:08; no review/submit.
+Mainnet finalized slot453577593: prepared mint absent, owner0.182835778SOL unchanged.
+Reload retains aaaaada/ret/3ED; targetAgent1/totalAgents2/wallet0/binding0.
+Source fix d574845 staging-deployed: pre-approval failure re-reads status without
+clearing a durable/unknown latch. 11 focused tests and local/VPS buildPASS, independent
+reviewACCEPTED, public bytes verified, all PM2 PIDs/restart counters unchanged.
+Proof artifacts/post-approval. Wallet provisioning/launch-success route remain
+unverified on-chain; fixture qualifications are not acceptance of the real flow.
+
+WAITING_FOR_HUMAN: clarify whether approved popup was Create Token/Pump transaction
+or Connect/Sign Message, or provide public transaction signature if available. If a
+signature exists, reconcile that exact transaction before any further execution.
+If none exists, rebuild fresh review only when human is ready, present fresh economics,
+then hand off ONE explicit transaction approval. No duplicate/rebroadcast or M5 trading.
+
+Historical context below:
+
 # Latest integrated-flow checkpoint — 5 October 2026
 
 19:07 WIB checkpoint (target19:14): implemented and deployed staging only.
