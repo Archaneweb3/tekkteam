@@ -1,3 +1,54 @@
+# CURRENT — ONE deterministic M4 attempt safely stopped; M4 PARTIAL
+
+Checkpoint 5 October 2026, 21:56:31 WIB. Started21:39; deadline22:09 WIB.
+Latest user accepted the historical fee limitation and authorized exactly ONE fresh
+staging Mainnet wallet request. That authorization is now consumed. No second request,
+M5, new Agent/draft, funding or Real trading is authorized.
+
+Source eb6d685 deployed STAGING ONLY. Added exact rejected d16 recovery grant and
+22s minimum at review/provider boundaries; unchanged30sTTL, immutable message,
+full17-account proof, 0.01SOL ceiling, reserve, one-shot and receipt-only provisioning.
+Independent read-only review ACCEPTED. Relevant52/52 tests PASS locally and VPS;
+build20.75s local/11.89s VPS. Served source/bundle SHA and HTTPS/API200 verified.
+Only staging API restarted; production tekkteam-api PID10722/restart0 and
+tekkteam-launch PID10893/restart0 stayed online and unchanged. Production path untouched.
+
+Fresh execution774a48ae-507c-4753-b901-6c2261d60a4c: Mainnet genesis verified,
+initialbuy0; simulationPASS94448CU. Exact200000CU x55602micro-lamports/CU gives
+11121lamport priority; base10000, network21121, other5547360, total5568481
+lamports (0.005568481SOL <=0.01). Projected177267297; reserve1000000.
+Three instructions: CB limit, CB price, Pump create_v2. 892bytes.
+Review created21:48:39.118; expires21:49:09.118 WIB. Provider handoff21:48:44.601:
+24.517s remaining. Exact first visible popup timestamp was not recorded separately.
+
+Real native Phantom: Konfirmasi Transaksi, Solana, yellow new-domain advisory only,
+no red/blocking warning. Displayed fee0.00002SOL agrees with backend0.000021121
+at displayed precision; exact wallet-internal fee remains UNVERIFIED without returned
+bytes. Root's popup inspection/evidence collection consumed the remaining lifetime.
+Root clicked Batal after expiry, never Konfirmasi. USER_REJECTED is root cancellation,
+not evidence that the owner manually rejected. No expired approval was requested.
+
+Prepared=reviewed=delivered message SHA256:
+89f9519fdc73019c93cf510298c5102dfa4f0aff3fd048da5fed1c503d5a8a80.
+Returned message/signatures unavailable. Stored mint signature verifies against
+prepared message; cannot claim verification against a returned final message.
+Exactly one provider request; API recover/review/status/reject200, no Submit.
+ownerSigned=false, broadcast=false, signature=null, receipt0, no launchedCA.
+
+Staging SQLite quick_checkOK. Existing target aaaaada count1, Agent wallets0,
+launch bindings0; no provisioning before receipt. Reload preserves owner connection,
+aaaaada/ret3ED, USER_REJECTED and disabled Review/Approve controls. Old rejected
+record archive SHA unchanged. Final Mainnet owner balance182835778lamports
+(0.182835778SOL), unchanged; actual SOL spent0. Metadata/imageHTTP200.
+Real trading/funding/workersOFF; production unchanged.
+Next wallet request requires new explicit single-attempt authorization and human
+manual approval. No automatic retry or activation. M4 remains PARTIAL, not COMPLETE.
+Evidence: artifacts/m4-deterministic-attempt/{byte-integrity.json,phantom-clean.png,
+phantom-clean.txt,api-requests.json,reject-response.json,durable-and-safety.png,
+final-balance.png,reload-locked.png,reload-locked.txt,checkpoint.md}.
+
+Previous checkpoint:
+
 # CURRENT final wording correction — 05/10/2026, 21:35:13 WIB
 
 Independent reviewer accepted f6e1264: historical final wallet message/fee unavailable;
