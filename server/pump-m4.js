@@ -51,7 +51,7 @@ export function createM4Execution({db,transport,publishMetadata,journalPath,now=
     const archive=s;
     let signer=Keypair.generate(),proof,walletTransactionBase64;
     try{
-     const prepare=prepareFactory({transport,publishMetadata,executionReview:true,now,captureDiagnostics,mintFactory:()=>signer.publicKey,captureProof:(r,p)=>{verifyCreatedAccounts(r,p.simulation.value.accounts[0],p.simulation.value.accounts[2]);verifyEvent(r,p.simulation.value.logs);proof=p;const tx=Transaction.from(Buffer.from(r.transactionBase64,'base64'));tx.partialSign(signer);walletTransactionBase64=tx.serialize({requireAllSignatures:false,verifySignatures:true}).toString('base64');}});
+     const prepare=prepareFactory({transport,publishMetadata,executionReview:true,explicitM4Fees:true,now,captureDiagnostics,mintFactory:()=>signer.publicKey,captureProof:(r,p)=>{verifyCreatedAccounts(r,p.simulation.value.accounts[0],p.simulation.value.accounts[2]);verifyEvent(r,p.simulation.value.logs);proof=p;const tx=Transaction.from(Buffer.from(r.transactionBase64,'base64'));tx.partialSign(signer);walletTransactionBase64=tx.serialize({requireAllSignatures:false,verifySignatures:true}).toString('base64');}});
      const result=await prepare(identity,'0',request.requestId);assertExecutionReview(result,identity,{now:now()});
      verifyIdentity();if(archive&&(result.mint===archive.result.mint||result.transactionBase64===archive.result.transactionBase64||recovery?.grantExecutionId===M4_REJECTED_RECOVERY_ID&&result.recentBlockhash===archive.result.recentBlockhash))throw m4Fail('M4_RECOVERY_BYTES_REUSED');s={target,revision:archive?.revision??0,executionId:request.requestId,signingOrder:'OWNER_FIRST_MINT_AFTER_APPROVAL',status:'READY_FOR_REVIEW',result,proof,walletTransactionBase64,walletApprovalOpened:false,broadcastAttempted:false,...(recovery?{recovery}:archive?.recovery?{recovery:archive.recovery}:{})};verifyM4Signed(walletTransactionBase64,s,false);save(s,archive);return publicState(s);
     }finally{if(signer)signer.secretKey.fill(0);signer=null;}
@@ -86,7 +86,7 @@ export function createM4Execution({db,transport,publishMetadata,journalPath,now=
     // Preserve a late valid signature as consumed, but NEVER broadcast it.
     assertReviewedExecutionRequest(s.result,identity,{...request,now:s.result.executionReview.startedAt});
     const signed=completeM4OwnerApproval(request.signedTransactionBase64,s);verifyIdentity();
-    s.status='SIGNED';s.signature=signed.signature;s.signedDigest=signed.signedDigest;s.signedTransactionBase64=signed.completeBase64;s.signedAt=now();save(s);
+    s.status='SIGNED';s.signature=signed.signature;s.signedDigest=signed.signedDigest;s.signedTransactionBase64=signed.completeBase64;s.integrity=signed.integrity??null;s.signedAt=now();save(s);
     try{assertReviewedExecutionRequest(s.result,identity,{...request,now:now()});await revalidate(s,identity,request,{transport,now,captureDiagnostics});verifyIdentity();assertReviewedExecutionRequest(s.result,identity,{...request,now:now()});}
     catch(error){s.status='SIGNED_NOT_BROADCAST';s.error=error.code??'M4_REVALIDATION_FAILED';save(s);return publicState(s);}
     // Durable intent precedes the ONLY send call. Crash/timeout never retries it.

@@ -259,7 +259,7 @@ function boundTransactionWallet(owner,ownerFirst=false){
       const result=await selected.injected.signTransaction(Transaction.from(Buffer.from(base64,'base64')));
       signed=Buffer.from(result.serialize({requireAllSignatures:!ownerFirst,verifySignatures:true})).toString('base64');
     }
-    if(ownerFirst){const actual=Transaction.from(Buffer.from(signed,'base64')),expected=Transaction.from(Buffer.from(base64,'base64'));if(actual.feePayer.toBase58()!==owner||actual.signatures.length!==2||!actual.signature||!actual.verifySignatures(false)||actual.signatures[1].signature!==null||!actual.serializeMessage().equals(expected.serializeMessage()))throw Error('M4 owner approval changed or missing');}
+    if(ownerFirst){const actual=Transaction.from(Buffer.from(signed,'base64')),expected=Transaction.from(Buffer.from(base64,'base64')),hash=async bytes=>Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes)),n=>n.toString(16).padStart(2,'0')).join('');console.info('M4 wallet returned fingerprints',JSON.stringify({deliveredMessageSha256:await hash(expected.serializeMessage()),returnedMessageSha256:await hash(actual.serializeMessage()),returnedOwnerPayloadSha256:await hash(Buffer.from(signed,'base64')),allowedWalletMutation:'SIGNATURES_ONLY'}));if(actual.feePayer.toBase58()!==owner||actual.signatures.length!==2||!actual.signature||!actual.verifySignatures(false)||actual.signatures[1].signature!==null||!actual.serializeMessage().equals(expected.serializeMessage()))throw Error('M4 owner approval changed or missing; reviewed instructions and fee must remain unchanged. Nothing broadcast.');}
     assertBound();return signed;
   }};
 }

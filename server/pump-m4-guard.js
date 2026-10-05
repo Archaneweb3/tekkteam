@@ -16,7 +16,7 @@ export function assertM4Target(identity,target=M4_TARGET){for(const k of ['owner
 export function launchEvidence(result,proof){return {...result,chainId:result.network,before:proof.before,afterRead:proof.afterRead,simulation:proof.simulation,feeQuote:proof.feeResponse};}
 export function verifyM4Signed(base64,record,requireOwner=true){
  const tx=verifyLaunchTransaction(base64,launchEvidence(record.result,record.proof),requireOwner);
- if(tx.signatures.length!==2||tx.instructions.length!==1||tx.instructions[0].programId.toBase58()!==PUMP)throw m4Fail('M4_SIGNATURE_STRUCTURE_CHANGED');
+ if(tx.signatures.length!==2||tx.instructions.length!==(record.result.feePolicy?3:1)||tx.instructions[record.result.feePolicy?2:0].programId.toBase58()!==PUMP)throw m4Fail('M4_SIGNATURE_STRUCTURE_CHANGED');
  const mintSignature=tx.signatures.find(s=>s.publicKey.toBase58()===record.result.mint)?.signature;
  const trusted=Transaction.from(Buffer.from(record.walletTransactionBase64,'base64')).signatures.find(s=>s.publicKey.toBase58()===record.result.mint)?.signature;
  if(!mintSignature||!trusted||!mintSignature.equals(trusted))throw m4Fail('M4_MINT_SIGNATURE_CHANGED');
@@ -35,7 +35,7 @@ export function completeM4OwnerApproval(base64,record){
  if(!mint||mint.signature!==null||!mintSignature||!trusted.verifySignatures(false)||trusted.signature!==null)throw m4Fail('M4_OWNER_FIRST_SIGNATURE_REQUIRED');
  tx.addSignature(new PublicKey(record.result.mint),mintSignature);
  const completeBase64=tx.serialize({requireAllSignatures:true,verifySignatures:true}).toString('base64');
- return {...verifyM4Signed(completeBase64,record,true),completeBase64};
+ return {...verifyM4Signed(completeBase64,record,true),completeBase64,integrity:{preparedMessageSha256:sha(Transaction.from(Buffer.from(record.result.transactionBase64,'base64')).serializeMessage()),deliveredMessageSha256:sha(trusted.serializeMessage()),returnedMessageSha256:sha(tx.serializeMessage()),returnedOwnerPayloadSha256:sha(bytes),finalSignedPayloadSha256:sha(Buffer.from(completeBase64,'base64')),allowedWalletMutation:'SIGNATURES_ONLY',feeModel:record.result.feePolicy?.model??'LEGACY_NO_EXPLICIT_PRIORITY'}};
 }
 // Scoped M4 freshness: latest finalized hash may advance, but the reviewed hash
 // must remain valid. The accepted message/digest/30s TTL are NEVER replaced.
@@ -50,7 +50,7 @@ export async function revalidateM4(record,identity,request,{transport,now=Date.n
  const before=await rpc('getMultipleAccounts',[addresses,{encoding:'base64',commitment:'finalized',minContextSlot:contextSlot(fee,contextSlot(validity))}]);
  const simulation=await rpc('simulateTransaction',[r.transactionBase64,{encoding:'base64',sigVerify:false,replaceRecentBlockhash:false,commitment:'finalized',minContextSlot:contextSlot(before,contextSlot(fee)),innerInstructions:true,accounts:{encoding:'base64',addresses}}]);
  const afterRead=await rpc('getMultipleAccounts',[addresses,{encoding:'base64',commitment:'finalized',minContextSlot:contextSlot(simulation,contextSlot(before))}]);contextSlot(afterRead,contextSlot(simulation));
- const policy=evaluateSimulation(Buffer.from(r.transactionBase64,'base64'),{mint:new PublicKey(r.mint),blockhash:r.recentBlockhash,genesis:r.genesis,chainId:r.network,launch:r.launch},{before,afterRead,simulation,fee:fee.value});
+ const policy=evaluateSimulation(Buffer.from(r.transactionBase64,'base64'),{mint:new PublicKey(r.mint),blockhash:r.recentBlockhash,genesis:r.genesis,chainId:r.network,launch:r.launch,feePolicy:r.feePolicy??null},{before,afterRead,simulation,fee:fee.value});
  if(captureDiagnostics)await captureDiagnostics({...r,createdAt:new Date(now()).toISOString(),policy:{...r.policy,...policy}},{before,afterRead,simulation,feeResponse:fee,validity,stage:'M4_REVALIDATION'});
  if(!policy.allowed||simulation.value.err!==null||!Array.isArray(simulation.value.innerInstructions)||before.value[0]!==null||fee.value!==review.networkFeeLamports||policy.validatedOverheadLamports!==review.reviewedDebitLamports||policy.estimatedPayerDebitLamports!==review.reviewedDebitLamports||before.value[5]?.lamports!==review.observedBalanceLamports||afterRead.value[5]?.lamports!==review.observedBalanceLamports||simulation.value.accounts[5]?.lamports!==review.expectedRemainingBalanceLamports)throw m4Fail('M4_ECONOMICS_CHANGED_REPREPARE');
  const payer=a=>JSON.stringify({owner:a?.owner,executable:a?.executable,data:a?.data});

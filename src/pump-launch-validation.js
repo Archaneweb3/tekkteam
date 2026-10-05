@@ -7,7 +7,7 @@ import {evaluateSimulation} from './pump-simulation-policy.js';
 export function validateLaunchEvidence(e){
  if(e.chainId!=='solana:101'||e.genesis!==GENESIS||e.metadataUri!==(e.launch?.metadataUri??URI))throw Error('Launch network or metadata mismatch');
  const bytes=Buffer.from(e.transactionBase64,'base64');
- const context={mint:new PublicKey(e.mint),blockhash:e.recentBlockhash,genesis:e.genesis,chainId:e.chainId,launch:e.launch};
+ const context={mint:new PublicKey(e.mint),blockhash:e.recentBlockhash,genesis:e.genesis,chainId:e.chainId,launch:e.launch,feePolicy:e.feePolicy??null};
  inspectCreation(bytes,context);
  const policy=evaluateSimulation(bytes,context,{before:e.before,afterRead:e.afterRead,simulation:e.simulation,fee:e.feeQuote.value});
  if(!policy.allowed)throw Error('Spending policy rejected: '+policy.reasons.join(', '));

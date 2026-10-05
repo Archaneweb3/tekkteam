@@ -1,3 +1,17 @@
+# Active milestone — M4 fee reconciliation; RUNNING
+
+Started 5 October 2026 21:04 WIB from 2ad8a14; checkpoint deadline 21:34 WIB.
+No new real wallet request until the fee discrepancy is proven and accounted for.
+Inspect captured original bytes and official fee semantics. Root alone implements
+bounded, explicit M4 Compute Budget before simulation/review/mint signature; preserve
+exact returned message, full atomic account coverage, 0.01 SOL/reserve/30s/one-shot.
+No retained mint key, fee mutation bypass, new Agent/draft or production change.
+Separate prepared/delivered/returned hashes; canceled original returned bytes are
+UNAVAILABLE, so historical Phantom CU limit/price must not be invented. Test/build,
+independent review, staging-only deployment/hashes. Real trading remains OFF.
+
+Historical checkpoint below:
+
 # Active milestone — M4 owner-first request inspected; PARTIAL / stopped
 
 Started5October2026 20:37WIB fromebf0826; checkpoint target21:07WIB.

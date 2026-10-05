@@ -2,6 +2,7 @@ import {PublicKey, Transaction, TransactionInstruction} from '@solana/web3.js';
 import {Buffer} from 'buffer';
 import {getAssociatedTokenAddressSync, TOKEN_2022_PROGRAM_ID} from '@solana/spl-token';
 import {initialBuyInstructions,initialBuyAccounts,buyLamports} from './initial-buy.js';
+import {feeInstructions,priorityLamports,COMPUTE_BUDGET} from './pump-fee-policy.js';
 
 export const PUMP_COMMIT = '81091419e4457566469d4e2a27f64ed84d42419c';
 export const PUMP = '6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P';
@@ -33,30 +34,33 @@ function creationData(launch) {
   return Buffer.concat([Buffer.from([214,144,76,236,95,139,49,180]),str(launch?.name??'TEKKWORK TEST'),str(launch?.symbol??'TEKK'),str(launch?.metadataUri??URI),new PublicKey(launch?.owner??PAYER).toBuffer(),Buffer.alloc(11)]);
 }
 
-export function buildCreation(mint, blockhash, launch) {
+export function buildCreation(mint, blockhash, launch, feePolicy=null) {
   const payer=new PublicKey(launch?.owner??PAYER);
   if(mint.equals(payer)) throw Error('Mint must be a new independent account');
-  return new Transaction({feePayer:payer,recentBlockhash:blockhash}).add(new TransactionInstruction({programId:pump,keys:creationAccounts(mint,payer.toBase58()),data:creationData(launch)}),...initialBuyInstructions(mint,launch));
+  if(feePolicy&&buyLamports(launch)!==0)throw Error('M4_ZERO_BUY_FEE_POLICY_REQUIRED');
+  return new Transaction({feePayer:payer,recentBlockhash:blockhash}).add(...feeInstructions(feePolicy),new TransactionInstruction({programId:pump,keys:creationAccounts(mint,payer.toBase58()),data:creationData(launch)}),...initialBuyInstructions(mint,launch));
 }
 
 /** Inspect the final serialized message; never trust a mutable UI summary. */
-export function inspectCreation(bytes,{mint,blockhash,genesis,chainId,launch}) {
+export function inspectCreation(bytes,{mint,blockhash,genesis,chainId,launch,feePolicy=null}) {
   if(genesis!==GENESIS || chainId!=='solana:101') throw Error('Wrong Mainnet context');
   const tx=Transaction.from(bytes);
   if(tx.signatures.some(s=>s.signature!==null)) throw Error('Unsigned construction only');
   if(tx.feePayer?.toBase58()!==(launch?.owner??PAYER)) throw Error('Payer changed');
   if(tx.recentBlockhash!==blockhash) throw Error('Blockhash changed');
   const amount=buyLamports(launch);
-  if(tx.instructions.length!==(amount?3:1)) throw Error('Unexpected instruction count');
-  const ix=tx.instructions[0], expected=creationAccounts(mint,launch?.owner??PAYER);
+  const prefix=feePolicy?2:0;
+  if(tx.instructions.length!==(amount?3:1)+prefix) throw Error('Unexpected instruction count');
+  const ix=tx.instructions[prefix], expected=creationAccounts(mint,launch?.owner??PAYER);
   if(ix.programId.toBase58()!==PUMP) throw Error('Unexpected program');
   if(ix.keys.length!==expected.length) throw Error('Unexpected account count');
   ix.keys.forEach((k,i)=>{const e=expected[i];if(!k.pubkey.equals(e.pubkey)||k.isSigner!==e.isSigner||k.isWritable!==e.isWritable)throw Error(`Unexpected account/privileges: ${e.name}`);});
   if(!ix.data.equals(creationData(launch))) throw Error('Creation data changed: metadata, creator, name, modes or trailing arguments');
-  const canonical=buildCreation(mint,blockhash,launch).serializeMessage();
+  const canonical=buildCreation(mint,blockhash,launch,feePolicy).serializeMessage();
   if(!tx.serializeMessage().equals(canonical)) throw Error('Unexpected message keys/header');
   if(amount)for(const a of initialBuyAccounts(mint,launch.owner))if(!expected.some(e=>e.pubkey.equals(a.pubkey)))expected.push(a);
-  return {instruction:amount?'create_v2 + createIdempotent + buy_exact_sol_in':'create_v2',programId:PUMP,requiredSigners:tx.compileMessage().header.numRequiredSignatures,accounts:expected.map(a=>({name:a.name,address:a.pubkey.toBase58(),signer:a.isSigner,writable:a.isWritable})),dataBase64:ix.data.toString('base64'),messageBase64:tx.serializeMessage().toString('base64'),initialBuyLamports:amount,explicitTransfers:[],priorityFeeLamports:0};
+  if(feePolicy)expected.push({name:'compute_budget_program',pubkey:new PublicKey(COMPUTE_BUDGET),isSigner:false,isWritable:false});
+  return {instruction:amount?'create_v2 + createIdempotent + buy_exact_sol_in':'create_v2',programId:PUMP,requiredSigners:tx.compileMessage().header.numRequiredSignatures,accounts:expected.map(a=>({name:a.name,address:a.pubkey.toBase58(),signer:a.isSigner,writable:a.isWritable})),dataBase64:ix.data.toString('base64'),messageBase64:tx.serializeMessage().toString('base64'),initialBuyLamports:amount,explicitTransfers:[],priorityFeeLamports:feePolicy?priorityLamports(feePolicy.computeUnitLimit,feePolicy.computeUnitPriceMicroLamports):0,...(feePolicy?{feePolicy:{...feePolicy},pumpInstructionIndex:prefix}:{})};
 }
 
 /** No CPI debit proof exists for this instruction. Fail closed regardless of

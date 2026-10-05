@@ -3,15 +3,17 @@ import {PublicKey} from '@solana/web3.js';
 import bs58 from 'bs58';
 import {Buffer} from 'buffer';
 import {FEE_PROGRAM} from './initial-buy.js';
+import {feeComponents} from './pump-fee-policy.js';
 
 export const POLICY_LABEL='Simulation-verified estimated spending limit';
 export function evaluateSimulation(bytes,context,{before,afterRead,simulation,fee}) {
- const structure=inspectCreation(bytes,context), v=simulation.value;
+ const structure=inspectCreation(bytes,context), v=simulation.value,components=structure.feePolicy?feeComponents(structure,fee):{networkFeeLamports:fee,baseFeeLamports:fee,priorityFeeLamports:0};
  const reasons=[], warnings=[],initialBuy=structure.initialBuyLamports;
  let payerMovements=0,buyMovements=0;
- const allowedPrograms=new Set([structure.programId,...structure.accounts.filter(a=>['system_program','token_program','associated_token_program','mayhem_program_id','fee_program'].includes(a.name)).map(a=>a.address)]);
+ const allowedPrograms=new Set([structure.programId,...structure.accounts.filter(a=>['system_program','token_program','associated_token_program','mayhem_program_id','fee_program','compute_budget_program'].includes(a.name)).map(a=>a.address)]);
  const logs=v.logs??[], invoked=[...new Set(logs.flatMap(l=>{const m=/^Program (\w+) invoke \[\d+\]$/.exec(l);return m?[m[1]]:[];}))];
  if(v.err!==null)reasons.push('SIMULATION_FAILED');
+ if(structure.feePolicy&&(logs.filter(l=>l===`Program ${structure.accounts.at(-1).address} invoke [1]`).length!==2||logs.filter(l=>l===`Program ${structure.accounts.at(-1).address} success`).length!==2))reasons.push('COMPUTE_BUDGET_EXECUTION_UNPROVEN');
  if(initialBuy&&!logs.includes('Program log: Instruction: BuyExactSolIn'))reasons.push('INITIAL_BUY_SUCCESS_NOT_CONFIRMED');
  if(!logs.includes('Program log: Instruction: CreateV2')||logs.at(-1)!==`Program ${structure.programId} success`)reasons.push('CREATE_V2_SUCCESS_NOT_CONFIRMED');
  if(!logs.length||!invoked.includes(structure.programId)||logs.some(l=>/truncat/i.test(l)))reasons.push('INCOMPLETE_PROGRAM_LOGS');
@@ -73,5 +75,5 @@ export function evaluateSimulation(bytes,context,{before,afterRead,simulation,fe
  if(valid(estimated)&&estimated>initialBuy+Number(CAP))reasons.push('ESTIMATED_DEBIT_EXCEEDS_LIMIT');
  if(valid(estimated)&&estimated>expectedTotal)reasons.push('UNEXPECTED_EXTRA_PAYER_DEBIT');
  if(!valid(accounts[5].pre?.lamports)||accounts[5].pre.lamports<initialBuy+overhead)reasons.push('INSUFFICIENT_MAINNET_BALANCE');
- return {label:POLICY_LABEL,allowed:reasons.length===0,reasons:[...new Set(reasons)],warnings:[...new Set(warnings)],prestateSameBank:sameBank,thresholdLamports:String(initialBuy+Number(CAP)),validatedOverheadLamports:overhead,estimatedPayerDebitLamports:estimated,baseFeeLamports:fee,priorityFeeLamports:0,initialBuyLamports:initialBuy,payerPreBalance:accounts[5].pre?.lamports??null,payerPostBalance:accounts[5].post?.lamports??null,createdAccountFundingLamports:effects.filter(a=>a.created).reduce((n,a)=>n+a.deltaLamports,0),existingNonpayerNetCreditLamports:effects.filter(a=>!a.created&&a.name!=='user').reduce((n,a)=>n+a.deltaLamports,0),invokedPrograms:invoked,accountEffects:effects,simulationResult:v.err!==null?'FAIL':'PASS',uncertainty:'Estimated debit uses externally read pre-balance and simulated post-balance; cross-bank reconciliation is telemetry, not atomic prestate proof. Not an absolute on-chain cap. Created-account funding is not automatically classified entirely as minimum rent. No signing or broadcasting permission is granted.'};
+ return {label:POLICY_LABEL,allowed:reasons.length===0,reasons:[...new Set(reasons)],warnings:[...new Set(warnings)],prestateSameBank:sameBank,thresholdLamports:String(initialBuy+Number(CAP)),validatedOverheadLamports:overhead,estimatedPayerDebitLamports:estimated,...components,initialBuyLamports:initialBuy,payerPreBalance:accounts[5].pre?.lamports??null,payerPostBalance:accounts[5].post?.lamports??null,createdAccountFundingLamports:effects.filter(a=>a.created).reduce((n,a)=>n+a.deltaLamports,0),existingNonpayerNetCreditLamports:effects.filter(a=>!a.created&&a.name!=='user').reduce((n,a)=>n+a.deltaLamports,0),invokedPrograms:invoked,accountEffects:effects,simulationResult:v.err!==null?'FAIL':'PASS',uncertainty:'Estimated debit uses externally read pre-balance and simulated post-balance; cross-bank reconciliation is telemetry, not atomic prestate proof. Not an absolute on-chain cap. Created-account funding is not automatically classified entirely as minimum rent. No signing or broadcasting permission is granted.'};
 }

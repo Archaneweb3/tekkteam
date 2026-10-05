@@ -11,27 +11,39 @@ import {walletTestConfig,walletTestRoute,preparationCapabilities} from '../serve
 import {validatePreparation} from '../src/pump-preparation-ui.js';
 import {GENESIS,PAYER,inspectCreation} from '../src/pump-readiness.js';
 import {fixtureAtomicBalances} from './pump-atomic-fixture.mjs';
+import {COMPUTE_BUDGET} from '../src/pump-fee-policy.js';
 // Derived local fixtures only; not evidence of a new Mainnet simulation or human owner.
 const original=JSON.parse(readFileSync(new URL('../docs/pump-simulation-2026-09-26.json',import.meta.url))),idl=JSON.parse(readFileSync(new URL('../node_modules/@pump-fun/pump-sdk/src/idl/pump.json',import.meta.url)));
 const identity={agentId:'LOCAL_FIXTURE',agentName:'Fixture Agent',name:'Fixture Coin',symbol:'FIX',description:'Fixture',character:'frank',owner:PAYER,image:'https://fixture.example/metadata/agents/LOCAL_FIXTURE/'+'a'.repeat(64)+'.png'};
-function fixture({wrongGenesis=false,failSimulation=false,now=Date.now,readPreparation,executionReview=false,captureDiagnostics,mutateSimulation}={}){
+function fixture({wrongGenesis=false,failSimulation=false,now=Date.now,readPreparation,executionReview=false,explicitM4Fees=false,captureDiagnostics,mutateSimulation}={}){
  const calls=[];let addresses,remapped;
  const transport={provider:'fixture.invalid',publicRequest:async url=>{assert.equal(url,PREPARATION_IDL);return {json:async()=>idl};},rpc:async(method,params)=>{
   calls.push(method);
   if(method==='getGenesisHash')return wrongGenesis?'WRONG':GENESIS;
   if(method==='getLatestBlockhash')return {context:{slot:original.before.context.slot},value:{blockhash:original.recentBlockhash,lastValidBlockHeight:original.lastValidBlockHeight}};
-  if(method==='getFeeForMessage')return {context:{slot:original.before.context.slot},value:original.feeQuote.value};
+  if(method==='getRecentPrioritizationFees'){assert.equal(explicitM4Fees,true);assert.deepEqual(params[0],original.structure.accounts.filter(a=>a.writable).map(a=>addresses[original.structure.accounts.findIndex(e=>e.name===a.name)]));return [{slot:original.before.context.slot,prioritizationFee:125001}];}
+  if(method==='getFeeForMessage'){const tx=Transaction.populate((await import('@solana/web3.js')).Message.from(Buffer.from(params[0],'base64')));if(explicitM4Fees){assert.equal(tx.instructions.length,3);assert.equal(tx.instructions[0].programId.toBase58(),COMPUTE_BUDGET);assert.equal(tx.instructions[1].data.readBigUInt64LE(1),125001n);}return {context:{slot:original.before.context.slot},value:original.feeQuote.value+(explicitM4Fees?25001:0)};}
   if(method==='isBlockhashValid')return {context:{slot:Math.max(original.before.context.slot,params[1]?.minContextSlot??0)},value:true};
   if(method==='getMinimumBalanceForRentExemption')return original.rent.find(a=>a.dataLength===params[0]).minimumRentExemptionLamports;
   if(method==='getMultipleAccounts'){
    if(!addresses){addresses=params[0];let json=JSON.stringify(original);original.structure.accounts.forEach((a,i)=>{if(a.address!==addresses[i])json=json.replaceAll(a.address,addresses[i]);});remapped=JSON.parse(json,(k,v)=>k==='data'&&typeof v==='object'&&typeof v?.sha256==='string'&&Number.isSafeInteger(v?.length)?[Buffer.alloc(v.length).toString('base64'),'base64']:v);}
+   if(explicitM4Fees&&params[0].length===17&&addresses.length===16){addresses=params[0];assert.equal(addresses[16],COMPUTE_BUDGET);const p={owner:'NativeLoader1111111111111111111111111111111',executable:true,lamports:1,data:['','base64']};remapped.before.value.push(structuredClone(p));remapped.afterRead.value.push(structuredClone(p));remapped.simulation.value.accounts.push(structuredClone(p));remapped.simulation.value.accounts[5].lamports-=25001;remapped.simulation.value.logs.unshift(`Program ${COMPUTE_BUDGET} invoke [1]`,`Program ${COMPUTE_BUDGET} success`,`Program ${COMPUTE_BUDGET} invoke [1]`,`Program ${COMPUTE_BUDGET} success`);for(const g of remapped.simulation.value.innerInstructions)g.index+=2;}
    const response=structuredClone(calls.filter(x=>x==='getMultipleAccounts').length<=2?remapped.before:remapped.afterRead);response.context.slot=Math.max(response.context.slot,params[1]?.minContextSlot??0);return response;
   }
-  if(method==='simulateTransaction'){assert.equal(params[1].sigVerify,false);assert.equal(params[1].replaceRecentBlockhash,false);const bytes=Buffer.from(params[0],'base64'),tx=Transaction.from(bytes);assert.ok(tx.signatures.every(x=>x.signature===null));const simulation=structuredClone(remapped.simulation);const structure={accounts:addresses.map(address=>({address}))};fixtureAtomicBalances(bytes,structure,remapped.before,simulation);if(failSimulation)simulation.value.err={InstructionError:[0,'InsufficientFunds']};mutateSimulation?.(simulation);return simulation;}
+  if(method==='simulateTransaction'){assert.equal(params[1].sigVerify,false);assert.equal(params[1].replaceRecentBlockhash,false);const bytes=Buffer.from(params[0],'base64'),tx=Transaction.from(bytes);assert.ok(tx.signatures.every(x=>x.signature===null));const simulation=structuredClone(remapped.simulation);const structure={accounts:addresses.map(address=>({address}))};fixtureAtomicBalances(bytes,structure,remapped.before,simulation,10000+(explicitM4Fees?25001:0));if(explicitM4Fees)assert.equal(params[1].accounts.addresses.length,17);if(failSimulation)simulation.value.err={InstructionError:[0,'InsufficientFunds']};mutateSimulation?.(simulation);return simulation;}
   assert.fail('Forbidden/unexpected RPC '+method);
  }};
- return {calls,prepare:createPumpLaunchPreparation({transport,publishMetadata:async()=> 'https://fixture.example/'+'b'.repeat(43),now,readPreparation,executionReview,captureDiagnostics})};
+ return {calls,prepare:createPumpLaunchPreparation({transport,publishMetadata:async()=> 'https://fixture.example/'+'b'.repeat(43),now,readPreparation,executionReview,explicitM4Fees,captureDiagnostics})};
 }
+
+test('actual M4 producer quotes scoped writable accounts and reviews the entire explicit-fee message/17 accounts',async()=>{
+ const f=fixture({executionReview:true,explicitM4Fees:true}),r=await f.prepare(identity,'0',crypto.randomUUID());
+ assert.equal(r.instructionCount,3);assert.equal(r.computeBudgetInstructionCount,2);assert.equal(r.structure.accounts.length,17);assert.equal(r.policy.baseFeeLamports,10000);assert.equal(r.policy.priorityFeeLamports,25001);assert.equal(r.policy.networkFeeLamports,35001);assert.equal(r.executionReview.networkFeeLamports,35001);assert.equal(r.executionReview.atomicBalanceEvidence.accounts.length,17);assert.equal(r.executionReview.reviewedDebitLamports,r.executionReview.otherRequiredDebitLamports+35001);assert.ok(f.calls.includes('getRecentPrioritizationFees'));await validatePreparation(r,identity,0);assert.equal(r.signingEnabled,false);assert.equal(r.broadcastEnabled,false);
+});
+
+test('explicit fee producer cannot omit or mutate the extra readonly CB account atomic proof',async()=>{
+ for(const mutateSimulation of [s=>s.value.accounts.pop(),s=>{s.value.accounts[16].lamports++;const index=s.value.postBalances.indexOf(1);assert.ok(index>=0);s.value.postBalances[index]++;}]){const f=fixture({executionReview:true,explicitM4Fees:true,mutateSimulation});await assert.rejects(f.prepare(identity,'0',crypto.randomUUID()));}
+});
 
 test('failure diagnostics persist BEFORE unexpected debit guard, privately and without signature or secret fields',async()=>{
  const root=mkdtempSync(join(tmpdir(),'tekkteam-m4-diagnostic-')),write=createPreparationDiagnosticWriter(root);

@@ -14,7 +14,7 @@ export async function confirmM4(record,{transport,now=Date.now}){
  if(landed.meta.err!==null||status.err!==null)return {status:'FAILED_ON_CHAIN',error:JSON.stringify(landed.meta.err??status.err),networkFeeLamports:landed.meta.fee??null};
  if(!Array.isArray(landed.transaction)||landed.transaction[1]!=='base64'||landed.transaction[0]!==record.signedTransactionBase64||!Number.isSafeInteger(landed.slot)||landed.slot<r.executionReview.simulationSlot||!Number.isSafeInteger(landed.blockTime))throw m4Fail('M4_LANDED_BYTES_OR_CONTEXT_MISMATCH');
  const {tx,signature,signedDigest}=verifyM4Signed(landed.transaction[0],record,true);if(signature!==record.signature||signedDigest!==record.signedDigest||tx.feePayer.toBase58()!==r.launch.owner||status.slot!==landed.slot)throw m4Fail('M4_LANDED_OWNER_OR_DIGEST_MISMATCH');
- inspectCreation(Buffer.from(r.transactionBase64,'base64'),{mint:new PublicKey(r.mint),blockhash:r.recentBlockhash,genesis:GENESIS,chainId:'solana:101',launch:r.launch});
+ inspectCreation(Buffer.from(r.transactionBase64,'base64'),{mint:new PublicKey(r.mint),blockhash:r.recentBlockhash,genesis:GENESIS,chainId:'solana:101',launch:r.launch,feePolicy:r.feePolicy??null});
  if(!landed.meta.logMessages?.includes(`Program ${PUMP} success`)||!landed.meta.logMessages?.some(l=>/Instruction: CreateV2/.test(l)))throw m4Fail('M4_PUMP_PROVENANCE_MISSING');
  verifyM4CreateEvent(r,landed.meta.logMessages);
  const mint=new PublicKey(r.mint),curveKey=pumpSdk.bondingCurvePda(mint);

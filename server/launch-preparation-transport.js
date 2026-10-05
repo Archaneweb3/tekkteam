@@ -59,7 +59,8 @@ export function createLaunchPreparationTransport({rpcUrl,origin,m4Target=null,fi
  return Object.freeze({provider:rpc.hostname,
   rpc:async(method,params)=>{
    if(finalityOnly){if(!FINALITY_RPC_METHODS.includes(method))throw fail('PREPARATION_RPC_METHOD_DENIED');params=finalityParams(method,params);}
-   else if(!PREPARATION_RPC_METHODS.includes(method)&&!(m4Target&&['getSignatureStatuses','getTransaction','getBlockHeight'].includes(method)))throw fail('PREPARATION_RPC_METHOD_DENIED');
+   else if(!PREPARATION_RPC_METHODS.includes(method)&&!(m4Target&&['getSignatureStatuses','getTransaction','getBlockHeight','getRecentPrioritizationFees'].includes(method)))throw fail('PREPARATION_RPC_METHOD_DENIED');
+   if(method==='getRecentPrioritizationFees'&&(!Array.isArray(params)||params.length!==1||!Array.isArray(params[0])||params[0].length<1||params[0].length>128||new Set(params[0]).size!==params[0].length||params[0].some(a=>{try{return typeof a!=='string'||bs58.decode(a).length!==32;}catch{return true;}})))throw fail('M4_PRIORITY_QUOTE_OPTIONS_DENIED');
    if(method==='getTransaction'&&(params?.[1]?.encoding!=='base64'||params?.[1]?.commitment!=='finalized'))throw fail('M4_CONFIRMATION_OPTIONS_DENIED');
    if(method==='simulateTransaction'&&(params?.[1]?.sigVerify!==false||params?.[1]?.replaceRecentBlockhash!==false||params?.[1]?.commitment!=='finalized'))throw fail('PREPARATION_SIMULATION_OPTIONS_DENIED');
    const id=++sequence,{bytes}=await request(rpc,JSON.stringify({jsonrpc:'2.0',id,method,params}));let response;try{response=JSON.parse(bytes);}catch{throw fail('PREPARATION_RPC_RESPONSE_INVALID');}

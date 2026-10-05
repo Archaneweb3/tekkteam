@@ -3,7 +3,7 @@ import {inspectCreation} from '../src/pump-readiness.js';
 const fail=code=>Object.assign(Error(code),{code,status:409});
 const valid=n=>Number.isSafeInteger(n)&&n>=0;
 export function canonicalExecutionStructure(result){
- const structure=inspectCreation(Buffer.from(result.transactionBase64,'base64'),{mint:new PublicKey(result.mint),blockhash:result.recentBlockhash,genesis:result.genesis,chainId:result.network,launch:result.launch});
+ const structure=inspectCreation(Buffer.from(result.transactionBase64,'base64'),{mint:new PublicKey(result.mint),blockhash:result.recentBlockhash,genesis:result.genesis,chainId:result.network,launch:result.launch,feePolicy:result.feePolicy??null});
  if(JSON.stringify(structure)!==JSON.stringify(result.structure))throw fail('EXECUTION_STRUCTURE_CHANGED');
  return structure;
 }
