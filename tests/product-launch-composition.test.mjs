@@ -43,3 +43,13 @@ test('shared composition never invents absent history or attaches M4 by default'
   assert.equal(typeof approved.serverOptions.m4ExecutionFactory,'function');assert.equal(calls,0,'Composition never signs, publishes, simulates or broadcasts');
  }finally{rmSync(dataDir,{recursive:true,force:true});}
 });
+test('native IncomingMessage prototype headers survive the inactive-plan gate',async t=>{
+ const http=await import('node:http');const cfg={origin:'https://tekkteam.tech',port:4190};
+ const server=http.createServer((req,res)=>{let allowed;try{allowed=productLaunchRequest(req,cfg);}catch(error){res.writeHead(500);res.end(error.message);return;}res.writeHead(allowed?200:403);res.end();});
+ await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));t.after(()=>new Promise(resolve=>server.close(resolve)));
+ const post=(path,origin=cfg.origin)=>new Promise((resolve,reject)=>{const q=http.request({host:'127.0.0.1',port:server.address().port,path,method:'POST',headers:{host:'tekkteam.tech',origin,'x-forwarded-proto':'https','sec-fetch-site':'same-origin'}},r=>{r.resume();r.on('end',()=>resolve(r.statusCode));});q.on('error',reject);q.end();});
+ const base='/api/agents/'+M4_TARGET.agentId;
+ for(const suffix of ['/activation-plan','/activation-plan/cancel','/publication'])assert.equal(await post(base+suffix),200);
+ assert.equal(await post(base+'/activation-plan','https://evil.example'),403);
+ for(const suffix of ['/activation-plan/approve','/activation-plan/activate','/trading/funding/submit','/trading/enable'])assert.equal(await post(base+suffix),403);
+});
