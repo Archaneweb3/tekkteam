@@ -1,3 +1,9 @@
+Latest direct mandate7October2026: bounded historical search may close as
+HISTORICAL_LIGHTHOUSE_STATE_SNAPSHOT_UNAVAILABLE. After qualified semantic fix,
+exactly ONE fresh successor diagnostic attempt is explicitly authorized. Prior
+grant/claim/journal stay immutable; manual Phantom financial approval remains a
+separate handoff. This supersedes the old historic-evidence stop. See decision102.
+
 # PROJECT_PLAYBOOK — TEKKTEAM
 
 Latest7October2026: Policy101 explicitly APPROVED for exactly ONE fresh canonical
