@@ -21,6 +21,7 @@ export function productLaunchConfiguration(env=process.env){
 }
 
 export function productLaunchRequest(req,configuration){
+ if(req.method==='POST'&&/^\/api\/agents\/[a-f0-9-]{36}\/publication$/.test(req.url))return walletTestRequest({...req,url:'/api/auth/challenge'},configuration);
  // Keep owner-scoped product reads available. Only mutation authority is narrowed
  // to the reviewed preparation/one-shot endpoints and the existing owner auth.
  if(['GET','HEAD'].includes(req.method)&&req.url.startsWith('/api/')){

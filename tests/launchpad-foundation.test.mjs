@@ -35,7 +35,7 @@ test('operator-inventoried production V2 schema needs no rebuild or relationship
 });
 test('registry truthful presets, fixed exposure and planned exclusion',()=>{
  const registry=strategyRegistry(),a=registry.archetypes[0];
- assert.deepEqual(a.presets.map(p=>[p.runtimePresetId,p.displayName]),[['selective','Strict'],['balanced','Standard'],['momentum','Broad']]);
+ assert.deepEqual(a.presets.map(p=>[p.runtimePresetId,p.displayName]),[['selective','Strict'],['balanced','Standard'],['momentum','Broad'],['guardian','Guardian'],['scout','Scout'],['operator','Operator'],['hunter','Hunter'],['berserker','Berserker']]);
  for(const p of a.presets){assert.equal(p.effectiveLimits.maxPositionPercent,10);assert.equal(p.parameters.risk.maxPositionPercent,10);}
  assert.ok(strategies.every(p=>p.maxPositionPct===10));
  assert.ok(registry.archetypes.slice(1).every(p=>p.implementationStatus==='PLANNED'&&!p.selectable&&!p.supportedModes.length));

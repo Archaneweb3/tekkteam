@@ -4,6 +4,7 @@ import {mountStrategyCenter} from './strategy-center.js';
 import {openAgentWalletDrawer} from './agent-wallet-ui.js';
 import {mountControlledSwap} from './controlled-swap-ui.js';
 import {mountAutonomousAcceptance} from './autonomous-acceptance-ui.js';
+import {PERSONALITIES} from './agent-personalities.js';
 
 const esc=value=>String(value??'').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
 const short=value=>value?`${value.slice(0,6)}…${value.slice(-6)}`:'Not created';
@@ -43,7 +44,7 @@ export function mountAgentSettings(host,agent,{request=api,isCurrent=()=>true,mo
  const show=dialog=>{if(!dialog.open)dialog.showModal();};
  function updatePlan(){if(dead)return;const center=q('#tw-strategy-center');if(!center?.querySelector('[data-plan-capital]'))return;
   const get=key=>Number(center.querySelector(`[data-config="${key}"]`)?.value),preset=center.querySelector('[data-preset][aria-pressed="true"]')?.dataset.preset;
-  q('[data-plan-strategy]').textContent=(preset||agent.strategy||'Unavailable').toUpperCase();q('[data-plan-risk]').textContent=({selective:'Conservative',balanced:'Balanced',momentum:'Aggressive'})[preset]||'Custom';
+  q('[data-plan-strategy]').textContent=(preset||agent.strategy||'Unavailable').toUpperCase();q('[data-plan-risk]').textContent=PERSONALITIES[preset]?.label||({selective:'Conservative',balanced:'Balanced',momentum:'Aggressive'})[preset]||'Custom';
   const size=get('risk.maxSolPerTrade'),stop=get('position.stopLossPercent'),profit=get('position.takeProfitPercent');
   q('[data-plan-size]').textContent=Number.isFinite(size)?size+' SOL':'Unavailable';q('[data-plan-stop]').textContent=Number.isFinite(stop)?'−'+stop+'%':'Unavailable';q('[data-plan-profit]').textContent=Number.isFinite(profit)?'+'+profit+'%':'Unavailable';q('[data-plan-hold]').textContent='15m';
   const status=center.querySelector('[data-save-status]')?.textContent||'';editorDirty=/UNSAVED/i.test(status);q('[data-settings-dirty]').hidden=!editorDirty;q('[data-settings-save-state]').textContent=editorDirty?'UNSAVED CHANGES':status||'Loading saved strategy…';

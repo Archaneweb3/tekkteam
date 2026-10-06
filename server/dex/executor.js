@@ -149,7 +149,7 @@ export function createControlledExecutor({ledger,provider,adapter,authorize,flag
    if(effects.agentSolDelta!==expectedSol.toString()||effects.agentTokenDelta!==expectedToken.toString())reject('CHAIN_BALANCE_MISMATCH');
    if(!Number.isSafeInteger(chain.slot)||chain.slot<0)reject('INVALID_SLOT');
    const verifiedEffects=Object.fromEntries(['actualInput','actualOutput','networkFeeLamports','rentLamports','agentSolDelta','agentTokenDelta'].map(k=>[k,effects[k]]));
-   const confirmed=ledger.confirm(id,{...verifiedEffects,executionId:id,signature:r.signature,finalized:true,messageHash:decoded.messageHash,slot:chain.slot,confirmedAt:now()});oneShot?.settle(confirmed);return confirmed;
+   const confirmed=ledger.confirm(id,{...verifiedEffects,executionId:id,signature:r.signature,finalized:true,messageHash:decoded.messageHash,slot:chain.slot,chainBlockTime:chain.chainBlockTime??null,confirmedAt:now()});oneShot?.settle(confirmed);return confirmed;
   },
   async cancel(actor,id){const {r}=await owned(actor,id);if(!['QUOTED','PREPARED'].includes(r.status)||r.signature)reject('CANNOT_CANCEL_SIGNED_EXECUTION');const cancelled=ledger.transition(id,['QUOTED','PREPARED'],'FAILED',{reason:'Cancelled before signing'});oneShot?.settle(cancelled);return cancelled;},
   async expire(actor,id){

@@ -45,7 +45,7 @@ export function createAutonomousExecutionPort({ledger,adapter,flags,network,curr
   if(input!==integer(r.intent.inputAmount)||output<integer(r.quote.minimumOutput)||fee!==integer(r.review.networkFeeLamports,{zero:true})||rent!==signedInteger(r.review.netRentLamports))reject('CHAIN_ECONOMICS_MISMATCH');
   const expectedSol=r.intent.direction==='BUY'?-input-fee-rent:output-fee-rent,expectedToken=r.intent.direction==='BUY'?output:-input;
   if(effects.agentSolDelta!==expectedSol.toString()||effects.agentTokenDelta!==expectedToken.toString())reject('CHAIN_BALANCE_MISMATCH');
-  const confirmed=ledger.confirm(id,{executionId:id,signature:r.signature,finalized:true,messageHash:r.messageHash,slot:chain.slot,confirmedAt:now(),...Object.fromEntries(['actualInput','actualOutput','networkFeeLamports','rentLamports','agentSolDelta','agentTokenDelta'].map(k=>[k,effects[k]]))});
+  const confirmed=ledger.confirm(id,{executionId:id,signature:r.signature,finalized:true,messageHash:r.messageHash,slot:chain.slot,chainBlockTime:chain.chainBlockTime??null,confirmedAt:now(),...Object.fromEntries(['actualInput','actualOutput','networkFeeLamports','rentLamports','agentSolDelta','agentTokenDelta'].map(k=>[k,effects[k]]))});
   if(r.intent.mode==='AUTONOMOUS_ACCEPTANCE_TEST'){
    const receipt=ledger.receipt(id),position=ledger.position(r.intent.agentId,r.intent.direction==='BUY'?r.intent.outputMint:r.intent.inputMint);
    if(r.intent.direction==='BUY')acceptance.confirmedBuy(confirmed,receipt,position);else acceptance.confirmedSell(confirmed,receipt,position);

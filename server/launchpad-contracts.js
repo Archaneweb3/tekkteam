@@ -41,6 +41,7 @@ export function operatingPlan(agent,paper=null){
  let c;try{c=strategyConfigFor(paper??agent);}catch{return {agentId:agent.id,available:false,reason:'CONFIGURATION_UNAVAILABLE',authorizationGranted:false};}
  const p=PROFILES[c.strategy];
  return {agentId:agent.id,available:true,strategyRegistryVersion:REGISTRY_VERSION,configurationRevision:paper?.strategyConfigVersion??0,riskRevision:null,strategyArchetype:'momentum-activity',presetId:c.strategy,presetDisplayName:presetDisplayName(c.strategy),
+  personality:p.version?{version:p.version,tradePercent:p.tradeBps/100,basis:'TRADABLE_SOL_AFTER_PROTECTED_RESERVE',subjectToIndependentCaps:true}:null,
   entryBehavior:{minPriceChange5mPercent:c.signal.minPriceChange5mPercent,maxPriceChange5mPercent:p.maxChange,minBuySellRatio:p.minRatio,minVolume5mUsd:c.signal.minVolume5mUsd,minLiquidityUsd:c.signal.minLiquidityUsd},
   exitBehavior:{takeProfitPercent:c.position.takeProfitPercent,stopLossPercent:c.position.stopLossPercent,maxHoldSeconds:900,guaranteedFill:false,paperSellSizeCapped:true},
   effectiveExposure:{configuredPercent:c.risk.maxPositionPercent,ceilingPercent:10,basis:'STARTING_PAPER_CAPITAL'},capitalLimit:{maxSolPerTrade:c.risk.maxSolPerTrade,startingCapitalSol:paper?.initialSol??null},riskLimits:{...c.risk,...c.execution},timeHorizon:{maxHoldSeconds:900,editable:false},executionMode:'PAPER',operationStatus:paper?.enabled?'WORKING':'PAUSED',authorizationGranted:false};

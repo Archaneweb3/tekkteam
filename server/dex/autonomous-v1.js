@@ -36,7 +36,7 @@ export function authorizeAutonomousV1({flags,network,agent,intent,market,ledger,
  if(intent.direction==='BUY'&&ledger.openPositions!==0||intent.direction==='SELL'&&ledger.openPositions!==1)reject('POSITION_LIMIT');
  if(!Number.isSafeInteger(ledger?.consecutiveFailures)||ledger.consecutiveFailures<0||ledger.consecutiveFailures>=AUTONOMOUS_V1.maxConsecutiveFailures)reject('AUTONOMOUS_CIRCUIT_OPEN');
  if(ledger?.pausedByBreaker===true)reject('AUTONOMOUS_CIRCUIT_OPEN');
- if(!Number.isSafeInteger(ledger?.cooldownUntil)||ledger.cooldownUntil>now)reject('TRADE_COOLDOWN');
+ if(!Number.isSafeInteger(ledger?.cooldownUntil)||intent.direction==='BUY'&&ledger.cooldownUntil>now)reject('TRADE_COOLDOWN');
  const spent=integer(ledger.dailyTurnoverLamports,{zero:true});
  if(spent+(intent.direction==='BUY'?amount:0n)>BigInt(AUTONOMOUS_V1.maxDailyTurnoverLamports))reject('DAILY_TURNOVER_LIMIT');
  if(intent.direction==='SELL'&&integer(ledger.positionQuantity,{zero:true})!==amount)reject('SELL_MUST_CLOSE_POSITION');

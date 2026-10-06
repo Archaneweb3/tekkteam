@@ -5,7 +5,7 @@ export {createPumpFixtureLedger} from './pump-fixture-ledger.js';
 
 export const ACTIVE_DEX_STATES=['QUOTED','PREPARING','PREPARED','SIGNED','SUBMITTED','UNKNOWN'];
 const transitions={QUOTED:['QUOTED','PREPARING','REJECTED_BEFORE_SIGNING','FAILED','EXPIRED'],PREPARING:['PREPARING','PREPARED','REJECTED_BEFORE_SIGNING','EXPIRED'],PREPARED:['UNKNOWN','REJECTED_BEFORE_SIGNING','FAILED','EXPIRED'],UNKNOWN:['SIGNED','FAILED','EXPIRED'],SIGNED:['SUBMITTED','UNKNOWN','FAILED'],SUBMITTED:['UNKNOWN','FAILED']};
-export function createDexLedger(db){
+export function createDexLedger(db,{productionOrigin=null}={}){
  const realReservations=createRealBalanceReservations(db);
  db.exec(`CREATE TABLE IF NOT EXISTS dex_executions(id TEXT PRIMARY KEY,owner TEXT NOT NULL,request_key TEXT NOT NULL,fingerprint TEXT NOT NULL,agent_id TEXT NOT NULL,status TEXT NOT NULL,data TEXT NOT NULL,UNIQUE(owner,request_key));
  CREATE TABLE IF NOT EXISTS dex_receipts(execution_id TEXT PRIMARY KEY,signature TEXT UNIQUE NOT NULL,data TEXT NOT NULL);
@@ -49,10 +49,10 @@ export function createDexLedger(db){
    const row=db.prepare('SELECT data,fingerprint FROM dex_executions WHERE owner=? AND request_key=?').get(intent.owner,requestKey);
    if(row){if(row.fingerprint!==fingerprint)reject('IDEMPOTENCY_CONFLICT');return {existing:true,record:JSON.parse(row.data)};}
    const active=db.prepare('SELECT status FROM dex_executions WHERE agent_id=?').all(intent.agentId).some(r=>ACTIVE_DEX_STATES.includes(r.status));if(active)reject('ACTIVE_EXECUTION_REQUIRES_RECONCILIATION');
-   const record={id:randomUUID(),intent,fingerprint,requestKey,status:'QUOTED',createdAt:intent.createdAt};
+   const record={id:randomUUID(),intent,fingerprint,requestKey,status:'QUOTED',createdAt:intent.createdAt,...(productionOrigin==='https://tekkteam.tech'&&intent.mode==='LIVE_AUTONOMOUS'?{productionProvenance:{environment:'PRODUCTION',origin:productionOrigin,network:'solana:mainnet',classification:'USER_OPERATION'}}:{})};
    db.prepare('INSERT INTO dex_executions VALUES(?,?,?,?,?,?,?)').run(record.id,intent.owner,requestKey,fingerprint,intent.agentId,record.status,JSON.stringify(record));event(record);return {existing:false,record};
   });},
-  transition(id,from,to,patch={}){return atomic(()=>{const r=get(id);if(!r||!from.includes(r.status)||!transitions[r.status]?.includes(to)||r.status==='UNKNOWN'&&to==='EXPIRED')reject('EXECUTION_STATE_CONFLICT');if(Object.keys(patch).some(k=>['id','intent','fingerprint','requestKey','status'].includes(k)))reject('IMMUTABLE_INTENT');const next={...r,...patch,status:to};put(next);return next;});},
+  transition(id,from,to,patch={}){return atomic(()=>{const r=get(id);if(!r||!from.includes(r.status)||!transitions[r.status]?.includes(to)||r.status==='UNKNOWN'&&to==='EXPIRED')reject('EXECUTION_STATE_CONFLICT');if(Object.keys(patch).some(k=>['id','intent','fingerprint','requestKey','status','productionProvenance'].includes(k)))reject('IMMUTABLE_INTENT');const next={...r,...patch,status:to};put(next);return next;});},
   expireNeverBroadcast(id,proof){return atomic(()=>{
    const r=get(id),claim=db.prepare('SELECT 1 FROM dex_autonomous_broadcast_claim WHERE execution_id=?').get(id),signClaim=db.prepare('SELECT 1 FROM dex_autonomous_sign_claim WHERE execution_id=?').get(id),receipt=db.prepare('SELECT 1 FROM dex_receipts WHERE execution_id=?').get(id);
    if(!r||r.status!=='UNKNOWN'||r.reason!=='SIGNED_NOT_BROADCAST'||r.intent?.mode!=='AUTONOMOUS_ACCEPTANCE_TEST'||!r.signature||!r.messageHash||!signClaim||r.broadcastAttemptedAt||claim||receipt||proof?.network!=='solana:mainnet'||proof?.genesis!=='5eykt4UsFv8P8NJdTREpY1vzqKqZKvdpKuc147dw2N9d'||proof?.signature!==r.signature||proof?.signatureStatus!==null||proof?.transaction!==null||!Number.isSafeInteger(proof.currentBlockHeight)||proof.currentBlockHeight<=r.lastValidBlockHeight||!Number.isSafeInteger(proof.checkedAt)||Math.abs(Date.now()-proof.checkedAt)>30000||proof.agentBalanceLamports!==r.risk?.snapshot?.solBalanceLamports||proof.tokenBalanceRaw!=='0'||proof.tokenAccountExists!==false)reject('NEVER_BROADCAST_PROOF_INCOMPLETE');

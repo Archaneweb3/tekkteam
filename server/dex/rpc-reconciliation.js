@@ -48,5 +48,5 @@ export async function readFinalizedSwap(connection,record,expected){
  if(status.slot!==response.slot)reject('RPC_SLOT_MISMATCH');
  const effects=extractFinalizedSwapEffects(response,record.intent,{...expected,signature:record.signature,messageHash:record.messageHash});
  const tx=new VersionedTransaction(response.transaction.message,response.transaction.signatures.map(s=>bs58.decode(s)));
- return {signature:record.signature,finalized:true,slot:response.slot,error:response.meta.err,transaction:Buffer.from(tx.serialize()).toString('base64'),networkFeeLamports:effects.networkFeeLamports,effects};
+ return {signature:record.signature,finalized:true,slot:response.slot,chainBlockTime:Number.isSafeInteger(response.blockTime)&&response.blockTime>=0?response.blockTime:null,error:response.meta.err,transaction:Buffer.from(tx.serialize()).toString('base64'),networkFeeLamports:effects.networkFeeLamports,effects};
 }

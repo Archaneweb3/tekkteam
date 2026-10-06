@@ -28,6 +28,7 @@ import {createTokenImageAuthority} from './launchpad-token-image.js';
 import {normalizeTokenDraft} from '../src/token-draft-schema.js';
 import {agentLaunchData,assertAgentLaunch} from '../src/agent-launch-data.js';
 import {parseInitialBuy} from '../src/initial-buy.js';
+import {installRealLeaderboard} from './real-leaderboard.js';
 import {resolveTokenDraftConfiguration} from './launchpad-token-configuration.js';
 
 const hash = v => createHash('sha256').update(v).digest('hex');
@@ -77,7 +78,7 @@ export function createServer({ dbPath, vaultKey, origins = ['http://127.0.0.1:51
   app.use(express.json({ limit: '5mb' }));
   app.use('/api/agents', (req,res,next) => {
     const paperAction=req.method==='POST'&&/^\/[^/]+\/trading\/(configure|enable|pause|strategy-config)$/.test(req.path)&&(!req.body?.mode||req.body.mode==='paper')&&(!req.query.mode||req.query.mode==='paper');
-    if (network === 'mainnet' && !['GET','HEAD','OPTIONS'].includes(req.method) && !paperAction && !(req.method==='POST' && /^\/[^/]+\/character$/.test(req.path))) return res.status(403).json({error:'MAINNET SAFETY MODE: drafts, token issuance, submission and value-moving actions disabled'});
+    if (network === 'mainnet' && !['GET','HEAD','OPTIONS'].includes(req.method) && !paperAction && !(req.method==='POST' && /^\/[^/]+\/(character|publication)$/.test(req.path))) return res.status(403).json({error:'MAINNET SAFETY MODE: drafts, token issuance, submission and value-moving actions disabled'});
     next();
   });
   app.get('/api/safety/memo', async(req,res) => {
@@ -115,7 +116,8 @@ export function createServer({ dbPath, vaultKey, origins = ['http://127.0.0.1:51
   try{m4Execution=m4ExecutionFactory?.({db,store});}catch(error){store.close();throw error;}
   const launchEvidence=a=>readLaunchEvidence(a,tokenDraftOptions?.journalPath);
   const trading=installAgentTrading(app,{store,auth,owned,now,realMoney,...(tokenDraftOptions?{receipt:a=>launchReceipt(a,tokenDraftOptions.journalPath)}:{}),sessionValid:req=>getSession(req)?.address===req.session?.address,...tradingOptions,readLaunchpadScope:scopeLedger.readLaunchpadScope});
-  const controlledDex=installControlledDex(app,{db,store,auth,owned,now,realMoney,pumpRuntimeDependencies,sessionValid:req=>getSession(req)?.address===req.session?.address,readLaunchpadScope:scopeLedger.readLaunchpadScope,readReceiptAuthority:a=>readFirstTokenReceiptAuthority(a,tokenDraftOptions?.journalPath??resolve(process.env.DATA_DIR||'server/data','pump-agent-launches.json'))});
+  const controlledDex=installControlledDex(app,{db,store,auth,owned,now,realMoney,pumpRuntimeDependencies,productionOrigin:production&&network==='mainnet'&&origins.length===1&&origins[0]==='https://tekkteam.tech'?origins[0]:null,sessionValid:req=>getSession(req)?.address===req.session?.address,readLaunchpadScope:scopeLedger.readLaunchpadScope,readReceiptAuthority:a=>readFirstTokenReceiptAuthority(a,tokenDraftOptions?.journalPath??resolve(process.env.DATA_DIR||'server/data','pump-agent-launches.json'))});
+  installRealLeaderboard(app,{db,auth,owned,now});
   if(controlledDex.autonomousScheduler)trading.tick.setAutonomousTick(()=>controlledDex.autonomousScheduler.tick());
   const event = (a, type, message) => db.prepare('INSERT INTO events (agent_id,owner,type,message,created_at) VALUES (?,?,?,?,?)').run(a.id, a.creator, type, message, now());
   const save = a => db.prepare('UPDATE agents SET data=? WHERE id=?').run(JSON.stringify(a), a.id);
@@ -184,7 +186,7 @@ export function createServer({ dbPath, vaultKey, origins = ['http://127.0.0.1:51
   const createIdentity=scoped=>(req,res)=>{
     if(Object.keys(req.body).some(k=>!['name','description','character','strategy'].includes(k)))fail(400,'Identity creation accepts identity fields only');
     const key=text(req.headers['idempotency-key'],8,100,'idempotency key');
-    const input={name:text(req.body.name,2,40,'agent name'),description:text(req.body.description??'',0,300,'description'),character:req.body.character,strategy:req.body.strategy??'balanced'};
+    const input={name:text(req.body.name,2,40,'agent name'),description:text(req.body.description??'',0,300,'description'),character:req.body.character,strategy:req.body.strategy??'operator'};
     if(!characters.some(c=>c.id===input.character)||!strategies.some(s=>s.id===input.strategy))fail(400,'Unknown character or strategy');
     const fingerprint=hash(JSON.stringify({kind:scoped?'LAUNCHPAD_IDENTITY':'IDENTITY_ONLY',...input}));
     const prior=db.prepare('SELECT * FROM requests WHERE owner=? AND key=?').get(req.session.address,key);

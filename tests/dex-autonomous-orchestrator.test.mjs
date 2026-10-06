@@ -9,7 +9,7 @@ import {SOL_MINT} from '../server/dex/intent.js';
 import {fixtureMarket,fixtureProvenance} from './market-provenance-fixture.mjs';
 
 const clock=1_800_000_000_000;
-function harness({sellOutput='120000',openedAt=clock-1000,unsupported=false,unknown=false,live=true,executionPortAvailable=true,staleMarket=false,staleValuation=false,riskAllowed=true,positionOpen=false,resultStatus=null}={}){
+function harness({sellOutput='120000',openedAt=clock-1000,unsupported=false,unknown=false,live=true,executionPortAvailable=true,staleMarket=false,staleValuation=false,riskAllowed=true,positionOpen=false,resultStatus=null,strategy='momentum',positionSizing}={}){
  const db=new DatabaseSync(':memory:'),health=createAutonomousHealth(db,{now:()=>clock});let position=positionOpen?{mint:CONTROLLED_USDC_MINT,pool:CONTROLLED_CPMM_POOL,quantity:'12000',costBasisLamports:'100000',openedAt,buySignature:'old-buy',strategyVersion:0}:null,quantity='12000',calls=[],active=unknown?[{status:'UNKNOWN'}]:[];
  const quote={...fixtureMarket(clock,'snapshot-1'),pair:unsupported?'unverified':CONTROLLED_CPMM_POOL,observedAt:clock-(staleMarket?60000:1000)};
  const port={provenProductionBoundary:true,async reconcile(id){return {id,status:'UNKNOWN'};},async execute({intent}){calls.push(intent);if(resultStatus)return {id:'attempt',status:resultStatus,reason:resultStatus};if(intent.direction==='BUY'){position={mint:CONTROLLED_USDC_MINT,pool:CONTROLLED_CPMM_POOL,quantity,costBasisLamports:'100000',openedAt,buySignature:'buy-signature',strategyVersion:0};return {id:'buy',status:'CONFIRMED',finalized:true,receipt:{signature:'buy-signature'}};}position=null;return {id:'sell',status:'CONFIRMED',finalized:true,receipt:{signature:'sell-signature'}};}};
@@ -19,12 +19,22 @@ function harness({sellOutput='120000',openedAt=clock-1000,unsupported=false,unkn
   positions:{read:()=>position,actualTokenBalance:async()=>quantity,riskState:async()=>({unknown:false,unresolved:false,reservationConflict:false,cooldownUntil:0,dailyTurnoverLamports:'0'})},
   executions:{list:()=>active},health,executionPort:executionPortAvailable?port:null,
   network:{verify:async()=>({network:'solana:mainnet',verified:true})},
-  agentContext:async()=>({agentId:'agent',owner:'owner',agentWallet:SOL_MINT,mode:'LIVE_AUTONOMOUS',enabled:true,paused:false,vaultVerified:true,strategy:'momentum'}),
+  agentContext:async()=>({agentId:'agent',owner:'owner',agentWallet:SOL_MINT,mode:'LIVE_AUTONOMOUS',enabled:true,paused:false,vaultVerified:true,strategy}),positionSizing,
   flags:()=>({liveAutonomousEnabled:live,autonomousKillSwitch:false,realMoneyEmergencyStop:false}),risk:{evaluate:async()=>({allowed:riskAllowed})},now:()=>clock
   ,resolveProvenance:args=>fixtureProvenance(args.snapshot,args.agentWallet,clock)
  });
  return {db,orchestrator,port,active,calls,health,close:()=>db.close(),get position(){return position;}};
 }
+
+test('Real personality sizing is fresh, bounded and independently requoted by execution',async()=>{
+ for(const [strategy,expected] of [['guardian','45000'],['scout','67500'],['operator','90000'],['hunter','100000'],['berserker','100000']]){
+  const h=harness({strategy,positionSizing:async()=>({balanceLamports:'1000000',reserveLamports:'100000',observedAt:clock})});
+  try{const out=await h.orchestrator.tick('agent');assert.equal(out.action,'BUY',strategy+': '+out.reason);assert.equal(h.calls[0].inputAmount,expected);}finally{h.close();}
+ }
+ for(const positionSizing of [undefined,async()=>({balanceLamports:'1000000',reserveLamports:'100000',observedAt:clock-10001}),async()=>({balanceLamports:'1000000',observedAt:clock})]){
+  const h=harness({strategy:'operator',positionSizing});try{assert.equal((await h.orchestrator.tick('agent')).action,'SKIP');assert.equal(h.calls.length,0);}finally{h.close();}
+ }
+});
 
 for(const [name,options] of [['take profit',{sellOutput:'120000'}],['stop loss',{sellOutput:'95000'}],['max hold',{sellOutput:'100000',openedAt:clock-900001}]])test(`same decision orchestration selects ${name} after a confirmed buy`,async()=>{
  const h=harness(options);

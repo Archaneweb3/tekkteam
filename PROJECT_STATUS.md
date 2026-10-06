@@ -1,3 +1,25 @@
+# CURRENT — 6 October 2026, 22:46 WIB: SSH VERIFIED; PRODUCT CONVERGENCE IN PROGRESS
+
+Resume started22:23 WIB, checkpoint target22:53 WIB. Dedicated authorized SSH identity
+reaches root@srv2016744 at179.198.214.104; strict known-host verification PASS.
+Accepted Lighthouse/Agent UI/composition cdf5b19 now deployed and hash-verified
+on staging; API/capabilities HTTPS200. Staging PID60916/restart25. No new wallet
+attempt, signing or broadcast. Production processes/data unchanged at this checkpoint.
+
+Five functional personality source integration accepted by independent review;
+40 affected tests PASS. Public opt-in Real weekly leaderboard implemented; 68
+additional focused tests PASS including executor/reconciliation/composition; build
+PASS. Browser/release verification for these new changes remains pending.
+Canonical target-only import is under review; legacy Agents/wallet/vault and all
+M4 history are preserved. Do not overwrite or infer historical relationships.
+Legacy journal has one broadcast-attempted record with null finalized transaction,
+null signature status and absent mint on configured Mainnet RPC. Null is not proof
+of historical failure: current M4 journal guard remains unchanged and blocks a new
+financial attempt until authoritative recovery or an explicit reviewed policy exists.
+Next checkpoint22:53 WIB: finish reviewed data migration/default-OFF canonical
+release and production desktop/mobile QA; no financial gate bypass.
+
+# Previous checkpoint
 # CURRENT — 6 October 2026, 22:22 WIB: HOSTINGER SSH PUBLIC KEY INSTALL REQUIRED
 
 Resume c20dfc3 preserved all accepted source/deployment evidence below. Filtered
@@ -1864,3 +1886,5 @@ Independent final composition review: ACCEPT, no remaining P1/P2. Product GET/HE
 status reads can reconcile and persist existing operations; they are not strictly
 side-effect-free. No signing/send path was found there. Existing Nginx/4193 legacy
 launch routing is outside the4190 request gate and MUST be qualified before activation.
+
+

@@ -1,8 +1,10 @@
 import { networkConfig } from '../src/networks.js';
+import {PERSONALITIES} from '../public/app/agent-personalities.js';
 export const strategies = [
-  { id: 'balanced', name: 'Balanced', description: 'A measured profile with conservative position limits.', maxPositionPct: 10 },
-  { id: 'momentum', name: 'Momentum', description: 'Broader movement and activity filters; shared position limits.', maxPositionPct: 10 },
-  { id: 'selective', name: 'Selective', description: 'Stricter activity and liquidity filters; shared position limits.', maxPositionPct: 10 },
+  ...Object.entries(PERSONALITIES).map(([id,p])=>({id,name:p.name,description:p.label,tradePercent:p.tradeBps/100,takeProfitPercent:p.takeProfit*100,stopLossPercent:p.stopLoss*100,cooldownSeconds:p.cooldownSeconds,recommended:id==='operator',personalityVersion:p.version,maxPositionPct:10})),
+  { id: 'balanced', name: 'Balanced', description: 'A measured profile with conservative position limits.', maxPositionPct: 10,legacy:true },
+  { id: 'momentum', name: 'Momentum', description: 'Broader movement and activity filters; shared position limits.', maxPositionPct: 10,legacy:true },
+  { id: 'selective', name: 'Selective', description: 'Stricter activity and liquidity filters; shared position limits.', maxPositionPct: 10,legacy:true },
 ];
 export const characters = [
   { id: 'frank', name: 'Felix Builder', role: 'Build with intention', color: '#548dff' },

@@ -2,6 +2,7 @@ import {createHash} from 'node:crypto';
 import {candidateQueue} from '../market-discovery.js';
 import {strategyIntent} from '../paper-engine.js';
 import {strategyConfigFor} from '../../public/app/strategy-config.js';
+import {PERSONALITIES,personalitySizeLamports} from '../../public/app/agent-personalities.js';
 import {SOL_MINT,reject} from './intent.js';
 import {AUTONOMOUS_V1,authorizeAutonomousV1,decideRealExit,markRealPosition,resolveAutonomousVenue} from './autonomous-v1.js';
 import {assertMarketBinding} from './market-provenance.js';
@@ -13,7 +14,7 @@ const REAL_ACTIVE=new Set(['QUOTED','PREPARING','PREPARED','SIGNED','SUBMITTED',
 // A single production decision path. The execution port must itself own the
 // atomic reservation, final message validator, simulation, signing and
 // reconciliation. No browser capability or Paper execution enters this path.
-export function createAutonomousOrchestrator({discovery,market,positions,executions,health,executionPort,network,agentContext,flags,risk,resolveProvenance,decision,now=Date.now}){
+export function createAutonomousOrchestrator({discovery,market,positions,executions,health,executionPort,network,agentContext,flags,risk,resolveProvenance,positionSizing,decision,now=Date.now}){
  if(!discovery?.scan||!market?.sellQuote||!positions?.read||!positions?.riskState||!positions?.actualTokenBalance||!executions?.list||!health?.read||!network?.verify||!agentContext||!flags||!risk?.evaluate||!resolveProvenance)throw Error('AUTONOMOUS_DEPENDENCY_MISSING');
  const record=(agentId,outcome)=>{decision?.(agentId,outcome);return outcome;};
  const pause=(agentId,reason)=>{health.pause(agentId,reason);return record(agentId,skip(reason));};
@@ -52,7 +53,8 @@ export function createAutonomousOrchestrator({discovery,market,positions,executi
   for(const candidate of queue.rows){
    if(!candidate.eligible)continue;
    record(agentId,{action:'CANDIDATE',mint:candidate.mint,marketIdentity:{mint:candidate.mint,pair:candidate.quote.pair??null,venue:candidate.quote.venue??null,quoteMint:candidate.quote.quoteMint??null,snapshotId:candidate.quote.snapshotId??null},executionSupport:'UNSUPPORTED'});
-   const state={...agent,mint:candidate.mint,position:null},signal=strategyIntent(state,candidate.quote,now());
+   // Signal evaluation must not invent a cash balance; Real size is proved below.
+   const state={...agent,mint:candidate.mint,position:null,signalOnly:true},signal=strategyIntent(state,candidate.quote,now());
    if(signal.side!=='BUY')continue;
    const provenance=await resolveProvenance({snapshot:candidate.quote,mint:candidate.mint,agentWallet:agent.agentWallet});
    if(provenance.status!=='SUPPORTED_RAYDIUM_CPMM'){unsupported=true;record(agentId,skip('UNSUPPORTED_EXECUTION_VENUE',{mint:candidate.mint,marketIdentity:provenance.binding?.identity??null,provenanceReason:provenance.reason}));continue;}
@@ -60,6 +62,17 @@ export function createAutonomousOrchestrator({discovery,market,positions,executi
    const config=strategyConfigFor(agent),inputLamports=Math.min(Math.floor(config.risk.maxSolPerTrade*1e9),Number(AUTONOMOUS_V1.maxBuyLamports));
    if(inputLamports<=0)return record(agentId,skip('TRADE_LIMIT'));
    const intent={mode:'LIVE_AUTONOMOUS',network:'solana:mainnet',agentId,owner:agent.owner,agentWallet:agent.agentWallet,direction:'BUY',inputMint:SOL_MINT,outputMint:candidate.mint,inputAmount:String(inputLamports),slippageBps:Math.min(config.execution.maxSlippageBps,AUTONOMOUS_V1.maxSlippageBps),pool:venue.pool,marketBinding:provenance.binding,requestKey:key(['BUY',agentId,candidate.mint,candidate.quote.snapshotId??candidate.quote.observedAt]),strategyVersion:agent.strategyConfigVersion??0,strategyConfig:config};
+   if(PERSONALITIES[config.strategy]){
+    try{
+     if(typeof positionSizing!=='function')throw Error('PERSONALITY_SIZING_UNAVAILABLE');
+     const budget=await positionSizing({agent,intent});
+     if(!Number.isSafeInteger(budget?.observedAt)||now()-budget.observedAt>10000||budget.observedAt>now())throw Error('PERSONALITY_SIZING_STALE');
+     const sizing=personalitySizeLamports({id:config.strategy,...budget,ceilingLamports:String(inputLamports)});
+     if(sizing.effectiveLamports==='0')return record(agentId,skip('PROTECTED_RESERVE'));
+     intent.inputAmount=sizing.effectiveLamports;
+     record(agentId,{action:'SIZING',...sizing});
+    }catch(e){return record(agentId,skip(e.code??e.message??'PERSONALITY_SIZING_UNAVAILABLE'));}
+   }
    try{assertMarketBinding(provenance.binding,candidate.quote,intent);}catch{return record(agentId,skip('MARKET_PROVENANCE_MISMATCH'));}
    record(agentId,{action:'BUY_INTENT',mint:candidate.mint,marketIdentity:provenance.binding.identity,verifiedVenue:venue.kind,verifiedPool:venue.pool,executionSupport:'SUPPORTED',marketBinding:provenance.binding});
    try{return await execute({agent,marketQuote:candidate.quote,intent,ledgerState:{...await positions.riskState(agentId),openPositions:0,consecutiveFailures:health.read(agentId).consecutiveFailures,pausedByBreaker:false},reason:signal.reason,source:{signal,marketBinding:provenance.binding}});}catch(e){return record(agentId,skip(e.code??'BUY_REJECTED'));}

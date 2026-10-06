@@ -8,6 +8,15 @@ const now=1_800_000_000_000;
 const base=()=>({flags:{liveAutonomousEnabled:true,autonomousKillSwitch:false,realMoneyEmergencyStop:false},network:{network:'solana:mainnet',verified:true},agent:{mode:'LIVE_AUTONOMOUS',enabled:true,paused:false,vaultVerified:true,owner:'owner',agentId:'agent',agentWallet:'wallet'},intent:{mode:'LIVE_AUTONOMOUS',network:'solana:mainnet',agentId:'agent',owner:'owner',agentWallet:'wallet',direction:'BUY',inputMint:SOL_MINT,outputMint:CONTROLLED_USDC_MINT,inputAmount:'100000',slippageBps:100,pool:CONTROLLED_CPMM_POOL},market:{mint:CONTROLLED_USDC_MINT,observedAt:now-1000},ledger:{openPositions:0,unknown:false,unresolved:false,reservationConflict:false,consecutiveFailures:0,pausedByBreaker:false,cooldownUntil:0,dailyTurnoverLamports:'0',riskPass:true},now});
 const blocked=(edit,code)=>{const x=base();edit(x);assert.throws(()=>authorizeAutonomousV1(x),e=>e.code===code);};
 
+test('entry cooldown blocks BUY but cannot hold a protective full-position SELL',()=>{
+ const x=base();x.ledger.cooldownUntil=now+1800000;
+ assert.throws(()=>authorizeAutonomousV1(x),e=>e.code==='TRADE_COOLDOWN');
+ x.intent={...x.intent,direction:'SELL',inputMint:CONTROLLED_USDC_MINT,outputMint:SOL_MINT,inputAmount:'12000'};
+ x.ledger.openPositions=1;x.ledger.positionQuantity='12000';
+ assert.equal(authorizeAutonomousV1(x).authorized,true);
+ x.flags.autonomousKillSwitch=true;assert.throws(()=>authorizeAutonomousV1(x),e=>e.code==='AUTONOMOUS_TRADING_STOP');
+});
+
 test('only the exact proven classic-SPL pool and pair resolve',()=>{
  assert.equal(resolveAutonomousVenue({mint:CONTROLLED_USDC_MINT,pool:CONTROLLED_CPMM_POOL,direction:'BUY'}).kind,'RAYDIUM_CPMM');
  for(const [mint,pool] of [['PumpFunMint',CONTROLLED_CPMM_POOL],[CONTROLLED_USDC_MINT,'unproven-pool']])assert.throws(()=>resolveAutonomousVenue({mint,pool,direction:'BUY'}),e=>e.code==='UNSUPPORTED_EXECUTION_VENUE');

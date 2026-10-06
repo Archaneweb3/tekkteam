@@ -1,6 +1,13 @@
 export const LIMITS=Object.freeze({maxTradeSol:0.001,maxSolPerTrade:0.001,maxPositionSol:0.005,maxPositionPercent:10,maxOpenPositions:1,maxDailySol:0.02,maxDailySpendSol:0.02,slippageBps:100,maxSlippageBps:100,minLiquidityUsd:10000,cooldownMs:60000,cooldownSeconds:60,paperCapitalSol:0.1,networkFeeSol:0.000005,feeBps:30});
 import {PROFILES,strategyConfigFor} from '../public/app/strategy-config.js';
+import {PERSONALITIES,personalitySizeLamports} from '../public/app/agent-personalities.js';
 export {PROFILES};
+export function paperPersonalitySizing(config,cashSol){
+ if(!Number.isFinite(cashSol)||cashSol<0)throw Error('Sizing balance unavailable');
+ const cap=config.risk.maxSolPerTrade;
+ const reserve=Math.ceil((2*LIMITS.networkFeeSol+2*cap*LIMITS.feeBps/10000)*1e9);
+ return personalitySizeLamports({id:config.strategy,balanceLamports:Math.floor(cashSol*1e9),reserveLamports:reserve,ceilingLamports:Math.floor(cap*1e9)});
+}
 const effective=s=>strategyConfigFor(s.position?.strategyConfig?{strategyConfig:s.position.strategyConfig}:s);
 export function strategyIntent(state,market,now){
  const config=effective(state),result=determineIntent(state,market,now),p=PROFILES[config.strategy];
@@ -12,7 +19,18 @@ function determineIntent(state,market,now){
   if(change>=c.position.takeProfitPercent/100||change<=-c.position.stopLossPercent/100||now-state.position.openedAt>=15*60000)return {side:'SELL',mint:state.mint,sol:Math.min(state.position.quantity*market.priceUsd/market.solUsd,c.risk.maxSolPerTrade),reason:change>=c.position.takeProfitPercent/100?'Take profit':change<=-c.position.stopLossPercent/100?'Stop loss':'Time limit'};
   return {side:'HOLD',reason:'Position within exit thresholds'};
  }
- if(market.change5m>=c.signal.minPriceChange5mPercent&&market.change5m<=p.maxChange&&market.buys5m>=Math.max(1,market.sells5m)*p.minRatio&&market.volume5m>=c.signal.minVolume5mUsd&&market.liquidityUsd>=c.signal.minLiquidityUsd)return {side:'BUY',mint:state.mint,sol:c.risk.maxSolPerTrade,reason:c.strategy+' entry thresholds met'};
+ if(market.change5m>=c.signal.minPriceChange5mPercent&&market.change5m<=p.maxChange&&market.buys5m>=Math.max(1,market.sells5m)*p.minRatio&&market.volume5m>=c.signal.minVolume5mUsd&&market.liquidityUsd>=c.signal.minLiquidityUsd){
+  let sol=c.risk.maxSolPerTrade,sizing;
+  if(PERSONALITIES[c.strategy]&&!state.signalOnly){
+   const cash=state.cashSol??state.cashUsd/market.solUsd;
+   if(!Number.isFinite(cash)||cash<0)return {side:'HOLD',reason:'Sizing balance unavailable'};
+   // Paper cost model only. Real sizing uses its independent fresh cost proof.
+   sizing=paperPersonalitySizing(c,cash);
+   sol=Number(sizing.effectiveLamports)/1e9;
+   if(sol<=0)return {side:'HOLD',reason:'Protected reserve leaves no tradable balance'};
+  }
+  return {side:'BUY',mint:state.mint,sol,...(sizing?{sizing}:{}),reason:c.strategy+' entry thresholds met'};
+ }
  return {side:'HOLD',reason:'Entry thresholds not met'};
 }
 export function riskCheck(state,intent,market,now){
