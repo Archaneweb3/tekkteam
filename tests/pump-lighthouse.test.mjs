@@ -10,15 +10,17 @@ import {atomicExecutionEffects} from '../server/pump-atomic-effects.js';import {
 import {revalidateM4} from '../server/pump-m4-guard.js';import {confirmM4} from '../server/pump-m4-confirmation.js';
 import {finalOracleAccounts} from './pump-lighthouse-oracle-fixture.mjs';import {tokenMetadata} from '../src/agent-launch-data.js';import {executionReviewBinding} from '../src/pump-execution-binding.js';
 import bs58 from 'bs58';
+import {LIGHTHOUSE_PROGRAM_DATA,readLighthouseDeployment} from '../server/pump-lighthouse-program.js';
 // Synthetic owners, disposable encrypted store, controlled RPC stubs; no real send.
 const record=f=>JSON.parse(f.db.prepare('SELECT payload FROM m4_execution').get().payload);
 const remainingKeys=f=>f.db.prepare('SELECT count(*) n FROM m4_ephemeral_mint_signers').get().n;
 const sdk={Transaction,Buffer};
 function append(tx,owner){return tx.add(new TransactionInstruction({programId:new PublicKey(LIGHTHOUSE_PROGRAM),keys:[{pubkey:owner,isSigner:true,isWritable:true}],data:Buffer.from('BgQDAMtDPAoAAAAABAMAAAEAAAAAAAAAAAA=','base64')}));}
+function deploymentFixture(){const p=Buffer.alloc(36),d=Buffer.alloc(50);p.writeUInt32LE(2);new PublicKey(LIGHTHOUSE_PROGRAM_DATA).toBuffer().copy(p,4);d.writeUInt32LE(3);d.writeBigUInt64LE(100n,4);d[45]=7;return [p,d].map((b,i)=>({owner:'BPFLoaderUpgradeab1e11111111111111111111111',executable:i===0,lamports:1,data:[b.toString('base64'),'base64']}));}
 async function setup(){
  const f=m4Fixture({useVault:true,freshBlockhash:true,feePolicy:{...M4_FEE_POLICY,computeUnitPriceMicroLamports:10000,quoteSlot:100}});
  let r,expired=false,simulationFails=false,proofMissing=false;
- const transport={...f.deps.transport,rpc:async(m,p)=>{if(m==='getGenesisHash')return GENESIS;if(m==='isBlockhashValid')return {context:{slot:104},value:!expired};if(m==='getBlockHeight')return r.lastValidBlockHeight+(expired?1:-100);if(m==='getMultipleAccounts')return {context:{slot:105},value:[null]};if(m==='getSignatureStatuses')return {context:{slot:105},value:[null]};if(m==='getTransaction')return null;throw Error('Unexpected RPC '+m);}};
+ const transport={...f.deps.transport,rpc:async(m,p)=>{if(m==='getGenesisHash')return GENESIS;if(m==='isBlockhashValid')return {context:{slot:104},value:!expired};if(m==='getBlockHeight')return r.lastValidBlockHeight+(expired?1:-100);if(m==='getMultipleAccounts')return {context:{slot:104},value:p[0].length===2?deploymentFixture():[null]};if(m==='getSignatureStatuses')return {context:{slot:105},value:[null]};if(m==='getTransaction')return null;throw Error('Unexpected RPC '+m);}};
  const prepareFactory=opts=>async(...args)=>{r=await f.deps.prepareFactory(opts)(...args);return r;};
  const revalidate=async s=>{if(simulationFails)throw Object.assign(Error('Final simulation failed'),{code:'FINAL_SIMULATION_FAILED'});const final=verifyM4Signed(s.signedTransactionBase64,s,true);return proofMissing?{}:{contextSlot:104,finalMessageProof:{messageSha256:sha(final.tx.serializeMessage()),signedPayloadSha256:final.signedDigest,simulationStatus:'PASS',signatureVerification:true}};};
  const deps={...f.deps,transport,prepareFactory,revalidate,actionTimeEnabled:true,lighthouseEnabled:true,signerStore:f.store},controller=createM4Execution(deps);
@@ -119,7 +121,7 @@ test('real final revalidation and finalized oracle use actual signed bytes, 18 a
   const image=Buffer.from('fixture PNG'),imageHash=sha(image);f.identity.image='https://fixture.example/metadata/agents/'+f.identity.agentId+'/'+imageHash+'.png';r.launch.image=f.identity.image;delete r.executionReview.digest;r.executionReview.digest=sha(executionReviewBinding(r));
   const proof=structuredClone(s.proof),valid=await finalOracleAccounts(r,proof),simulation=proof.simulation;
   simulation.value.accounts[0]=valid.mintAccount;simulation.value.accounts[2]=valid.curveAccount;simulation.value.accounts[3]=valid.ata;simulation.value.logs=valid.logs;
-  const programDataKey=Keypair.generate().publicKey,programBytes=Buffer.alloc(36);programBytes.writeUInt32LE(2);programDataKey.toBuffer().copy(programBytes,4);
+  const programDataKey=new PublicKey(LIGHTHOUSE_PROGRAM_DATA),programBytes=Buffer.alloc(36);programBytes.writeUInt32LE(2);programDataKey.toBuffer().copy(programBytes,4);
   const program={owner:'BPFLoaderUpgradeab1e11111111111111111111111',executable:true,lamports:1,data:[programBytes.toString('base64'),'base64']},code=Buffer.alloc(50);code.writeUInt32LE(3);code.writeBigUInt64LE(100n,4);code[45]=7;
   proof.before.value.push(structuredClone(program));proof.afterRead.value.push(structuredClone(program));simulation.value.accounts.push(structuredClone(program));
   const structure=inspectFinalCreation(bytes,{mint:new PublicKey(r.mint),blockhash:r.recentBlockhash,genesis:r.genesis,chainId:r.network,launch:r.launch,feePolicy:r.feePolicy,finalMessageResult:r,finalMessageRequiresAllSignatures:true});fixtureAtomicBalances(bytes,structure,proof.before,simulation,r.executionReview.networkFeeLamports);
@@ -129,17 +131,17 @@ test('real final revalidation and finalized oracle use actual signed bytes, 18 a
    if(m==='getFeeForMessage'){assert.equal(p[0],Transaction.from(bytes).serializeMessage().toString('base64'));assert.notEqual(p[0],Transaction.from(Buffer.from(r.transactionBase64,'base64')).serializeMessage().toString('base64'));return {context:ctx(),value:r.executionReview.networkFeeLamports};}
    if(m==='getMultipleAccounts'){
     if(p[0].length===18){assert.deepEqual(p[0],structure.accounts.map(a=>a.address));return {context:ctx(),value:structuredClone(++reads%2?proof.before.value:proof.afterRead.value)};}
-    if(p[0][0]===LIGHTHOUSE_PROGRAM)return {context:ctx(),value:[structuredClone(program)]};
-    assert.equal(p[0][0],programDataKey.toBase58());const b=Buffer.from(code);if(upgrade&&++programReads%2===0)b[45]=8;return {context:ctx(),value:[{owner:program.owner,executable:false,lamports:1,data:[b.toString('base64'),'base64']}]};
+    assert.deepEqual(p[0],[LIGHTHOUSE_PROGRAM,programDataKey.toBase58()]);const b=Buffer.from(code);if(upgrade&&++programReads%2===0)b[45]=8;return {context:ctx(),value:[structuredClone(program),{owner:program.owner,executable:false,lamports:1,data:[b.toString('base64'),'base64']}]};
    }
    if(m==='simulateTransaction'){assert.equal(p[0],s.signedTransactionBase64);assert.equal(p[1].sigVerify,true);assert.equal(p[1].replaceRecentBlockhash,false);assert.equal(p[1].accounts.addresses.length,18);const out=structuredClone(simulation);out.context=ctx();if(wrongPointer){const b=Buffer.from(out.value.accounts[0].data[0],'base64');Keypair.generate().publicKey.toBuffer().copy(b,170);out.value.accounts[0].data[0]=b.toString('base64');}return out;}
    if(m==='getMinimumBalanceForRentExemption')return r.policy.rentAccounts.find(a=>a.dataLength===p[0]).minimumRentExemptionLamports;
    throw Error('Unexpected RPC '+m);
   },publicRequest:async uri=>uri===r.metadataUri?Response.json(tokenMetadata(f.identity)):new Response(image,{headers:{'Content-Type':'image/png'}})};
+  s.reviewedLighthouseDeployment=(await readLighthouseDeployment(transport,104)).identity;
   const request=f.request({executionId:s.executionId,result:r}),final=await revalidateM4(s,f.identity,request,{transport,now:f.clock});assert.equal(final.finalMessageProof.atomicEffects.length,18);assert.equal(final.finalMessageProof.signatureVerification,true);assert.equal(final.finalMessageProof.lighthouseDeployment.codeSha256,sha(code.subarray(45)));
   simulation.value.accounts[17]=Object.fromEntries(Object.entries(simulation.value.accounts[17]).reverse());
   assert.equal((await revalidateM4(s,f.identity,request,{transport,now:f.clock})).finalMessageProof.simulationStatus,'PASS','cross-bank key order is not mutation');
-  for(const field of ['owner','executable','data','rentEpoch','space']){const saved=structuredClone(simulation.value.accounts[17]);simulation.value.accounts[17][field]=field==='executable'?false:field==='data'?['AA==','base64']:'changed';await assert.rejects(revalidateM4(s,f.identity,request,{transport,now:f.clock}),error=>{assert.equal(error.code,'M4_LIGHTHOUSE_PROGRAM_OR_STATE_CHANGED');assert.equal(error.validationFailure.stage,'LIGHTHOUSE_ACCOUNT_STATE');assert.deepEqual(error.validationFailure.accounts.simulation,simulation.value.accounts[17]);return true;});simulation.value.accounts[17]=saved;}
+  for(const field of ['owner','executable','data','rentEpoch','space']){const saved=structuredClone(simulation.value.accounts[17]);simulation.value.accounts[17][field]=field==='executable'?false:field==='data'?['AA==','base64']:'changed';let captured;await assert.rejects(revalidateM4(s,f.identity,request,{transport,now:f.clock,captureFinalDiagnostics:e=>{captured=e;}}),error=>{assert.ok(captured.evidence.validationFailure.field);assert.equal(captured.evidence.deployments.length,1);assert.equal(error.code,'M4_LIGHTHOUSE_PROGRAM_OR_STATE_CHANGED');assert.equal(error.validationFailure.stage,'LIGHTHOUSE_ACCOUNT_STATE');assert.equal(error.validationFailure.phase,'simulation');assert.equal(error.validationFailure.pubkey,LIGHTHOUSE_PROGRAM);return true;});simulation.value.accounts[17]=saved;}
   s.finalMessageProof=final.finalMessageProof;s.finalMessageEvidence=final.finalMessageEvidence;
   wrongPointer=true;await assert.rejects(revalidateM4(s,f.identity,request,{transport,now:f.clock}),{code:'M4_MINT_STATE_MISMATCH'});wrongPointer=false;reads=0;
   upgrade=true;await assert.rejects(revalidateM4(s,f.identity,request,{transport,now:f.clock}),{code:'M4_LIGHTHOUSE_DEPLOYMENT_CHANGED'});upgrade=false;reads=0;
@@ -148,5 +150,24 @@ test('real final revalidation and finalized oracle use actual signed bytes, 18 a
   const confirmation={rpc:async(m,p)=>{if(m==='getGenesisHash')return GENESIS;if(m==='getSignatureStatuses')return {value:[{slot:1000,err:null,confirmationStatus:'finalized'}]};if(m==='getTransaction')return landed;if(m==='getMultipleAccounts'){assert.equal(p[0].length,5);return {context:{slot:1001},value:[valid.mintAccount,valid.curveAccount,simulation.value.accounts[5],valid.ata,null]};}throw Error(m);}};
   assert.equal((await confirmM4(s,{transport:confirmation})).status,'LAUNCHED');
   s.finalMessageProof.messageSha256='0'.repeat(64);await assert.rejects(confirmM4(s,{transport:confirmation}),{code:'M4_FINAL_MESSAGE_PROOF_REQUIRED'});
+ }finally{f.db.close();}
+});
+test('handoff pin is durable and presend upgrade diagnostic is persisted before any send claim',async()=>{
+ const f=await setup();try{
+  const pin=record(f).reviewedLighthouseDeployment;assert.ok(pin.codeSha256);assert.equal(pin.programData,LIGHTHOUSE_PROGRAM_DATA);
+  const rpc=f.deps.transport.rpc,transport={...f.deps.transport,rpc:async(m,p)=>{const out=await rpc(m,p);if(m==='getMultipleAccounts'&&p[0].length===2){const b=Buffer.from(out.value[1].data[0],'base64');b[45]++;out.value[1].data[0]=b.toString('base64');}return out;}};
+  const revalidate=async s=>{const result=await f.deps.revalidate(s);result.finalMessageProof.lighthouseDeployment=pin;result.finalMessageProof.slot=104;return result;};
+  const c=createM4Execution({...f.deps,transport,revalidate}),out=await c.run('submit',f.identity,{...f.request(f.p),signedTransactionBase64:f.signed()});
+  assert.equal(out.status,'SIGNED_NOT_BROADCAST');assert.equal(out.broadcastAttempted,false);assert.equal(out.submittedAt,null);assert.equal(f.sends(),0);
+  const d=JSON.parse(f.db.prepare("SELECT payload FROM m4_wallet_diagnostics WHERE json_extract(payload,'$.stage')='PRESEND_LIGHTHOUSE_VALIDATION'").get().payload);assert.equal(d.validationFailure.field,'codeSha256');assert.equal(d.validationFailure.phase,'presend');assert.equal(d.lighthouseObservations[0].accounts[1].pubkey,LIGHTHOUSE_PROGRAM_DATA);
+ }finally{f.db.close();}
+});
+test('handoff deployment failure cannot claim wallet delivery',async()=>{
+ const f=await setup();try{
+  f.expire();const previous=record(f),rpc=f.deps.transport.rpc;f.deps.transport.rpc=async(m,p)=>{const out=await rpc(m,p);if(m==='getMultipleAccounts')f.live();return out;};
+  const c=createM4Execution(f.deps),fresh=await c.run('wallet-prepare',f.identity,{initialBuy:'0',requestId:crypto.randomUUID(),previousExecutionId:previous.executionId});
+  f.deps.transport.rpc=async(m,p)=>{const out=await rpc(m,p);if(m==='getMultipleAccounts'&&p[0].length===2)out.value[0].executable=false;return out;};
+  await assert.rejects(c.run('wallet-claim',f.identity,f.request(fresh)),{code:'M4_LIGHTHOUSE_DEPLOYMENT_CHANGED'});assert.equal(record(f).walletDeliveryClaimed,undefined);assert.equal(f.sends(),0);
+  const d=JSON.parse(f.db.prepare("SELECT payload FROM m4_wallet_diagnostics WHERE operation_id=? AND json_extract(payload,'$.stage')='WALLET_HANDOFF_DEPLOYMENT'").get(fresh.executionId).payload);assert.equal(d.validationFailure.field,'executable');assert.equal(d.validationFailure.phase,'walletHandoff');
  }finally{f.db.close();}
 });

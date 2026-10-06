@@ -59,7 +59,12 @@ export function createM4Execution({db,transport,publishMetadata,journalPath,now=
    }
    if(action==='wallet-claim'){
     if(!s||s.status!=='AWAITING_WALLET_APPROVAL'||!isActionTimePackage(s.result)||s.walletDeliveryClaimed||s.broadcastAttempted||s.signature)throw m4Fail('M4_APPROVAL_ALREADY_OPENED');
-    bound(s,identity,request);const walletValidity=await checkM4Blockhash(s.result,{transport,now,minimumRemainingBlocks:MIN_WALLET_BLOCKS});verifyIdentity();
+    bound(s,identity,request);let minimum=s.result.executionReview.validitySlot;
+    if(s.walletMessagePolicy===FINAL_MESSAGE_POLICY){
+     const evidence={deployments:[]};try{const d=await readLighthouseDeployment(transport,minimum,null,o=>evidence.deployments.push({phase:'walletHandoff',...o}));s.reviewedLighthouseDeployment=d.identity;minimum=d.contextSlot;diagnostic(s,'WALLET_HANDOFF_DEPLOYMENT','LIGHTHOUSE_DEPLOYMENT_PASS',evidence);}
+     catch(error){evidence.validationFailure=error.validationFailure??null;if(evidence.validationFailure)evidence.validationFailure.phase='walletHandoff';diagnostic(s,'WALLET_HANDOFF_DEPLOYMENT',error.code,evidence);throw error;}
+    }
+    const walletValidity=await checkM4Blockhash(s.result,{transport,now,minimumRemainingBlocks:MIN_WALLET_BLOCKS,minimumContextSlot:minimum});verifyIdentity();
     isolation?.assertExecution(s.executionId);s.walletDeliveryClaimed=true;s.walletDeliveryClaimedAt=now();save(s);return {...publicState(s),walletValidity};
    }
    if(action==='prepare'||action==='recover'||action==='wallet-prepare'){
@@ -155,7 +160,7 @@ export function createM4Execution({db,transport,publishMetadata,journalPath,now=
     const actionTime=isActionTimePackage(s.result);
     if(!actionTime)claimSend();
     const authorize=(bytes,signature)=>{verifyIdentity();isolation?.assertExecution(s.executionId);const durable=read();assertReviewedExecutionRequest(durable.result,identity,{...request,now:now()});return durable.status==='SUBMITTED'&&durable.signature===signature&&durable.signedDigest===sha(Buffer.from(bytes,'base64'))&&durable.signedTransactionBase64===bytes;};
-    try{await transport.submitOnce(s.signedTransactionBase64,s.signature,actionTime?async(bytes,signature)=>{if(s.finalMessageProof?.lighthouseDeployment)await readLighthouseDeployment(transport,s.finalMessageProof.slot,s.finalMessageProof.lighthouseDeployment);await checkM4Blockhash(s.result,{transport,now,minimumContextSlot:finalContext?.blockhashValidity?.contextSlot??finalContext?.contextSlot??s.result.executionReview.validitySlot});verifyIdentity();const durable=read();if(durable.status!=='SIGNED'||durable.executionId!==s.executionId||durable.signedTransactionBase64!==bytes||durable.signature!==signature)throw m4Fail('M4_SEND_AUTHORITY_REQUIRED');claimSend();return authorize(bytes,signature);}:authorize);s.status='CONFIRMING';}
+    try{await transport.submitOnce(s.signedTransactionBase64,s.signature,actionTime?async(bytes,signature)=>{let minimum=finalContext?.blockhashValidity?.contextSlot??finalContext?.contextSlot??s.result.executionReview.validitySlot;if(s.finalMessageProof?.lighthouseDeployment){const evidence={deployments:[]};try{const deployment=await readLighthouseDeployment(transport,minimum,s.finalMessageProof.lighthouseDeployment,o=>evidence.deployments.push({phase:'presend',...o}));minimum=deployment.contextSlot;diagnostic(s,'PRESEND_LIGHTHOUSE_VALIDATION','LIGHTHOUSE_DEPLOYMENT_PASS',evidence);}catch(error){evidence.validationFailure=error.validationFailure??null;if(evidence.validationFailure)evidence.validationFailure.phase='presend';diagnostic(s,'PRESEND_LIGHTHOUSE_VALIDATION',error.code,evidence);throw error;}}await checkM4Blockhash(s.result,{transport,now,minimumContextSlot:minimum});verifyIdentity();const durable=read();if(durable.status!=='SIGNED'||durable.executionId!==s.executionId||durable.signedTransactionBase64!==bytes||durable.signature!==signature)throw m4Fail('M4_SEND_AUTHORITY_REQUIRED');claimSend();return authorize(bytes,signature);}:authorize);s.status='CONFIRMING';}
     catch(error){s.status=s.broadcastAttempted?'CONFIRMATION_UNKNOWN':'SIGNED_NOT_BROADCAST';s.error=error.code??(s.broadcastAttempted?'M4_SUBMISSION_UNCERTAIN':'M4_PRESEND_VALIDATION_FAILED');}
     save(s);return publicState(s);
    }

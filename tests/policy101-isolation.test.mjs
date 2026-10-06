@@ -5,7 +5,7 @@ import {Keypair} from '@solana/web3.js';
 import {m4Fixture} from './pump-m4-fixture.mjs';
 import {createM4Execution} from '../server/pump-m4.js';
 import {sha} from '../server/pump-m4-guard.js';
-import {createPolicy101Authority,POLICY101_ID} from '../server/policy101-isolation.js';
+import {createPolicy101Authority,POLICY101_ID,POLICY101_LIGHTHOUSE_ID} from '../server/policy101-isolation.js';
 import {createLegacyQuarantine,writeLegacyQuarantine} from '../server/legacy-launch-quarantine.js';
 import {GENESIS} from '../src/pump-readiness.js';
 import {readLaunchEvidence} from '../server/launchpad-contracts.js';
@@ -60,3 +60,30 @@ test('confirmed receipt is appended atomically; read authorities persist with au
 
 test('removing runtime approval cannot bypass persisted grant at wallet delivery or Submit',async()=>{const f=await setup();try{const p=await f.controller.run('wallet-prepare',f.identity,f.request()),off=createPolicy101Authority({db:f.db,journalPath:f.journalPath}),resumed=createM4Execution({...f.deps,receiptAuthority:off});await assert.rejects(resumed.run('wallet-claim',f.identity,f.reviewRequest(p)),{code:'POLICY101_NOT_ARMED'});await assert.rejects(resumed.run('submit',f.identity,{...f.reviewRequest(p),signedTransactionBase64:f.signed()}),{code:'POLICY101_NOT_ARMED'});assert.equal(readFileSync(f.journalPath,'utf8'),f.raw);assert.equal(f.sends(),0);}finally{f.db.close();}});
 test('a pin changed during native validity is refused before payload delivery',async()=>{const f=await setup();try{const rpc=f.deps.transport.rpc;let nativeChecks=0;f.deps.transport.rpc=async(m,p)=>{const r=await rpc(m,p);if(m==='isBlockhashValid'&&++nativeChecks===2)writeFileSync(f.approval.evidencePath,'changed');return r;};await assert.rejects(f.controller.run('wallet-prepare',f.identity,f.request()),{code:'POLICY101_HISTORY_CHANGED'});assert.equal(record(f).executionId,f.prior.executionId);assert.equal(f.sends(),0);}finally{f.db.close();}});
+
+async function successorFixture(){
+ const f=await setup(),p=await f.controller.run('wallet-prepare',f.identity,f.request());await f.controller.run('wallet-claim',f.identity,f.reviewRequest(p));
+ const failing=createM4Execution({...f.deps,revalidate:async()=>{throw Object.assign(Error('fixture'),{code:'M4_LIGHTHOUSE_PROGRAM_OR_STATE_CHANGED'});}});
+ await failing.run('submit',f.identity,{...f.reviewRequest(p),signedTransactionBase64:f.signed()});
+ const payload=f.db.prepare('SELECT payload FROM m4_execution').get().payload,parent=f.db.prepare('SELECT payload FROM launch_isolation_grants').get().payload,claim=f.db.prepare('SELECT * FROM launch_isolation_claims').get();
+ const approval={...f.approval,id:POLICY101_LIGHTHOUSE_ID,predecessor:{id:POLICY101_ID,sha256:sha(parent),claimSha256:sha(JSON.stringify(claim))},prior:{id:p.executionId,sha256:sha(payload)},history:f.db.prepare('SELECT execution_id,payload FROM m4_execution_history ORDER BY execution_id').all().map(r=>({id:r.execution_id,sha256:sha(r.payload)}))};
+ return {...f,p,approval,parent,claim,payload};
+}
+test('one explicit successor preserves old grant and signed history, and never rearms old operation',async()=>{
+ const f=await successorFixture();try{
+  const authority=createPolicy101Authority({db:f.db,journalPath:f.journalPath,approval:f.approval});assert.equal(authority.isolation.available(),true);
+  assert.throws(()=>f.authority.isolation.assertExecution(f.p.executionId),{code:'POLICY101_NOT_ARMED'});
+  const oldApproval=JSON.parse(f.parent),stale=createPolicy101Authority({db:f.db,journalPath:f.journalPath,approval:oldApproval});assert.throws(()=>stale.isolation.available(),{code:'POLICY101_NOT_ARMED'});
+  f.expire();const rpc=f.deps.transport.rpc,transport={...f.deps.transport,rpc:async(m,p)=>m==='getSignatureStatuses'?{context:{slot:105},value:[null]}:m==='getTransaction'?null:rpc(m,p)};
+  const c=createM4Execution({...f.deps,transport,receiptAuthority:authority}),req={initialBuy:'0',requestId:crypto.randomUUID(),previousExecutionId:f.p.executionId},fresh=await c.run('wallet-prepare',f.identity,req);
+  assert.notEqual(fresh.executionId,f.p.executionId);assert.notEqual(fresh.result.mint,f.p.result.mint);assert.notEqual(fresh.result.recentBlockhash,f.p.result.recentBlockhash);assert.equal(f.db.prepare('SELECT payload FROM m4_execution_history WHERE execution_id=?').get(f.p.executionId).payload,f.payload);
+  assert.equal(f.db.prepare('SELECT payload FROM launch_isolation_grants WHERE id=?').get(POLICY101_ID).payload,f.parent);assert.deepEqual(f.db.prepare('SELECT * FROM launch_isolation_claims WHERE grant_id=?').get(POLICY101_ID),f.claim);
+  assert.equal(f.db.prepare('SELECT COUNT(*) n FROM launch_isolation_claims').get().n,2);assert.equal((await c.run('wallet-prepare',f.identity,req)).executionId,fresh.executionId);
+  await assert.rejects(c.run('wallet-prepare',f.identity,{...req,requestId:crypto.randomUUID(),previousExecutionId:fresh.executionId}),{code:'POLICY101_ATTEMPT_CONSUMED'});
+  await assert.rejects(c.run('submit',f.identity,{...f.reviewRequest(f.p),signedTransactionBase64:f.signed()}),{code:'M4_EXECUTION_MISMATCH'});assert.equal(f.sends(),0);
+ }finally{f.db.close();}
+});
+for(const field of ['lineage','claim','prior','target','limit','third','broadcast'])test('successor refuses '+field+' and rolls back grant insertion',async()=>{const f=await successorFixture();try{
+ const a=structuredClone(f.approval);if(field==='lineage')a.predecessor.sha256='0';if(field==='claim')a.predecessor.claimSha256='0';if(field==='prior')a.prior.sha256='0';if(field==='target')a.target.owner='wrong';if(field==='limit')a.maximumAttempts=2;if(field==='third')a.id+='-2';if(field==='broadcast'){const s=record(f);s.broadcastAttempted=true;f.db.prepare('UPDATE m4_execution SET payload=?').run(JSON.stringify(s));a.prior.sha256=sha(JSON.stringify(s));}
+ assert.throws(()=>createPolicy101Authority({db:f.db,journalPath:f.journalPath,approval:a}));assert.equal(f.db.prepare('SELECT COUNT(*) n FROM launch_isolation_grants').get().n,1);assert.equal(f.sends(),0);
+ }finally{f.db.close();}});

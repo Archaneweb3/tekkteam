@@ -46,3 +46,11 @@ test('final simulation evidence binds request pubkeys and compiled balance index
   const d=walletDiagnostic(f.s,{returnedTransactionBase64:f.body.returnedTransactionBase64,stage:'FINAL_REVALIDATION',rule:'M4_LIGHTHOUSE_PROGRAM_OR_STATE_CHANGED',evidence});assert.equal(d.finalSimulatedDebitLamports,5562578);assert.equal(d.accounts[1].pubkey,f.identity.owner);assert.equal(d.accounts[1].atomicDeltaLamports,-5562578);assert.equal(d.simulation.signatureVerificationRequested,true);assert.equal(d.accounts[1].before.data.length,6);assert.equal(JSON.stringify(d).includes('cHVibGlj'),false);
  }finally{f.db.close();}
 });
+
+test('deployment observations and exact failed field survive redacted durable diagnostics',async()=>{
+ const f=await fixture();try{
+  const evidence={deployments:[{phase:'afterSimulation',addresses:[LIGHTHOUSE_PROGRAM,'missing-program-data'],response:{context:{slot:123},value:[{owner:'wrong-loader',executable:true,lamports:42,rentEpoch:7,data:['AA==','base64']},null]}}],validationFailure:{stage:'LIGHTHOUSE_ACCOUNT_STATE',phase:'afterSimulation',slot:123,pubkey:LIGHTHOUSE_PROGRAM,field:'owner',expected:'loader',actual:'wrong-loader'}};
+  const snapshot=walletDiagnostic(f.s,{returnedTransactionBase64:f.body.returnedTransactionBase64,stage:'FINAL_REVALIDATION',rule:'M4_LIGHTHOUSE_DEPLOYMENT_CHANGED',evidence}),out=createWalletDiagnosticStore(f.db)(snapshot);
+  const stored=JSON.parse(f.db.prepare('SELECT payload FROM m4_wallet_diagnostics WHERE id=?').get(out.diagnosticId).payload);assert.deepEqual(stored.validationFailure,evidence.validationFailure);assert.equal(stored.lighthouseObservations[0].slot,123);assert.equal(stored.lighthouseObservations[0].accounts[1].exists,false);assert.equal(stored.lighthouseObservations[0].accounts[0].data.length,1);assert.equal(JSON.stringify(stored).includes('AA=='),false);assert.equal(f.sends(),0);
+ }finally{f.db.close();}
+});

@@ -1,4 +1,3 @@
-import {sameRpcValue} from '../src/rpc-value-equality.js';
 import {Transaction,PublicKey} from '@solana/web3.js';
 import {createHash} from 'node:crypto';
 import bs58 from 'bs58';
@@ -13,7 +12,7 @@ import {atomicExecutionEffects} from './pump-atomic-effects.js';
 import {isActionTimePackage} from '../src/pump-action-time.js';
 import {FINAL_MESSAGE_POLICY,validateFinalWalletMessage} from '../src/pump-wallet-final.js';
 import {inspectFinalCreation} from '../src/pump-final-structure.js';
-import {readLighthouseDeployment} from './pump-lighthouse-program.js';
+import {readLighthouseDeployment,validateLighthouseProgramSnapshots} from './pump-lighthouse-program.js';
 export const M4_TARGET=Object.freeze({owner:'C2nddai75FJZWWkNdUF7csEBryRCMikJyTTZZqYcMiBv',agentId:'8fc6fe77-16a0-4fed-8ca0-ddd1f6ef9fa7',agentName:'aaaaada',name:'ret',symbol:'3ED',tokenDraftRevision:1,initialBuyLamports:0,ceilingLamports:10000000});
 export const m4Fail=code=>Object.assign(Error(code),{code,status:409});
 export const sha=value=>createHash('sha256').update(value).digest('hex');
@@ -66,7 +65,7 @@ export async function checkM4Blockhash(result,{transport,now=Date.now,minimumRem
 export async function revalidateM4(record,identity,request,options){
  const evidence={};let result;
  try{result=await revalidateM4Observed(record,identity,request,{...options,diagnosticEvidence:evidence});}
- catch(error){if(record.walletMessagePolicy===FINAL_MESSAGE_POLICY)await options.captureFinalDiagnostics?.({rule:error.code,evidence});throw error;}
+ catch(error){evidence.validationFailure=error.validationFailure??null;if(evidence.validationFailure&&!evidence.validationFailure.phase)evidence.validationFailure.phase=evidence.deployments?.at(-1)?.phase??null;if(record.walletMessagePolicy===FINAL_MESSAGE_POLICY)await options.captureFinalDiagnostics?.({rule:error.code,evidence});throw error;}
  if(record.walletMessagePolicy===FINAL_MESSAGE_POLICY)await options.captureFinalDiagnostics?.({rule:'FINAL_REVALIDATION_PASS',evidence});
  return result;
 }
@@ -86,7 +85,10 @@ async function revalidateM4Observed(record,identity,request,{transport,now=Date.
  const fee=await rpc('getFeeForMessage',[tx.serializeMessage().toString('base64'),{commitment:'finalized',minContextSlot:contextSlot(validity)}]);
  diagnosticEvidence.fee=fee;
  const before=await rpc('getMultipleAccounts',[addresses,{encoding:'base64',commitment:'finalized',minContextSlot:contextSlot(fee,contextSlot(validity))}]);diagnosticEvidence.before=before;
- const deployment=structure.lighthouse?await readLighthouseDeployment(transport,contextSlot(before,contextSlot(fee))):null;
+ const observeDeployment=phase=>observation=>{diagnosticEvidence.deployments??=[];diagnosticEvidence.deployments.push({phase,...observation});};
+ if(structure.lighthouse&&!record.reviewedLighthouseDeployment)throw m4Fail('M4_LIGHTHOUSE_HANDOFF_IDENTITY_REQUIRED');
+ const deployment=structure.lighthouse?await readLighthouseDeployment(transport,contextSlot(before,contextSlot(fee)),record.reviewedLighthouseDeployment,observeDeployment('beforeSimulation')):null;
+ if(deployment)diagnosticEvidence.deploymentIdentity=deployment.identity;
  const simulation=await rpc('simulateTransaction',[finalBase64??r.transactionBase64,{encoding:'base64',sigVerify:!!finalBase64,replaceRecentBlockhash:false,commitment:'finalized',minContextSlot:deployment?.contextSlot??contextSlot(before,contextSlot(fee)),innerInstructions:true,accounts:{encoding:'base64',addresses}}]);
  diagnosticEvidence.simulation=simulation;
  const afterRead=await rpc('getMultipleAccounts',[addresses,{encoding:'base64',commitment:'finalized',minContextSlot:contextSlot(simulation,deployment?.contextSlot??contextSlot(before))}]);diagnosticEvidence.afterRead=afterRead;contextSlot(afterRead,contextSlot(simulation));
@@ -97,12 +99,9 @@ async function revalidateM4Observed(record,identity,request,{transport,now=Date.
  if(before.value[5]?.owner!=='11111111111111111111111111111111'||before.value[5]?.executable!==false||payer(before.value[5])!==payer(afterRead.value[5])||payer(before.value[5])!==payer(simulation.value.accounts[5]))throw m4Fail('M4_PAYER_CHANGED');
  const atomicEffects=atomicExecutionEffects(r,{simulation,feeResponse:fee,before,afterRead},policy,finalBase64);
  if(structure.lighthouse){
-  const i=addresses.indexOf(structure.lighthouse.program),program=before.value[i],post=simulation.value.accounts[i],after=afterRead.value[i];
-  if(!program||program.executable!==true||program.owner!=='BPFLoaderUpgradeab1e11111111111111111111111'||!sameRpcValue(program,after)||!sameRpcValue(program,post)||simulation.value.accounts[5].lamports<structure.lighthouse.minBalanceLamports){
-   const error=m4Fail('M4_LIGHTHOUSE_PROGRAM_OR_STATE_CHANGED');
-   error.validationFailure={stage:'LIGHTHOUSE_ACCOUNT_STATE',slots:{before:before.context.slot,simulation:simulation.context.slot,after:afterRead.context.slot},accounts:{before:program??null,simulation:post??null,after:after??null},payerPostLamports:simulation.value.accounts[5].lamports,assertionMinimumLamports:structure.lighthouse.minBalanceLamports};
-   throw error;
-  }
+  const i=addresses.indexOf(structure.lighthouse.program);
+  validateLighthouseProgramSnapshots([{phase:'before',slot:before.context.slot,account:before.value[i]},{phase:'simulation',slot:simulation.context.slot,account:simulation.value.accounts[i]},{phase:'afterRead',slot:afterRead.context.slot,account:afterRead.value[i]}].map(o=>({...o,pubkey:structure.lighthouse.program})),deployment.identity);
+  if(simulation.value.accounts[5].lamports<structure.lighthouse.minBalanceLamports)throw m4Fail('M4_LIGHTHOUSE_BALANCE_ASSERTION_FAILED');
  }
  decodeM4CreationAccounts(r,simulation.value.accounts[0],simulation.value.accounts[2]);verifyM4CreateEvent(r,simulation.value.logs);
  if(finalBase64)verifyM4TokenAccounts(r,simulation.value.accounts);
@@ -110,7 +109,7 @@ async function revalidateM4Observed(record,identity,request,{transport,now=Date.
  const metadata=await (await transport.publicRequest(r.metadataUri)).json();if(JSON.stringify(metadata)!==JSON.stringify(tokenMetadata(identity)))throw m4Fail('M4_METADATA_CHANGED');
  const image=await transport.publicRequest(metadata.image),imageBytes=Buffer.from(await image.arrayBuffer());if(!image.headers.get('content-type')?.startsWith('image/png')||sha(imageBytes)!==new URL(metadata.image).pathname.split('/').at(-1)?.replace('.png',''))throw m4Fail('M4_IMAGE_UNAVAILABLE');
  assertReviewedExecutionRequest(r,identity,{...request,now:now()});
- if(deployment)await readLighthouseDeployment(transport,contextSlot(afterRead,contextSlot(simulation)),deployment.identity);
- const finalValidity=isActionTimePackage(r)?await checkM4Blockhash(r,{transport,now,minimumContextSlot:contextSlot(afterRead,contextSlot(simulation))}):null;
+ const finalDeployment=deployment?await readLighthouseDeployment(transport,contextSlot(afterRead,contextSlot(simulation)),deployment.identity,observeDeployment('afterSimulation')):null;
+ const finalValidity=isActionTimePackage(r)?await checkM4Blockhash(r,{transport,now,minimumContextSlot:finalDeployment?.contextSlot??contextSlot(afterRead,contextSlot(simulation))}):null;
  return {contextSlot:simulation.context.slot,checkedAt:now(),height:finalValidity?.height??height,...(finalValidity?{blockhashValidity:finalValidity}:{}),...(finalBase64?{finalMessageProof:{messageSha256:sha(tx.serializeMessage()),signedPayloadSha256:sha(bytes),simulationStatus:'PASS',signatureVerification:true,feeLamports:fee.value,reviewedDebitLamports:policy.validatedOverheadLamports,otherRequiredDebitLamports:policy.validatedOverheadLamports-fee.value,atomicEffects,programs:policy.invokedPrograms,slot:simulation.context.slot,lighthouseDeployment:deployment?.identity??null},finalMessageEvidence:{before,afterRead,simulation,feeResponse:fee}}:{})};
 }

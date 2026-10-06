@@ -1,3 +1,34 @@
+# CURRENT — 7 October 2026, 01:33 WIB: LIGHTHOUSE SEMANTIC FIX DEPLOYED
+
+Bounded archive search CLOSED: HISTORICAL_LIGHTHOUSE_STATE_SNAPSHOT_UNAVAILABLE.
+Local project evidence plus141 TEKKTEAM-owned VPS text/log/backup records (2.96MB),
+TEKKTEAM-only journal unit and auxiliary SQLite tables contain no final historical
+Lighthouse before/simulation/afterRead snapshot. Initial unsigned proof is distinct.
+The exact old failed field stays UNPROVEN; completed message reconstruction retained.
+
+Confirmed implementation defect: whole-account equality across independent finalized
+contexts unnecessarily treated external lamports/rent/RPC presentation as deployment
+identity. Decision102 documents the field-specific correction. Coherent Program/PDA
+reads, exact loader/state/pointer, stable code/authority/deployed-slot/full-data hash
+are pinned at wallet handoff and checked through final simulation and presend.
+Every validation failure is captured before return with phase/slot/pubkey/field and
+redacted values. Final-message intent, signer/privilege/CPI restrictions, atomic
+readonly balance deltas, final simulation, max0.01SOL and initialbuy0 unchanged.
+
+Mainnet current read: slot453982692; correct Program/PDA; upgradeAuthority=null;
+ProgramData hash94aee62cffe609a6a676b0b71281c49f1aa7ed3f388bae7dcb88d3b8ca412f9a.
+Source independently reviewed; local108 regressions plus2 presend/handoff cases PASS;
+VPS final combined110/110 PASS; canonical client build PASS24.72s. API-only deployment
+01:31:28 WIB, frontend index unchanged a465ae49…9210. Only tekkteam-api restarted;
+no shared-service/proxy/VPS/CUDA changes. All general transaction/trading flags OFF.
+
+Latest owner mandate authorizes one finite successor grant, preserving original
+grant/claim and raw failed operation hash28425c88…ec9339. New grant configuration
+prepared under /var/lib/tekkteam-mainnet/lighthouse-context-abd24eb. No fresh operation
+or wallet request yet at this checkpoint. Receipt0, target Agent1, Agent wallet0.
+Next: verify successor activation, recover existing owner session, make ONE fresh
+native-blockhash preparation and stop at manual Phantom action-time confirmation.
+
 # CURRENT â€” 7 October 2026, 01:13 WIB: MESSAGE DIFF KNOWN; HISTORIC STATE DELTA UNPROVEN
 
 Exactly one Policy101 operation reached Phantom; owner signature returned. The

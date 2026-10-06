@@ -1,6 +1,7 @@
 // Private, append-only observations. Never an execution, receipt or replay source.
 import {createHash,randomUUID} from 'node:crypto';
-import {VersionedTransaction,VersionedMessage,Transaction} from '@solana/web3.js';
+import {VersionedTransaction,VersionedMessage,Transaction,PublicKey} from '@solana/web3.js';
+import {LIGHTHOUSE_PROGRAM_DATA} from './pump-lighthouse-program.js';
 import {LIGHTHOUSE_PROGRAM,validateFinalWalletMessage} from '../src/pump-wallet-final.js';
 import {COMPUTE_BUDGET} from '../src/pump-fee-policy.js';
 const hash=b=>createHash('sha256').update(b).digest('hex');
@@ -38,12 +39,26 @@ function account(a){
  let data=null;try{if(Array.isArray(a.data)&&a.data[1]==='base64'){const b=Buffer.from(a.data[0],'base64');data={encoding:'base64',length:b.length,sha256:hash(b)};}}catch{}
  return {fields:Object.keys(a).sort(),owner:typeof a.owner==='string'?a.owner:null,executable:typeof a.executable==='boolean'?a.executable:null,lamports:valid(a.lamports)?a.lamports:null,rentEpoch:typeof a.rentEpoch==='number'?a.rentEpoch:null,space:valid(a.space)?a.space:null,data,allFieldsSha256:digest(a)};
 }
+function deploymentAccount(pubkey,a){
+ const safe=account(a);if(!safe||safe.unavailable)return {exists:false,...safe};safe.exists=true;
+ try{const b=Buffer.from(a.data[0],'base64');
+  if(pubkey===LIGHTHOUSE_PROGRAM&&b.length===36)safe.loaderState={tag:b.readUInt32LE(0),programData:new PublicKey(b.subarray(4,36)).toBase58()};
+  if(pubkey===LIGHTHOUSE_PROGRAM_DATA&&b.length>45)safe.loaderState={tag:b.readUInt32LE(0),deployedSlot:b.readBigUInt64LE(4).toString(),authorityOption:b[12],upgradeAuthority:b[12]===1?new PublicKey(b.subarray(13,45)).toBase58():null,codeSha256:hash(b.subarray(45))};
+ }catch{}
+ return safe;
+}
+function validationFailure(v){
+ if(!v)return null;
+ const scalar=x=>typeof x==='string'?x.slice(0,256):typeof x==='boolean'||typeof x==='number'?x:null;
+ return Object.fromEntries(['stage','phase','slot','pubkey','field','expected','actual'].map(k=>[k,scalar(v[k])]));
+}
 export function walletDiagnostic(record,{returnedTransactionBase64,returnedMessageBase64,stage,rule,evidence=null,now=Date.now,source='SERVER'}={}){
  const result=record.result,prepared=describeDiagnosticMessage(result.transactionBase64,result),final=describeDiagnosticMessage(returnedTransactionBase64??returnedMessageBase64??'',result,{messageOnly:!returnedTransactionBase64}),v=evidence?.simulation?.value;
  const addresses=evidence?.addresses??[],keyOrder=final.compiledAccountOrder??[],ownerIndex=keyOrder.indexOf(result.launch.owner),atomic=Array.isArray(v?.preBalances)&&Array.isArray(v?.postBalances)&&v.preBalances.length===keyOrder.length&&v.postBalances.length===keyOrder.length&&[...v.preBalances,...v.postBalances].every(valid);
  const accounts=addresses.map((pubkey,i)=>{const at=keyOrder.indexOf(pubkey);return {pubkey,role:prepared.accountKeys?.find(a=>a.pubkey===pubkey)?.role??(pubkey===LIGHTHOUSE_PROGRAM?'lighthouse_program':'UNRECOGNIZED'),before:account(evidence.before?.value?.[i]),simulation:account(v?.accounts?.[i]),after:account(evidence.afterRead?.value?.[i]),atomicDeltaLamports:atomic&&at>=0?v.postBalances[at]-v.preBalances[at]:null};});
  const review=result.executionReview;
- return {formatVersion:1,evidence:'WALLET_FINAL_DIAGNOSTIC',authorizationGranted:false,source,operationId:record.executionId,timestamp:new Date(now()).toISOString(),stage:safeRule(stage),rule:safeRule(rule),owner:result.launch.owner,agentId:result.launch.agentId,network:result.network,lastValidBlockHeight:result.lastValidBlockHeight,reviewDigest:review.digest,prepared,final,diff:diagnosticMessageDiff(prepared,final),expectedDebitLamports:review.reviewedDebitLamports,ceilingLamports:review.ceilingLamports,initialBuyLamports:result.launch.initialBuyLamports,reviewedNetworkFeeLamports:review.networkFeeLamports,priorityFeeLamports:review.priorityFeeLamports??null,rentAccounts:(result.policy?.rentAccounts??[]).map(a=>({name:a.name,dataLength:a.dataLength,minimumRentExemptionLamports:a.minimumRentExemptionLamports,fundedLamports:a.fundedLamports})),finalFeeLamports:valid(evidence?.fee?.value)?evidence.fee.value:null,simulation:v?{status:v.err===null?'PASS':'FAIL',errorSha256:v.err===null?null:digest(v.err),slot:evidence.simulation.context?.slot??null,feeLamports:valid(v.fee)?v.fee:null,logsSha256:digest(v.logs??[]),signatureVerificationRequested:evidence.sigVerify===true,replaceRecentBlockhash:false}:null,finalSimulatedDebitLamports:atomic&&ownerIndex>=0?v.preBalances[ownerIndex]-v.postBalances[ownerIndex]:null,atomicBalancesAvailable:atomic,context:{before:evidence?.before?.context?.slot??null,after:evidence?.afterRead?.context?.slot??null},accounts};
+ const lighthouseObservations=(evidence?.deployments??[]).map(o=>({phase:o.phase,slot:o.response?.context?.slot??null,accounts:o.addresses.map((pubkey,i)=>({pubkey,...deploymentAccount(pubkey,o.response?.value?.[i])}))}));
+ return {formatVersion:1,evidence:'WALLET_FINAL_DIAGNOSTIC',authorizationGranted:false,source,operationId:record.executionId,timestamp:new Date(now()).toISOString(),stage:safeRule(stage),rule:safeRule(rule),owner:result.launch.owner,agentId:result.launch.agentId,network:result.network,lastValidBlockHeight:result.lastValidBlockHeight,reviewDigest:review.digest,prepared,final,diff:diagnosticMessageDiff(prepared,final),expectedDebitLamports:review.reviewedDebitLamports,ceilingLamports:review.ceilingLamports,initialBuyLamports:result.launch.initialBuyLamports,reviewedNetworkFeeLamports:review.networkFeeLamports,priorityFeeLamports:review.priorityFeeLamports??null,rentAccounts:(result.policy?.rentAccounts??[]).map(a=>({name:a.name,dataLength:a.dataLength,minimumRentExemptionLamports:a.minimumRentExemptionLamports,fundedLamports:a.fundedLamports})),finalFeeLamports:valid(evidence?.fee?.value)?evidence.fee.value:null,simulation:v?{status:v.err===null?'PASS':'FAIL',errorSha256:v.err===null?null:digest(v.err),slot:evidence.simulation.context?.slot??null,feeLamports:valid(v.fee)?v.fee:null,logsSha256:digest(v.logs??[]),signatureVerificationRequested:evidence.sigVerify===true,replaceRecentBlockhash:false}:null,finalSimulatedDebitLamports:atomic&&ownerIndex>=0?v.preBalances[ownerIndex]-v.postBalances[ownerIndex]:null,atomicBalancesAvailable:atomic,context:{before:evidence?.before?.context?.slot??null,simulation:evidence?.simulation?.context?.slot??null,after:evidence?.afterRead?.context?.slot??null},accounts,lighthouseObservations,validationFailure:validationFailure(evidence?.validationFailure)};
 }
 export function createWalletDiagnosticStore(db){
  db.exec(`CREATE TABLE IF NOT EXISTS m4_wallet_diagnostics(id TEXT PRIMARY KEY,operation_id TEXT NOT NULL,fingerprint TEXT NOT NULL,payload TEXT NOT NULL,UNIQUE(operation_id,fingerprint));
