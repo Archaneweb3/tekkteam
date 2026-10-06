@@ -76,3 +76,9 @@
 .ad-secondary-actions{display:flex;justify-content:flex-end;gap:16px;margin:12px 0 20px}.ad-secondary-actions button{border:0;background:none;color:var(--tw-muted,#99adcd);font:inherit;font-size:12px;padding:8px;cursor:pointer}.ad-secondary-actions button:hover,.ad-secondary-actions button[aria-pressed=true]{color:var(--tw-yellow,#ffd13f)}.ad-tab-panel>.tw-agent-wallet{max-width:100%;min-width:0}.ad-tab-panel .tw-agent-wallet code{overflow-wrap:anywhere}
 
 @media(max-width:520px){.ad-tablist{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;overflow:visible}.ad-tablist button{min-width:0;padding:14px 4px;font-size:11px;letter-spacing:0}}
+/* Owner configuration only; layout uses the existing Agent panel controls. */
+.aw-activation-review .aw-position-details{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.aw-activation-review label{display:grid;gap:8px;min-width:0;font-size:13px}
+.aw-activation-review input,.aw-activation-review select{box-sizing:border-box;min-width:0;width:100%;padding:12px;color:inherit;background:var(--navy,#152340);border:1px solid #56617a;border-radius:6px;font:inherit}
+.aw-activation-review form>.tw-button{margin:8px 8px 8px 0}
+@media(max-width:600px){.aw-activation-review .aw-position-details{grid-template-columns:1fr}.aw-activation-review .tw-button{width:100%;margin-right:0}}

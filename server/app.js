@@ -31,6 +31,7 @@ import {parseInitialBuy} from '../src/initial-buy.js';
 import {installRealLeaderboard} from './real-leaderboard.js';
 import {resolveTokenDraftConfiguration} from './launchpad-token-configuration.js';
 import {readAgentSetup,createLaunchpadFundingAuthority} from './agent-setup.js';
+import {createActivationPlans} from './dex/activation-plan.js';
 
 const hash = v => createHash('sha256').update(v).digest('hex');
 const fail = (status, message) => { throw Object.assign(new Error(message), { status }); };
@@ -79,7 +80,8 @@ export function createServer({ dbPath, vaultKey, origins = ['http://127.0.0.1:51
   app.use(express.json({ limit: '5mb' }));
   app.use('/api/agents', (req,res,next) => {
     const paperAction=req.method==='POST'&&/^\/[^/]+\/trading\/(configure|enable|pause|strategy-config)$/.test(req.path)&&(!req.body?.mode||req.body.mode==='paper')&&(!req.query.mode||req.query.mode==='paper');
-    if (network === 'mainnet' && !['GET','HEAD','OPTIONS'].includes(req.method) && !paperAction && !(req.method==='POST' && /^\/[^/]+\/(character|publication)$/.test(req.path))) return res.status(403).json({error:'MAINNET SAFETY MODE: drafts, token issuance, submission and value-moving actions disabled'});
+    const inactivePlan=req.method==='POST'&&/^\/[^/]+\/activation-plan(\/cancel)?$/.test(req.path);
+    if (network === 'mainnet' && !['GET','HEAD','OPTIONS'].includes(req.method) && !paperAction && !inactivePlan && !(req.method==='POST' && /^\/[^/]+\/(character|publication)$/.test(req.path))) return res.status(403).json({error:'MAINNET SAFETY MODE: drafts, token issuance, submission and value-moving actions disabled'});
     next();
   });
   app.get('/api/safety/memo', async(req,res) => {
@@ -118,6 +120,7 @@ export function createServer({ dbPath, vaultKey, origins = ['http://127.0.0.1:51
   }
   try{m4Execution=m4ExecutionFactory?.({db,store,receiptAuthority});}catch(error){store.close();throw error;}
   const launchEvidence=a=>readLaunchEvidence(a,tokenDraftOptions?.journalPath,receiptReader);
+  const activationPlans=createActivationPlans(db,{now,readAuthority:createLaunchpadFundingAuthority({db,readScope:scopeLedger.readLaunchpadScope,readEvidence:launchEvidence})});
   const trading=installAgentTrading(app,{store,auth,owned,now,realMoney,...(tokenDraftOptions?{receipt:a=>launchReceipt(a,tokenDraftOptions.journalPath,receiptReader)}:{}),sessionValid:req=>getSession(req)?.address===req.session?.address,...tradingOptions,readLaunchpadScope:scopeLedger.readLaunchpadScope,readFundingAuthority:createLaunchpadFundingAuthority({db,readScope:scopeLedger.readLaunchpadScope,readEvidence:launchEvidence})});
   const controlledDex=installControlledDex(app,{db,store,auth,owned,now,realMoney,pumpRuntimeDependencies,productionOrigin:production&&network==='mainnet'&&origins.length===1&&origins[0]==='https://tekkteam.tech'?origins[0]:null,sessionValid:req=>getSession(req)?.address===req.session?.address,readLaunchpadScope:scopeLedger.readLaunchpadScope,readReceiptAuthority:a=>readFirstTokenReceiptAuthority(a,tokenDraftOptions?.journalPath??resolve(process.env.DATA_DIR||'server/data','pump-agent-launches.json'),receiptReader)});
   installRealLeaderboard(app,{db,auth,owned,now});
@@ -179,6 +182,15 @@ export function createServer({ dbPath, vaultKey, origins = ['http://127.0.0.1:51
       const current=owned(req).agent;return {owner,agent:current,evidence:launchEvidence(current)};
     }});
     res.json(setup);
+  });
+  app.get('/api/agents/:id/activation-plan',auth,(req,res)=>res.json(activationPlans.read(owned(req).agent)));
+  app.post('/api/agents/:id/activation-plan',auth,(req,res)=>{
+    if(!req.body||Object.keys(req.body).some(k=>!['revision','policy'].includes(k)))fail(400,'Unexpected activation plan fields');
+    res.json(activationPlans.save(owned(req).agent,req.body));
+  });
+  app.post('/api/agents/:id/activation-plan/cancel',auth,(req,res)=>{
+    if(!req.body||Object.keys(req.body).some(k=>k!=='revision'))fail(400,'Unexpected cancellation fields');
+    res.json(activationPlans.cancel(owned(req).agent,req.body));
   });
   app.get('/api/agents/:id/contract',auth,async(req,res)=>{
     const initial=owned(req).agent,owner=req.session.address,initialBinding=tokenStore?.readTokenBinding(initial.id,owner);

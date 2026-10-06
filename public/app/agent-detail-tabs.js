@@ -6,6 +6,7 @@ import {renderAgentTrading,renderReasoning} from './agent-trading-ui.js';
 import {renderAgentOverview} from './agent-overview-ui.js';
 import {mountAgentActivity} from './agent-activity-ui.js';
 import {mountAgentWallet} from './agent-wallet-ui.js';
+import {mountActivationReview} from './agent-activation-review.js';
 
 const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[c]));
 const number=(value,digits=4)=>value==null||!Number.isFinite(Number(value))?'—':Number(value).toLocaleString('en-US',{maximumFractionDigits:digits});
@@ -76,7 +77,7 @@ function overviewTab(host,agent,valid,{select,onTradingState,loadContract,loadSe
 }
 
 function walletTab(host,agent,valid,{loadContract,loadSetup}){
- let dead=false,wallet=null;
+ let dead=false,wallet=null,activation=null;
  const alive=()=>!dead&&valid();
  async function load(){
   host.innerHTML='<p role="status" class="ad-loading">Loading Agent wallet…</p>';
@@ -85,9 +86,10 @@ function walletTab(host,agent,valid,{loadContract,loadSetup}){
    if(contract?.id!==agent.id||contract.owner!==agent.creator||contract.launchpadScope?.available!==true||typeof contract.launchpadScope.scoped!=='boolean')throw Error('Agent setup could not be verified.');
    const child=document.createElement('div'),readiness=document.createElement('div');readiness.innerHTML=renderAgentSetup(setup,agent,{navigation:false});host.replaceChildren(readiness,child);
    wallet=mountAgentWallet(child,agent,{isCurrent:alive,receiptRequired:contract.launchpadScope.scoped});
+   if(setup?.launch?.confirmed===true){const review=document.createElement('section');host.append(review);activation=mountActivationReview(review,agent,{isCurrent:alive});}
   }catch{if(alive()){host.innerHTML='<p role="alert">Agent wallet setup is unavailable right now.</p><button class="tw-button secondary" data-wallet-retry>Try again</button>';host.querySelector('[data-wallet-retry]').onclick=load;}}
  }
- load();return {destroy(){dead=true;wallet?.destroy();}};
+ load();return {destroy(){dead=true;wallet?.destroy();activation?.destroy();}};
 }
 
 function tradingTab(host,agent,valid,{select,onTradingState,loadSetup}){
