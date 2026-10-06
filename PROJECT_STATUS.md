@@ -1,3 +1,18 @@
+# CURRENT - 7 October 2026, 03:49 WIB: REPLACEMENT GRANT QUALIFIED
+
+Latest user explicitly authorized exactly one replacement for the pre-Phantom
+failed request 1a5bf85c-ef80-43c9-b2fe-66ad598e68f0. Append-only grant
+policy101-20261007-ret-3ed-rpc-replacement-1 pins previous grants/claims, raw
+active/history and failed-preparation evidence. No reset, synthetic execution,
+validator redesign or generic retry authorization. Both old authorities fenced.
+Independent review PASS; scoped local and VPS tests47/47 PASS.
+API-only deployment03:48:40 WIB PID75412; HTTPS health200. Frontend unchanged;
+all general signing/broadcast/trading/funding/withdrawal flags false. CUDA and
+shared infrastructure untouched. Grants3, claims2, receipts0 before new attempt.
+Existing owner session connected; Mainnet UI balance refreshed0.182836 SOL.
+Next: exactly ONE action-time preparation through existing Agent UI, verify
+fresh backend review then stop at manual consequential Phantom approval.
+
 # CURRENT - 7 October 2026, 01:38 WIB: FRESH ATTEMPT STOPPED BEFORE PHANTOM
 
 Historical search CLOSED: HISTORICAL_LIGHTHOUSE_STATE_SNAPSHOT_UNAVAILABLE.

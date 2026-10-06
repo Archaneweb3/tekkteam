@@ -1,23 +1,14 @@
-# Active milestone - Lighthouse gap closed; fresh attempt safely stopped
+# Active milestone - ONE explicitly authorized replacement attempt
 
-Started 7 October 2026 01:20 WIB; checkpoint target 01:50 WIB.
-Actual checkpoint 01:38 WIB. Status: BLOCKED_AT_CONSUMED_GRANT.
+Started 7 October 2026 03:43 WIB; checkpoint target 04:13 WIB.
+Continue from 04dde73. Historical Lighthouse investigation CLOSED.
+Preserve all prior grants/claims, including pre-Phantom failed request
+1a5bf85c-ef80-43c9-b2fe-66ad598e68f0. No reset or reuse.
 
-DONE: bounded historical search closed as
-HISTORICAL_LIGHTHOUSE_STATE_SNAPSHOT_UNAVAILABLE; semantic Program/ProgramData
-identity correction, slot-tagged failure diagnostics, independent review,
-110/110 VPS regressions and canonical build PASS; API-only deploy.
-
-ONE authorized fresh attempt was claimed at 01:34:42.086 WIB, request
-1a5bf85c-ef80-43c9-b2fe-66ad598e68f0. Recovery getBlockHeight failed with
-PREPARATION_RPC_ERROR / -32016 before fresh preparation or Phantom handoff.
-Narrow read-only bounded context-lag retry fix deployed 01:37:57 WIB;
-33/33 recovery/context/policy regressions PASS. No second attempt.
-
-The consumed grant/claim and old execution/journal remain immutable.
-No fresh transaction/review/mint/signature/broadcast. Agent1, wallet0, receipt0;
-SOL spent this attempt0. Real trading OFF. CUDA/shared infrastructure untouched.
-
-Next permitted step requires explicit new fresh-attempt authorization; never
-reset the existing claim, reuse old bytes or start another attempt automatically.
-Financial Phantom approval remains a separate manual owner action.
+One fixed replacement grant, new operation/mint/blockhash/fingerprints only;
+existing aaaaada / ret / 3ED, initial buy0, max debit0.01SOL. Refresh Mainnet
+state and retain bounded read-only retry guarantees. No validator redesign.
+Root integrates source; independent policy review PASS; scoped tests47/47 PASS.
+Deploy TEKKTEAM API only. Stop with fresh Phantom transaction ready for manual
+owner approval; then verify exact final wallet message before any single send.
+No automatic consequential approval. Trading/funding OFF. CUDA excluded.

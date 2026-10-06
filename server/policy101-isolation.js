@@ -7,6 +7,9 @@ import {M4_TARGET} from './pump-m4-guard.js';
 
 export const POLICY101_ID='policy101-20261007-ret-3ed';
 export const POLICY101_LIGHTHOUSE_ID='policy101-20261007-ret-3ed-lighthouse-diagnostic-1';
+export const POLICY101_REPLACEMENT_ID='policy101-20261007-ret-3ed-rpc-replacement-1';
+export const POLICY101_FAILED_PREPARATION_ID='1a5bf85c-ef80-43c9-b2fe-66ad598e68f0';
+const grantIds=[POLICY101_ID,POLICY101_LIGHTHOUSE_ID,POLICY101_REPLACEMENT_ID];
 const hash=v=>createHash('sha256').update(v).digest('hex');
 const fail=code=>{throw Object.assign(Error(code),{code,status:409});};
 const same=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
@@ -23,7 +26,7 @@ function install(db){
 export function loadPolicy101Approval({path,sha256}){
  const bytes=file(path);if(hash(bytes)!==sha256)fail('POLICY101_APPROVAL_HASH');
  const grant=JSON.parse(bytes);
- if(![POLICY101_ID,POLICY101_LIGHTHOUSE_ID].includes(grant.id)||grant.policy!==101||grant.classification!=='LEGACY_UNKNOWN_QUARANTINED'||grant.origin!=='https://tekkteam.tech'||grant.network!=='solana:101'||grant.maximumAttempts!==1||!same(grant.target,M4_TARGET))fail('POLICY101_APPROVAL_SCOPE');
+ if(!grantIds.includes(grant.id)||grant.policy!==101||grant.classification!=='LEGACY_UNKNOWN_QUARANTINED'||grant.origin!=='https://tekkteam.tech'||grant.network!=='solana:101'||grant.maximumAttempts!==1||!same(grant.target,M4_TARGET))fail('POLICY101_APPROVAL_SCOPE');
  return grant;
 }
 export function createPolicy101Authority(options){
@@ -32,16 +35,30 @@ export function createPolicy101Authority(options){
 }
 function authority({db,journalPath,approval=null,now=Date.now}){
  const has=table=>!!db.prepare("SELECT 1 FROM sqlite_master WHERE type='table' AND name=?").get(table);
+ function replacementEvidence(g){
+  const pin=g.failedPreparation,bytes=pin?.path?file(pin.path):null;
+  if(!bytes||hash(bytes)!==pin.sha256)fail('POLICY101_REPLACEMENT_EVIDENCE');
+  const e=JSON.parse(bytes),id=POLICY101_FAILED_PREPARATION_ID;
+  if(e.freshRequestId!==id||e.stage!=='RECOVERY_BEFORE_FRESH_PREPARATION'||e.error!=='PREPARATION_RPC_ERROR'||e.rpcMethod!=='getBlockHeight'||e.rpcCode!==-32016||e.oldActiveOperation!==g.prior.id||e.oldPayloadSha256!==g.prior.sha256||e.freshOperationPersisted!==false||e.freshArchived!==false||e.freshDiagnostics!==0||e.freshPhantomOpened!==false||e.freshOwnerSigned!==false||e.freshBroadcast!==false||e.oldBroadcast!==false||e.secondAttempt!==false||e.receipts!==0||e.solSpentThisAttempt!==0)fail('POLICY101_REPLACEMENT_EVIDENCE');
+  const active=db.prepare('SELECT payload FROM m4_execution WHERE id=1').get();
+  if(active&&JSON.parse(active.payload).executionId===id)fail('POLICY101_REPLACEMENT_NOT_UNEXPOSED');
+  for(const [table,key]of [['m4_execution_history','execution_id'],['canonical_launch_receipts','execution_id'],['m4_wallet_diagnostics','operation_id'],['m4_ephemeral_mint_signers','execution_id']])if(has(table)&&db.prepare(`SELECT 1 FROM ${table} WHERE ${key}=?`).get(id))fail('POLICY101_REPLACEMENT_NOT_UNEXPOSED');
+ }
  if(approval){
-  install(db);if(![POLICY101_ID,POLICY101_LIGHTHOUSE_ID].includes(approval.id))fail('POLICY101_APPROVAL_SCOPE');
+  install(db);if(!grantIds.includes(approval.id))fail('POLICY101_APPROVAL_SCOPE');
   const old=db.prepare('SELECT payload FROM launch_isolation_grants WHERE id=?').get(approval.id);if(old&&!same(JSON.parse(old.payload),approval))fail('POLICY101_GRANT_CHANGED');
   if(!old){
-   if(approval.id===POLICY101_LIGHTHOUSE_ID){
-    const parent=db.prepare('SELECT payload FROM launch_isolation_grants WHERE id=?').get(POLICY101_ID),claim=db.prepare('SELECT * FROM launch_isolation_claims WHERE grant_id=?').get(POLICY101_ID),active=db.prepare('SELECT payload FROM m4_execution WHERE id=1').get();
-    if(!parent||!claim||!active||approval.predecessor?.id!==POLICY101_ID||approval.predecessor.sha256!==hash(parent.payload)||approval.predecessor.claimSha256!==hash(JSON.stringify(claim)))fail('POLICY101_SUCCESSOR_LINEAGE');
+   if(approval.id!==POLICY101_ID){
+    const replacement=approval.id===POLICY101_REPLACEMENT_ID,parentId=replacement?POLICY101_LIGHTHOUSE_ID:POLICY101_ID;
+    const parent=db.prepare('SELECT payload FROM launch_isolation_grants WHERE id=?').get(parentId),claim=db.prepare('SELECT * FROM launch_isolation_claims WHERE grant_id=?').get(parentId),active=db.prepare('SELECT payload FROM m4_execution WHERE id=1').get();
+    if(!parent||!claim||!active||approval.predecessor?.id!==parentId||approval.predecessor.sha256!==hash(parent.payload)||approval.predecessor.claimSha256!==hash(JSON.stringify(claim)))fail('POLICY101_SUCCESSOR_LINEAGE');
     const previous=JSON.parse(parent.payload),state=JSON.parse(active.payload);
     for(const key of ['policy','classification','origin','network','target','journalSha256','quarantineSha256','evidencePath','evidenceSha256','retiredEntrypoint','retiredEntrypointSha256','tokenSha256'])if(!same(approval[key],previous[key]))fail('POLICY101_SUCCESSOR_SCOPE');
-    if(approval.maximumAttempts!==1||state.executionId!==claim.execution_id||approval.prior?.id!==state.executionId||approval.prior.sha256!==hash(active.payload)||state.status!=='SIGNED_NOT_BROADCAST'||state.broadcastAttempted!==false||state.submittedAt!=null||state.confirmation!=null||state.error!=='M4_LIGHTHOUSE_PROGRAM_OR_STATE_CHANGED'||!state.signature||db.prepare('SELECT COUNT(*) n FROM canonical_launch_receipts').get().n!==0)fail('POLICY101_SUCCESSOR_PRIOR_STATE');
+    if(approval.maximumAttempts!==1||(!replacement&&state.executionId!==claim.execution_id)||approval.prior?.id!==state.executionId||approval.prior.sha256!==hash(active.payload)||state.status!=='SIGNED_NOT_BROADCAST'||state.broadcastAttempted!==false||state.submittedAt!=null||state.confirmation!=null||state.error!=='M4_LIGHTHOUSE_PROGRAM_OR_STATE_CHANGED'||!state.signature||db.prepare('SELECT COUNT(*) n FROM canonical_launch_receipts').get().n!==0)fail('POLICY101_SUCCESSOR_PRIOR_STATE');
+    if(replacement){
+     if(claim.execution_id!==POLICY101_FAILED_PREPARATION_ID||claim.idempotency_key!==claim.execution_id||claim.execution_id===state.executionId||!same(previous.prior,approval.prior)||!same(previous.history,approval.history)||db.prepare('SELECT COUNT(*) n FROM launch_isolation_grants').get().n!==2)fail('POLICY101_REPLACEMENT_LINEAGE');
+     replacementEvidence(approval);
+    }
     const history=db.prepare('SELECT execution_id,payload FROM m4_execution_history ORDER BY execution_id').all().map(r=>({id:r.execution_id,sha256:hash(r.payload)}));
     if(!same(history,[...approval.history].sort((a,b)=>a.id.localeCompare(b.id))))fail('POLICY101_ARCHIVE_CHANGED');
    }else if(db.prepare('SELECT COUNT(*) n FROM launch_isolation_grants').get().n)fail('POLICY101_MULTIPLE_GRANTS');
@@ -51,11 +68,11 @@ function authority({db,journalPath,approval=null,now=Date.now}){
  const installed=has(tables[0]);
  if(installed&&tables.some(t=>!has(t)))fail('POLICY101_STORE_INCOMPLETE');
  const persisted=installed?db.prepare('SELECT payload FROM launch_isolation_grants').all():[];
- if(persisted.length>2)fail('POLICY101_MULTIPLE_GRANTS');
+ if(persisted.length>3)fail('POLICY101_MULTIPLE_GRANTS');
  const grants=persisted.map(r=>JSON.parse(r.payload));
- if(grants.some(g=>![POLICY101_ID,POLICY101_LIGHTHOUSE_ID].includes(g.id)))fail('POLICY101_APPROVAL_SCOPE');
- const grant=grants.find(g=>g.id===POLICY101_LIGHTHOUSE_ID)??grants[0]??null;
- if(grant?.id===POLICY101_LIGHTHOUSE_ID){const parent=persisted.find(r=>JSON.parse(r.payload).id===POLICY101_ID),c=db.prepare('SELECT * FROM launch_isolation_claims WHERE grant_id=?').get(POLICY101_ID);if(!parent||!c||grant.predecessor?.sha256!==hash(parent.payload)||grant.predecessor.claimSha256!==hash(JSON.stringify(c)))fail('POLICY101_SUCCESSOR_LINEAGE');}
+ if(grants.some(g=>!grantIds.includes(g.id)))fail('POLICY101_APPROVAL_SCOPE');
+ const grant=[...grantIds].reverse().map(id=>grants.find(g=>g.id===id)).find(Boolean)??null;
+ for(const g of grants.filter(g=>g.id!==POLICY101_ID)){const parentId=g.id===POLICY101_REPLACEMENT_ID?POLICY101_LIGHTHOUSE_ID:POLICY101_ID,parent=persisted.find(r=>JSON.parse(r.payload).id===parentId),c=db.prepare('SELECT * FROM launch_isolation_claims WHERE grant_id=?').get(parentId);if(!parent||!c||g.predecessor?.id!==parentId||g.predecessor.sha256!==hash(parent.payload)||g.predecessor.claimSha256!==hash(JSON.stringify(c)))fail('POLICY101_SUCCESSOR_LINEAGE');}
  if(installed&&!grant)fail('POLICY101_GRANT_MISSING');
  const quarantine=grant?loadLegacyQuarantine(journalPath,{required:true}):null;
  const claim=()=>grant?db.prepare('SELECT * FROM launch_isolation_claims WHERE grant_id=?').get(grant.id):null;
@@ -64,6 +81,7 @@ function authority({db,journalPath,approval=null,now=Date.now}){
   if(!grant)return legacy;
   if(db.prepare('SELECT payload FROM launch_isolation_grants WHERE id=?').get(grant.id)?.payload!==JSON.stringify(grant))fail('POLICY101_GRANT_CHANGED');
   quarantine.read();
+  if(grant.id===POLICY101_REPLACEMENT_ID)replacementEvidence(grant);
   for(const [path,digest] of [[journalPath,grant.journalSha256],[journalPath+'.quarantine.json',grant.quarantineSha256],[grant.evidencePath,grant.evidenceSha256],[grant.retiredEntrypoint,grant.retiredEntrypointSha256]])if(hash(file(path))!==digest)fail('POLICY101_HISTORY_CHANGED');
   const token=db.prepare('SELECT owner,version,token_json FROM launchpad_first_tokens WHERE agent_id=?').get(grant.target.agentId);
   if(token?.owner!==grant.target.owner||token.version!==1||hash(token.token_json)!==grant.tokenSha256)fail('POLICY101_DRAFT_CHANGED');
@@ -92,7 +110,7 @@ function authority({db,journalPath,approval=null,now=Date.now}){
   }
   return validateReceiptJournal({version:2,receipts:merged});
  }
- const requireApproval=()=>{if(!approval||!grant||!same(approval,grant)||grant.id!==POLICY101_LIGHTHOUSE_ID&&db.prepare('SELECT 1 FROM launch_isolation_grants WHERE id=?').get(POLICY101_LIGHTHOUSE_ID))fail('POLICY101_NOT_ARMED');};
+ const requireApproval=()=>{if(!approval||!grant||!same(approval,grant)||grantIds.slice(grantIds.indexOf(grant.id)+1).some(id=>db.prepare('SELECT 1 FROM launch_isolation_grants WHERE id=?').get(id)))fail('POLICY101_NOT_ARMED');};
  function assertExecution(id){requireApproval();assertHistory();if(claim()?.execution_id!==id)fail('POLICY101_OPERATION_NOT_CLAIMED');}
  function assertFresh(result){
   assertExecution(result.id);

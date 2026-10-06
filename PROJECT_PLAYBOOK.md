@@ -1,3 +1,8 @@
+Latest direct mandate 7 October 2026: exactly ONE replacement for pre-Phantom
+failed request 1a5bf85c-ef80-43c9-b2fe-66ad598e68f0 is authorized. Preserve all
+old claims; append one fixed grant with pinned failure evidence. Manual owner
+financial approval remains separate; no automatic next attempt.
+
 Latest direct mandate7October2026: bounded historical search may close as
 HISTORICAL_LIGHTHOUSE_STATE_SNAPSHOT_UNAVAILABLE. After qualified semantic fix,
 exactly ONE fresh successor diagnostic attempt is explicitly authorized. Prior

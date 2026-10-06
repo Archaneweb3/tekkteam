@@ -5,7 +5,7 @@ import {Keypair} from '@solana/web3.js';
 import {m4Fixture} from './pump-m4-fixture.mjs';
 import {createM4Execution} from '../server/pump-m4.js';
 import {sha} from '../server/pump-m4-guard.js';
-import {createPolicy101Authority,POLICY101_ID,POLICY101_LIGHTHOUSE_ID} from '../server/policy101-isolation.js';
+import {createPolicy101Authority,POLICY101_ID,POLICY101_LIGHTHOUSE_ID,POLICY101_REPLACEMENT_ID,POLICY101_FAILED_PREPARATION_ID} from '../server/policy101-isolation.js';
 import {createLegacyQuarantine,writeLegacyQuarantine} from '../server/legacy-launch-quarantine.js';
 import {GENESIS} from '../src/pump-readiness.js';
 import {readLaunchEvidence} from '../server/launchpad-contracts.js';
@@ -87,3 +87,51 @@ for(const field of ['lineage','claim','prior','target','limit','third','broadcas
  const a=structuredClone(f.approval);if(field==='lineage')a.predecessor.sha256='0';if(field==='claim')a.predecessor.claimSha256='0';if(field==='prior')a.prior.sha256='0';if(field==='target')a.target.owner='wrong';if(field==='limit')a.maximumAttempts=2;if(field==='third')a.id+='-2';if(field==='broadcast'){const s=record(f);s.broadcastAttempted=true;f.db.prepare('UPDATE m4_execution SET payload=?').run(JSON.stringify(s));a.prior.sha256=sha(JSON.stringify(s));}
  assert.throws(()=>createPolicy101Authority({db:f.db,journalPath:f.journalPath,approval:a}));assert.equal(f.db.prepare('SELECT COUNT(*) n FROM launch_isolation_grants').get().n,1);assert.equal(f.sends(),0);
  }finally{f.db.close();}});
+
+async function replacementFixture(){
+ const f=await successorFixture(),diagnostic=createPolicy101Authority({db:f.db,journalPath:f.journalPath,approval:f.approval});
+ // LOCAL_FIXTURE: durable pre-recovery claim, no candidate was produced.
+ diagnostic.isolation.beforePrepare(POLICY101_FAILED_PREPARATION_ID,f.p.executionId);
+ const parent=f.db.prepare('SELECT payload FROM launch_isolation_grants WHERE id=?').get(POLICY101_LIGHTHOUSE_ID).payload,claim=f.db.prepare('SELECT * FROM launch_isolation_claims WHERE grant_id=?').get(POLICY101_LIGHTHOUSE_ID);
+ const evidence={freshRequestId:POLICY101_FAILED_PREPARATION_ID,stage:'RECOVERY_BEFORE_FRESH_PREPARATION',error:'PREPARATION_RPC_ERROR',rpcMethod:'getBlockHeight',rpcCode:-32016,oldActiveOperation:f.p.executionId,oldPayloadSha256:sha(f.payload),freshOperationPersisted:false,freshArchived:false,freshDiagnostics:0,freshPhantomOpened:false,freshOwnerSigned:false,freshBroadcast:false,oldBroadcast:false,secondAttempt:false,receipts:0,solSpentThisAttempt:0};
+ const path=join(f.root,'failed-preparation.json');writeFileSync(path,JSON.stringify(evidence));
+ const approval={...f.approval,id:POLICY101_REPLACEMENT_ID,predecessor:{id:POLICY101_LIGHTHOUSE_ID,sha256:sha(parent),claimSha256:sha(JSON.stringify(claim))},failedPreparation:{path,sha256:sha(readFileSync(path))}};
+ return {...f,diagnostic,approval,diagnosticParent:parent,diagnosticClaim:claim,evidence};
+}
+test('one replacement preserves both claims and failed claim-only state; concurrent/restart duplicate fenced',async()=>{
+ const f=await replacementFixture();try{
+  const before=f.db.prepare('SELECT * FROM launch_isolation_claims ORDER BY grant_id').all(),authority=createPolicy101Authority({db:f.db,journalPath:f.journalPath,approval:f.approval});
+  assert.equal(authority.isolation.available(),true);for(const old of [f.authority,f.diagnostic])assert.throws(()=>old.isolation.assertExecution(f.p.executionId),{code:'POLICY101_NOT_ARMED'});
+  f.expire();const rpc=f.deps.transport.rpc,transport={...f.deps.transport,rpc:async(m,p)=>m==='getSignatureStatuses'?{context:{slot:105},value:[null]}:m==='getTransaction'?null:rpc(m,p)};
+  const deps={...f.deps,transport,receiptAuthority:authority},c=createM4Execution(deps),req={initialBuy:'0',requestId:crypto.randomUUID(),previousExecutionId:f.p.executionId};
+  const results=await Promise.allSettled([c.run('wallet-prepare',f.identity,req),createM4Execution(deps).run('wallet-prepare',f.identity,{...req,requestId:crypto.randomUUID()})]);assert.equal(results.filter(x=>x.status==='fulfilled').length,1);
+  const fresh=results.find(x=>x.status==='fulfilled').value;assert.equal(fresh.executionId,req.requestId);assert.notEqual(fresh.result.mint,f.p.result.mint);assert.notEqual(fresh.result.recentBlockhash,f.p.result.recentBlockhash);
+  assert.equal(f.db.prepare('SELECT payload FROM m4_execution_history WHERE execution_id=?').get(f.p.executionId).payload,f.payload);
+  assert.equal(f.db.prepare('SELECT payload FROM launch_isolation_grants WHERE id=?').get(POLICY101_LIGHTHOUSE_ID).payload,f.diagnosticParent);
+  assert.deepEqual(f.db.prepare('SELECT * FROM launch_isolation_claims ORDER BY grant_id').all().filter(r=>r.grant_id!==POLICY101_REPLACEMENT_ID),before);
+  assert.equal(f.db.prepare('SELECT 1 FROM m4_execution_history WHERE execution_id=?').get(POLICY101_FAILED_PREPARATION_ID),undefined);
+  const restarted=createM4Execution({...deps,receiptAuthority:createPolicy101Authority({db:f.db,journalPath:f.journalPath,approval:f.approval})});
+  assert.equal((await restarted.run('wallet-prepare',f.identity,req)).walletTransactionBase64,fresh.walletTransactionBase64);
+  await restarted.run('wallet-claim',f.identity,f.reviewRequest(fresh));assert.equal((await restarted.run('wallet-prepare',f.identity,req)).walletTransactionBase64,undefined);
+  await assert.rejects(restarted.run('wallet-prepare',f.identity,{...req,requestId:crypto.randomUUID(),previousExecutionId:fresh.executionId}),{code:'POLICY101_ATTEMPT_CONSUMED'});assert.equal(f.sends(),0);
+ }finally{f.db.close();}
+});
+for(const kind of ['lineage','claim','prior','target','limit','fourth','evidence-hash','wrong-method','signed','diagnostic','signer','archived'])test('replacement rejects '+kind+' before installation',async()=>{
+ const f=await replacementFixture();try{const a=structuredClone(f.approval);
+  if(kind==='lineage')a.predecessor.sha256='0';if(kind==='claim')a.predecessor.claimSha256='0';if(kind==='prior')a.prior.sha256='0';if(kind==='target')a.target.owner='wrong';if(kind==='limit')a.maximumAttempts=2;if(kind==='fourth')a.id+='-2';if(kind==='evidence-hash')a.failedPreparation.sha256='0';
+  if(['wrong-method','signed'].includes(kind)){const e={...f.evidence,...(kind==='signed'?{freshOwnerSigned:true}:{rpcMethod:'sendTransaction'})};writeFileSync(a.failedPreparation.path,JSON.stringify(e));a.failedPreparation.sha256=sha(readFileSync(a.failedPreparation.path));}
+  if(kind==='diagnostic')f.db.prepare('INSERT INTO m4_wallet_diagnostics VALUES(?,?,?,?)').run('fixture',POLICY101_FAILED_PREPARATION_ID,'fixture','{}');
+  if(kind==='signer'){f.db.exec('CREATE TABLE IF NOT EXISTS m4_ephemeral_mint_signers(execution_id TEXT PRIMARY KEY,binding TEXT,ciphertext TEXT)');f.db.prepare('INSERT INTO m4_ephemeral_mint_signers VALUES(?,?,?)').run(POLICY101_FAILED_PREPARATION_ID,'fixture','fixture');}
+  if(kind==='archived')f.db.prepare('INSERT INTO m4_execution_history VALUES(?,?)').run(POLICY101_FAILED_PREPARATION_ID,'{}');
+  assert.throws(()=>createPolicy101Authority({db:f.db,journalPath:f.journalPath,approval:a}));assert.equal(f.db.prepare('SELECT COUNT(*) n FROM launch_isolation_grants').get().n,2);assert.equal(f.sends(),0);
+ }finally{f.db.close();}
+});
+test('replacement failed build stays consumed and cannot reuse failed request or change evidence',async()=>{
+ const f=await replacementFixture();try{const authority=createPolicy101Authority({db:f.db,journalPath:f.journalPath,approval:f.approval});
+  assert.throws(()=>authority.isolation.beforePrepare(POLICY101_FAILED_PREPARATION_ID,f.p.executionId));assert.equal(authority.isolation.available(),true);
+  f.expire();const rpc=f.deps.transport.rpc,transport={...f.deps.transport,rpc:async(m,p)=>m==='getSignatureStatuses'?{context:{slot:105},value:[null]}:m==='getTransaction'?null:rpc(m,p)};
+  const c=createM4Execution({...f.deps,transport,receiptAuthority:authority,prepareFactory:()=>async()=>{throw Error('fixture build failure');}}),req={initialBuy:'0',requestId:crypto.randomUUID(),previousExecutionId:f.p.executionId};
+  await assert.rejects(c.run('wallet-prepare',f.identity,req),/fixture build failure/);const restart=createPolicy101Authority({db:f.db,journalPath:f.journalPath,approval:f.approval});assert.equal(restart.isolation.available(),false);assert.throws(()=>restart.isolation.beforePrepare(crypto.randomUUID(),f.p.executionId),{code:'POLICY101_ATTEMPT_CONSUMED'});
+  assert.equal(f.db.prepare('SELECT payload FROM m4_execution').get().payload,f.payload);writeFileSync(f.approval.failedPreparation.path,'{}');assert.throws(()=>restart.isolation.available(),{code:'POLICY101_REPLACEMENT_EVIDENCE'});assert.equal(f.sends(),0);
+ }finally{f.db.close();}
+});
