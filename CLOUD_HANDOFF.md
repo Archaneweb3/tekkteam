@@ -1,4 +1,22 @@
-# CURRENT — 6 October 2026, 22:22 WIB: HOSTINGER SSH PUBLIC KEY INSTALL REQUIRED
+# CURRENT — 6 October 2026, 23:31 WIB: CANONICAL PRODUCT DEPLOYED DEFAULT-OFF
+
+SSH is working; do not repeat discovery or generate keys. Canonical API d2516bc
+and UI0516940 deployed at https://tekkteam.tech. Staging public pages redirect;
+internal API remains4395 and its external API access is denied. Legacy4193 stopped.
+Actual owner Phantom Sign In/Mainnet balance/Refresh/reload PASS. One target Agent,
+no target wallet, no mint/receipt. Legacy data and full journal retained.
+
+Fresh unsigned preparation deeaa9a4-8b53-44bb-8303-ab33b6a06e87 passed simulation;
+0initialbuy,0.005557360SOL estimate, review expired23:28:27.671 WIB. No wallet
+transaction attempt or broadcast. Do not reuse. Target provisioning still requires
+confirmed receipt. All trading/funding/transfers remain disabled.
+
+Next dependency is authoritative reconciliation of legacy broadcast-attempted
+UNKNOWN. Null RPC history does not prove historical failure. Do not erase/filter
+the journal to open M4. Existing guard remains. Read PROJECT_STATUS and
+docs/CANONICAL-DEPLOYMENT-20261006.md; no repeat broad audit/Lighthouse review.
+
+# Previous — 6 October 2026, 22:22 WIB: HOSTINGER SSH PUBLIC KEY INSTALL REQUIRED
 
 Resume c20dfc3. Existing offered identity rejected; no alternative authorized key
 found. History and authenticated Hostinger confirm root@179.198.214.104:22.

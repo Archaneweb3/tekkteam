@@ -1,4 +1,41 @@
-# CURRENT — 6 October 2026, 22:46 WIB: SSH VERIFIED; PRODUCT CONVERGENCE IN PROGRESS
+# CURRENT — 6 October 2026, 23:31 WIB: CANONICAL DEPLOYED; REAL OWNER QA PASS; M4 BLOCKED
+
+SSH verified root@srv2016744; canonical production now uses API release d2516bc
+and UI0516940. HTTPS/API200, www redirects, staging pages redirect to canonical,
+external staging API403. Effect capabilities remain OFF; safety locks are enforced.
+Old launch service stopped;
+no VPS restart. Backups retained; unrelated user changes preserved.
+
+Five bounded personalities, weekly opt-in Real leaderboard, accepted Lighthouse
+validation and completed Agent UI deployed. Home now uses the shared Real ranking.
+Fixed stale stylesheet cache, connected-versus-authenticated Wallet presentation,
+and Agent launch-status read formerly pointing at the retired4193 service.
+
+Actual Phantom Connect + human owner Sign In on https://tekkteam.tech PASS.
+Mainnet balance0.182835778 SOL and Refresh PASS23:23 WIB. Reload retains session,
+one aaaaada and immutable ret/3ED. Canonical SQLite3Agents/1legacywallet; target
+wallet0, receipt0, mintnull. Seven old M4 histories and four raw legacy journal
+records preserved. No association fabricated or historical status overwritten.
+
+One fresh UNSIGNED preparation23:28 WIB: create_v2/Mainnet/simulationPASS,
+initialbuy0, fee10000 + other5547360 =5557360lamports (0.005557360SOL),
+840bytes/1instruction. Metadata/image HTTP200. Persisted request
+deeaa9a4-8b53-44bb-8303-ab33b6a06e87; review expired23:28:27.671 WIB.
+This is historical preparation evidence, NOT approval/broadcast/launch. Never reuse.
+
+Production desktop/mobile route QA completed for reachable states; responsive
+viewport is not a real-device wallet proof. Focused tests/builds PASS; details in
+docs/CANONICAL-DEPLOYMENT-20261006.md. Old cached browser console errors and an
+extension message-channel error are distinguished from current application evidence.
+
+M4 BLOCKED: legacy broadcast-attempted UNKNOWN lacks retrievable finalized chain
+evidence/original signed bytes. Existing M4_PRIOR_EXECUTION_REQUIRES_RECONCILIATION
+guard remains unchanged. Need authoritative historical evidence or separately
+reviewed, explicit approval of historical isolation before changing that policy.
+No fresh Phantom transaction request, signing, broadcast, funding or trading.
+No PHANTOM ACTION-TIME READY / CUDA-LEVEL PRODUCT READY claim is justified.
+
+# Previous — 6 October 2026, 22:46 WIB: SSH VERIFIED; PRODUCT CONVERGENCE IN PROGRESS
 
 Resume started22:23 WIB, checkpoint target22:53 WIB. Dedicated authorized SSH identity
 reaches root@srv2016744 at179.198.214.104; strict known-host verification PASS.
