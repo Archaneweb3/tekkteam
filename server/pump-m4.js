@@ -142,7 +142,7 @@ export function createM4Execution({db,transport,publishMetadata,journalPath,now=
     verifyIdentity();s.status='SIGNED';s.signature=signed.signature;s.signedDigest=signed.signedDigest;s.signedTransactionBase64=signed.completeBase64;s.integrity=signed.integrity??null;s.signedAt=now();save(s);
     let finalContext;
     try{assertReviewedExecutionRequest(s.result,identity,{...request,now:now()});finalContext=await revalidate(s,identity,request,{transport,now,captureDiagnostics});verifyIdentity();assertReviewedExecutionRequest(s.result,identity,{...request,now:now()});if(s.walletMessagePolicy===FINAL_MESSAGE_POLICY){if(finalContext?.finalMessageProof?.messageSha256!==s.integrity.walletFinalMessageFingerprint||finalContext.finalMessageProof.signedPayloadSha256!==s.signedDigest||finalContext.finalMessageProof.simulationStatus!=='PASS'||finalContext.finalMessageProof.signatureVerification!==true)throw m4Fail('M4_FINAL_MESSAGE_PROOF_REQUIRED');s.finalMessageProof=finalContext.finalMessageProof;s.finalMessageEvidence=finalContext.finalMessageEvidence;save(s);}}
-    catch(error){s.status='SIGNED_NOT_BROADCAST';s.error=error.code??'M4_REVALIDATION_FAILED';save(s);return publicState(s);}
+    catch(error){s.status='SIGNED_NOT_BROADCAST';s.error=error.code??'M4_REVALIDATION_FAILED';if(error.code==='M4_LIGHTHOUSE_PROGRAM_OR_STATE_CHANGED'&&error.validationFailure)s.validationFailure=error.validationFailure;save(s);return publicState(s);}
     // Claim only after the last native check succeeds, immediately before the
     // transport's ONLY network send. A pre-claim rejection is provably unsent;
     // crashes/timeouts after the durable claim stay uncertain and never retry.

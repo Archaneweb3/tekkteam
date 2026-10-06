@@ -1,3 +1,4 @@
+import {sameRpcValue} from '../src/rpc-value-equality.js';
 import {Transaction,PublicKey} from '@solana/web3.js';
 import {createHash} from 'node:crypto';
 import bs58 from 'bs58';
@@ -85,7 +86,14 @@ export async function revalidateM4(record,identity,request,{transport,now=Date.n
  const payer=a=>JSON.stringify({owner:a?.owner,executable:a?.executable,data:a?.data});
  if(before.value[5]?.owner!=='11111111111111111111111111111111'||before.value[5]?.executable!==false||payer(before.value[5])!==payer(afterRead.value[5])||payer(before.value[5])!==payer(simulation.value.accounts[5]))throw m4Fail('M4_PAYER_CHANGED');
  const atomicEffects=atomicExecutionEffects(r,{simulation,feeResponse:fee,before,afterRead},policy,finalBase64);
- if(structure.lighthouse){const i=addresses.indexOf(structure.lighthouse.program),program=before.value[i];if(!program||program.executable!==true||program.owner!=='BPFLoaderUpgradeab1e11111111111111111111111'||JSON.stringify(program)!==JSON.stringify(afterRead.value[i])||JSON.stringify(program)!==JSON.stringify(simulation.value.accounts[i])||simulation.value.accounts[5].lamports<structure.lighthouse.minBalanceLamports)throw m4Fail('M4_LIGHTHOUSE_PROGRAM_OR_STATE_CHANGED');}
+ if(structure.lighthouse){
+  const i=addresses.indexOf(structure.lighthouse.program),program=before.value[i],post=simulation.value.accounts[i],after=afterRead.value[i];
+  if(!program||program.executable!==true||program.owner!=='BPFLoaderUpgradeab1e11111111111111111111111'||!sameRpcValue(program,after)||!sameRpcValue(program,post)||simulation.value.accounts[5].lamports<structure.lighthouse.minBalanceLamports){
+   const error=m4Fail('M4_LIGHTHOUSE_PROGRAM_OR_STATE_CHANGED');
+   error.validationFailure={stage:'LIGHTHOUSE_ACCOUNT_STATE',slots:{before:before.context.slot,simulation:simulation.context.slot,after:afterRead.context.slot},accounts:{before:program??null,simulation:post??null,after:after??null},payerPostLamports:simulation.value.accounts[5].lamports,assertionMinimumLamports:structure.lighthouse.minBalanceLamports};
+   throw error;
+  }
+ }
  decodeM4CreationAccounts(r,simulation.value.accounts[0],simulation.value.accounts[2]);verifyM4CreateEvent(r,simulation.value.logs);
  if(finalBase64)verifyM4TokenAccounts(r,simulation.value.accounts);
  for(const account of r.policy.rentAccounts)if(await rpc('getMinimumBalanceForRentExemption',[account.dataLength,{commitment:'finalized'}])!==account.minimumRentExemptionLamports)throw m4Fail('M4_RENT_CHANGED');

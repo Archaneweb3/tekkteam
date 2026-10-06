@@ -31,3 +31,21 @@ test('two independent controller instances cannot both claim wallet approval',as
   assert.equal(JSON.parse(f.db.prepare('SELECT payload FROM m4_execution').get().payload).status,'AWAITING_WALLET_APPROVAL');assert.equal(f.sends(),0);
  }finally{f.db.close();}
 });
+
+test('Lighthouse refusal diagnostics persist privately across restart without a send or retry',async()=>{
+ const diagnostic={stage:'LIGHTHOUSE_ACCOUNT_STATE',slots:{before:101,simulation:102,after:103},accounts:{before:{owner:'expected'},simulation:{owner:'changed'},after:{owner:'expected'}}};
+ const f=m4Fixture({dependencies:{revalidate:async record=>{
+  if(record.signature)throw Object.assign(Error('state changed'),{code:'M4_LIGHTHOUSE_PROGRAM_OR_STATE_CHANGED',validationFailure:diagnostic});
+  return {contextSlot:104};
+ }}});
+ try{
+  const s=await prepare(f),request=f.request(s);await f.controller.run('review',f.identity,request);
+  const result=await f.controller.run('submit',f.identity,{...request,signedTransactionBase64:f.signed()});
+  assert.equal(result.status,'SIGNED_NOT_BROADCAST');assert.equal(result.error,'M4_LIGHTHOUSE_PROGRAM_OR_STATE_CHANGED');assert.equal(result.broadcastAttempted,false);assert.ok(result.signature);assert.equal('validationFailure' in result,false);
+  assert.deepEqual(JSON.parse(f.db.prepare('SELECT payload FROM m4_execution').get().payload).validationFailure,diagnostic);
+  const resumed=createM4Execution(f.deps),status=await resumed.run('status',f.identity);
+  assert.equal(status.status,'SIGNED_NOT_BROADCAST');assert.equal('validationFailure' in status,false);
+  await assert.rejects(resumed.run('submit',f.identity,{...request,signedTransactionBase64:f.signed()}));
+  await assert.rejects(resumed.run('prepare',f.identity,{initialBuy:'0',requestId:crypto.randomUUID()}));assert.equal(f.sends(),0);
+ }finally{f.db.close();}
+});

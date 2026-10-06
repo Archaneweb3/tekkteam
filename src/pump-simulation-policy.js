@@ -1,3 +1,4 @@
+import {sameRpcValue} from './rpc-value-equality.js';
 import {inspectCreation,CAP} from './pump-readiness.js';
 import {PublicKey} from '@solana/web3.js';
 import bs58 from 'bs58';
@@ -60,7 +61,7 @@ export function evaluateSimulation(bytes,context,{before,afterRead,simulation,fe
  }
  if(!Array.isArray(v.innerInstructions))reasons.push('MISSING_INNER_INSTRUCTIONS');
  const valid=n=>Number.isSafeInteger(n)&&n>=0;
- const same=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
+ const same=sameRpcValue;
  // External reads are not atomic simulation prestate. Cross-bank differences
  // are telemetry, not proof that this transaction mutated those accounts.
  const sameBank=before.context.slot===simulation.context.slot&&afterRead.context.slot===simulation.context.slot&&same(before.value,afterRead.value);
