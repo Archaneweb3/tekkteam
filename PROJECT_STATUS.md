@@ -1,4 +1,34 @@
-# CURRENT — 6 October 2026, 22:05 WIB: browser terminal blocked after recovery
+# CURRENT — 6 October 2026, 22:15 WIB: direct SSH authentication unavailable
+
+Latest user mandate replaces web-terminal infrastructure access with direct SSH.
+Resume began22:12:43 WIB from5058c9c; source and unrelated user changes preserved.
+OpenSSH9.5 client and scp are installed. 179.198.214.104:22 is reachable and its
+server key matches existing known_hosts. Both default identity login and the one
+existing nondefault local identity fail for root: Permission denied
+(publickey,password), SSH exit255. Verbose filtered evidence confirms the local
+public key was offered but never accepted; this is an authentication blocker,
+not a network/host-key or browser blocker. No secret/key contents were printed.
+
+No user/system SSH config, default identity files, running ssh-agent, PuTTY or
+WinSCP saved connection, relevant SSH environment configuration, or TEKKTEAM
+deployment reference identifying another authorized identity was found. ssh-agent
+is Stopped/Disabled. The alternative local key was tested only against the exact
+known TEKKTEAM VPS; no CUDA project/configuration was inspected.
+
+DIRECT VPS ACCESS REQUIRED: configure a valid VPS-authorized SSH login/identity
+locally (or supply the location/alias of an existing valid configuration, not its
+secret contents). Per Phase1, stop before deployment/reconciliation. No remote
+command passed authentication, so current hostname/revision/systemd/disk/RAM/API
+and environment were not reverified through SSH. No VPS/production/staging changes,
+new wallet prompt, signing or broadcast occurred in this resume.
+
+Preserved implementation/deployment states below remain checkpoint evidence:
+Lighthouse60d54d1 staging verified; Agent UI bde8e2a and controlled product composition
+2c5a302 local/source-reviewed only; latest baseline5058c9c. Canonical DB/journal
+reconciliation, profiles, worker and global Real leaderboard remain unfinished.
+Evidence: artifacts/m4-deterministic-attempt/direct-ssh-20261006.txt.
+
+# Previous — 6 October 2026, 22:05 WIB: browser terminal blocked after recovery
 
 Resume same active milestone; no broad audit or Lighthouse reimplementation.
 HEAD bde8e2a contains accepted Agent tab/wallet UI. Staging deployed checkpoint is

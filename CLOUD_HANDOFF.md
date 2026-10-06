@@ -1,4 +1,15 @@
-# CURRENT — 6 October 2026, 22:05 WIB: browser terminal blocked after recovery
+# CURRENT — 6 October 2026, 22:15 WIB: DIRECT VPS ACCESS REQUIRED
+
+Continue5058c9c without Hostinger Web Terminal. Direct OpenSSH reached the known
+179.198.214.104:22 with matching host key, but root authentication failed for both
+default and existing nondefault identity. The offered key was rejected; exit255,
+Permission denied(publickey,password). No SSH config/active agent/PuTTY/WinSCP
+saved login or TEKKTEAM identity reference exists in inspected standard locations.
+No secrets displayed and no remote mutation. A VPS-authorized identity/login must
+be configured locally before Phase2 deploy/Phase3 reconciliation. No new financial
+attempt. PROJECT_STATUS and EXECUTION_BRIEF record scope/evidence; same milestone.
+
+# Previous — 6 October 2026, 22:05 WIB: browser terminal blocked after recovery
 
 Resume same active milestone; no broad audit or Lighthouse reimplementation.
 HEAD bde8e2a contains accepted Agent tab/wallet UI. Staging deployed checkpoint is

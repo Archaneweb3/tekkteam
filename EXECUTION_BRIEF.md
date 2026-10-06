@@ -1,4 +1,15 @@
-Checkpoint22:05 WIB: BROWSER TOOL HARD-BLOCKED after fresh Hostinger console recovery.
+Checkpoint 6 October2026 22:15 WIB: DIRECT VPS ACCESS REQUIRED. Resume started
+22:12:43 WIB; current checkpoint target22:35 WIB. Phase1 direct OpenSSH reached
+179.198.214.104:22 and matched known_hosts, but root authentication failed with
+the default identities and the existing local nondefault identity (key offered,
+server rejected; exit255, publickey/password). No usable SSH config, running agent,
+PuTTY/WinSCP saved session or repository SSH identity reference was found.
+Need a VPS-authorized SSH identity/login configured securely on this laptop.
+Do not request private keys/passwords in chat, use Hostinger web terminal, repeat
+accepted implementation, or initiate a new financial attempt. No deploy or VPS
+mutation occurred in this resume. Same active milestone; source5058c9c preserved.
+
+Previous checkpoint22:05 WIB: BROWSER TOOL HARD-BLOCKED after fresh Hostinger console recovery.
 Lighthouse60d54d1 deployed staging; bde8e2a UI and subsequent controlled product
 composition local only. No financial attempt. Production unchanged. See current
 PROJECT_STATUS for exact storage conflict, tests and terminal errors. Resume this
