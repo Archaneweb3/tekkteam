@@ -1,34 +1,56 @@
-# CURRENT — 7 October 2026, 00:35 WIB: PHANTOM ACTION-TIME CONFIRMATION REQUIRED
+# CURRENT â€” 7 October 2026, 00:48 WIB: ONE ATTEMPT CONSUMED; SIGNED_NOT_BROADCAST
 
-Policy101 source823e9d9 deployed00:32:14 WIB. Local100/100 targeted regressions,
-Ubuntu16/16 focused tests, canonical build PASS. Independent source/deployment
-review ACCEPT. Only tekkteam-api restarted (PID67891); legacy sender PID0.
-Journal/quarantine hashes unchanged; no CUDA/shared infra changes.
+Policy101 source823e9d9 deployed00:32 WIB. Exactly one fresh canonical operation
+38c731bc-2b8d-4e95-961c-8ac2eefd08f0 reached Phantom at00:34:48.781 WIB.
+The owner signature returned; no automated wallet approval was performed.
+Final signed-message validation refused before submission:
+SIGNED_NOT_BROADCAST / M4_LIGHTHOUSE_PROGRAM_OR_STATE_CHANGED.
+This supersedes the premature pending-approval checkpoint in677ecf4.
 
-Exactly one claim consumed: 38c731bc-2b8d-4e95-961c-8ac2eefd08f0.
-Fresh wallet preparation created 2026-10-06T17:34:44.689Z; Phantom handoff00:34:48.781 WIB.
-Reviewed debit 5562578 lamports; fee15218, other5547360;
-initialbuy0, ceiling10000000. Mainnet simulation PASS; guards PASS.
-Native blockhash expiry: lastValidBlockHeight 432007905;137 blocks
-remaining at handoff, no invented wall-clock deadline. No retry authorized.
-Payload 7e1e0180d87cf79bb592462d8d5e94f4e6832f2829cf6cc5d51827a60d638028
-Message c2c5b046e3635c7d0247e0032f9d5a6b9b01514989125d85f7447c3023e49b8d
-Browser handoff hashes equal backend reviewed payload/message; owner-first signing
-and Lighthouse final-message policy active. Actual final returned wallet message
-must still pass independent server validation and final simulation before broadcast.
+OwnerSigned=true; broadcast=false; submittedAt=null; receipt0; confirmed CA absent.
+Signed signature (not an on-chain receipt):
+2rYv4ZuhsF3feaks1BoQGsM9MyNaB46fzbuMCuFWNfZWpC8vSfv3HcqHNXr88ExMcC7qXnKVFDEu1G2z7zEFWsn5.
+TargetAgent aaaaada count1; targetwallet0; immutablegrant1/claim1.
+No retry, second operation, signature reuse or rebroadcast authorized.
+Read-only finalized Mainnet balance at00:40:07 WIB:182835778lamports, equal to
+pre-review balance. SOL spent by this attempt0. Trading/funding remain OFF.
+Candidate mint6wgsA1nHo9hApde3HkSzjUSknrGtU9jaHSZoZBHKa2WG is NOT a confirmed CA.
 
-At evidence capture: ownerSigned=True, broadcast=False,signature=2rYv4ZuhsF3feaks1BoQGsM9MyNaB46fzbuMCuFWNfZWpC8vSfv3HcqHNXr88ExMcC7qXnKVFDEu1G2z7zEFWsn5,
-receipt0, targetAgent1, targetwallet0; Real trading OFF.
-Metadata/image GET200 (image HEAD403; GET PNG80197bytes). Desktop and390px dialog
-usable; viewport restored. Existing owner session preserved. The extension popup
-is inaccessible to browser tooling; clean Phantom screen is NOT independently
-verified. Request pending at website wallet handoff. Human must inspect and approve
-only the clean fresh transaction; never bypass warning or use expired approval.
+Review created00:34:44.689 WIB: total5562578lamports=0.005562578SOL;
+fee15218; other5547360; initialbuy0; ceiling10000000. Unsigned simulation PASS.
+Native expiry lastValidBlockHeight432007905;137 blocks remained at handoff.
+The old review must not be reused. Payload/message fingerprints at wallet handoff
+matched backend review. Owner-first signing used; semantic validation accepted
+only the narrowly permitted Lighthouse assertion addition. Complete final proof
+is null because the later account-state guard refused. Final validation NOT PASS.
+Actual Phantom extension screen inaccessible; clean warning-free UI not independently
+verified. No warning bypass. Metadata/image GET200; image HEAD403 is not GET failure.
 
-Evidence: artifacts/legacy-reconciliation/policy101-fresh-evidence.json,
-policy101-wallet-handoff.png and /var/lib/tekkteam-mainnet/policy101-823e9d9/.
+Correction bd2dc47: compare every RPC field/value without treating object
+insertion order as account state. Array order/length and missing fields remain strict.
+Persist private Lighthouse refusal diagnostics for future diagnosis. The real failed
+attempt did not retain those snapshots. Field ordering is a proven code defect,
+NOT a proven cause of this specific refusal. Do not invent historical diagnostics.
+Targeted51/51 PASS; canonical client build PASS; independent review ACCEPT.
+Deployed bd2dc47 at00:47:45WIB. VPS51/51 PASS, canonical client build PASS.
+Only tekkteam-api restarted (PID69929); retired senderPID0. Source hashes match;
+active private payload SHA28425c88eb3391ee6de018d3b2cd7f40ee35a1e7d2cbfa46cfd88c8b32ec9339
+unchanged across restart; claim1/receipt0. No past operation repaired or reopened.
+Frontend index SHA41f5a8d4c2a57cd3422110d5607bb20c6adae6999014bc7faa73ff416e3f3e42.
+Deployment evidence /var/lib/tekkteam-mainnet/policy101-bd2dc47/deployment.json.
+Independent release review ACCEPT at00:48:14â€“00:48:43WIB: six deployed files equal
+Git bd2dc47. HTTPS root/health/capabilities200 and index hash match. Owner remains
+connected after browser reload; consumed-attempt UI persists with retry disabled.
+Screenshot artifacts/legacy-reconciliation/policy101-consumed-outcome.png.
 
-# Previous — 7 October 2026, 00:34 WIB: POLICY101 APPROVED; LOCAL QUALIFICATION PASS
+Legacy operation6b713ac6-cfcb-4ca6-8090-72a9b9c1654f permanently remains
+LEGACY_UNKNOWN_QUARANTINED. Raw journal/quarantine/evidence/retired sender unchanged.
+No CUDA or shared-infrastructure access/change. Canonical TEKKTEAM only.
+Evidence: artifacts/legacy-reconciliation/policy101-final-outcome.json and
+/var/lib/tekkteam-mainnet/policy101-823e9d9/final-outcome.json.
+M4 remains BLOCKED. A new wallet attempt needs explicit new authorization.
+
+# Previous â€” 7 October 2026, 00:34 WIB: POLICY101 APPROVED; LOCAL QUALIFICATION PASS
 
 Owner explicitly approved permanent legacy quarantine plus exactly one fresh canonical
 launch for the existing aaaaada / ret / 3ED. Financial approval remains manual.

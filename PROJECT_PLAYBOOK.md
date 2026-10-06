@@ -1,5 +1,10 @@
 # PROJECT_PLAYBOOK — TEKKTEAM
 
+Latest7October2026: Policy101 explicitly APPROVED for exactly ONE fresh canonical
+operation, separate from manual financial approval. That claim is now consumed;
+SIGNED_NOT_BROADCAST does not authorize retry. Preserve immutable legacy history,
+consumed operation and receipt-only Agent wallet provisioning.
+
 Latest legacy-reconciliation mandate, 6–7 October 2026: preserve unresolved raw
 history; quarantine does not authorize a new launch. Unknown-history isolation
 requires explicit owner policy approval before activation, then separate manual
