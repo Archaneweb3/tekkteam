@@ -1,4 +1,57 @@
-## 20:52 WIB checkpoint — real wallet message mismatch stopped before Submit
+## CURRENT — 6 October 2026, 21:01 WIB: manual approval verified; Phantom compatibility BLOCKED
+
+User confirmed manual approval for execution a50e30db-a404-4c87-b3b7-5903265c567a.
+Created20:52:58.249 WIB; returned20:53:35.291. Mainnet, initialbuy0, reviewed
+5559367lamports (network12007 + other5547360), simulation/financial guards PASS.
+Native lastValidBlockHeight431958545; preparation checked142 remaining blocks;
+wallet handoff20:53:00.271 WIB checked141 remaining blocks.
+No artificial decision TTL. Normal Phantom transaction screen was observed,
+with yellow new-domain advisory, no red blocking warning. Root never approved it.
+
+REAL captured return: owner signature present and cryptographically valid on the
+returned message; mint signature absent. Phantom Wallet Standard1.0.0 appended
+Lighthouse AssertAccountInfoMulti and reordered compiled account keys. The original
+three instruction payloads/accounts/privileges, fee payer, signers and blockhash
+are unchanged. Raw wire equals local compilation on both sides, excluding local
+reserialization as the cause. Prepared message SHA17c1b1001bbb0c0171031351641a64fc8eb76cc1af8a0f78bbb4abd153ec0c6f;
+returned SHA3706b646efea422f77fcbddbc43efe2b089e9d1ebc611b6faefdedd1ec44a098.
+The exact-message guard stopped BEFORE Submit. This was not failed human approval,
+priority-fee mutation or expiry rejection. Current later status TRANSACTION_EXPIRED
+is native expiry after the original mismatch; it is not the mismatch root cause.
+
+Backend accepted ownerSigned=false, broadcast=false, signature=null, receipt0,
+no launchedCA. Finalized Mainnet getBalance at slot453921769 returned182835778
+lamports (0.182835778SOL), unchanged; getAccountInfo candidate mint returnednull.
+No spend by this attempt. DATA_DIR /var/lib/tekkteam-staging, wallet-test.sqlite,
+API4395. Validated journal receipts0 (the JSON envelope has two keys, not two
+receipts). Target aaaaada count1, total pre-existing Agents2, Agentwallets0,
+launch bindings absent. No provisioning before receipt. Historical774a payload SHA
+bb12a6fe5a98eba70ed0568c91a7cd54955f5197911d313bb07de29285b8fbfb unchanged.
+Production PM2 API PID10722/restart0 and launch PID10893/restart0 still online;
+staging PID58813/restart23. No production path/config/service modification.
+Trading/funding/workers remain OFF. No third wallet request, retry or broadcast.
+
+Independent read-only review ACCEPTED final scoped tests/docs, no P1/P2 findings.
+Local regression24/24 PASS includes both provider transports refusing the captured
+Lighthouse instruction shape and backend rejection with zero sends/unchanged record.
+Synthetic regression is distinct from the captured real owner signature. Existing
+staging build/source evidence remains valid; latest changes are tests/docs only,
+so no additional deployment or process restart is needed.
+
+BLOCKER: observed Phantom augmentation conflicts with the user's exact prepared
+message requirement and the stored mint signature. Official Phantom docs document
+augmentation but no immutable-message/deduplication contract. Pre-inclusion is an
+unverified candidate, not a fix. Do not strip Lighthouse, exempt it from hashes,
+disable wallet protection or reuse the old mint signature. A provider-supported
+immutable-message path, or explicit approval of a separately reviewed augmented
+message/signing lifecycle, is needed before another real attempt. See
+docs/decisions/097-phantom-lighthouse-compatibility-blocker.md. Receipt-dependent
+funding/trading/canary/production acceptance remains blocked, not PASS.
+Evidence: artifacts/m4-deterministic-attempt/{wallet-return-diagnostics.json,
+lighthouse-integrity-summary.json,action-time-diagnostic-review.json,
+post-approval-staging.txt,post-approval-state.jpg,lighthouse-regression.log}.
+
+## Historical 20:52 WIB checkpoint — first wallet message mismatch stopped before Submit
 
 Attempt15dd72ef-ed4c-46c5-a1e6-1358c4cc45e6 prepared20:46:37.238 WIB. Final v2, Mainnet simulationPASS, reviewed5565360lamports (fee18000 + other5547360), initialbuy0. Handoff20:46:39.232 had141blocks remaining, native lastValidBlockHeight431957116. Prepared/delivered message25de4cdcc50a5cfa8db154afa86e8a6aad23acc1a0d2d8e3565aa22f3f2c87c7; returned20:46:44.430 messagec3605a9633b3753872c68e9c6ce041dad4d4b226a82c716038426e992a76d445. Exact-message guard rejected it. No Submit observed, backend signature=null/broadcast=false; no receipt/CA. Raw returned message was not captured, so changed fields and wallet-side signature validity are UNKNOWN, not a proven Phantom fee/Lighthouse cause.
 

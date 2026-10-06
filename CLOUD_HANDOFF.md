@@ -1,4 +1,35 @@
-# CURRENT — ONE deterministic M4 attempt safely stopped; M4 PARTIAL
+# CURRENT — 6 October 2026, 21:01 WIB: Phantom Lighthouse compatibility BLOCKED
+
+Read PROJECT_PLAYBOOK -> PROJECT_STATUS -> EXECUTION_BRIEF. Latest milestone is
+TEKKTEAM_PRODUCTION_PARITY; older one-attempt/30s review notes below are historical.
+Phase1 native blockhash/action-time review deployed staging, source3ef0b31;
+frontend unsigned-message diagnostics deployedf7a0a04. Root remains sole source writer.
+
+User manually approved executiona50e30db-a404-4c87-b3b7-5903265c567a at20:53 WIB.
+Captured owner signature validates on Phantom's returned message, which adds a
+Lighthouse assertion and recompiles account ordering. Exact-message guard refused
+BEFORE Submit. Original fee/Pump instructions and blockhash unchanged. No accepted
+backend owner signature, broadcast, receipt, launchedCA or provisioned Agentwallet.
+Recheck later records TRANSACTION_EXPIRED; do not mislabel expiry as original cause.
+
+Owner finalized balance182835778lamports unchanged at slot453921769; a separate
+finalized read found the candidate mint absent. Targetaaaaada count1; total
+existingAgents2, wallets0. Production
+PM2 PID10722/10893 restart0 unchanged; stagingPID58813/restart23. DATA_DIR remains
+/var/lib/tekkteam-staging, API4395, hostnamehttps://staging.tekkteam.tech.
+Trading/funding/workersOFF; production path untouched. No third wallet request.
+
+Decision097 records precise evidence and the blocked protocol choice: documented
+immutable-message provider behavior, or explicit user approval of a separately
+reviewed constrained-augmentation and delayed mint-signing lifecycle. Do not strip
+Lighthouse, bypass Phantom warnings, exempt hash checks or reuse mismatched mint
+signatures.24/24 local focused regressionPASS; latest edits tests/docs only.
+No additional deploy/restart required. Preserve unsigned forensic artifacts under
+artifacts/m4-deterministic-attempt and do not rewrite the first incomplete capture.
+
+Historical checkpoint:
+
+# ONE deterministic M4 attempt safely stopped; M4 PARTIAL
 
 Checkpoint 5 October 2026, 21:56:31 WIB. Started21:39; deadline22:09 WIB.
 Latest user accepted the historical fee limitation and authorized exactly ONE fresh

@@ -1,0 +1,34 @@
+{
+  "executionId": "a50e30db-a404-4c87-b3b7-5903265c567a",
+  "capturedAt": "2026-10-06T13:53:35.291Z",
+  "provider": "Phantom",
+  "transport": "wallet-standard",
+  "reviewDigest": "fbd6c7e3c32ee848b457eb9ab59d9101fb2859c29ed609805c189fa4f9b72ec2",
+  "preparedMessageSha256": "17c1b1001bbb0c0171031351641a64fc8eb76cc1af8a0f78bbb4abd153ec0c6f",
+  "returnedMessageSha256": "3706b646efea422f77fcbddbc43efe2b089e9d1ebc611b6faefdedd1ec44a098",
+  "wireEqualsCompiled": {
+    "prepared": true,
+    "returned": true
+  },
+  "blockhashUnchanged": true,
+  "signersUnchanged": true,
+  "originalInstructionsUnchanged": true,
+  "addedInstructions": [
+    {
+      "program": "L2TExMFKdjpN9kozasaurPirfHy9P8sbXoAN1qA3S95",
+      "accounts": [
+        {
+          "address": "C2nddai75FJZWWkNdUF7csEBryRCMikJyTTZZqYcMiBv",
+          "writable": true,
+          "signer": true
+        }
+      ],
+      "data": "BgQDAMtDPAoAAAAABAMAAAEAAAAAAAAAAAA="
+    }
+  ],
+  "ownerSignaturePresent": true,
+  "returnedSignaturesValid": true,
+  "mintSignaturePresent": false,
+  "backendOwnerSignatureAccepted": false,
+  "broadcast": false
+}

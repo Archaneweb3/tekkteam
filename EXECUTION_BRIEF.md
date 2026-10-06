@@ -2,7 +2,20 @@
 
 Started 6 October 2026, 20:22 WIB; first checkpoint 20:52 WIB.
 Continue actual HEAD536afdd with existing aaaaada/ret3ED and preserved evidence.
-Phase1 source/tests/staging PASS; real wallet handoff pending. Phase1 scope: separate informational review from fresh action-time wallet package;
+Checkpoint21:01 WIB: Phase1 source/tests/staging PASS; real Phantom compatibility
+BLOCKED. Owner manually approved a50e30db; returned owner signature is valid but
+Phantom added Lighthouse, changing the exact reviewed message. Frontend rejected
+before Submit; backend signature=null/broadcast=false, receipts0, targetAgent1,
+Agentwallet0, finalized owner balance0.182835778SOL unchanged. No third request.
+Current execution later reached native TRANSACTION_EXPIRED; expiry was not the
+original rejection cause. Preserve both attempts independently and keep all guards.
+Need a documented immutable-message provider path or explicit approval of the
+separately reviewed augmented-message signing lifecycle described in decision097.
+No hash exception, Lighthouse removal, old mint-signature reuse or automatic retry.
+Receipt-dependent real funding/trading/canary/production remain gated. Current24/24
+local regression PASS; no further staging deploy required for tests/docs-only changes.
+
+Phase1 scope: separate informational review from fresh action-time wallet package;
 native Solana blockhash/lastValidBlockHeight validity, immutable explicit-fee message,
 durable one-shot submit and explicit safe retry. Preserve branding and ten routes.
 Implement/test/deploy staging, then one Mainnet launch with manual owner approval;
