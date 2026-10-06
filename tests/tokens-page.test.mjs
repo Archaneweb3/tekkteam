@@ -11,6 +11,16 @@ function fixture(overrides={}){const a=agent(),host={innerHTML:''},reads=[];cons
 
 test('loading becomes receipt-backed list with exact Agent/detail links and full mint',async()=>{const f=fixture();assert.match(f.host.innerHTML,/LOADING/);await flush();assert.deepEqual(f.reads,['agent/one']);assert.match(f.host.innerHTML,/CANONICAL_RECEIPT_MINT/);assert.match(f.host.innerHTML,/BACKEND VERIFIED/);assert.match(f.host.innerHTML,/#\/tokens\/agent%2Fone/);assert.match(f.host.innerHTML,/#\/agent\/agent%2Fone/);assert.match(f.host.innerHTML,/https:\/\/pump.fun\/coin\/CANONICAL_RECEIPT_MINT/);assert.doesNotMatch(f.host.innerHTML,/ON-CHAIN VERIFIED|LIVE/);});
 test('detail keeps full receipt and related identity, with unavailable economics',async()=>{const f=fixture({selectedAgentId:'agent/one'});await flush();assert.match(f.host.innerHTML,/TOKEN DETAIL/);assert.match(f.host.innerHTML,/CANONICAL_SIGNATURE/);assert.match(f.host.innerHTML,/Market values, fees and token-holder rights · UNAVAILABLE/);assert.match(f.host.innerHTML,/ALL TOKENS/);});
+test('confirmed diagnostics are closed by default and injected finalized detail cannot promote canonical missing proof',async()=>{
+ const f=fixture({projectUnit:(a,d)=>({...project(a,d),launch:{...project(a,d).launch,receiptDetails:{bindingProvenance:'FINALIZED_M4_RECEIPT'}}})});await flush();
+ assert.match(f.host.innerHTML,/<details><summary>Advanced · launch receipt<\/summary>/);assert.doesNotMatch(f.host.innerHTML,/<details open|Finalized launch receipt/);assert.match(f.host.innerHTML,/Confirmed launch receipt/);
+ const primary=f.host.innerHTML.replace(/<details>[\s\S]*?<\/details>/g,'');assert.doesNotMatch(primary,/CANONICAL_SIGNATURE|Transaction delivery|Recorded receipt phase/);assert.match(primary,/VIEW ON PUMP.FUN/);
+});
+test('complete canonical finalized receipt earns precise primary label while workflow diagnostics stay secondary',async()=>{
+ const a=agent('finalized'),d=dto(a);d.lifecycle.token.mint='So11111111111111111111111111111111111111112';
+ d.lifecycle.launch.receiptDetails={executionId:'11111111-2222-3333-4444-555555555555',coinDraftAgentId:a.id,coinDraftRevision:1,metadataUri:'https://fixture.invalid/metadata',confirmedSlot:100,confirmedAt:1800000000000,pumpProvenance:'FINALIZED_EXACT_MESSAGE_MINT_METADATA_CURVE_CREATOR'};
+ const f=fixture({agents:[a],loadContract:async()=>d,projectUnit:launchpadUnit});await flush();assert.match(f.host.innerHTML,/Solana Mainnet · Pump.fun · Finalized launch receipt/);const primary=f.host.innerHTML.replace(/<details>[\s\S]*?<\/details>/g,'');assert.doesNotMatch(primary,/UNVERIFIED|CANONICAL_SIGNATURE|Recorded launch workflow/);assert.match(primary,/VIEW RELATED AGENT/);
+});
 test('visitor never reads or exposes private roster',async()=>{const f=fixture({owner:null});await flush();assert.equal(f.reads.length,0);assert.match(f.host.innerHTML,/Public opt-in token discovery is not available/);assert.doesNotMatch(f.host.innerHTML,/Actual Agent|Actual token/);});
 test('mixed owner or duplicate IDs reject entire roster before reads',async()=>{for(const agents of [[agent(),{...agent('other'),creator:'wrong'}],[agent(),agent()]]){const f=fixture({agents});await flush();assert.equal(f.reads.length,0);assert.match(f.host.innerHTML,/INVENTORY ERROR/);}});
 test('null roster, missing adapter, preview and unknown detail are unavailable rather than empty',async()=>{for(const overrides of [{agents:null},{loadContract:null},{projectUnit:null},{config:{preview:true}},{selectedAgentId:'not-owned'}]){const f=fixture(overrides);await flush();assert.match(f.host.innerHTML,/UNAVAILABLE/);assert.equal(f.reads.length,0);assert.doesNotMatch(f.host.innerHTML,/NO TOKENS YET/);}});
@@ -54,7 +64,7 @@ test('confirmed detail links the exact launch transaction through current shared
  const a=agent('receipt-agent',null),d=dto(a);d.lifecycle.token.mint='1'.repeat(32);d.lifecycle.launch.signature='LOCAL_SIGNATURE_ONLY';
  const f=fixture({agents:[a],selectedAgentId:a.id,loadContract:async()=>d,projectUnit:launchpadUnit});await flush();
  assert.match(f.host.innerHTML,/href="https:\/\/explorer.solana.com\/tx\/LOCAL_SIGNATURE_ONLY" target="_blank" rel="noopener noreferrer"/);
- assert.match(f.host.innerHTML,/launch receipt associates this Agent and mint with the transaction/);
+ assert.match(f.host.innerHTML,/backend’s recorded receipt/);
  assert.match(f.host.innerHTML,/#\/agent\/receipt-agent/);
  assert.match(f.host.innerHTML,/<h3>Token metadata unavailable<\/h3>/);
  assert.match(f.host.innerHTML,/aria-label="Inspect Token metadata unavailable"/);

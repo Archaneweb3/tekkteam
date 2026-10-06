@@ -1,3 +1,22 @@
+# Checkpoint - 7 October 2026, 04:47 WIB
+
+Inactive owner trading-limit review committed bce9618 and independently PASS:
+five personalities, exact receipt/wallet scope, per-trade/session/daily/count/
+slippage/duration ceilings, atomic revision save/reload/cancel. Saving is DRAFT,
+startsAt/expiresAt null, authorization false; no approve/activate/sign/send or
+worker-start method and no lifecycle enabled mutation. Paper profile unchanged.
+UI adds Review Trading Limits in Agent Wallet with disabled Activate.
+
+Activation17/17 + product/UI/auth regression passed; one expected-error assertion
+was adjusted after strengthening authority validation, then rerun17/17 passed.
+Final client build PASS. Canonical Tokens browser exposed overly prominent
+workflow diagnostics despite finalized receipt; now secondary closed Advanced,
+canonical finalized label cannot be injected by a projector.30/30 UI tests PASS.
+Deployment of reviewed source/UI with c91ccc1 queued now; funding/trading OFF.
+Remaining: production browser verification; first-BUY rent/effects qualification,
+active bounded budget/authorization integration. These remain internal work,
+not a request for owner funding yet.
+
 # Checkpoint - 7 October 2026, 04:40 WIB
 
 Local Pump restart/native-validity and funding-binding batch independently PASS.
