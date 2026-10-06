@@ -308,7 +308,7 @@ export function createServer({ dbPath, vaultKey, origins = ['http://127.0.0.1:51
     }
   });
   if(m4Execution){
-   for(const action of ['prepare','recover','review','submit','reject','status','estimate','wallet-prepare','wallet-status','wallet-claim'])app[['status','wallet-status'].includes(action)?'get':'post']('/api/launchpad/agents/:id/execution/'+action,authLimit,auth,async(req,res)=>{
+   for(const action of ['prepare','recover','review','submit','reject','status','estimate','wallet-prepare','wallet-status','wallet-claim','wallet-diagnostic'])app[['status','wallet-status'].includes(action)?'get':'post']('/api/launchpad/agents/:id/execution/'+action,authLimit,auth,async(req,res)=>{
     const owner=req.session.address;
     const snapshot=()=>{
      if(getSession(req)?.address!==owner)fail(401,'Owner session changed');
@@ -317,9 +317,9 @@ export function createServer({ dbPath, vaultKey, origins = ['http://127.0.0.1:51
      return agentLaunchData({...a,tokenDraftAuthority:{available:true,revision:1}});
     };
     const identity=snapshot(),body=['status','wallet-status'].includes(action)?{}:req.body;
-    const allowed={prepare:['initialBuy','requestId','replaceExecutionId'],recover:['initialBuy','requestId','previousExecutionId'],review:['requestId','reviewDigest','transactionBase64'],submit:['requestId','reviewDigest','transactionBase64','signedTransactionBase64'],reject:['requestId'],status:[],estimate:['initialBuy','requestId'],'wallet-prepare':['initialBuy','requestId','previousExecutionId'],'wallet-status':[],'wallet-claim':['requestId','reviewDigest','transactionBase64']}[action];
+    const allowed={prepare:['initialBuy','requestId','replaceExecutionId'],recover:['initialBuy','requestId','previousExecutionId'],review:['requestId','reviewDigest','transactionBase64'],submit:['requestId','reviewDigest','transactionBase64','signedTransactionBase64'],reject:['requestId'],status:[],estimate:['initialBuy','requestId'],'wallet-prepare':['initialBuy','requestId','previousExecutionId'],'wallet-status':[],'wallet-claim':['requestId','reviewDigest','transactionBase64'],'wallet-diagnostic':['requestId','reviewDigest','returnedTransactionBase64','returnedMessageBase64','clientStage']}[action];
     if(!body||Array.isArray(body)||Object.keys(body).some(k=>!allowed.includes(k)))fail(400,'Invalid M4 request');
-    try{const verifyIdentity=()=>{if(JSON.stringify(snapshot())!==JSON.stringify(identity))fail(409,'Owner/Agent changed');};const result=await m4Execution.run(action,identity,body,verifyIdentity);verifyIdentity();res.json(result);}
+    try{const verifyIdentity=()=>{if(JSON.stringify(snapshot())!==JSON.stringify(identity))fail(409,'Owner/Agent changed');};const result=action==='wallet-diagnostic'?m4Execution.diagnose(identity,body,verifyIdentity):await m4Execution.run(action,identity,body,verifyIdentity);verifyIdentity();res.json(result);}
     catch(error){res.status(error.status??503).json({error:'Controlled launch stopped',code:/^[A-Z0-9_]+$/.test(error.code??'')?error.code:'M4_FAILED'});}
    });
   }

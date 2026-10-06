@@ -241,10 +241,14 @@ export function m4LaunchWallet(owner){
   if(m4ApprovalRequests.has(review.executionId))throw Error('Single reviewed M4 approval already requested');
   m4ApprovalRequests.add(review.executionId);
   console.info('M4 wallet transaction request',JSON.stringify({executionId:review.executionId,signingOrder:current.signingOrder,openedAt,reviewStartedAt:review.result.executionReview.startedAt,expiresAt:review.result.executionReview.expiresAt,remainingMs,remainingBlocks,lastValidBlockHeight:current.result.lastValidBlockHeight,reviewedPayloadSha256,presentedPayloadSha256,reviewedMessageSha256,presentedMessageSha256}));
-  try{return await boundTransactionWallet(owner,ownerFirst,current.walletMessagePolicy===FINAL_MESSAGE_POLICY?current.result:null).signTransaction(base64);}catch(error){error.walletRequestOpened=true;throw error;}
+  const report=current.walletMessagePolicy===FINAL_MESSAGE_POLICY?async payload=>{
+   const receipt=await request(path+'wallet-diagnostic',{method:'POST',signal:AbortSignal.timeout(8000),body:JSON.stringify({requestId:current.executionId,reviewDigest:current.result.executionReview.digest,clientStage:'WALLET_RETURNED',...payload})});
+   if(receipt?.persisted!==true||typeof receipt.diagnosticId!=='string')throw Object.assign(Error('Wallet diagnostic persistence failed; nothing submitted.'),{code:'M4_DIAGNOSTIC_PERSISTENCE_FAILED'});
+  }:null;
+  try{return await boundTransactionWallet(owner,ownerFirst,current.walletMessagePolicy===FINAL_MESSAGE_POLICY?current.result:null,report).signTransaction(base64);}catch(error){error.walletRequestOpened=true;throw error;}
  }};
 }
-function boundTransactionWallet(owner,ownerFirst=false,finalReview=null){
+function boundTransactionWallet(owner,ownerFirst=false,finalReview=null,report=null){
   const selected=active||watchedSelection,current=selected?.standard?.accounts?.find(a=>a.address===owner);
   const assertBound=()=>{
     if(!selected||selected!==(active||watchedSelection)||ownerAccessDetached())throw Error('Reconnect your selected owner wallet');
@@ -258,16 +262,20 @@ function boundTransactionWallet(owner,ownerFirst=false,finalReview=null){
   assertBound();
   return {assertBound,async signTransaction(base64){
     assertBound();const {Buffer,Transaction}=window.TekkworkSDK;let signed,providerMessageBase64=null;
+    const providerCall=async call=>{try{return await call();}catch(error){if(error.code===4001||/reject|denied|declin/i.test(error.message??''))error.providerRejected=true;throw error;}};
     if(selected.standard){
       const feature=selected.standard.features['solana:signTransaction'];
       if(typeof feature?.signTransaction!=='function')throw Error('Transaction-only signing unavailable');
-      const result=await feature.signTransaction({account:current,chain:'solana:mainnet',transaction:Uint8Array.from(Buffer.from(base64,'base64'))});
-      if(!(result?.[0]?.signedTransaction instanceof Uint8Array))throw Error('Signed transaction unavailable');
+      const result=await providerCall(()=>feature.signTransaction({account:current,chain:'solana:mainnet',transaction:Uint8Array.from(Buffer.from(base64,'base64'))}));
+      if(!(result?.[0]?.signedTransaction instanceof Uint8Array)){await report?.({returnedTransactionBase64:''});throw Error('Signed transaction unavailable');}
       signed=Buffer.from(result[0].signedTransaction).toString('base64');
+      await report?.({returnedTransactionBase64:signed});
     }else{
       if(typeof selected.injected.signTransaction!=='function')throw Error('Transaction-only signing unavailable');
-      const result=await selected.injected.signTransaction(Transaction.from(Buffer.from(base64,'base64')));
-      if(ownerFirst)providerMessageBase64=Buffer.from(result.serializeMessage()).toString('base64');
+      const result=await providerCall(()=>selected.injected.signTransaction(Transaction.from(Buffer.from(base64,'base64'))));
+      if(ownerFirst){try{providerMessageBase64=Buffer.from(result.serializeMessage()).toString('base64');}catch{}}
+      if(report){let unchecked;try{unchecked=Buffer.from(result.serialize({requireAllSignatures:false,verifySignatures:false})).toString('base64');}catch{}
+       await report(unchecked?{returnedTransactionBase64:unchecked}:{returnedMessageBase64:providerMessageBase64??''});}
       signed=Buffer.from(result.serialize({requireAllSignatures:!ownerFirst,verifySignatures:true})).toString('base64');
     }
     if(ownerFirst&&finalReview){const final=validateFinalWalletMessage(base64,signed,finalReview,{Transaction,Buffer},false);console.info('M4 wallet final semantic validation',JSON.stringify({allowedMessageDiff:final.allowedDiff,assertion:final.assertion}));}

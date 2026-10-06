@@ -1,0 +1,240 @@
+{
+  "evidence": "RECOVERED_UNSIGNED_MESSAGE_BYTES_ONLY",
+  "operationId": "38c731bc-2b8d-4e95-961c-8ac2eefd08f0",
+  "privateStateSha256": "28425c88eb3391ee6de018d3b2cd7f40ee35a1e7d2cbfa46cfd88c8b32ec9339",
+  "preparedMessageBase64": "AgAJEaPlu5b/2vS871Q9nd28DDd7sZipFd34N2+F89HYEGftWEzfoBY2Gk2T0FtrUiTa/R+/aPCCrRfCIA5spLtaKI0pSVLbS2D0lnyndLCrIFHCmEHekuf8ljRNaAgDaGE5CE3+1PhmLZQZ0hF1w7KjYF50elcg0UYxW4vItnW323k5ootf0mq0eaapzGy/awsj62GIWjceASCsqRO+7z0TinjoTN/MgJSESAp9NYtTNHR6U6pJL/eOgu5y2ILtUVOms/uES1XKMMEWsWXJeuyRv86sWZYCw1LCLPEuw0g5WQZpBSrl16fapySm6rCnKVSRhVrUoGcWYGdMTgNFWYA9ZaMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACtrqJ9s8bz0E5c8KICnwPjOY8IU5Xv7+8XH8ZK+BdBOoZeae4PVIDKvPZjV+TcLxjVjUXB6nSJ+zcj2Xk8cqYBVuD2k2Zaz0TbFWi/F1uqUYnLl/XS/ztlXSu2/W0YsIyXJY9OJInxuz0QKRSODYMLWhOZ2v8QhASOe9jb6fhZrPE26wH8HE6IPSPItYRKtZo39mrdV8XprDtT4FnTXGQDBkZv5SEXMv/srbpyw5vnvIzlu8X3EmssQ5s6QAAAAAbd9uHudY/eGEJdvORszdq2GvxNg7kNJ/69+SjYoYv8BsXBzmONJWfSZGiwXrlR0aKNzG4SNIK1xnUUl3DmK/L+nB7Nsi5w/wjLJbi/V+PXJItkdag2+S4AGnNcR0Om6QMOAAUCQA0DAA4ACQPnZQAAAAAAAAsQARAFBgoACA8MBwkEAwINC44B1pBM7F+LMbQDAAAAcmV0AwAAADNFREkAAABodHRwczovL3N0YWdpbmcudGVra3RlYW0udGVjaC90ekNvSkF6aDEtLXdoZ2lMY3Nhc1BnQTQxV3ZpckZYbUhfSG8yTHRGTDFno+W7lv/a9LzvVD2d3bwMN3uxmKkV3fg3b4Xz0dgQZ+0AAAAAAAAAAAAAAA==",
+  "walletMessageBase64": "AgAKEqPlu5b/2vS871Q9nd28DDd7sZipFd34N2+F89HYEGftWEzfoBY2Gk2T0FtrUiTa/R+/aPCCrRfCIA5spLtaKI0FKuXXp9qnJKbqsKcpVJGFWtSgZxZgZ0xOA0VZgD1loylJUttLYPSWfKd0sKsgUcKYQd6S5/yWNE1oCANoYTkITf7U+GYtlBnSEXXDsqNgXnR6VyDRRjFbi8i2dbfbeTmii1/SarR5pqnMbL9rCyPrYYhaNx4BIKypE77vPROKeOhM38yAlIRICn01i1M0dHpTqkkv946C7nLYgu1RU6az+4RLVcowwRaxZcl67JG/zqxZlgLDUsIs8S7DSDlZBmkAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACtrqJ9s8bz0E5c8KICnwPjOY8IU5Xv7+8XH8ZK+BdBAVbg9pNmWs9E2xVovxdbqlGJy5f10v87ZV0rtv1tGLADBkZv5SEXMv/srbpyw5vnvIzlu8X3EmssQ5s6QAAAAATfrXli/7Hdkl0Kn7Xm0AzmGVuouzqR/QfvmGDF6Xu4BsXBzmONJWfSZGiwXrlR0aKNzG4SNIK1xnUUl3DmK/IG3fbh7nWP3hhCXbzkbM3athr8TYO5DSf+vfko2KGL/DqGXmnuD1SAyrz2Y1fk3C8Y1Y1Fwep0ifs3I9l5PHKmjJclj04kifG7PRApFI4NgwtaE5na/xCEBI572Nvp+Fms8TbrAfwcTog9I8i1hEq1mjf2at1XxemsO1PgWdNcZP6cHs2yLnD/CMsluL9X49cki2R1qDb5LgAac1xHQ6bpBAsABQJADQMACwAJA+dlAAAAAAAAChABDQYHDwAIDhACCQUEAxEKjgHWkEzsX4sxtAMAAAByZXQDAAAAM0VESQAAAGh0dHBzOi8vc3RhZ2luZy50ZWtrdGVhbS50ZWNoL3R6Q29KQXpoMS0td2hnaUxjc2FzUGdBNDFXdmlyRlhtSF9IbzJMdEZMMWej5buW/9r0vO9UPZ3dvAw3e7GYqRXd+DdvhfPR2BBn7QAAAAAAAAAAAAAADAEAGgYEAwBANzwKAAAAAAQDAAABAAAAAAAAAAAA",
+  "result": {
+    "network": "solana:101",
+    "mint": "6wgsA1nHo9hApde3HkSzjUSknrGtU9jaHSZoZBHKa2WG",
+    "recentBlockhash": "J8tdUR5wJfgVTgMRbEKidSzm8vPwcDp76MJuC9CfGHCL",
+    "lastValidBlockHeight": 432007905,
+    "launch": {
+      "owner": "C2nddai75FJZWWkNdUF7csEBryRCMikJyTTZZqYcMiBv"
+    },
+    "executionReview": {
+      "version": 2,
+      "status": "FINAL_WALLET_PREPARATION",
+      "guaranteeClass": "EXECUTION_GUARDED",
+      "authorizationGranted": false,
+      "startedAt": 1791308082717,
+      "expiresAt": null,
+      "observedBalanceLamports": 182835778,
+      "balanceContextSlot": 453969989,
+      "blockhashContextSlot": 453969986,
+      "feeContextSlot": 453969988,
+      "simulationSlot": 453969991,
+      "postReadSlot": 453969992,
+      "validitySlot": 453969994,
+      "reviewedDebitLamports": 5562578,
+      "networkFeeLamports": 15218,
+      "otherRequiredDebitLamports": 5547360,
+      "minimumRentExemptionLamports": 5547360,
+      "initialBuyLamports": 0,
+      "priorityFeeLamports": 5218,
+      "baseFeeLamports": 10000,
+      "feeModel": "DAPP_EXPLICIT_IMMUTABLE_V1",
+      "maximumPriorityFeeLamports": 100000,
+      "reviewedMaximumDebitLamports": 10000000,
+      "ceilingLamports": 10000000,
+      "minimumReserveLamports": 1000000,
+      "requiredRemainingBalanceLamports": 172835778,
+      "expectedRemainingBalanceLamports": 177273200,
+      "budgetHeadroomLamports": 4437422,
+      "absoluteOnchainMaximumLamports": null,
+      "policySource": "M3.1 total ceiling; NETWORKS.MAINNET.reserveLamports",
+      "limitations": "Application budget enforced against fresh decoded simulation. Pump has no on-chain maximum debit argument; a new context, message or economic change requires another review.",
+      "atomicBalanceEvidence": {
+        "source": "SIMULATION_BANK",
+        "slot": 453969991,
+        "feeLamports": 15218,
+        "accounts": [
+          {
+            "name": "mint",
+            "address": "6wgsA1nHo9hApde3HkSzjUSknrGtU9jaHSZoZBHKa2WG",
+            "writable": true,
+            "signer": true,
+            "compiledAccountIndex": 1,
+            "preLamports": 0,
+            "postLamports": 2667000,
+            "deltaLamports": 2667000
+          },
+          {
+            "name": "mint_authority",
+            "address": "TSLvdd1pWpHVjahSpsvCXUbgwsL3JAcvokwaKt1eokM",
+            "writable": false,
+            "signer": false,
+            "compiledAccountIndex": 16,
+            "preLamports": 1020235880,
+            "postLamports": 1020235880,
+            "deltaLamports": 0
+          },
+          {
+            "name": "bonding_curve",
+            "address": "GdoaHMDNuHVBscNEomWQfe9JeAVpZhfCqvmM11sHdvV8",
+            "writable": true,
+            "signer": false,
+            "compiledAccountIndex": 5,
+            "preLamports": 0,
+            "postLamports": 1366520,
+            "deltaLamports": 1366520
+          },
+          {
+            "name": "associated_bonding_curve",
+            "address": "HvpLN8eysMUs7APssAvFGDCrdFRkfBuH4x2XNKkZjD6g",
+            "writable": true,
+            "signer": false,
+            "compiledAccountIndex": 6,
+            "preLamports": 0,
+            "postLamports": 1513840,
+            "deltaLamports": 1513840
+          },
+          {
+            "name": "global",
+            "address": "4wTV1YmiEkRvAtNtsSGPtUrqRYQMe5SKy2uB4Jjaxnjf",
+            "writable": false,
+            "signer": false,
+            "compiledAccountIndex": 10,
+            "preLamports": 4089837831,
+            "postLamports": 4089837831,
+            "deltaLamports": 0
+          },
+          {
+            "name": "user",
+            "address": "C2nddai75FJZWWkNdUF7csEBryRCMikJyTTZZqYcMiBv",
+            "writable": true,
+            "signer": true,
+            "compiledAccountIndex": 0,
+            "preLamports": 182835778,
+            "postLamports": 177273200,
+            "deltaLamports": -5562578
+          },
+          {
+            "name": "system_program",
+            "address": "11111111111111111111111111111111",
+            "writable": false,
+            "signer": false,
+            "compiledAccountIndex": 8,
+            "preLamports": 1,
+            "postLamports": 1,
+            "deltaLamports": 0
+          },
+          {
+            "name": "token_program",
+            "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+            "writable": false,
+            "signer": false,
+            "compiledAccountIndex": 15,
+            "preLamports": 70228638,
+            "postLamports": 70228638,
+            "deltaLamports": 0
+          },
+          {
+            "name": "associated_token_program",
+            "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
+            "writable": false,
+            "signer": false,
+            "compiledAccountIndex": 12,
+            "preLamports": 3388612899,
+            "postLamports": 3388612899,
+            "deltaLamports": 0
+          },
+          {
+            "name": "mayhem_program_id",
+            "address": "MAyhSmzXzV1pTf7LsNkrNwkWKTo4ougAJ1PPg47MD4e",
+            "writable": true,
+            "signer": false,
+            "compiledAccountIndex": 7,
+            "preLamports": 11149834,
+            "postLamports": 11149834,
+            "deltaLamports": 0
+          },
+          {
+            "name": "global_params",
+            "address": "13ec7XdrjF3h3YcqBTFDSReRcUFwbCnJaAQspM4j6DDJ",
+            "writable": false,
+            "signer": false,
+            "compiledAccountIndex": 9,
+            "preLamports": 3104160,
+            "postLamports": 3104160,
+            "deltaLamports": 0
+          },
+          {
+            "name": "sol_vault",
+            "address": "BwWK17cbHxwWBKZkUYvzxLcNQ1YVyaFezduWbtm2de6s",
+            "writable": true,
+            "signer": false,
+            "compiledAccountIndex": 4,
+            "preLamports": 59781061493236,
+            "postLamports": 59781061493236,
+            "deltaLamports": 0
+          },
+          {
+            "name": "mayhem_state",
+            "address": "6FTmWRBakBszn4NupXwvcMU2RNVLhhX3b1PwsTf5dwoN",
+            "writable": true,
+            "signer": false,
+            "compiledAccountIndex": 3,
+            "preLamports": 0,
+            "postLamports": 0,
+            "deltaLamports": 0
+          },
+          {
+            "name": "mayhem_token_vault",
+            "address": "3nAZgMiPwN8xTReVWiay4vGrZki8hkN9jETkorDX3wsm",
+            "writable": true,
+            "signer": false,
+            "compiledAccountIndex": 2,
+            "preLamports": 0,
+            "postLamports": 0,
+            "deltaLamports": 0
+          },
+          {
+            "name": "event_authority",
+            "address": "Ce6TQqeHC9p8KetsN6JsjHK7UTZk7nasjjnr7XxXp9F1",
+            "writable": false,
+            "signer": false,
+            "compiledAccountIndex": 13,
+            "preLamports": 168261611,
+            "postLamports": 168261611,
+            "deltaLamports": 0
+          },
+          {
+            "name": "program",
+            "address": "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P",
+            "writable": false,
+            "signer": false,
+            "compiledAccountIndex": 11,
+            "preLamports": 9323912471,
+            "postLamports": 9323912471,
+            "deltaLamports": 0
+          },
+          {
+            "name": "compute_budget_program",
+            "address": "ComputeBudget111111111111111111111111111111",
+            "writable": false,
+            "signer": false,
+            "compiledAccountIndex": 14,
+            "preLamports": 1,
+            "postLamports": 1,
+            "deltaLamports": 0
+          }
+        ]
+      },
+      "freshness": "SOLANA_BLOCKHASH_V2",
+      "preparedAt": 1791308085519,
+      "recentBlockhash": "J8tdUR5wJfgVTgMRbEKidSzm8vPwcDp76MJuC9CfGHCL",
+      "lastValidBlockHeight": 432007905,
+      "messageSha256": "c2c5b046e3635c7d0247e0032f9d5a6b9b01514989125d85f7447c3023e49b8d",
+      "digest": "edb6539dbe13d7f7842ebd85f3e16401b95b2081389c4f3e3d13786693f38ef6"
+    },
+    "feePolicy": {
+      "model": "DAPP_EXPLICIT_IMMUTABLE_V1",
+      "computeUnitLimit": 200000,
+      "maximumPriorityFeeLamports": 100000,
+      "computeUnitPriceMicroLamports": 26087,
+      "quoteSlot": 453970016
+    }
+  },
+  "note": "No signatures or keys. Exact historical transformation; not historical final RPC account snapshots."
+}

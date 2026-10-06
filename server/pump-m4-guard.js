@@ -63,7 +63,14 @@ export async function checkM4Blockhash(result,{transport,now=Date.now,minimumRem
 }
 // Revalidate the immutable reviewed economics. Legacy v1 retains its 30s TTL;
 // v2 is valid only while its native hash remains live, including after this work.
-export async function revalidateM4(record,identity,request,{transport,now=Date.now,captureDiagnostics}){
+export async function revalidateM4(record,identity,request,options){
+ const evidence={};let result;
+ try{result=await revalidateM4Observed(record,identity,request,{...options,diagnosticEvidence:evidence});}
+ catch(error){if(record.walletMessagePolicy===FINAL_MESSAGE_POLICY)await options.captureFinalDiagnostics?.({rule:error.code,evidence});throw error;}
+ if(record.walletMessagePolicy===FINAL_MESSAGE_POLICY)await options.captureFinalDiagnostics?.({rule:'FINAL_REVALIDATION_PASS',evidence});
+ return result;
+}
+async function revalidateM4Observed(record,identity,request,{transport,now=Date.now,captureDiagnostics,diagnosticEvidence}){
  const r=record.result,review=r.executionReview;
  assertM4Target(identity,record.target??M4_TARGET);assertReviewedExecutionRequest(r,identity,{...request,now:now()});
  const finalBase64=record.walletMessagePolicy===FINAL_MESSAGE_POLICY?record.signedTransactionBase64:null;
@@ -72,14 +79,17 @@ export async function revalidateM4(record,identity,request,{transport,now=Date.n
  const bytes=Buffer.from(finalBase64??r.transactionBase64,'base64'),context={mint:new PublicKey(r.mint),blockhash:r.recentBlockhash,genesis:r.genesis,chainId:r.network,launch:r.launch,feePolicy:r.feePolicy??null,...(finalBase64?{finalMessageResult:r,finalMessageRequiresAllSignatures:true}:{})};
  const structure=finalBase64?inspectFinalCreation(bytes,context):r.structure;
  const rpc=(m,p)=>readAtMinimumContext(transport,m,p),addresses=structure.accounts.map(a=>a.address),tx=Transaction.from(bytes);
+ diagnosticEvidence.addresses=addresses;diagnosticEvidence.sigVerify=!!finalBase64;
  if(await rpc('getGenesisHash',[])!==GENESIS)throw m4Fail('M4_WRONG_MAINNET');
  const validity=await rpc('isBlockhashValid',[r.recentBlockhash,{commitment:'finalized',minContextSlot:review.validitySlot}]);if(validity.value!==true)throw m4Fail('M4_BLOCKHASH_EXPIRED');
  const height=await rpc('getBlockHeight',[{commitment:'finalized',minContextSlot:contextSlot(validity,review.validitySlot)}]);if(!Number.isSafeInteger(height)||height>r.lastValidBlockHeight)throw m4Fail('M4_BLOCKHASH_EXPIRED');
  const fee=await rpc('getFeeForMessage',[tx.serializeMessage().toString('base64'),{commitment:'finalized',minContextSlot:contextSlot(validity)}]);
- const before=await rpc('getMultipleAccounts',[addresses,{encoding:'base64',commitment:'finalized',minContextSlot:contextSlot(fee,contextSlot(validity))}]);
+ diagnosticEvidence.fee=fee;
+ const before=await rpc('getMultipleAccounts',[addresses,{encoding:'base64',commitment:'finalized',minContextSlot:contextSlot(fee,contextSlot(validity))}]);diagnosticEvidence.before=before;
  const deployment=structure.lighthouse?await readLighthouseDeployment(transport,contextSlot(before,contextSlot(fee))):null;
  const simulation=await rpc('simulateTransaction',[finalBase64??r.transactionBase64,{encoding:'base64',sigVerify:!!finalBase64,replaceRecentBlockhash:false,commitment:'finalized',minContextSlot:deployment?.contextSlot??contextSlot(before,contextSlot(fee)),innerInstructions:true,accounts:{encoding:'base64',addresses}}]);
- const afterRead=await rpc('getMultipleAccounts',[addresses,{encoding:'base64',commitment:'finalized',minContextSlot:contextSlot(simulation,deployment?.contextSlot??contextSlot(before))}]);contextSlot(afterRead,contextSlot(simulation));
+ diagnosticEvidence.simulation=simulation;
+ const afterRead=await rpc('getMultipleAccounts',[addresses,{encoding:'base64',commitment:'finalized',minContextSlot:contextSlot(simulation,deployment?.contextSlot??contextSlot(before))}]);diagnosticEvidence.afterRead=afterRead;contextSlot(afterRead,contextSlot(simulation));
  const policy=evaluateSimulation(bytes,context,{before,afterRead,simulation,fee:fee.value});
  if(captureDiagnostics&&!finalBase64)await captureDiagnostics({...r,createdAt:new Date(now()).toISOString(),policy:{...r.policy,...policy}},{before,afterRead,simulation,feeResponse:fee,validity,stage:'M4_REVALIDATION'});
  if(!policy.allowed||simulation.value.err!==null||!Array.isArray(simulation.value.innerInstructions)||before.value[0]!==null||fee.value!==review.networkFeeLamports||policy.validatedOverheadLamports!==review.reviewedDebitLamports||policy.estimatedPayerDebitLamports!==review.reviewedDebitLamports||before.value[5]?.lamports!==review.observedBalanceLamports||afterRead.value[5]?.lamports!==review.observedBalanceLamports||simulation.value.accounts[5]?.lamports!==review.expectedRemainingBalanceLamports)throw m4Fail('M4_ECONOMICS_CHANGED_REPREPARE');

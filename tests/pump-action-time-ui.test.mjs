@@ -6,7 +6,7 @@ import {Keypair,Transaction,TransactionInstruction,SystemProgram} from '@solana/
 import {agentLaunchData,assertAgentLaunch} from '../src/agent-launch-data.js';
 import {FINAL_MESSAGE_POLICY,validateFinalWalletMessage} from '../src/pump-wallet-final.js';
 // LOCAL_FIXTURE UI lifecycle; synthetic owner, no RPC and no real wallet.
-async function fixture({failedStatus=false,reject=false,initial='NOT_STARTED',closeDuringPrepare=false,consumed=false}={}){
+async function fixture({failedStatus=false,reject=false,initial='NOT_STARTED',closeDuringPrepare=false,consumed=false,semanticDenied=false}={}){
  const owner=Keypair.generate(),mint=Keypair.generate(),agent={id:'fixture',name:'Agent',creator:owner.publicKey.toBase58(),coin:{name:'Coin',ticker:'FIX'}};
  const tx=new Transaction({feePayer:owner.publicKey,recentBlockhash:Keypair.generate().publicKey.toBase58()}).add(new TransactionInstruction({programId:SystemProgram.programId,keys:[{pubkey:owner.publicKey,isSigner:true,isWritable:true},{pubkey:mint.publicKey,isSigner:true,isWritable:true}],data:Buffer.alloc(0)}));
  const bytes=tx.serialize({requireAllSignatures:false}).toString('base64'),result={transactionBase64:bytes,mint:mint.publicKey.toBase58(),metadataUri:'https://fixture.invalid',createdAt:'fixture',simulation:{status:'PASS'},executionReview:{version:2,digest:'fixture',reviewedDebitLamports:5500000,networkFeeLamports:20000,otherRequiredDebitLamports:5480000,ceilingLamports:10000000}};
@@ -22,7 +22,7 @@ async function fixture({failedStatus=false,reject=false,initial='NOT_STARTED',cl
   throw Error('Unexpected '+action);
  }};
  vm.runInNewContext(readFileSync('src/pump-action-time-ui.js','utf8').replace(/^import .*$/gm,'').replace(/export /g,''),context);
- context.mountM4ActionTimeLaunch(host,{agent,isCurrent:()=>host.isConnected,capability:{m4Target:{owner:agent.creator,agentId:agent.id}},getM4Wallet:()=>({assertBound(){},async signTransaction(raw){signs++;if(reject)throw Object.assign(Error('User rejected'),{code:4001,walletRequestOpened:true});const t=Transaction.from(Buffer.from(raw,'base64'));t.partialSign(owner);return t.serialize({requireAllSignatures:false}).toString('base64');}})});
+ context.mountM4ActionTimeLaunch(host,{agent,isCurrent:()=>host.isConnected,capability:{m4Target:{owner:agent.creator,agentId:agent.id}},getM4Wallet:()=>({assertBound(){},async signTransaction(raw){signs++;if(reject)throw Object.assign(Error('User rejected'),{code:4001,walletRequestOpened:true,providerRejected:true});if(semanticDenied)throw Object.assign(Error('M4_LIGHTHOUSE_ASSERTION_DENIED'),{code:'M4_LIGHTHOUSE_ASSERTION_DENIED',walletRequestOpened:true});const t=Transaction.from(Buffer.from(raw,'base64'));t.partialSign(owner);return t.serialize({requireAllSignatures:false}).toString('base64');}})});
  await new Promise(r=>setImmediate(r));return {host,requests,signs:()=>signs,setFailure:v=>failStatus=v,q:s=>host.querySelector('[data-'+s+']')};
 }
 test('initial failed state disables actions without render exception; successful recheck unlocks',async()=>{const f=await fixture({failedStatus:true});assert.equal(f.q('approve').disabled,true);assert.equal(f.q('prepare').disabled,true);assert.match(f.q('status').textContent,/unavailable/);f.setFailure(false);await f.q('check').onclick();assert.equal(f.q('approve').disabled,false);assert.equal(f.signs(),0);});
@@ -32,3 +32,5 @@ test('reload in claimed awaiting state never reopens wallet',async()=>{const f=a
 test('closed dialog after final preparation prevents wallet handoff',async()=>{const f=await fixture({closeDuringPrepare:true});await f.q('approve').onclick();assert.equal(f.signs(),0);assert.equal(f.requests.filter(r=>r.action==='submit').length,0);});
 
 test('consumed isolation grant disables new cost review and wallet retry after reload',async()=>{const f=await fixture({initial:'TRANSACTION_EXPIRED',consumed:true});assert.equal(f.q('approve').disabled,true);assert.equal(f.q('prepare').disabled,true);assert.equal(f.q('approve').textContent,'Attempt consumed');await f.q('approve').onclick();assert.equal(f.signs(),0);assert.equal(f.requests.filter(r=>r.method==='POST').length,0);});
+
+test('semantic denial never becomes user rejection or Submit',async()=>{const f=await fixture({semanticDenied:true});await f.q('approve').onclick();assert.equal(f.signs(),1);assert.equal(f.requests.filter(r=>['reject','submit'].includes(r.action)).length,0);assert.match(f.q('error').textContent,/M4_LIGHTHOUSE_ASSERTION_DENIED/);});

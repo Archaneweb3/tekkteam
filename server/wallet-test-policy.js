@@ -21,7 +21,7 @@ export function walletTestRoute(method,target,preparation=false,m4=false){
  if(preparation){
   if(walletTestPublicAsset(method,target,preparation))return true;
   const id='[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}';
-  if(m4&&target.startsWith('/api/launchpad/agents/'+M4_TARGET.agentId+'/execution/')){const action=target.slice(target.lastIndexOf('/')+1);return method==='GET'&&['status','wallet-status'].includes(action)||method==='POST'&&['prepare','recover','review','submit','reject','estimate','wallet-prepare','wallet-claim'].includes(action);}
+  if(m4&&target.startsWith('/api/launchpad/agents/'+M4_TARGET.agentId+'/execution/')){const action=target.slice(target.lastIndexOf('/')+1);return method==='GET'&&['status','wallet-status'].includes(action)||method==='POST'&&['prepare','recover','review','submit','reject','estimate','wallet-prepare','wallet-claim','wallet-diagnostic'].includes(action);}
   if(method==='GET'&&new RegExp('^/api/agents/'+id+'(?:/contract|/operating-plan|/launch-lifecycle)?$').test(target))return true;
   if(method==='POST'&&(target==='/api/launchpad/agent-identities'||new RegExp('^/api/launchpad/agents/'+id+'/(token-draft|preparation)$').test(target)))return true;
  }

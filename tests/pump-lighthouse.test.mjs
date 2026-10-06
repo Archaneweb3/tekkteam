@@ -1,5 +1,6 @@
 import test from 'node:test';import assert from 'node:assert/strict';
 import {Transaction,TransactionInstruction,PublicKey,Keypair,SystemProgram} from '@solana/web3.js';
+import {TOKEN_PROGRAM_ID} from '@solana/spl-token';
 import {createM4Execution} from '../server/pump-m4.js';
 import {FINAL_MESSAGE_POLICY,LIGHTHOUSE_PROGRAM,validateFinalWalletMessage} from '../src/pump-wallet-final.js';
 import {GENESIS} from '../src/pump-readiness.js';import {M4_FEE_POLICY} from '../src/pump-fee-policy.js';
@@ -45,7 +46,9 @@ const mutations={
  'Pump data':tx=>tx.instructions[2].data[20]^=1,
  'priority price':tx=>tx.instructions[1].data[1]^=1,
  'blockhash':tx=>tx.recentBlockhash=Keypair.generate().publicKey.toBase58(),
- 'extra transfer':tx=>tx.add(SystemProgram.transfer({fromPubkey:tx.feePayer,toPubkey:Keypair.generate().publicKey,lamports:1})),
+ 'extra SOL transfer':tx=>tx.add(SystemProgram.transfer({fromPubkey:tx.feePayer,toPubkey:Keypair.generate().publicKey,lamports:1})),
+ 'extra SPL transfer':tx=>tx.add(new TransactionInstruction({programId:TOKEN_PROGRAM_ID,keys:[],data:Buffer.concat([Buffer.from([3]),Buffer.from([1,0,0,0,0,0,0,0])])})),
+ 'unknown program':tx=>tx.add(new TransactionInstruction({programId:Keypair.generate().publicKey,keys:[],data:Buffer.alloc(0)})),
  'extra signer':tx=>tx.instructions[2].keys[2].isSigner=true,
  'writable Lighthouse':tx=>tx.instructions.at(-1).keys.push({pubkey:new PublicKey(LIGHTHOUSE_PROGRAM),isSigner:false,isWritable:true}),
  'different target':tx=>tx.instructions.at(-1).keys[0].pubkey=tx.signatures[1].publicKey,

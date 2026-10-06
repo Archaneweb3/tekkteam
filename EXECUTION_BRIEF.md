@@ -1,22 +1,31 @@
-# Active milestone — POLICY101: ONE ATTEMPT CONSUMED
+# Active milestone — Phantom Lighthouse evidence: HISTORIC STATE BLOCKER
 
-Started7October2026 00:16WIB; checkpoint target00:46WIB (exceeded during safe repair).
-User accepted permanent legacy quarantine and exactly one fresh canonical operation
-for aaaaada / ret / 3ED; initialbuy0; maximum debit0.01SOL; manual financial approval.
+Started7October2026 00:51WIB; target checkpoint01:21WIB.
 
-Outcome: operation38c731bc-2b8d-4e95-961c-8ac2eefd08f0 reached Phantom; owner
-signature returned. Final signed-message guard rejected before broadcast:
+Exact prepared/final wallet message transform recovered for operation
+38c731bc-2b8d-4e95-961c-8ac2eefd08f0. Only the recognized readonly Lighthouse
+AssertAccountInfoMulti was appended; blockhash, payer, signer set, Pump/ComputeBudget
+instructions and existing account privileges stayed unchanged. The transaction
+message passed semantic validation. The recorded refusal was later:
 SIGNED_NOT_BROADCAST / M4_LIGHTHOUSE_PROGRAM_OR_STATE_CHANGED.
-ownerSigned=true; broadcast=false; receipt0; targetAgent1; targetwallet0;
-SOL spent0; finalized balance0.182835778SOL at00:40:07WIB; trading/funding OFF.
 
-Grant/claim consumed. No retry, new mint, new operation, Submit or wallet prompt.
-Do not present the expired review as awaiting approval. M4 is not PASS.
-Historical missing snapshots prevent attributing the real refusal to a particular
-account field. Preserve the exact consumed operation and legacy journal.
+Exact historic subcondition is unavailable. The VPS DB lacks validationFailure and
+finalMessageEvidence. Its log has the initial unsigned simulation diagnostic only;
+there are no signed-message before/simulation/after Lighthouse account snapshots.
+The error branch proves earlier simulation/economic checks passed, and the payer's
+reviewed final balance177273200 lamports exceeded the assertion floor171718464.
+Therefore the failing guard was the Lighthouse executable-account existence/owner/
+executable/state-equality predicate, but the differing field or absent account is
+unproven. The old RPC object key-order bug is already fixed/deployed; do not claim it
+caused this specific operation.
 
-bd2dc47 repairs strict RPC comparison and private refusal diagnostics;51/51 targeted
-tests, canonical build, independent review PASS. Deployed00:47:45WIB; VPS51/51 PASS; API health200; active state hash unchanged.
-Claim1/receipt0; independent release review ACCEPT; public HTTPS200 and browser
-reload verified, connected owner retained and Attempt consumed disabled. No new attempt without explicit user authorization.
-No CUDA or shared-infrastructure inspection/change.
+Redacted wallet-return/final-guard diagnostics deployed to tekkteam.tech. Dry checks:
+85/85 PASS on local fixture and VPS; canonical client build PASS; HTTPS root/health
+200; anonymous diagnostic endpoint401. Diagnostic DB table empty; existing active
+payload hash28425c88…ec9339, claim1, receipt0 unchanged. All runtime trading, funding,
+withdrawal, signing and broadcast flags OFF. No Phantom opened; no new attempt made.
+
+BLOCKED before Phase6: no historical snapshot exists to identify/fix the precise
+Lighthouse account-state delta. Do not prepare a new Mainnet operation or open Phantom
+until the actual subcondition is established and a correction independently passes.
+TEKKTEAM only; CUDA untouched. Preserve the quarantined journal and consumed attempt.

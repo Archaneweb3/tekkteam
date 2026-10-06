@@ -12,12 +12,14 @@ import {FINAL_MESSAGE_POLICY,validateFinalWalletMessage} from '../src/pump-walle
 import {createEphemeralMintSigner} from './pump-mint-signer.js';
 import bs58 from 'bs58';
 import {readLighthouseDeployment} from './pump-lighthouse-program.js';
+import {createWalletDiagnosticStore,walletDiagnostic,diagnoseWalletReturn} from './pump-wallet-diagnostics.js';
 export function createM4Execution({db,transport,publishMetadata,journalPath,now=Date.now,prepareFactory=createPumpLaunchPreparation,revalidate=revalidateM4,confirm=confirmM4,target=M4_TARGET,verifyCreatedAccounts=decodeM4CreationAccounts,verifyEvent=verifyM4CreateEvent,captureDiagnostics,provisionAgent,recoverExecutionId=null,actionTimeEnabled=false,lighthouseEnabled=false,signerStore,receiptAuthority}){
  if(!db||!transport?.submitOnce||typeof publishMetadata!=='function')throw m4Fail('M4_EXPLICIT_CAPABILITY_REQUIRED');
  if(lighthouseEnabled&&(!actionTimeEnabled||signerStore?.db!==db))throw m4Fail('M4_LIGHTHOUSE_CAPABILITY_REQUIRED');
  const mintSigner=lighthouseEnabled?createEphemeralMintSigner(signerStore):null;
  db.exec("PRAGMA synchronous=FULL; CREATE TABLE IF NOT EXISTS m4_execution (id INTEGER PRIMARY KEY CHECK(id=1), payload TEXT NOT NULL); CREATE TABLE IF NOT EXISTS m4_execution_history (execution_id TEXT PRIMARY KEY, payload TEXT NOT NULL); CREATE TRIGGER IF NOT EXISTS m4_history_no_update BEFORE UPDATE ON m4_execution_history BEGIN SELECT RAISE(ABORT,'Immutable M4 history'); END; CREATE TRIGGER IF NOT EXISTS m4_history_no_delete BEFORE DELETE ON m4_execution_history BEGIN SELECT RAISE(ABORT,'Immutable M4 history'); END;");
- const isolation=receiptAuthority?.isolation;
+ const isolation=receiptAuthority?.isolation,writeDiagnostic=createWalletDiagnosticStore(db);
+ const diagnostic=(s,stage,rule,evidence=null,returnedTransactionBase64=s.signedTransactionBase64??s.ownerApprovedTransactionBase64)=>writeDiagnostic(walletDiagnostic(s,{stage,rule,evidence,returnedTransactionBase64,now}));
  const journal=receiptAuthority?{read:()=>receiptAuthority.read().receipts}:createReceiptJournal(journalPath);let busy=false,fenced=false;
  const read=()=>{const row=db.prepare('SELECT payload FROM m4_execution WHERE id=1').get();if(!row)return null;const s=JSON.parse(row.payload);if(JSON.stringify(s.target)!==JSON.stringify(target))throw m4Fail('M4_AUTHORIZATION_CHANGED');return s;};
  const save=(s,archive=null,signerWrite=null,receiptWrite=null)=>{
@@ -132,17 +134,20 @@ export function createM4Execution({db,transport,publishMetadata,journalPath,now=
     let signed;
     if(s.walletMessagePolicy===FINAL_MESSAGE_POLICY){
      if(!mintSigner)throw m4Fail('M4_LIGHTHOUSE_CAPABILITY_REQUIRED');
-     const final=validateFinalWalletMessage(s.result.transactionBase64,request.signedTransactionBase64,s.result,{Transaction,Buffer},false);
+     let final;
+     try{final=validateFinalWalletMessage(s.result.transactionBase64,request.signedTransactionBase64,s.result,{Transaction,Buffer},false);}
+     catch(error){diagnostic(s,'SERVER_SEMANTIC_VALIDATION',error.code,null,request.signedTransactionBase64);throw error;}
+     diagnostic(s,'SERVER_SEMANTIC_VALIDATION','SEMANTIC_PASS',null,request.signedTransactionBase64);
      verifyIdentity();
      s.status='OWNER_APPROVED';s.ownerApprovedTransactionBase64=request.signedTransactionBase64;s.signature=bs58.encode(final.tx.signature);s.ownerApprovedAt=now();
      s.integrity={preparedIntentFingerprint:sha(final.preparedMessage),walletFinalMessageFingerprint:sha(final.finalMessage),allowedMessageDiff:final.allowedDiff,assertion:final.assertion,ownerApprovedPayloadSha256:sha(Buffer.from(request.signedTransactionBase64,'base64'))};save(s);
      try{await checkM4Blockhash(s.result,{transport,now});verifyIdentity();const completeBase64=mintSigner.sign(s,final.tx);signed={...verifyM4Signed(completeBase64,s,true),completeBase64,integrity:{...s.integrity,finalSignedPayloadSha256:sha(Buffer.from(completeBase64,'base64'))}};}
-     catch(error){s.status='OWNER_APPROVED_NOT_BROADCAST';s.error=error.code??'M4_MINT_SIGNER_FAILED';save(s);return publicState(s);}
+     catch(error){s.status='OWNER_APPROVED_NOT_BROADCAST';s.error=error.code??'M4_MINT_SIGNER_FAILED';save(s);diagnostic(s,'MINT_COMPLETION',s.error);return publicState(s);}
     }else signed=completeM4OwnerApproval(request.signedTransactionBase64,s);
     verifyIdentity();s.status='SIGNED';s.signature=signed.signature;s.signedDigest=signed.signedDigest;s.signedTransactionBase64=signed.completeBase64;s.integrity=signed.integrity??null;s.signedAt=now();save(s);
     let finalContext;
-    try{assertReviewedExecutionRequest(s.result,identity,{...request,now:now()});finalContext=await revalidate(s,identity,request,{transport,now,captureDiagnostics});verifyIdentity();assertReviewedExecutionRequest(s.result,identity,{...request,now:now()});if(s.walletMessagePolicy===FINAL_MESSAGE_POLICY){if(finalContext?.finalMessageProof?.messageSha256!==s.integrity.walletFinalMessageFingerprint||finalContext.finalMessageProof.signedPayloadSha256!==s.signedDigest||finalContext.finalMessageProof.simulationStatus!=='PASS'||finalContext.finalMessageProof.signatureVerification!==true)throw m4Fail('M4_FINAL_MESSAGE_PROOF_REQUIRED');s.finalMessageProof=finalContext.finalMessageProof;s.finalMessageEvidence=finalContext.finalMessageEvidence;save(s);}}
-    catch(error){s.status='SIGNED_NOT_BROADCAST';s.error=error.code??'M4_REVALIDATION_FAILED';if(error.code==='M4_LIGHTHOUSE_PROGRAM_OR_STATE_CHANGED'&&error.validationFailure)s.validationFailure=error.validationFailure;save(s);return publicState(s);}
+    try{assertReviewedExecutionRequest(s.result,identity,{...request,now:now()});finalContext=await revalidate(s,identity,request,{transport,now,captureDiagnostics,captureFinalDiagnostics:({rule,evidence})=>diagnostic(s,'FINAL_REVALIDATION',rule,evidence)});verifyIdentity();assertReviewedExecutionRequest(s.result,identity,{...request,now:now()});if(s.walletMessagePolicy===FINAL_MESSAGE_POLICY){if(finalContext?.finalMessageProof?.messageSha256!==s.integrity.walletFinalMessageFingerprint||finalContext.finalMessageProof.signedPayloadSha256!==s.signedDigest||finalContext.finalMessageProof.simulationStatus!=='PASS'||finalContext.finalMessageProof.signatureVerification!==true)throw m4Fail('M4_FINAL_MESSAGE_PROOF_REQUIRED');s.finalMessageProof=finalContext.finalMessageProof;s.finalMessageEvidence=finalContext.finalMessageEvidence;save(s);}}
+    catch(error){s.status='SIGNED_NOT_BROADCAST';s.error=error.code??'M4_REVALIDATION_FAILED';if(error.code==='M4_LIGHTHOUSE_PROGRAM_OR_STATE_CHANGED'&&error.validationFailure)s.validationFailure=error.validationFailure;save(s);diagnostic(s,'FINAL_REFUSAL',s.error);return publicState(s);}
     // Claim only after the last native check succeeds, immediately before the
     // transport's ONLY network send. A pre-claim rejection is provably unsent;
     // crashes/timeouts after the durable claim stay uncertain and never retry.
@@ -157,5 +162,6 @@ export function createM4Execution({db,transport,publishMetadata,journalPath,now=
    throw m4Fail('M4_ACTION_DENIED');
   }finally{busy=false;}
  }
- return Object.freeze({run,status:()=>publicState(read())});
+ const diagnose=(identity,input,verifyIdentity=()=>{})=>{assertM4Target(identity,target);verifyIdentity();const s=read();const out=diagnoseWalletReturn(s,input,writeDiagnostic,now);verifyIdentity();return out;};
+ return Object.freeze({run,diagnose,status:()=>publicState(read())});
 }

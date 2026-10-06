@@ -1,54 +1,59 @@
-# CURRENT — 7 October 2026, 00:48 WIB: ONE ATTEMPT CONSUMED; SIGNED_NOT_BROADCAST
+# CURRENT — 7 October 2026, 01:13 WIB: MESSAGE DIFF KNOWN; HISTORIC STATE DELTA UNPROVEN
 
-Policy101 source823e9d9 deployed00:32 WIB. Exactly one fresh canonical operation
-38c731bc-2b8d-4e95-961c-8ac2eefd08f0 reached Phantom at00:34:48.781 WIB.
-The owner signature returned; no automated wallet approval was performed.
-Final signed-message validation refused before submission:
-SIGNED_NOT_BROADCAST / M4_LIGHTHOUSE_PROGRAM_OR_STATE_CHANGED.
-This supersedes the premature pending-approval checkpoint in677ecf4.
+Exactly one Policy101 operation reached Phantom; owner signature returned. The
+backend stopped before submission with SIGNED_NOT_BROADCAST /
+M4_LIGHTHOUSE_PROGRAM_OR_STATE_CHANGED. Existing signature is not an on-chain
+receipt. Broadcast0, receipt0, confirmed mint none, Agent1, Agent wallet0,
+SOL spent0, trading/funding OFF. Legacy operation remains LEGACY_UNKNOWN_QUARANTINED.
+No new operation, wallet popup, Mainnet simulation or CUDA/shared service access.
 
-OwnerSigned=true; broadcast=false; submittedAt=null; receipt0; confirmed CA absent.
-Signed signature (not an on-chain receipt):
-2rYv4ZuhsF3feaks1BoQGsM9MyNaB46fzbuMCuFWNfZWpC8vSfv3HcqHNXr88ExMcC7qXnKVFDEu1G2z7zEFWsn5.
-TargetAgent aaaaada count1; targetwallet0; immutablegrant1/claim1.
-No retry, second operation, signature reuse or rebroadcast authorized.
-Read-only finalized Mainnet balance at00:40:07 WIB:182835778lamports, equal to
-pre-review balance. SOL spent by this attempt0. Trading/funding remain OFF.
-Candidate mint6wgsA1nHo9hApde3HkSzjUSknrGtU9jaHSZoZBHKa2WG is NOT a confirmed CA.
+The recovered prepared/final MESSAGE bytes are bound to operation
+38c731bc-2b8d-4e95-961c-8ac2eefd08f0 and private-state hash28425c88…ec9339.
+Both messages are legacy, same owner payer, same two signers and blockhash
+J8tdUR5wJfgVTgMRbEKidSzm8vPwcDp76MJuC9CfGHCL. Prepared message SHA256
+c2c5b046e3635c7d0247e0032f9d5a6b9b01514989125d85f7447c3023e49b8d;
+wallet-final message SHA25630311cd44c4ada596f6147b6b2acd35f315ad2ecd62225b3b5fb24890af182f1.
+Pump/ComputeBudget instructions and existing account privileges match. No ALT,
+blockhash, fee payer, signer-set, fee or initial-buy change. The sole addition is
+recognized Phantom Lighthouse program L2TExMFKdjpN9kozasaurPirfHy9P8sbXoAN1qA3S95,
+readonly/nonsigner in the account list, plus AssertAccountInfoMulti with one owner
+account and floor171718464 lamports. Compile account order changes as expected.
+Original Pump create_v2 message is unchanged. No SPL or SOL transfer was added.
+This was the exact allowed PHANTOM_LIGHTHOUSE_ADDED transform, not the failed rule.
 
-Review created00:34:44.689 WIB: total5562578lamports=0.005562578SOL;
-fee15218; other5547360; initialbuy0; ceiling10000000. Unsigned simulation PASS.
-Native expiry lastValidBlockHeight432007905;137 blocks remained at handoff.
-The old review must not be reused. Payload/message fingerprints at wallet handoff
-matched backend review. Owner-first signing used; semantic validation accepted
-only the narrowly permitted Lighthouse assertion addition. Complete final proof
-is null because the later account-state guard refused. Final validation NOT PASS.
-Actual Phantom extension screen inaccessible; clean warning-free UI not independently
-verified. No warning bypass. Metadata/image GET200; image HEAD403 is not GET failure.
+The observed failed guard compares the Lighthouse executable program account: it
+must exist, be executable, owned by BPFLoaderUpgradeable, and match across before,
+simulation and after reads. Earlier checks passed the review fee/debit/account
+balances; simulated owner balance matched177273200 lamports and exceeded assertion
+floor171718464. Thus the remaining failing condition was the Lighthouse program
+account predicate. Historic before/simulation/after snapshots are absent: SQLite
+has no validationFailure/finalMessageEvidence, and VPS logs record only the unsigned
+simulation event. The exact field (or missing account) is therefore UNPROVEN. Do
+not attribute this attempt to the prior JSON object-key-order bug; that correction
+was already deployed separately. Old final simulation PASS is inferred from the
+control-flow order of the recorded error, not preserved as raw RPC evidence.
 
-Correction bd2dc47: compare every RPC field/value without treating object
-insertion order as account state. Array order/length and missing fields remain strict.
-Persist private Lighthouse refusal diagnostics for future diagnosis. The real failed
-attempt did not retain those snapshots. Field ordering is a proven code defect,
-NOT a proven cause of this specific refusal. Do not invent historical diagnostics.
-Targeted51/51 PASS; canonical client build PASS; independent review ACCEPT.
-Deployed bd2dc47 at00:47:45WIB. VPS51/51 PASS, canonical client build PASS.
-Only tekkteam-api restarted (PID69929); retired senderPID0. Source hashes match;
-active private payload SHA28425c88eb3391ee6de018d3b2cd7f40ee35a1e7d2cbfa46cfd88c8b32ec9339
-unchanged across restart; claim1/receipt0. No past operation repaired or reopened.
-Frontend index SHA41f5a8d4c2a57cd3422110d5607bb20c6adae6999014bc7faa73ff416e3f3e42.
-Deployment evidence /var/lib/tekkteam-mainnet/policy101-bd2dc47/deployment.json.
-Independent release review ACCEPT at00:48:14–00:48:43WIB: six deployed files equal
-Git bd2dc47. HTTPS root/health/capabilities200 and index hash match. Owner remains
-connected after browser reload; consumed-attempt UI persists with retry disabled.
-Screenshot artifacts/legacy-reconciliation/policy101-consumed-outcome.png.
+Redacted diagnostics are now deployed. Wallet-return and server refusal snapshots
+store message fingerprints, semantic account/instruction diffs and hashed/redacted
+RPC state, never raw signed transaction bytes or private keys. Evidence is bound to
+the exact owner, claimed operation and review. The diagnostics table is empty; the
+consumed execution payload is unchanged (SHA28425c88…ec9339). No old operation was
+reopened. Fresh read-only health/capabilities HTTP200; anonymous diagnostic POST401.
+Runtime trading/funding/withdrawal/signing/broadcast all false.
 
-Legacy operation6b713ac6-cfcb-4ca6-8090-72a9b9c1654f permanently remains
-LEGACY_UNKNOWN_QUARANTINED. Raw journal/quarantine/evidence/retired sender unchanged.
-No CUDA or shared-infrastructure access/change. Canonical TEKKTEAM only.
-Evidence: artifacts/legacy-reconciliation/policy101-final-outcome.json and
-/var/lib/tekkteam-mainnet/policy101-823e9d9/final-outcome.json.
-M4 remains BLOCKED. A new wallet attempt needs explicit new authorization.
+Fixture and adversarial checks: 85/85 PASS locally and on VPS, including recovered
+message diff, final simulation path, extra SOL/SPL transfers, added signer, writable
+account, unknown program and authority/data mutation. Canonical client build PASS.
+Only tekkteam-api was restarted (PID72705); legacy sender PID0. Deployment index
+SHA256a465ae4943cefe48ac624211331ac7c34cac2b8977e79c529eea7048335e9210.
+No Nginx/shared service/CUDA change. Evidence: artifacts/legacy-reconciliation/
+phantom-lighthouse-final-tests.log and
+/var/lib/tekkteam-mainnet/lighthouse-diag-970f965-r1/deployment.json.
+
+M4 remains BLOCKED before a fresh Phantom handoff: exact wallet MESSAGE transform is
+known, but the specific historic Lighthouse account-state mismatch cannot be
+recovered from absent snapshots. Do not prepare or request another wallet signature
+under this brief until that subcondition is resolved and a reviewed correction passes.
 
 # Previous — 7 October 2026, 00:34 WIB: POLICY101 APPROVED; LOCAL QUALIFICATION PASS
 

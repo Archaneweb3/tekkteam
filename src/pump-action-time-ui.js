@@ -71,7 +71,7 @@ export function mountM4ActionTimeLaunch(host,{agent,isCurrent,getM4Wallet,capabi
    status('Submitting…');current=await api(identity.agentId,'submit',{...request,signedTransactionBase64});render();
    for(let count=0;count<15&&alive()&&current.broadcastAttempted&&['SUBMITTED','CONFIRMING','CONFIRMATION_UNKNOWN'].includes(current.status);count++){await new Promise(resolve=>setTimeout(resolve,5000));current=await api(identity.agentId,'status');render();}
   }catch(e){
-   if(request&&e.walletRequestOpened===true&&(e.code===4001||/reject|denied|declin/i.test(e.message))){try{current=await api(identity.agentId,'reject',{requestId:request.requestId});}catch{}}
+   if(request&&e.walletRequestOpened===true&&e.providerRejected===true){try{current=await api(identity.agentId,'reject',{requestId:request.requestId});}catch{}}
    try{await refresh();}catch{status('Launch state unavailable. Recheck before another action.');}
    error(explain(e));
   }finally{pending=false;render();}
