@@ -3,9 +3,17 @@ import assert from 'node:assert/strict';
 import {PERSONALITIES,personalitySizeLamports} from '../public/app/agent-personalities.js';
 import {defaultStrategyConfig,validateStrategyConfig} from '../public/app/strategy-config.js';
 import {strategyIntent,riskCheck,executePaper} from '../server/paper-engine.js';
+import {candidateQueue} from '../server/market-discovery.js';
 const now=1800000000000;
 const market={mint:'test',network:'solana:101',priceUsd:1,solUsd:100,liquidityUsd:100000,volume5m:5000,change5m:2,buys5m:30,sells5m:10,observedAt:now};
 const state=id=>({agentId:id,mint:'test',strategy:id,strategyConfig:defaultStrategyConfig(id),mode:'paper',enabled:true,cashSol:.0005,cashUsd:.05,initialSol:.01,realizedSol:0,realizedUsd:0,dailySpentSol:0,dailyDate:new Date(now).toISOString().slice(0,10)});
+test('five personalities pass distinct discovery tiers and all WAIT on invalid market evidence',()=>{
+ const mint='So11111111111111111111111111111111111111112',ids=Object.keys(PERSONALITIES);
+ const decide=(id,quote)=>{const s={...state(id),mint,signalOnly:true};return candidateQueue(s,{candidates:[{mint:quote.mint,quote}]},now).rows[0]?.eligible&&strategyIntent(s,quote,now).side==='BUY'?'BUY':'WAIT';};
+ const rows=[[.3,550,11000,11,'00001'],[.6,650,13000,12,'00011'],[.8,800,16000,13,'00111'],[1.1,1100,26000,16,'01111'],[1.6,1600,31000,19,'11111']];
+ for(const [change5m,volume5m,liquidityUsd,buys5m,expected] of rows)assert.equal(ids.map(id=>decide(id,{...market,mint,change5m,volume5m,liquidityUsd,buys5m})==='BUY'?'1':'0').join(''),expected);
+ for(const patch of [{change5m:-1},{volume5m:NaN},{volume5m:Infinity},{sells5m:undefined},{observedAt:now-30001},{mint:'invalid'}])for(const id of ids)assert.equal(decide(id,{...market,mint,...patch}),'WAIT',id);
+});
 test('five exact profiles affect signals, requested sizing and bounded execution independently',()=>{
  const sizes=[];
  for(const [id,p] of Object.entries(PERSONALITIES)){

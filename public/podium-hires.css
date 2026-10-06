@@ -49,3 +49,10 @@
 .ov-dashboard .tw-hire-live{color:#25e9ad;font-size:10px}
 @media(max-width:900px){.ov-dashboard .tw-overview-top-grid{grid-template-columns:1fr}.ov-dashboard .tw-overview-top-grid>.tw-overview-panel{min-height:220px}}
 @media(max-width:540px){.ov-dashboard .tw-overview-top-grid>.tw-overview-panel{padding:12px 10px}.ov-dashboard .tw-overview-top-grid .tw-overview-panel-head h2{font-size:13px}.ov-dashboard .tw-employee-podium{padding-inline:0}.ov-dashboard .tw-new-hires .tw-overview-panel-head>span{margin:0;font-size:9px}.ov-dashboard .tw-ranking-switch button{min-width:34px;padding-inline:7px}}
+
+/* Empty places have no fabricated portrait or performance value. */
+.ov-dashboard .tw-podium-waiting{justify-content:center;min-height:210px;padding-bottom:55px}
+.ov-dashboard .tw-podium-waiting h3{white-space:normal;overflow-wrap:anywhere;text-overflow:clip;font-size:13px!important;line-height:1.4}
+.tw-podium-waiting small{display:block;line-height:1.5;opacity:.7}
+.tw-floor-podium-place.tw-podium-waiting{min-height:210px}
+@media(max-width:700px){.tw-floor-podium-place.tw-podium-waiting{min-height:108px}.tw-floor-podium-place.tw-podium-waiting h3,.tw-floor-podium-place.tw-podium-waiting small{grid-column:2/-1;min-width:0;white-space:normal}.ov-dashboard .tw-podium-waiting{min-height:180px}}

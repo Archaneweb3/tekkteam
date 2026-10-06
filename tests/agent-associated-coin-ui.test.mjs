@@ -37,9 +37,9 @@ function tabHarness(reply,{throwContract=false}={}){
  const content={innerHTML:'',querySelector(selector){return selector==='.at-drawer'?{...element,open:false}:selector==='[data-associated-configure]'?configure:selector==='[data-paper-action]'?action:element;},querySelectorAll(){return [];}};
  const host={innerHTML:'',addEventListener(){},removeEventListener(){},querySelector(){return content;}};
  const renders=[],states=[],timers=[];
- const context={host,agent,pending:null,request:async()=>reply,setInterval(fn){timers.push(fn);return 1;},clearInterval(){},renderAgentOverview(value){renders.push(value);return 'overview';},renderAgentTrading(value){renders.push(value);return 'trading';},renderReasoning(){return '';},onTradingState(value){states.push(value);},loadContract(){if(throwContract)throw Error('fixture contract error');return null;}};
+ const context={host,agent,pending:null,loadSetup:async()=>null,matchedSetup:()=>null,renderAgentSetup:()=>'',request:async()=>reply,setInterval(fn){timers.push(fn);return 1;},clearInterval(){},renderAgentOverview(value){renders.push(value);return 'overview';},renderAgentTrading(value){renders.push(value);return 'trading';},renderReasoning(){return '';},onTradingState(value){states.push(value);},loadContract(){if(throwContract)throw Error('fixture contract error');return null;}};
  vm.createContext(context);vm.runInContext(source,context);
- return {context,renders,states,timers,configure,action,start(tab){vm.runInContext(`${tab}Tab(host,agent,()=>true,{select(){},onTradingState,loadContract});`,context);return context.pending;}};
+ return {context,renders,states,timers,configure,action,start(tab){vm.runInContext(`${tab}Tab(host,agent,()=>true,{select(){},onTradingState,loadContract,loadSetup});`,context);return context.pending;}};
 }
 for(const reply of [null,undefined,'malformed',42,[],{}, {agentId:'other'}, {agentId:agent.id,decisions:{},config:'bad'}]) test('actual Overview/Trading loaders safely settle '+JSON.stringify(reply),async()=>{
  for(const tab of ['overview','trading']){

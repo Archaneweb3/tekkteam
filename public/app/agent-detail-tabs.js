@@ -1,3 +1,4 @@
+import {matchedSetup,renderAgentSetup} from './agent-setup-ui.js';
 import {request} from './backend.js';
 import {mountAgentPerformance} from './agent-performance-ui.js';
 import {mountAgentSettings} from './agent-settings-ui.js';
@@ -24,7 +25,7 @@ const chart=points=>{
 };
 function heading(title,eyebrow='AGENT WORKSPACE'){return `<header class="ad-section-head"><div><p>${eyebrow}</p><h2>${title}</h2></div></header>`;}
 
-export function mountAgentDetailTabs(host,agent,{isCurrent=()=>true,mountLaunch=()=>Promise.resolve(),onTradingState=()=>{},loadContract=id=>request('/agents/'+encodeURIComponent(id)+'/contract')}={}){
+export function mountAgentDetailTabs(host,agent,{isCurrent=()=>true,mountLaunch=()=>Promise.resolve(),onTradingState=()=>{},loadContract=id=>request('/agents/'+encodeURIComponent(id)+'/contract'),loadSetup=id=>request('/agents/'+encodeURIComponent(id)+'/setup')}={}){
  let active='overview',lastPrimary='overview',controller=null,dead=false,version=0;
  host.className='tw-agent-tabs';
  host.innerHTML=`<nav class="ad-tablist" role="tablist" aria-label="Agent Detail sections">${PRIMARY_TABS.map(([key,label])=>`<button type="button" role="tab" data-agent-tab="${key}" aria-selected="${key==='overview'}" tabindex="${key==='overview'?'0':'-1'}">${label}</button>`).join('')}</nav><div class="ad-secondary-actions" aria-label="Agent tools">${SECONDARY_TABS.map(([key,label])=>`<button type="button" data-agent-tab="${key}" aria-pressed="false">${label}</button>`).join('')}</div><div class="ad-tab-panel" role="tabpanel" id="tw-agent-tab-panel" aria-label="Overview"></div>`;
@@ -38,7 +39,7 @@ export function mountAgentDetailTabs(host,agent,{isCurrent=()=>true,mountLaunch=
   panel.innerHTML='<p role="status" class="ad-loading">Loading '+esc(tab)+'…</p>';
   const current=version;
   const valid=()=>!dead&&isCurrent()&&version===current;
-  controller=({overview:overviewTab,trading:tradingTab,wallet:walletTab,performance:performanceTab,activity:activityTab,settings:settingsTab})[tab](panel,agent,valid,{select,mountLaunch,onTradingState,loadContract});
+  controller=({overview:overviewTab,trading:tradingTab,wallet:walletTab,performance:performanceTab,activity:activityTab,settings:settingsTab})[tab](panel,agent,valid,{select,mountLaunch,onTradingState,loadContract,loadSetup});
  }
  host.addEventListener('click',event=>{const button=event.target.closest('[data-agent-tab]');if(button)select(button.dataset.agentTab);});
  host.querySelector('.ad-tablist').addEventListener('keydown',event=>{
@@ -51,7 +52,7 @@ export function mountAgentDetailTabs(host,agent,{isCurrent=()=>true,mountLaunch=
  return {select,destroy(){dead=true;version++;controller?.destroy?.();host.innerHTML='';}};
 }
 
-function overviewTab(host,agent,valid,{select,onTradingState,loadContract}){
+function overviewTab(host,agent,valid,{select,onTradingState,loadContract,loadSetup}){
  let busy=false,snapshot=null;const base='/agents/'+encodeURIComponent(agent.id);
  const navigate=event=>{const action=event.target.closest('[data-overview-action]')?.dataset.overviewAction;if(action)select(action);};
  host.addEventListener('click',navigate);
@@ -60,38 +61,39 @@ function overviewTab(host,agent,valid,{select,onTradingState,loadContract}){
  host.addEventListener('pointermove',chartPointer);host.addEventListener('pointerdown',chartPointer);host.addEventListener('pointerleave',chartLeave,true);
  async function load(){
   if(!valid()||busy)return;busy=true;
-  const [trading,analytics,decisions,contract]=await Promise.allSettled([()=>request(base+'/trading'),()=>request(base+'/analytics'),()=>request(base+'/trading/decisions?filter=all'),()=>loadContract(agent.id)].map(read=>Promise.resolve().then(read)));
+  const [trading,analytics,decisions,contract,setup]=await Promise.allSettled([()=>request(base+'/trading'),()=>request(base+'/analytics'),()=>request(base+'/trading/decisions?filter=all'),()=>loadContract(agent.id),()=>loadSetup(agent.id)].map(read=>Promise.resolve().then(read)));
   busy=false;if(!valid())return;
   const t=matched(trading,agent.id),a=matched(analytics,agent.id),decisionData=matched(decisions,agent.id),d=Array.isArray(decisionData?.decisions)?decisionData.decisions[0]:null;
   onTradingState(t);
-  snapshot={t,a,d,contract:contract.status==='fulfilled'?contract.value:null};paint();
+  snapshot={t,a,d,contract:contract.status==='fulfilled'?contract.value:null,setup:setup.status==='fulfilled'?matchedSetup(setup.value,agent):null};paint();
  }
  function paint(){
   if(!snapshot||!valid())return;
-  const {t,a,d,contract}=snapshot;
-  host.innerHTML=renderAgentOverview({t,a,d,agent,contract});
+  const {t,a,d,contract,setup}=snapshot;
+  host.innerHTML=renderAgentOverview({t,a,d,agent,contract,setup});
  }
  load();const timer=setInterval(load,20000);return {destroy(){clearInterval(timer);host.removeEventListener('click',navigate);host.removeEventListener('pointermove',chartPointer);host.removeEventListener('pointerdown',chartPointer);host.removeEventListener('pointerleave',chartLeave,true);}};
 }
 
-function walletTab(host,agent,valid,{loadContract}){
+function walletTab(host,agent,valid,{loadContract,loadSetup}){
  let dead=false,wallet=null;
  const alive=()=>!dead&&valid();
  async function load(){
   host.innerHTML='<p role="status" class="ad-loading">Loading Agent wallet…</p>';
   try{
-   const contract=await loadContract(agent.id);if(!alive())return;
+   const [contract,setup]=await Promise.all([loadContract(agent.id),loadSetup(agent.id).catch(()=>null)]);if(!alive())return;
    if(contract?.id!==agent.id||contract.owner!==agent.creator||contract.launchpadScope?.available!==true||typeof contract.launchpadScope.scoped!=='boolean')throw Error('Agent setup could not be verified.');
-   const child=document.createElement('div');host.replaceChildren(child);
+   const child=document.createElement('div'),readiness=document.createElement('div');readiness.innerHTML=renderAgentSetup(setup,agent,{navigation:false});host.replaceChildren(readiness,child);
    wallet=mountAgentWallet(child,agent,{isCurrent:alive,receiptRequired:contract.launchpadScope.scoped});
   }catch{if(alive()){host.innerHTML='<p role="alert">Agent wallet setup is unavailable right now.</p><button class="tw-button secondary" data-wallet-retry>Try again</button>';host.querySelector('[data-wallet-retry]').onclick=load;}}
  }
  load();return {destroy(){dead=true;wallet?.destroy();}};
 }
 
-function tradingTab(host,agent,valid,{select,onTradingState}){
+function tradingTab(host,agent,valid,{select,onTradingState,loadSetup}){
  const base='/agents/'+encodeURIComponent(agent.id)+'/trading';let busy=false;
- host.innerHTML='<div data-trading-content></div>';
+ host.innerHTML='<div data-real-setup></div><div data-trading-content></div>';
+ const readiness=host.querySelector('[data-real-setup]');loadSetup(agent.id).then(s=>{if(valid())readiness.innerHTML=renderAgentSetup(s,agent);}).catch(()=>{if(valid())readiness.innerHTML=renderAgentSetup(null,agent);});readiness.onclick=event=>{if(event.target.closest('[data-overview-action=wallet]'))select('wallet');};
  const content=host.querySelector('[data-trading-content]');
  async function load(){
   if(!valid()||busy||content.querySelector('.at-drawer')?.open)return;busy=true;

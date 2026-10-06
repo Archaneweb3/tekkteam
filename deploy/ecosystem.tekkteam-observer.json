@@ -1,0 +1,18 @@
+{
+  "apps": [{
+    "name": "tekkteam-observer",
+    "cwd": "/var/www/tekkteam-releases/d2516bc",
+    "script": "/var/www/tekkteam-releases/d2516bc/server/agent-observer-start.js",
+    "exec_mode": "fork", "instances": 1, "autorestart": true,
+    "max_memory_restart": "160M", "restart_delay": 5000,
+    "out_file": "/var/lib/tekkteam-observer/observer-out.log",
+    "error_file": "/var/lib/tekkteam-observer/observer-error.log",
+    "env": {
+      "NODE_ENV": "production",
+      "TEKKTEAM_OBSERVER_MODE": "OBSERVER_ONLY",
+      "TEKKTEAM_OBSERVER_EXECUTION_ENABLED": "false",
+      "TEKKTEAM_OBSERVER_PRODUCT_DB": "/var/lib/tekkteam-mainnet/tekkwork.sqlite",
+      "TEKKTEAM_OBSERVER_STATE_DB": "/var/lib/tekkteam-observer/observer.sqlite"
+    }
+  }]
+}

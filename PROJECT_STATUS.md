@@ -1,3 +1,40 @@
+# Checkpoint — 7 October 2026, 04:24 WIB
+
+Canonical post-launch setup/observer batch deployed and independently reviewed.
+Agent `aaaaada` uses its single verified launch binding and encrypted wallet.
+Target counts: Agent1 / wallet1 / binding1 / receipt1. Whole DB contains3 Agents
+and2 wallets because existing unrelated legacy identities/wallets are preserved.
+No new launch, funding, withdrawal or trading transaction in this batch.
+
+CURRENT user-visible: launch-confirmed hero routes to Agent Wallet; setup shows
+real0SOL Agent balance, protected0.00202SOL baseline reserve, Fund/Activate OFF.
+Technical receipt/setup details are under Advanced. Paper controls are separate;
+hero is navigation-only and cannot auto-start Paper. Three real weekly leaderboard
+slots show WAITING FOR AGENT; no fabricated ranks or performance.
+
+CURRENT hosted `tekkteam-observer`: HEALTHY_OBSERVER_ONLY, reads canonical product
+SQLite with readOnly/query_only; separate `/var/lib/tekkteam-observer/observer.sqlite`
+for lease/fencing/Agent locks. Exact confirmed receipt/mint/wallet observed,
+pending[], EXECUTION_OFF. PM2 explicit entrypoint corrected; API4190 HTTP200.
+No vault/signer/broadcast dependency. This is not a qualified Real trading worker.
+
+Evidence: scoped87/87 tests PASS; bounded-memory client build PASS; independent
+review PASS. Canonical browser Agent1440/360/390/412 and leaderboard3-place
+responsive checks PASS. Fixed mobile quick-nav/tab horizontal scrolling. Home
+verified412; remaining route data/interaction QA continues (navigation alone is
+not full-flow proof). Browser errors observed are third-party extension inpage
+channel errors, not TEKKTEAM application errors. Real mobile WebView not retested.
+Remote evidence: `/var/lib/tekkteam-mainnet/postlaunch-2a707c8/` tests.log,
+observer-verified.json, product-verified.json. Local screenshots/tests:
+`artifacts/postlaunch/`. Historical journal and quarantine hashes unchanged.
+API PID78060; observer process separately scoped. CUDA/shared infra untouched.
+
+NEXT ACTIVE: non-financial Pump production preparation validity/restart gaps.
+Persist original raw account/message/blockhash evidence; enforce native expiry;
+then bounded owner activation/budget reservations and production envelope/effects
+qualification. Existing local fixture gates stay unchanged. Funding is a future
+owner gate, not a blocker for implementing/testing these source contracts.
+
 # CURRENT - 7 October 2026, 04:00 WIB: REAL PUMP LAUNCH FINALIZED
 
 Operation 18778924-c1d7-44c8-8253-2019e73363b2 reached the existing Phantom

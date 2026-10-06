@@ -30,6 +30,7 @@ import {agentLaunchData,assertAgentLaunch} from '../src/agent-launch-data.js';
 import {parseInitialBuy} from '../src/initial-buy.js';
 import {installRealLeaderboard} from './real-leaderboard.js';
 import {resolveTokenDraftConfiguration} from './launchpad-token-configuration.js';
+import {readAgentSetup} from './agent-setup.js';
 
 const hash = v => createHash('sha256').update(v).digest('hex');
 const fail = (status, message) => { throw Object.assign(new Error(message), { status }); };
@@ -171,6 +172,14 @@ export function createServer({ dbPath, vaultKey, origins = ['http://127.0.0.1:51
   const paperFor=id=>{const r=db.prepare('SELECT data FROM paper_states WHERE agent_id=?').get(id);return r?JSON.parse(r.data):null;};
   app.get('/api/agents/:id/operating-plan',auth,(req,res)=>{const a=owned(req).agent;res.json(operatingPlan(a,paperFor(a.id)));});
   app.get('/api/agents/:id/launch-lifecycle',auth,(req,res)=>{const a=owned(req).agent,p=paperFor(a.id);res.json(lifecycleProjection(a,{...launchEvidence(a),operation:p?{status:p.enabled?'WORKING':'PAUSED',mode:'PAPER'}:null}));});
+  app.get('/api/agents/:id/setup',auth,async(req,res)=>{
+    const agent=owned(req).agent,owner=req.session.address;
+    const setup=await readAgentSetup({db,agent,owner,evidence:launchEvidence(agent),balanceReader:ownerBalance,revalidate:()=>{
+      if(getSession(req)?.address!==owner)return null;
+      const current=owned(req).agent;return {owner,agent:current,evidence:launchEvidence(current)};
+    }});
+    res.json(setup);
+  });
   app.get('/api/agents/:id/contract',auth,async(req,res)=>{
     const initial=owned(req).agent,owner=req.session.address,initialBinding=tokenStore?.readTokenBinding(initial.id,owner);
     const verifiedImage=initialBinding?.token?.image;

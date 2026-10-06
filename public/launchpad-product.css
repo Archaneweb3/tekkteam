@@ -97,3 +97,5 @@
  .tt-product #app .tt-map-hero #tw-office .ob-t b{font-size:11px!important}
  .tt-product #app .ov-data-sections .tw-overview-feed{scroll-margin-top:134px}
 }
+
+@media(max-width:520px){.tt-product #app .tt-mobile-links{display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr));gap:0;overflow:visible;white-space:normal}.tt-product #app .tt-mobile-links a{min-width:0;padding:10px 2px;text-align:center;font-size:11px;line-height:1.4}}
