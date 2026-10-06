@@ -1,5 +1,11 @@
 # PROJECT_PLAYBOOK — TEKKTEAM
 
+Latest legacy-reconciliation mandate, 6–7 October 2026: preserve unresolved raw
+history; quarantine does not authorize a new launch. Unknown-history isolation
+requires explicit owner policy approval before activation, then separate manual
+Phantom financial approval. Decision 101 records the scoped proposal. TEKKTEAM-only
+infrastructure: no CUDA inspection or changes, no shared VPS/proxy/service changes.
+
 Latest6October2026 final product convergence mandate: canonical public product is
 https://tekkteam.tech; staging remains internal QA. Limited Phantom Lighthouse
 semantic validation and complete final-message simulation are explicitly approved

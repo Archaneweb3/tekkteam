@@ -13,6 +13,7 @@ import {readInternalAgent} from './internal-agent-request.js';
 import {parseInitialBuy,buyLamports} from '../src/initial-buy.js';
 import {createPrepareAttemptJournal,publicAttempt,safeDiagnosticMessage,PREPARE_STAGES} from './pump-prepare-diagnostics.js';
 import {createReceiptJournal} from './launch-receipt-journal.js';
+import {loadLegacyQuarantine} from './legacy-launch-quarantine.js';
 
 export function classifyLaunchPreparationFailure(stderr=''){
  const fatal=String(stderr).split(/\r?\n/).filter(line=>!/^\s*(?:\(node:|\(Use |Node\.js v|PUMP_EVENT |\s*at |\s*\^)/.test(line)).join(' ');
@@ -42,15 +43,17 @@ export function prepareLaunch(launch,onEvent=()=>{}){
  * Public receipt only is journaled; no mint secret or signed transaction is saved.
  * /prepare prepares; /submit requires BOTH valid signatures; /status only reads.
  */
-export function createPumpLaunch({journal,initializeJournal=false,journalOptions={},attemptJournal=journal.replace(/\.json$/,'-prepare-attempts.json'),rpc='https://api.mainnet-beta.solana.com',origins=['http://127.0.0.1:5188'],serviceHost='127.0.0.1:4193',prepare=prepareLaunch,connection,send,publishMetadata=publishAgentMetadata,removeMetadata=removeDraftMetadata,getAgent=async(id,req)=>{
+export function createPumpLaunch({journal,initializeJournal=false,journalOptions={},quarantineRequired=false,attemptJournal=journal.replace(/\.json$/,'-prepare-attempts.json'),rpc='https://api.mainnet-beta.solana.com',origins=['http://127.0.0.1:5188'],serviceHost='127.0.0.1:4193',prepare=prepareLaunch,connection,send,publishMetadata=publishAgentMetadata,removeMetadata=removeDraftMetadata,getAgent=async(id,req)=>{
  return readInternalAgent(id,req.headers.cookie||'');
 }}={}){
  const c=connection??new Connection(rpc,{commitment:'confirmed',disableRetryOnRateLimit:true});
  const attempts=createPrepareAttemptJournal(attemptJournal);
  const receiptJournal=createReceiptJournal(journal,{...journalOptions,initializeMissing:initializeJournal});
+ const quarantine=loadLegacyQuarantine(journal,{required:quarantineRequired});
  const launches=new Map();
  for(const [id,record] of Object.entries(receiptJournal.read()))launches.set(id,{agentId:id,record,evidence:null,busy:false});
  const persist=(cell,record)=>{
+  quarantine.assertMutation(cell.agentId);
   const records=Object.fromEntries([...launches].filter(([,v])=>v!==cell&&v.record).map(([id,v])=>[id,v.record]));
   if(record)records[cell.agentId]=record;
   const ack=receiptJournal.commit(records);cell.record=record;return ack;
@@ -81,7 +84,14 @@ export function createPumpLaunch({journal,initializeJournal=false,journalOptions
   receiptJournal.assertAvailable();
   const id=req.body?.agentId??req.query.agentId;
   if(typeof id!=='string'||!id){if(req.prepareAttempt)attempts.fail(req.prepareAttempt,Object.assign(Error('Agent ID required'),{code:'AGENT_ID_REQUIRED'}),400);return res.status(400).json({error:'Agent ID required',attempt:responseAttempt(req.prepareAttempt,400,'FAILED')});}
+  if(req.method!=='GET')quarantine.assertMutation(id);
   try{req.originalAgent=await getAgent(id,req);}catch(error){return next(error);}
+  const isolated=quarantine.projection(id);
+  if(isolated&&req.method==='GET'&&req.path==='/pump-launch/status'){
+   const record=receiptJournal.read()[id];
+   if(req.originalAgent?.id!==id||(req.originalAgent.owner??req.originalAgent.creator)!==record.owner)throw Error('Launch receipt owner mismatch');
+   return res.json({...record,reconciliation:isolated,launchLifecycle:'RECONCILIATION_REQUIRED',canStartFreshPreparation:false});
+  }
   if(req.prepareAttempt)attempts.passed(req.prepareAttempt,'OWNER_AUTH');
   if(req.prepareAttempt)attempts.stage(req.prepareAttempt,'OWNERSHIP_CHECK');
   const agent=agentLaunchData(req.originalAgent);if(agent.agentId!==id)throw Error('Agent ID mismatch');
@@ -161,6 +171,7 @@ export function createPumpLaunch({journal,initializeJournal=false,journalOptions
    // Persist intent BEFORE touching the network: even ambiguous timeout cannot retry.
    record={...record,status:'Confirming',signature:bs58.encode(tx.signature),broadcastAttempted:true,submissionAcknowledged:false};save();cell.evidence=null;
    let acknowledged=false;
+   quarantine.assertMutation(cell.agentId);
    try{const signature=await broadcast(bytes);if(signature!==record.signature)throw Error('RPC returned a different signature');acknowledged=true;}
    catch{/* Preserve the same signature; an RPC error does not authorize replay. */}
    record=acknowledged?{...record,submissionAcknowledged:true,submissionAcknowledgedAt:Date.now()}:{...record,notice:'Broadcast outcome unknown. Check confirmation; never resubmit this launch.'};
@@ -169,6 +180,8 @@ export function createPumpLaunch({journal,initializeJournal=false,journalOptions
  });
  app.get('/pump-launch/status',async(req,res)=>{
   const cell=req.launchCell;let {record}=cell;const save=()=>persist(cell,record);
+  const isolated=quarantine.projection(cell.agentId);
+  if(isolated)return res.json({...record,reconciliation:isolated,launchLifecycle:'RECONCILIATION_REQUIRED',canStartFreshPreparation:false});
   const view=()=>({...record,launchLifecycle:record.status==='Success'&&record.confirmed?'TOKEN_LAUNCHED':record.signature?'RECONCILIATION_REQUIRED':'PREVIOUS_ATTEMPT_ENDED',canStartFreshPreparation:false,resolutionReason:record.signature?'Previous signed transaction requires conclusive reconciliation before another launch.':'No signed transaction on this receipt.',latestAttempt:latestAttempt(req.agentData.agentId)});
   if(!record)return res.json({status:'Idle',launchLifecycle:'PREVIOUS_ATTEMPT_ENDED',canStartFreshPreparation:true,latestAttempt:latestAttempt(req.agentData.agentId)});
   if(!record.signature||record.status==='Success')return res.json(view());
