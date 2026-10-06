@@ -1,4 +1,10 @@
-## Phase 1 staging verification — 6 October 2026, 20:47 WIB
+## 20:52 WIB checkpoint — real wallet message mismatch stopped before Submit
+
+Attempt15dd72ef-ed4c-46c5-a1e6-1358c4cc45e6 prepared20:46:37.238 WIB. Final v2, Mainnet simulationPASS, reviewed5565360lamports (fee18000 + other5547360), initialbuy0. Handoff20:46:39.232 had141blocks remaining, native lastValidBlockHeight431957116. Prepared/delivered message25de4cdcc50a5cfa8db154afa86e8a6aad23acc1a0d2d8e3565aa22f3f2c87c7; returned20:46:44.430 messagec3605a9633b3753872c68e9c6ce041dad4d4b226a82c716038426e992a76d445. Exact-message guard rejected it. No Submit observed, backend signature=null/broadcast=false; no receipt/CA. Raw returned message was not captured, so changed fields and wallet-side signature validity are UNKNOWN, not a proven Phantom fee/Lighthouse cause.
+
+Frontend diagnostic sourcef7a0a04 records unsigned raw/provider/compiled messages and changed fields without signature bytes/private keys.18/18 testsPASS and build12.70s. Guard remains unchanged. Staging frontend-only deployment in progress, no PM2 restart. Need one subsequent explicit fresh wallet action/manual owner approval to observe the returned message; no blind retry. Existing Agent/draft untouched, targetAgent1/wallet0, tradingOFF, production unchanged.
+
+## Phase 1 staging verification — 6 October 2026, 20:46 WIB
 
 Source3ef0b31 deployed via pinned manifest dedc451. VPS100/100 tests PASS; build25.69s. Runtime source hashes PASS, served backend and action-time module SHA match, HTTPS health/capabilities200 with actionTimePreparation=true. Existing execution payload unchanged at deployment; production PID10722/10893 restart0 unchanged. No production path/config/service changes.
 
