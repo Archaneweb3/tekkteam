@@ -1,4 +1,16 @@
-Checkpoint 6 October2026 22:15 WIB: DIRECT VPS ACCESS REQUIRED. Resume started
+Checkpoint 6 October2026 22:22 WIB: HOSTINGER SSH PUBLIC KEY INSTALL REQUIRED.
+Resume c20dfc3; same active milestone/deadline22:35 WIB. Existing identity rejection
+is conclusive; filtered terminal history confirms root@179.198.214.104:22 and no
+alternative key. One dedicated key pair created safely outside repository:
+C:\Users\budir\.ssh\tekkteam_vps_ed25519(.pub), fingerprint
+SHA256:roFk4O0w5ErHc+1egf21CR0KZz5oNO+IV5L46O0g58U.
+Pair and owner-only protected private ACL verified. Authenticated Hostinger Add
+SSH Key form is open for the required human credential-installation handoff; no
+key has been submitted. After public-key installation, verify direct SSH once and
+resume accepted product work. No repeated Lighthouse work, deploy, VPS restart,
+production mutation, new wallet prompt, signing or broadcast in this resume.
+
+Previous checkpoint 6 October2026 22:15 WIB: DIRECT VPS ACCESS REQUIRED. Resume started
 22:12:43 WIB; current checkpoint target22:35 WIB. Phase1 direct OpenSSH reached
 179.198.214.104:22 and matched known_hosts, but root authentication failed with
 the default identities and the existing local nondefault identity (key offered,

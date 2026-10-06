@@ -1,4 +1,18 @@
-# CURRENT — 6 October 2026, 22:15 WIB: DIRECT VPS ACCESS REQUIRED
+# CURRENT — 6 October 2026, 22:22 WIB: HOSTINGER SSH PUBLIC KEY INSTALL REQUIRED
+
+Resume c20dfc3. Existing offered identity rejected; no alternative authorized key
+found. History and authenticated Hostinger confirm root@179.198.214.104:22.
+One new dedicated local key exists at C:\Users\budir\.ssh\tekkteam_vps_ed25519;
+install PUBLIC .pub only, fingerprint
+SHA256:roFk4O0w5ErHc+1egf21CR0KZz5oNO+IV5L46O0g58U.
+Pair and protected owner-only ACL verified; no private material exposed.
+Hostinger Add SSH Key form is open/blank for the mandatory human credential-change
+handoff. Installation NOT completed; no new-key SSH login attempted. After install,
+one harmless explicit-identity strict-host-key SSH probe precedes existing deploy/
+canonical DB reconciliation. No server/production changes or financial action.
+Do not regenerate keys or repeat accepted implementation. See PROJECT_STATUS.
+
+# Previous — 6 October 2026, 22:15 WIB: DIRECT VPS ACCESS REQUIRED
 
 Continue5058c9c without Hostinger Web Terminal. Direct OpenSSH reached the known
 179.198.214.104:22 with matching host key, but root authentication failed for both

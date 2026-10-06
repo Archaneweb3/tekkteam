@@ -1,4 +1,27 @@
-# CURRENT — 6 October 2026, 22:15 WIB: direct SSH authentication unavailable
+# CURRENT — 6 October 2026, 22:22 WIB: HOSTINGER SSH PUBLIC KEY INSTALL REQUIRED
+
+Resume c20dfc3 preserved all accepted source/deployment evidence below. Filtered
+PowerShell history confirms root@179.198.214.104 on default port22, without a
+TEKKTEAM-specific identity argument. No alternative authorized local identity was
+found; the prior bounded verbose diagnostic already proved offered-key rejection.
+No further login retries, web-terminal use, server changes or financial attempts.
+
+Created ONE dedicated ED25519 pair at C:\Users\budir\.ssh\tekkteam_vps_ed25519
+and .pub, without overwriting existing keys. Public/private pairing verified;
+private file has protected DACL with one FullControl ACE for its Windows owner.
+No private material was printed. Public fingerprint:
+SHA256:roFk4O0w5ErHc+1egf21CR0KZz5oNO+IV5L46O0g58U.
+
+Authenticated Hostinger VPS2016744 Overview independently confirms root and the
+same IP. SSH key management currently shows no listed keys. Opened Add SSH Key
+form and left it blank for the human credential-installation handoff required by
+Computer Use policy. Public key is NOT installed; direct SSH remains unverified.
+Next minimum action: install this .pub through the open Hostinger form. Then run
+one strict-host-key explicit-identity harmless SSH probe and resume the same
+product milestone. No VPS reboot, PM2 restart, deploy or production mutation.
+Evidence: artifacts/m4-deterministic-attempt/hostinger-ssh-public-key-install-required.png.
+
+# Previous — 6 October 2026, 22:15 WIB: direct SSH authentication unavailable
 
 Latest user mandate replaces web-terminal infrastructure access with direct SSH.
 Resume began22:12:43 WIB from5058c9c; source and unrelated user changes preserved.
