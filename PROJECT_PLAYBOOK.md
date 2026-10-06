@@ -1,5 +1,14 @@
 # PROJECT_PLAYBOOK — TEKKTEAM
 
+Latest6October2026: TEKKTEAM_PRODUCTION_PARITY supersedes the stop-after-one-attempt
+batch boundary. Preserve TEKKTEAM blue/yellow identity and all ten destinations.
+Implement native Solana action-time final preparation separately from informational
+review; exact message/signatures, native blockhash expiry, spend/reserve and durable
+one-shot/reconciliation guards remain mandatory. Stage and verify each dependency.
+Manual wallet approval remains mandatory for consequential financial actions;
+funding/activation/QA trading require concrete bounded action-time review. Production
+go-live follows real launch/trade/canary/security acceptance, never fixture counts.
+
 Latest 5 October 2026: preserve the CURRENT TEKKTEAM visual design. Bagwork is
 public behavioral reference only. Implement one continuous coin + Agent journey,
 confirmed-receipt-only encrypted Agent wallet provisioning and honest operating

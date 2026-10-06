@@ -304,7 +304,7 @@ export function createServer({ dbPath, vaultKey, origins = ['http://127.0.0.1:51
     }
   });
   if(m4Execution){
-   for(const action of ['prepare','recover','review','submit','reject','status'])app[action==='status'?'get':'post']('/api/launchpad/agents/:id/execution/'+action,authLimit,auth,async(req,res)=>{
+   for(const action of ['prepare','recover','review','submit','reject','status','estimate','wallet-prepare','wallet-status','wallet-claim'])app[['status','wallet-status'].includes(action)?'get':'post']('/api/launchpad/agents/:id/execution/'+action,authLimit,auth,async(req,res)=>{
     const owner=req.session.address;
     const snapshot=()=>{
      if(getSession(req)?.address!==owner)fail(401,'Owner session changed');
@@ -312,8 +312,8 @@ export function createServer({ dbPath, vaultKey, origins = ['http://127.0.0.1:51
      if(a.creator!==owner||row.secret!==null||scope?.owner!==owner||scope.source!=='LAUNCHPAD_IDENTITY'||scopeAuthority?.available!==true||scopeAuthority.scoped!==true||scopeAuthority.reason!==null||binding?.available!==true||binding.bound!==true||binding.revision!==1||a.tokenDraftRevision!==1||a.coin?.mint!==null)fail(409,'Immutable original owner/Agent/draft authority required');
      return agentLaunchData({...a,tokenDraftAuthority:{available:true,revision:1}});
     };
-    const identity=snapshot(),body=action==='status'?{}:req.body;
-    const allowed={prepare:['initialBuy','requestId','replaceExecutionId'],recover:['initialBuy','requestId','previousExecutionId'],review:['requestId','reviewDigest','transactionBase64'],submit:['requestId','reviewDigest','transactionBase64','signedTransactionBase64'],reject:['requestId'],status:[]}[action];
+    const identity=snapshot(),body=['status','wallet-status'].includes(action)?{}:req.body;
+    const allowed={prepare:['initialBuy','requestId','replaceExecutionId'],recover:['initialBuy','requestId','previousExecutionId'],review:['requestId','reviewDigest','transactionBase64'],submit:['requestId','reviewDigest','transactionBase64','signedTransactionBase64'],reject:['requestId'],status:[],estimate:['initialBuy','requestId'],'wallet-prepare':['initialBuy','requestId','previousExecutionId'],'wallet-status':[],'wallet-claim':['requestId','reviewDigest','transactionBase64']}[action];
     if(!body||Array.isArray(body)||Object.keys(body).some(k=>!allowed.includes(k)))fail(400,'Invalid M4 request');
     try{const verifyIdentity=()=>{if(JSON.stringify(snapshot())!==JSON.stringify(identity))fail(409,'Owner/Agent changed');};const result=await m4Execution.run(action,identity,body,verifyIdentity);verifyIdentity();res.json(result);}
     catch(error){res.status(error.status??503).json({error:'Controlled launch stopped',code:/^[A-Z0-9_]+$/.test(error.code??'')?error.code:'M4_FAILED'});}

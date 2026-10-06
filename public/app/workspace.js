@@ -29,7 +29,7 @@ import {launchpadUnit} from './launchpad-view-model.js';
 import {createIdentityIntentJournal} from './launchpad-identity-intent.js';
 import {mountTokensPage} from './tokens-page.js';
 import {openPumpLaunchDialog} from './pump-launch-dialog.js';
-import {launchWallet} from './backend.js';
+import {launchWallet,m4LaunchWallet} from './backend.js';
 
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const short = s => s ? `${s.slice(0, 5)}…${s.slice(-4)}` : '';
@@ -234,7 +234,7 @@ async function detail(page, id, version) {
   try { scenes.push(createBoss($('#tw-detail-character'), { skin: a.character })); } catch { $('#tw-detail-character').innerHTML = `<img src="${characterPortraitUrl(a.character)}" alt="${esc(a.name)} character">`; }
   const heroAction=$('[data-hero-trading]',page);heroAction.disabled=true;heroAction.textContent='CHECKING AGENT…';
   const updateHero=t=>{if(version!==routeVersion||!heroAction.isConnected)return;const working=t?.status==='WORKING';heroAction.disabled=!t||!['READY','DRAFT','PAUSED','WORKING'].includes(t.status);heroAction.innerHTML=working?'PAUSE AI AGENT <span aria-hidden="true">Ⅱ</span>':'START AI AGENT <span aria-hidden="true">→</span>';const status=$('.ad-hero-role .tw-status',page);if(status&&t){const label=t.openPositions?.length?(working?'POSITION OPEN':t.status==='PAUSED'?'PAUSED · POSITION OPEN':'POSITION OPEN'):working?'SCANNING MARKETS':t.status==='PAUSED'?'PAUSED':t.status==='READY'?'READY TO START':'DRAFT';status.textContent=label;status.dataset.status=label;}const strategy=$('.ad-hero-role>span:last-child',page);if(strategy&&t?.strategy)strategy.textContent=t.strategy.toUpperCase();};
-  const tabs=mountAgentDetailTabs($('#tw-agent-tabs',page),a,{isCurrent:()=>version===routeVersion&&routeName()==='agent',onTradingState:updateHero,mountLaunch:async host=>{try{await window.mountPumpLaunch(host,{agent:a,getWallet:launchWallet,isCurrent:()=>version===routeVersion&&routeName()==='agent'&&location.hash.slice(2).split('/')[1]===id&&!!host.isConnected});}catch(error){if(host.isConnected)host.textContent='Launch unavailable: '+error.message;}}});
+  const tabs=mountAgentDetailTabs($('#tw-agent-tabs',page),a,{isCurrent:()=>version===routeVersion&&routeName()==='agent',onTradingState:updateHero,mountLaunch:async host=>{try{await window.mountPumpLaunch(host,{agent:a,getWallet:launchWallet,getM4Wallet:m4LaunchWallet,isCurrent:()=>version===routeVersion&&routeName()==='agent'&&location.hash.slice(2).split('/')[1]===id&&!!host.isConnected});}catch(error){if(host.isConnected)host.textContent='Launch unavailable: '+error.message;}}});
   scenes.push(tabs);
   heroAction.onclick=()=>{if(heroAction.disabled)return;tabs.select('trading');$('#tw-agent-tabs',page)?.scrollIntoView({block:'start',behavior:'smooth'});const panel=$('#tw-agent-tab-panel',page);const observer=new MutationObserver(()=>{const action=panel.querySelector('[data-paper-action]');if(!action)return;observer.disconnect();if(version===routeVersion&&!action.disabled)action.click();});observer.observe(panel,{childList:true,subtree:true});setTimeout(()=>observer.disconnect(),8000);};
   $('[data-hero-settings]',page).onclick=()=>{tabs.select('settings');$('#tw-agent-tabs',page)?.scrollIntoView({block:'start',behavior:'smooth'});};

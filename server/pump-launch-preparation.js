@@ -14,7 +14,8 @@ const expectedArgs=[['name','string'],['symbol','string'],['uri','string'],['cre
 function checkAccounts(definition,accounts){if(definition?.accounts?.length!==accounts.length)throw failure('PREPARATION_IDL_ACCOUNT_MISMATCH');definition.accounts.forEach((a,i)=>{const e=accounts[i];if(a.name!==e.name||!!a.writable!==e.isWritable||!!a.signer!==e.isSigner||(a.address&&a.address!==e.pubkey.toBase58()))throw failure('PREPARATION_IDL_ACCOUNT_MISMATCH');});}
 import {readAtMinimumContext} from './pump-context-rpc.js';
 export {readAtMinimumContext} from './pump-context-rpc.js';
-export function createPumpLaunchPreparation({transport,publishMetadata,readPreparation,executionReview=false,explicitM4Fees=false,now=Date.now,mintFactory,captureProof,captureDiagnostics}){
+export function createPumpLaunchPreparation({transport,publishMetadata,readPreparation,executionReview=false,explicitM4Fees=false,actionTime=false,now=Date.now,mintFactory,captureProof,captureDiagnostics}){
+ if(actionTime&&(!executionReview||!explicitM4Fees||typeof mintFactory!=='function'||readPreparation))throw failure('M4_ACTION_TIME_FACTORY_INVALID');
  if(explicitM4Fees&&!executionReview)throw failure('M4_FEE_EXECUTION_REVIEW_REQUIRED');
  if(typeof transport?.rpc!=='function'||typeof transport.publicRequest!=='function'||typeof publishMetadata!=='function')throw failure('PREPARATION_CONFIGURATION_REQUIRED');
  const pending=new Map(),busy=new Set();
@@ -23,7 +24,7 @@ export function createPumpLaunchPreparation({transport,publishMetadata,readPrepa
   const amount=parseInitialBuy(initialBuy),fingerprint=preparationFingerprint(identity,amount),key=identity.owner+':'+requestId;
   if(executionReview&&amount!==0)throw Object.assign(failure('EXECUTION_ZERO_BUY_REQUIRED'),{status:409});
   const stored=await readPreparation?.(identity,amount,requestId);if(stored){if(executionReview)assertExecutionReview(stored,identity,{now:now()});return stored;}
-  const prior=pending.get(key);if(prior){if(prior.fingerprint!==fingerprint)throw Object.assign(failure('PREPARATION_REQUEST_CONFLICT'),{status:409});return prior.task.then(result=>{if(result.expiresAt<=now())throw Object.assign(failure('PREPARATION_EXPIRED'),{status:409});return result;});}
+  const prior=pending.get(key);if(prior){if(prior.fingerprint!==fingerprint)throw Object.assign(failure('PREPARATION_REQUEST_CONFLICT'),{status:409});return prior.task.then(result=>{if(result.expiresAt!==null&&result.expiresAt<=now())throw Object.assign(failure('PREPARATION_EXPIRED'),{status:409});return result;});}
   if(busy.has(identity.agentId))throw Object.assign(failure('PREPARATION_IN_PROGRESS'),{status:409});
   if(pending.size>=100){if(readPreparation)for(const [id,p]of pending)if(p.expiresAt!==null&&p.expiresAt<=now())pending.delete(id);if(pending.size>=100)throw failure('PREPARATION_CAPACITY_REACHED');}
   busy.add(identity.agentId);
@@ -87,7 +88,7 @@ export function createPumpLaunchPreparation({transport,publishMetadata,readPrepa
    // Persist public-chain facts before a review guard can throw. Failed write
    // fails preparation. Diagnostic evidence grants no financial authorization.
    if(captureDiagnostics)await captureDiagnostics(result,{before,afterRead,simulation,feeResponse,latestResponse,validity});
-   if(executionReview){result.executionReview=createExecutionReview(result,{before,afterRead,simulation,feeResponse,latestResponse,validity,startedAt,now:now()});result.expiresAt=result.executionReview.expiresAt;assertExecutionReview(result,identity,{now:now()});}
+   if(executionReview){result.executionReview=createExecutionReview(result,{before,afterRead,simulation,feeResponse,latestResponse,validity,startedAt,now:now(),actionTime});result.expiresAt=result.executionReview.expiresAt;assertExecutionReview(result,identity,{now:now()});}
    if(captureProof)await captureProof(result,{before,afterRead,simulation,feeResponse,latestResponse});
    return result;
   })().then(result=>{entry.expiresAt=result.expiresAt;return result;}).catch(error=>{pending.delete(key);throw error;}).finally(()=>busy.delete(identity.agentId));entry.task=task;pending.set(key,entry);return task;

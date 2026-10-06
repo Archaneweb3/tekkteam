@@ -1,3 +1,34 @@
+# CURRENT - TEKKTEAM_PRODUCTION_PARITY / Phase 1 staging preparation
+
+6 October 2026, 20:42 WIB. Resume 536afdd; first checkpoint 20:52 WIB.
+Phase 1 source implemented: separate informational estimate and action-time v2 final
+transaction; native Solana validity replaces the wallet decision TTL. Construction
+still bounded to 30s; immutable fee/message/owner-first/integrity gates preserved.
+Durable wallet delivery and send claims reject duplicate popup/send after reload.
+Explicit retry requires full expired transaction/signature/mint absence proof;
+SIGNED crash boundary is recoverable only before any durable submission claim.
+
+Independent backend/UI read-only review ACCEPTED; focused regression 89/89 plus
+preparation/owner-route 15/15 PASS locally (104 total). Staging build PASS42.44s,
+existing chunk-size warning. No lint/typecheck script configured. Real wallet,
+Mainnet confirmation, deployment and browser acceptance remain pending this phase.
+
+Fresh VPS read-only baseline 20:38 WIB: staging API4395 online PID53613/restart22.
+Production API4190 PID10722/restart0 and launch4193 PID10893/restart0 online;
+production path untouched. Staging execution774a48ae-507c-4753-b901-6c2261d60a4c
+still USER_REJECTED, ownerSigned=false, broadcast=false, signature=null.
+Payload SHA256 bb12a6fe5a98eba70ed0568c91a7cd54955f5197911d313bb07de29285b8fbfb.
+Staging has two existing Agent records overall; target must remain exactly one.
+Agent wallets0. DATA_DIR /var/lib/tekkteam-staging; persistent wallet-test.sqlite.
+No new wallet request, signature, broadcast, funding or real trading this checkpoint.
+
+Next: pinned staging deploy and real Edge/Phantom action-time approval handoff for
+existing aaaaada/ret3ED only. Manual financial approval required. Later phases remain
+TARGET, not shipped: five profiles, bounded funding/activation, linked-token executor,
+VPS worker, Real weekly leaderboard/canary and gated production release.
+
+Historical evidence (superseded authorization, preserved facts):
+
 # CURRENT — ONE deterministic M4 attempt safely stopped; M4 PARTIAL
 
 Checkpoint 5 October 2026, 21:56:31 WIB. Started21:39; deadline22:09 WIB.

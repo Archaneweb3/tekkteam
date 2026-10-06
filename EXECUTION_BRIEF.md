@@ -1,3 +1,22 @@
+# Active milestone — TEKKTEAM_PRODUCTION_PARITY
+
+Started 6 October 2026, 20:22 WIB; first checkpoint 20:52 WIB.
+Continue actual HEAD536afdd with existing aaaaada/ret3ED and preserved evidence.
+Phase1 active: separate informational review from fresh action-time wallet package;
+native Solana blockhash/lastValidBlockHeight validity, immutable explicit-fee message,
+durable one-shot submit and explicit safe retry. Preserve branding and ten routes.
+Implement/test/deploy staging, then one Mainnet launch with manual owner approval;
+initialbuy0, total ceiling0.01SOL. No stale review reuse, automatic signing or retry.
+After receipt: canonical existingAgent/encrypted-wallet binding, then bounded funding,
+activation, five functional profiles, linked-token QA BUY/SELL, VPS worker, public
+leaderboard/revenue audit/canary and gated production delivery per latest user brief.
+Financial actions stop at action-time human confirmation with exact exposure.
+No production activation until all explicit acceptance gates pass. No hidden fees.
+Root sole source writer; independent read-only contract/UI/downstream reviewers.
+Previous USER_REJECTED was root cancellation after expiry, not human rejection.
+
+Previous checkpoint:
+
 # CURRENT — ONE deterministic M4 attempt safely stopped; M4 PARTIAL
 
 Checkpoint 5 October 2026, 21:56:31 WIB. Started21:39; deadline22:09 WIB.

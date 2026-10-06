@@ -9,6 +9,7 @@ import {readAtMinimumContext} from './pump-context-rpc.js';
 import {tokenMetadata} from '../src/agent-launch-data.js';
 import {decodeM4CreationAccounts,verifyM4CreateEvent} from './pump-m4-provenance.js';
 import {atomicExecutionEffects} from './pump-atomic-effects.js';
+import {isActionTimePackage} from '../src/pump-action-time.js';
 export const M4_TARGET=Object.freeze({owner:'C2nddai75FJZWWkNdUF7csEBryRCMikJyTTZZqYcMiBv',agentId:'8fc6fe77-16a0-4fed-8ca0-ddd1f6ef9fa7',agentName:'aaaaada',name:'ret',symbol:'3ED',tokenDraftRevision:1,initialBuyLamports:0,ceilingLamports:10000000});
 export const m4Fail=code=>Object.assign(Error(code),{code,status:409});
 export const sha=value=>createHash('sha256').update(value).digest('hex');
@@ -37,8 +38,20 @@ export function completeM4OwnerApproval(base64,record){
  const completeBase64=tx.serialize({requireAllSignatures:true,verifySignatures:true}).toString('base64');
  return {...verifyM4Signed(completeBase64,record,true),completeBase64,integrity:{preparedMessageSha256:sha(Transaction.from(Buffer.from(record.result.transactionBase64,'base64')).serializeMessage()),deliveredMessageSha256:sha(trusted.serializeMessage()),returnedMessageSha256:sha(tx.serializeMessage()),returnedOwnerPayloadSha256:sha(bytes),finalSignedPayloadSha256:sha(Buffer.from(completeBase64,'base64')),allowedWalletMutation:'SIGNATURES_ONLY',feeModel:record.result.feePolicy?.model??'LEGACY_NO_EXPLICIT_PRIORITY'}};
 }
-// Scoped M4 freshness: latest finalized hash may advance, but the reviewed hash
-// must remain valid. The accepted message/digest/30s TTL are NEVER replaced.
+// A native validity observation never replaces any transaction/message fields.
+export async function checkM4Blockhash(result,{transport,now=Date.now,minimumRemainingBlocks=0,minimumContextSlot=result.executionReview.validitySlot}){
+ if(!Number.isSafeInteger(minimumContextSlot)||minimumContextSlot<result.executionReview.validitySlot)throw m4Fail('M4_CONTEXT_STALE');
+ const minimum=minimumContextSlot,rpc=(m,p)=>readAtMinimumContext(transport,m,p);
+ if(await rpc('getGenesisHash',[])!==GENESIS)throw m4Fail('M4_WRONG_MAINNET');
+ const validity=await rpc('isBlockhashValid',[result.recentBlockhash,{commitment:'finalized',minContextSlot:minimum}]);
+ const slot=contextSlot(validity,minimum),height=await rpc('getBlockHeight',[{commitment:'finalized',minContextSlot:slot}]);
+ if(validity.value!==true||!Number.isSafeInteger(height)||height>result.lastValidBlockHeight)throw m4Fail('M4_BLOCKHASH_EXPIRED');
+ const remainingBlocks=result.lastValidBlockHeight-height;
+ if(remainingBlocks<minimumRemainingBlocks)throw m4Fail('M4_WALLET_BLOCKHASH_TOO_OLD');
+ return {recentBlockhash:result.recentBlockhash,lastValidBlockHeight:result.lastValidBlockHeight,reviewDigest:result.executionReview.digest,commitment:'finalized',height,remainingBlocks,contextSlot:slot,checkedAt:now()};
+}
+// Revalidate the immutable reviewed economics. Legacy v1 retains its 30s TTL;
+// v2 is valid only while its native hash remains live, including after this work.
 export async function revalidateM4(record,identity,request,{transport,now=Date.now,captureDiagnostics}){
  const r=record.result,review=r.executionReview;
  assertM4Target(identity,record.target??M4_TARGET);assertReviewedExecutionRequest(r,identity,{...request,now:now()});
@@ -60,5 +73,7 @@ export async function revalidateM4(record,identity,request,{transport,now=Date.n
  for(const account of r.policy.rentAccounts)if(await rpc('getMinimumBalanceForRentExemption',[account.dataLength,{commitment:'finalized'}])!==account.minimumRentExemptionLamports)throw m4Fail('M4_RENT_CHANGED');
  const metadata=await (await transport.publicRequest(r.metadataUri)).json();if(JSON.stringify(metadata)!==JSON.stringify(tokenMetadata(identity)))throw m4Fail('M4_METADATA_CHANGED');
  const image=await transport.publicRequest(metadata.image),imageBytes=Buffer.from(await image.arrayBuffer());if(!image.headers.get('content-type')?.startsWith('image/png')||sha(imageBytes)!==new URL(metadata.image).pathname.split('/').at(-1)?.replace('.png',''))throw m4Fail('M4_IMAGE_UNAVAILABLE');
- assertReviewedExecutionRequest(r,identity,{...request,now:now()});return {contextSlot:simulation.context.slot,checkedAt:now(),height};
+ assertReviewedExecutionRequest(r,identity,{...request,now:now()});
+ const finalValidity=isActionTimePackage(r)?await checkM4Blockhash(r,{transport,now,minimumContextSlot:contextSlot(afterRead,contextSlot(simulation))}):null;
+ return {contextSlot:simulation.context.slot,checkedAt:now(),height:finalValidity?.height??height,...(finalValidity?{blockhashValidity:finalValidity}:{})};
 }

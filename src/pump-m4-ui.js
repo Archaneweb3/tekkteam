@@ -3,9 +3,11 @@ import {Transaction} from '@solana/web3.js';
 import {agentLaunchData,assertAgentLaunch} from './agent-launch-data.js';
 import {validatePreparation} from './pump-preparation-ui.js';
 import {assertM4ReviewLifetime} from './pump-review-lifetime.js';
+import {mountM4ActionTimeLaunch} from './pump-action-time-ui.js';
 const sol=n=>Number.isSafeInteger(n)?(n/1e9).toFixed(9)+' SOL':'UNAVAILABLE';
 async function api(id,action,body){const response=await fetch('/api/launchpad/agents/'+encodeURIComponent(id)+'/execution/'+action,{method:body?'POST':'GET',headers:body?{'Content-Type':'application/json'}:undefined,body:body?JSON.stringify(body):undefined,signal:AbortSignal.timeout(180000)});let result;try{result=await response.json();}catch{throw Error('Launch service unavailable (HTTP '+response.status+')');}if(!response.ok)throw Object.assign(Error(result.code||result.error||'Controlled launch unavailable'),{code:result.code});return result;}
 export function mountM4Launch(host,{agent,isCurrent,getM4Wallet,capability}){
+ if(capability.actionTimePreparation===true)return mountM4ActionTimeLaunch(host,{agent,isCurrent,getM4Wallet,capability});
  const identity=agentLaunchData(agent),target=capability.m4Target,alive=()=>host.isConnected&&isCurrent();
  if(Object.keys(identity).filter(k=>Object.hasOwn(target,k)).some(k=>identity[k]!==target[k])){host.textContent='M4 is authorized for a different saved Agent and coin. No transaction is available.';return;}
  let pending=false,current=null,opened=false,timer;

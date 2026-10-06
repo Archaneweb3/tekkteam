@@ -6,6 +6,7 @@ import {pack as packMetadata} from '@solana/spl-token-metadata';
 import {curveProgram,BN,pumpSdk} from '../server/dex/pump-sdk-boundary.js';
 import {encoded} from './pump-account-fixture.mjs';
 import {m4Fixture} from './pump-m4-fixture.mjs';
+import {createExecutionReview} from '../server/pump-execution-review.js';
 import {confirmM4} from '../server/pump-m4-confirmation.js';
 import {revalidateM4,completeM4OwnerApproval,sha} from '../server/pump-m4-guard.js';
 import {decodeM4CreationAccounts,verifyM4CreateEvent} from '../server/pump-m4-provenance.js';
@@ -18,6 +19,7 @@ const eventTemplate=curveProgram.coder.events.decode(publicEvent.programData).da
 async function fixture(options={}){
  const f=m4Fixture(options),state=await f.controller.run('prepare',f.identity,{initialBuy:'0',requestId:crypto.randomUUID()}),request=f.request(state);await f.controller.run('review',f.identity,request);
  const record=JSON.parse(f.db.prepare('SELECT payload FROM m4_execution').get().payload),r=record.result;record.signedTransactionBase64=completeM4OwnerApproval(f.signed(),record).completeBase64;const tx=Transaction.from(Buffer.from(record.signedTransactionBase64,'base64'));record.signature=(await import('bs58')).default.encode(tx.signature);record.signedDigest=sha(Buffer.from(record.signedTransactionBase64,'base64'));
+ if(options.actionTime){r.executionReview=createExecutionReview(r,{...record.proof,validity:{context:{slot:103},value:true},startedAt:f.clock(),now:f.clock(),actionTime:true});r.expiresAt=null;}
  const mint=new PublicKey(r.mint),mintBytes=Buffer.alloc(MintLayout.span);MintLayout.encode({mintAuthorityOption:0,mintAuthority:PublicKey.default,supply:1000000000000000n,decimals:6,isInitialized:true,freezeAuthorityOption:0,freezeAuthority:PublicKey.default},mintBytes);
  const pointer=Buffer.alloc(MetadataPointerLayout.span);MetadataPointerLayout.encode({authority:PublicKey.default,metadataAddress:mint},pointer);const metadata=Buffer.from(packMetadata({mint,name:r.launch.name,symbol:r.launch.symbol,uri:r.metadataUri,additionalMetadata:[]}));
  const tlv=(type,bytes)=>{const h=Buffer.alloc(4);h.writeUInt16LE(type);h.writeUInt16LE(bytes.length,2);return Buffer.concat([h,bytes]);};const mintAccount={owner:TOKEN_2022_PROGRAM_ID.toBase58(),executable:false,lamports:5547360,data:[Buffer.concat([mintBytes,Buffer.alloc(83),Buffer.from([1]),tlv(ExtensionType.MetadataPointer,pointer),tlv(ExtensionType.TokenMetadata,metadata)]).toString('base64'),'base64']};
@@ -37,23 +39,23 @@ test('confirmation rejects corruption, missing context, wrong event/mint and inc
  for(const mutation of [f=>f.record.signedDigest='a'.repeat(64),f=>delete f.accountResponse.context,f=>f.signatureStatus.slot++,f=>f.landed.meta.preBalances.pop(),f=>f.landed.meta.postBalances[2]=NaN,f=>f.accountResponse.value[2].lamports=null,f=>f.mintAccount.owner=PUMP,f=>f.landed.meta.logMessages=f.logs.filter(l=>!l.startsWith('Program data: ')),f=>f.r.launch.name='changed']){const f=await fixture();try{mutation(f);await assert.rejects(confirmM4(f.record,{transport:f.transport}));}finally{f.db.close();}}
 });
 test('actual M4 revalidation retains reviewed blockhash and rejects expired/cost/rent/context changes',async()=>{
- for(const feePolicy of [null,explicitFee]){const f=await fixture({feePolicy});try{
+ for(const [feePolicy,actionTime] of [[null,false],[explicitFee,false],[explicitFee,true]]){const f=await fixture({feePolicy,actionTime});try{
   const proof=f.record.proof,simulation=structuredClone(proof.simulation);simulation.context.slot=106;simulation.value.accounts[0]=f.mintAccount;simulation.value.accounts[2]=f.curveAccount;simulation.value.logs=f.logs;
   // The synthetic created accounts preserve original funding/debits; only their
   // decoded data is replaced with complete valid Token2022/Pump fixture state.
   simulation.value.accounts[0].lamports=proof.simulation.value.accounts[0].lamports;simulation.value.accounts[2].lamports=proof.simulation.value.accounts[2].lamports;
-  let balanceReads=0,feeChange=0,rentChange=0;
+  let balanceReads=0,feeChange=0,rentChange=0,expireAfterImage=false,nativeExpired=false;
   const image=Buffer.from('fixture PNG'),imageHash=sha(image);f.identity.image='https://fixture.example/metadata/agents/'+f.identity.agentId+'/'+imageHash+'.png';f.r.launch.image=f.identity.image;
   // Rebind the complete review using the server digest helper's canonical bytes.
   const {executionReviewBinding}=await import('../src/pump-execution-binding.js');delete f.r.executionReview.digest;f.r.executionReview.digest=sha(executionReviewBinding(f.r));
   const transport={rpc:async(method,params)=>{
-   if(method==='getGenesisHash')return GENESIS;if(method==='isBlockhashValid')return {context:{slot:104},value:true};if(method==='getBlockHeight')return f.r.lastValidBlockHeight-5;if(method==='getFeeForMessage'){assert.equal(params[0],Transaction.from(Buffer.from(f.r.transactionBase64,'base64')).serializeMessage().toString('base64'));return {context:{slot:104},value:f.r.executionReview.networkFeeLamports+feeChange};}
+   if(method==='getGenesisHash')return GENESIS;if(method==='isBlockhashValid')return {context:{slot:Math.max(104,params[1].minContextSlot??0)},value:!nativeExpired};if(method==='getBlockHeight')return f.r.lastValidBlockHeight-5;if(method==='getFeeForMessage'){assert.equal(params[0],Transaction.from(Buffer.from(f.r.transactionBase64,'base64')).serializeMessage().toString('base64'));return {context:{slot:104},value:f.r.executionReview.networkFeeLamports+feeChange};}
    if(method==='getMultipleAccounts'){assert.deepEqual(params[0],f.r.structure.accounts.map(a=>a.address));const data=structuredClone(++balanceReads%2?proof.before:proof.afterRead);data.context.slot=balanceReads%2?105:107;return data;}if(method==='simulateTransaction'){assert.equal(params[0],f.r.transactionBase64);assert.equal(params[1].accounts.addresses.length,feePolicy?17:16);return simulation;}
    if(method==='getMinimumBalanceForRentExemption')return f.r.policy.rentAccounts.find(a=>a.dataLength===arguments[1]?.[0])?.minimumRentExemptionLamports;
    assert.fail(method);
-  },publicRequest:async(uri)=>uri===f.r.metadataUri?Response.json(tokenMetadata(f.identity)):new Response(image,{headers:{'Content-Type':'image/png'}})};
+  },publicRequest:async(uri)=>{if(uri===f.r.metadataUri)return Response.json(tokenMetadata(f.identity));if(expireAfterImage)nativeExpired=true;return new Response(image,{headers:{'Content-Type':'image/png'}});}};
   const baseRpc=transport.rpc;transport.rpc=async(method,params)=>method==='getMinimumBalanceForRentExemption'?f.r.policy.rentAccounts.find(a=>a.dataLength===params[0]).minimumRentExemptionLamports+rentChange:baseRpc(method,params);
   const request=f.request({executionId:f.record.executionId,result:f.r});assert.equal((await revalidateM4(f.record,f.identity,request,{transport,now:f.clock})).contextSlot,106);
-  feeChange++;await assert.rejects(revalidateM4(f.record,f.identity,request,{transport,now:f.clock}));feeChange=0;rentChange++;await assert.rejects(revalidateM4(f.record,f.identity,request,{transport,now:f.clock}));rentChange=0;simulation.context.slot=1;await assert.rejects(revalidateM4(f.record,f.identity,request,{transport,now:f.clock}));simulation.context.slot=106;f.advance(30000);await assert.rejects(revalidateM4(f.record,f.identity,request,{transport,now:f.clock}),e=>e.code==='EXECUTION_REVIEW_EXPIRED');
+  feeChange++;await assert.rejects(revalidateM4(f.record,f.identity,request,{transport,now:f.clock}));feeChange=0;rentChange++;await assert.rejects(revalidateM4(f.record,f.identity,request,{transport,now:f.clock}));rentChange=0;simulation.context.slot=1;await assert.rejects(revalidateM4(f.record,f.identity,request,{transport,now:f.clock}));simulation.context.slot=106;balanceReads=0;f.advance(35000);if(actionTime){assert.equal((await revalidateM4(f.record,f.identity,request,{transport,now:f.clock})).blockhashValidity.remainingBlocks,5);expireAfterImage=true;await assert.rejects(revalidateM4(f.record,f.identity,request,{transport,now:f.clock}),e=>e.code==='M4_BLOCKHASH_EXPIRED');}else await assert.rejects(revalidateM4(f.record,f.identity,request,{transport,now:f.clock}),e=>e.code==='EXECUTION_REVIEW_EXPIRED');
  }finally{f.db.close();}}
 });

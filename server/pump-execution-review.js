@@ -8,13 +8,14 @@ import {evaluateSimulation} from '../src/pump-simulation-policy.js';
 import {readAtMinimumContext} from './pump-context-rpc.js';
 import {atomicExecutionEffects,canonicalExecutionStructure} from './pump-atomic-effects.js';
 import {feeComponents} from '../src/pump-fee-policy.js';
+import {ACTION_TIME_MODE,isActionTimePackage,assertActionTimePackage} from '../src/pump-action-time.js';
 export const EXECUTION_POLICY=Object.freeze({version:1,ceilingLamports:10000000,minimumReserveLamports:NETWORKS.MAINNET.reserveLamports,ttlMs:30000});
 const fail=code=>Object.assign(Error(code),{code,status:409});
 const valid=n=>Number.isSafeInteger(n)&&n>=0;
 const digest=result=>createHash('sha256').update(executionReviewBinding(result)).digest('hex');
 export function contextSlot(response,minimum=0){const slot=response?.context?.slot;if(!valid(slot)||slot<minimum)throw fail('EXECUTION_CONTEXT_STALE');return slot;}
 // Application budget, never a claim of an absolute Pump/on-chain debit bound.
-export function createExecutionReview(result,{before,afterRead,simulation,feeResponse,latestResponse,validity,startedAt,now=Date.now()}){
+export function createExecutionReview(result,{before,afterRead,simulation,feeResponse,latestResponse,validity,startedAt,now=Date.now(),actionTime=false}){
  const p=result.policy,ceiling=EXECUTION_POLICY.ceilingLamports,reserve=EXECUTION_POLICY.minimumReserveLamports;
  if(!valid(startedAt)||!valid(now)||now<startedAt||now-startedAt>=EXECUTION_POLICY.ttlMs)throw fail('EXECUTION_REVIEW_EXPIRED');
  if(result.launch.initialBuyLamports!==0||p.initialBuyLamports!==0)throw fail('EXECUTION_ZERO_BUY_REQUIRED');
@@ -37,13 +38,16 @@ export function createExecutionReview(result,{before,afterRead,simulation,feeRes
  const floor=observed-ceiling;if(!valid(floor)||floor<reserve||post<floor)throw fail('EXECUTION_BALANCE_FLOOR_VIOLATION');
  const review={version:1,status:'FRESH_EXECUTION_REVIEW',guaranteeClass:'EXECUTION_GUARDED',authorizationGranted:false,startedAt,expiresAt:startedAt+EXECUTION_POLICY.ttlMs,observedBalanceLamports:observed,balanceContextSlot:balanceSlot,blockhashContextSlot:latestSlot,feeContextSlot:feeSlot,simulationSlot,postReadSlot:postSlot,validitySlot,reviewedDebitLamports:decoded,networkFeeLamports:fee,otherRequiredDebitLamports:decoded-fee,minimumRentExemptionLamports:p.minimumRentExemptionLamports,initialBuyLamports:0,priorityFeeLamports:decodedPolicy.priorityFeeLamports,...(result.feePolicy?{baseFeeLamports:decodedPolicy.baseFeeLamports,feeModel:result.feePolicy.model,maximumPriorityFeeLamports:result.feePolicy.maximumPriorityFeeLamports}:{}),reviewedMaximumDebitLamports:ceiling,ceilingLamports:ceiling,minimumReserveLamports:reserve,requiredRemainingBalanceLamports:floor,expectedRemainingBalanceLamports:observed-decoded,budgetHeadroomLamports:ceiling-decoded,absoluteOnchainMaximumLamports:null,policySource:'M3.1 total ceiling; NETWORKS.MAINNET.reserveLamports',limitations:'Application budget enforced against fresh decoded simulation. Pump has no on-chain maximum debit argument; a new context, message or economic change requires another review.'};
  review.atomicBalanceEvidence={source:'SIMULATION_BANK',slot:simulationSlot,feeLamports:simulation.value.fee,accounts:atomicEffects};
+ if(actionTime)Object.assign(review,{version:2,status:'FINAL_WALLET_PREPARATION',freshness:ACTION_TIME_MODE,preparedAt:now,expiresAt:null,recentBlockhash:result.recentBlockhash,lastValidBlockHeight:result.lastValidBlockHeight,messageSha256:createHash('sha256').update(Transaction.from(Buffer.from(result.transactionBase64,'base64')).serializeMessage()).digest('hex')});
  const bound={...result,executionReview:review};review.digest=digest(bound);return review;
 }
 export function assertExecutionReview(result,identity,{now=Date.now()}={}){
  const structure=canonicalExecutionStructure(result);
  const r=result.executionReview;assertAgentLaunch(identity,result.launch);
- if(!r||r.guaranteeClass!=='EXECUTION_GUARDED'||r.authorizationGranted!==false||r.status!=='FRESH_EXECUTION_REVIEW'||r.ceilingLamports!==EXECUTION_POLICY.ceilingLamports||r.reviewedMaximumDebitLamports!==r.ceilingLamports||r.minimumReserveLamports!==EXECUTION_POLICY.minimumReserveLamports||r.absoluteOnchainMaximumLamports!==null||!valid(r.reviewedDebitLamports)||r.reviewedDebitLamports>r.ceilingLamports||!valid(r.requiredRemainingBalanceLamports)||r.requiredRemainingBalanceLamports<r.minimumReserveLamports)throw fail('EXECUTION_REVIEW_INVALID');
- if(!valid(now)||!valid(r.startedAt)||!valid(r.expiresAt)||now<r.startedAt||now>=r.expiresAt||r.expiresAt!==r.startedAt+EXECUTION_POLICY.ttlMs)throw fail('EXECUTION_REVIEW_EXPIRED');
+ const actionTime=isActionTimePackage(result);
+ if(!r||r.guaranteeClass!=='EXECUTION_GUARDED'||r.authorizationGranted!==false||r.status!==(actionTime?'FINAL_WALLET_PREPARATION':'FRESH_EXECUTION_REVIEW')||r.ceilingLamports!==EXECUTION_POLICY.ceilingLamports||r.reviewedMaximumDebitLamports!==r.ceilingLamports||r.minimumReserveLamports!==EXECUTION_POLICY.minimumReserveLamports||r.absoluteOnchainMaximumLamports!==null||!valid(r.reviewedDebitLamports)||r.reviewedDebitLamports>r.ceilingLamports||!valid(r.requiredRemainingBalanceLamports)||r.requiredRemainingBalanceLamports<r.minimumReserveLamports)throw fail('EXECUTION_REVIEW_INVALID');
+ if(actionTime){assertActionTimePackage(result,now);if(r.messageSha256!==createHash('sha256').update(Transaction.from(Buffer.from(result.transactionBase64,'base64')).serializeMessage()).digest('hex'))throw fail('EXECUTION_REVIEW_MUTATED');}
+ else if(!valid(now)||!valid(r.startedAt)||!valid(r.expiresAt)||now<r.startedAt||now>=r.expiresAt||r.expiresAt!==r.startedAt+EXECUTION_POLICY.ttlMs)throw fail('EXECUTION_REVIEW_EXPIRED');
  const slots=['blockhashContextSlot','feeContextSlot','balanceContextSlot','simulationSlot','postReadSlot','validitySlot'].map(k=>r[k]);if(slots.some((s,i)=>!valid(s)||(i>0&&s<slots[i-1])))throw fail('EXECUTION_CONTEXT_STALE');
  if(!valid(r.observedBalanceLamports)||r.requiredRemainingBalanceLamports!==r.observedBalanceLamports-r.ceilingLamports||r.expectedRemainingBalanceLamports!==r.observedBalanceLamports-r.reviewedDebitLamports||r.budgetHeadroomLamports!==r.ceilingLamports-r.reviewedDebitLamports||r.networkFeeLamports+r.otherRequiredDebitLamports!==r.reviewedDebitLamports||result.policy.estimatedPayerDebitLamports!==r.reviewedDebitLamports||result.policy.validatedOverheadLamports!==r.reviewedDebitLamports||result.policy.baseFeeLamports+(result.policy.priorityFeeLamports??0)!==r.networkFeeLamports||result.launch.initialBuyLamports!==0)throw fail('EXECUTION_REVIEW_INVALID');
  const components=feeComponents(structure,r.networkFeeLamports);

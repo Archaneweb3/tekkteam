@@ -71,7 +71,7 @@ export function createLaunchPreparationTransport({rpcUrl,origin,m4Target=null,fi
   ...(m4Target?{submitOnce:async(base64,expectedSignature,authorize)=>{
    // This private capability is inaccessible to HTTP clients. The durable M4
    // controller authorizes exact signed bytes AFTER committing its send latch.
-   if(typeof authorize!=='function'||authorize(base64,expectedSignature)!==true)throw fail('M4_SEND_AUTHORITY_REQUIRED');
+   if(typeof authorize!=='function'||await authorize(base64,expectedSignature)!==true)throw fail('M4_SEND_AUTHORITY_REQUIRED');
    const id=++sequence,{bytes}=await request(rpc,JSON.stringify({jsonrpc:'2.0',id,method:'sendTransaction',params:[base64,{encoding:'base64',skipPreflight:false,preflightCommitment:'finalized',maxRetries:0}]}));
    const response=JSON.parse(bytes);if(response.id!==id||response.jsonrpc!=='2.0'||response.error||response.result!==expectedSignature)throw fail('M4_SUBMISSION_UNCERTAIN');return response.result;
   }}:{}),

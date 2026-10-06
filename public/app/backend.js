@@ -3,6 +3,7 @@ import {createPreviewConnection} from './preview-wallet.js';
 import {walletShortcuts,walletName,injectedWallet} from './wallet-catalog.js';
 import {normalizeTokenDraft} from '../../src/token-draft-schema.js';
 import {assertM4ReviewLifetime} from '../../src/pump-review-lifetime.js';
+import {isActionTimePackage,assertActionTimeHandoff} from '../../src/pump-action-time.js';
 const detachedKey='tekkteam:owner-detached';
 export function ownerAccessDetached(){try{return sessionStorage.getItem(detachedKey)==='1';}catch{return false;}}
 function setOwnerDetached(value){try{if(value)sessionStorage.setItem(detachedKey,'1');else sessionStorage.removeItem(detachedKey);}catch{}}
@@ -17,7 +18,7 @@ export async function request(path, options = {}) {
   const data = await response.json().catch(() => {malformed=true;return {};});
   if (!response.ok) {
     const fallback=[401,403].includes(response.status)?'Access is unavailable for this request.':'The TEKKTEAM API request failed.';
-    throw Object.assign(new Error(typeof data?.error==='string'?data.error:fallback),{submissionState:data?.submissionState==='REJECTED_BEFORE_BROADCAST'?data.submissionState:undefined,httpStatus:response.status,code:typeof data?.code==='string'&&data.code.startsWith('BALANCE_RPC_')?data.code:undefined});
+    throw Object.assign(new Error(typeof data?.error==='string'?data.error:fallback),{submissionState:data?.submissionState==='REJECTED_BEFORE_BROADCAST'?data.submissionState:undefined,httpStatus:response.status,code:typeof data?.code==='string'&&/^(BALANCE_RPC_|M4_|EXECUTION_REVIEW_)/.test(data.code)?data.code:undefined});
   }
   if(malformed)throw Object.assign(Error('The TEKKTEAM API returned an invalid response.'),{httpStatus:response.status,code:'API_RESPONSE_INVALID'});
   if(path==='/state'&&ownerAccessDetached())return {config:data.config,localFixture:data.localFixture,session:null,agents:[],events:[],stats:{}};
@@ -216,7 +217,8 @@ export function m4LaunchWallet(owner){
   binding.assertBound();
   // Same authenticated status read proves the live M4 capability AND exact latch.
   // A disabled/unmounted runtime returns no approvalCapability; never use cache.
-  const current=await request('/launchpad/agents/'+encodeURIComponent(review?.result?.launch?.agentId)+'/execution/status'),capability=current.approvalCapability??{};
+  const actionTime=isActionTimePackage(review?.result),path='/launchpad/agents/'+encodeURIComponent(review?.result?.launch?.agentId)+'/execution/';
+  const current=await (actionTime?post(path+'wallet-claim',{requestId:review.executionId,reviewDigest:review.result.executionReview.digest,transactionBase64:review.result.transactionBase64}):request(path+'status')),capability=current.approvalCapability??{};
   if(capability.mode!=='M4_CONTROLLED_SINGLE_LAUNCH'||capability.controlledOwnerApproval!==true||capability.m4Target?.owner!==owner||review?.status!=='AWAITING_WALLET_APPROVAL'||review.result?.launch?.agentId!==capability.m4Target.agentId||review.result?.launch?.initialBuyLamports!==0||review.result?.executionReview?.ceilingLamports!==10000000||review.walletTransactionBase64!==base64||m4ApprovalRequests.has(review.executionId))throw Error('Single reviewed M4 approval unavailable');
   if(current.status!=='AWAITING_WALLET_APPROVAL'||current.executionId!==review.executionId||current.result?.executionReview?.digest!==review.result.executionReview.digest)throw Error('M4 review changed');
   if(current.result.transactionBase64!==review.result.transactionBase64)throw Error('M4 review changed; no wallet prompt opened');
@@ -229,8 +231,13 @@ export function m4LaunchWallet(owner){
   const reviewedPayloadSha256=await fingerprint(Buffer.from(current.result.transactionBase64,'base64')),presentedPayloadSha256=await fingerprint(partial.serialize({requireAllSignatures:false,verifySignatures:true}));
   const reviewedMessageSha256=await fingerprint(unsigned.serializeMessage()),presentedMessageSha256=await fingerprint(partial.serializeMessage());
   if(reviewedPayloadSha256!==current.result.transactionSha256||reviewedMessageSha256!==presentedMessageSha256||ownerFirst&&reviewedPayloadSha256!==presentedPayloadSha256)throw Error('M4 transaction fingerprint changed');
-  binding.assertBound();if(typeof assertReady!=='function')throw Error('Launch dialog binding required');assertReady();const openedAt=Date.now();let remainingMs;try{remainingMs=assertM4ReviewLifetime(review.result,openedAt,22000);}catch(error){error.walletRequestOpened=false;throw error;}m4ApprovalRequests.add(review.executionId);
-  console.info('M4 wallet transaction request',JSON.stringify({executionId:review.executionId,signingOrder:current.signingOrder,openedAt,reviewStartedAt:review.result.executionReview.startedAt,expiresAt:review.result.executionReview.expiresAt,remainingMs,reviewedPayloadSha256,presentedPayloadSha256,reviewedMessageSha256,presentedMessageSha256}));
+  binding.assertBound();if(typeof assertReady!=='function')throw Error('Launch dialog binding required');assertReady();const openedAt=Date.now();let remainingMs=null,remainingBlocks=null;
+  try{if(isActionTimePackage(current.result))remainingBlocks=assertActionTimeHandoff(current.result,current.walletValidity,openedAt);else remainingMs=assertM4ReviewLifetime(review.result,openedAt,22000);}catch(error){error.walletRequestOpened=false;throw error;}
+  // Recheck after all awaited status/hash work so concurrent bridge calls cannot
+  // both pass the earlier check and open two wallet prompts.
+  if(m4ApprovalRequests.has(review.executionId))throw Error('Single reviewed M4 approval already requested');
+  m4ApprovalRequests.add(review.executionId);
+  console.info('M4 wallet transaction request',JSON.stringify({executionId:review.executionId,signingOrder:current.signingOrder,openedAt,reviewStartedAt:review.result.executionReview.startedAt,expiresAt:review.result.executionReview.expiresAt,remainingMs,remainingBlocks,lastValidBlockHeight:current.result.lastValidBlockHeight,reviewedPayloadSha256,presentedPayloadSha256,reviewedMessageSha256,presentedMessageSha256}));
   try{return await boundTransactionWallet(owner,ownerFirst).signTransaction(base64);}catch(error){error.walletRequestOpened=true;throw error;}
  }};
 }

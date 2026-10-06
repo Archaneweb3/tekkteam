@@ -21,7 +21,7 @@ export async function startWalletTest(args=process.argv.slice(2)){
  let parsed;try{parsed=JSON.parse(readFileSync(args[2],'utf8'));}catch{throw Error('WALLET_TEST_CONFIG_UNREADABLE');}
  const cfg=walletTestConfig(parsed);
  const reader=createMainnetBalanceReader(cfg.rpcUrl);
- const capabilities=cfg.m4Launch?{...m4Capabilities,...(cfg.m4RecoveryExecutionId?{m4RecoveryExecutionId:cfg.m4RecoveryExecutionId}:{})}:cfg.launchPreparation?preparationCapabilities:walletTestCapabilities;
+ const capabilities=cfg.m4Launch?{...m4Capabilities,...(cfg.m4RecoveryExecutionId?{m4RecoveryExecutionId:cfg.m4RecoveryExecutionId}:{}),...(cfg.m4ActionTime?{actionTimePreparation:true}:{})}:cfg.launchPreparation?preparationCapabilities:walletTestCapabilities;
  if(!isAbsolute(cfg.dataDir))throw Error('WALLET_TEST_ABSOLUTE_DATA_REQUIRED');
  const dir=resolve(cfg.dataDir);
  for(let p=dir;;p=dirname(p)){if(lstatSync(p).isSymbolicLink())throw Error('WALLET_TEST_LINK_DENIED');if(dirname(p)===p)break;}
@@ -55,7 +55,7 @@ export async function startWalletTest(args=process.argv.slice(2)){
   const evidence=createPreparationEvidenceWriter(tokenDraftConfiguration.assetRoot);
   const captureDiagnostics=createPreparationDiagnosticWriter(tokenDraftConfiguration.assetRoot);
   preparationOptions={tokenDraftConfiguration,launchPreparation:createPumpLaunchPreparation({transport,publishMetadata:createMetadataPublisher(tokenDraftConfiguration,{request:transport.publicRequest}),readPreparation:evidence.read,executionReview:true,captureDiagnostics}),launchPreparationEvidence:evidence};
-  if(cfg.m4Launch)preparationOptions.m4ExecutionFactory=({db,store})=>createM4Execution({db,transport,publishMetadata:createMetadataPublisher(tokenDraftConfiguration,{request:transport.publicRequest}),journalPath:tokenDraftConfiguration.journalPath,captureDiagnostics,provisionAgent:receipt=>provisionLaunchAgent(store,receipt),recoverExecutionId:cfg.m4RecoveryExecutionId??null});
+  if(cfg.m4Launch)preparationOptions.m4ExecutionFactory=({db,store})=>createM4Execution({db,transport,publishMetadata:createMetadataPublisher(tokenDraftConfiguration,{request:transport.publicRequest}),journalPath:tokenDraftConfiguration.journalPath,captureDiagnostics,provisionAgent:receipt=>provisionLaunchAgent(store,receipt),recoverExecutionId:cfg.m4RecoveryExecutionId??null,actionTimeEnabled:cfg.m4ActionTime===true});
  }
  for(const k of Object.keys(process.env))delete process.env[k];
  Object.assign(process.env,{NODE_ENV:'production',DATA_DIR:dir,SOLANA_NETWORK:'MAINNET',MAINNET_SAFETY_MODE:'true',REAL_MONEY_NETWORK:'MAINNET',FUNDING_ENABLED:'false',WITHDRAWAL_ENABLED:'false',LIVE_TRADING_ENABLED:'false',LIVE_AUTONOMOUS_ENABLED:'false',CONTROLLED_REAL_ENABLED:'false',CONTROLLED_BUY_PREPARE_ENABLED:'false',GLOBAL_TRADING_KILL_SWITCH:'true',AUTONOMOUS_KILL_SWITCH:'true',REAL_MONEY_EMERGENCY_STOP:'true',WALLET_TRANSFERS_PAUSED:'true',PAPER_TRADING_KILL_SWITCH:'true'});

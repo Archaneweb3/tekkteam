@@ -4,6 +4,7 @@ import {agentLaunchData,assertAgentLaunch} from './agent-launch-data.js';
 import {inspectCreation,GENESIS,PUMP,CAP} from './pump-readiness.js';
 import {parseInitialBuy} from './initial-buy.js';
 import {executionReviewBinding} from './pump-execution-binding.js';
+import {isActionTimePackage,assertActionTimePackage} from './pump-action-time.js';
 const sol=n=>Number.isSafeInteger(n)&&n>=0?(n/1e9).toFixed(9)+' SOL':'UNAVAILABLE';
 async function api(path,body){const r=await fetch('/api/'+path,{method:body?'POST':'GET',headers:body?{'Content-Type':'application/json'}:undefined,body:body?JSON.stringify(body):undefined,signal:AbortSignal.timeout(180000)});let data;try{data=await r.json();}catch{throw Error('Preparation service unavailable (HTTP '+r.status+')');}if(!r.ok)throw Object.assign(Error([data.code||data.error||'Preparation unavailable',data.httpStatus?'HTTP '+data.httpStatus:null,data.rpcCode!=null?'RPC '+data.rpcCode:null].filter(Boolean).join(' · ')),{code:data.code??data.error});return data;}
 export async function validatePreparation(data,identity,amount){
@@ -12,12 +13,14 @@ export async function validatePreparation(data,identity,amount){
  const bytes=Buffer.from(data.transactionBase64,'base64'),structure=inspectCreation(bytes,{mint:new PublicKey(data.mint),blockhash:data.recentBlockhash,genesis:data.genesis,chainId:data.network,launch:data.launch,feePolicy:data.feePolicy??null});
  const digest=[...new Uint8Array(await crypto.subtle.digest('SHA-256',bytes))].map(b=>b.toString(16).padStart(2,'0')).join('');
  if(digest!==data.transactionSha256||data.transactionSize!==bytes.length||data.instructionCount!==(amount?3:1)+(data.feePolicy?2:0)||structure.initialBuyLamports!==amount)throw Error('Unsigned preparation changed');
- if(data.expiresAt<=Date.now())throw Object.assign(Error('Preparation expired; refresh for a new review.'),{code:'PREPARATION_EXPIRED'});
+ const actionTime=isActionTimePackage(data);
+ if(actionTime)assertActionTimePackage(data);
+ else if(data.expiresAt<=Date.now())throw Object.assign(Error('Preparation expired; refresh for a new review.'),{code:'PREPARATION_EXPIRED'});
  if(data.policy.absoluteMaximumWalletDebitLamports!==null||!Number.isSafeInteger(data.policy.reviewDebitCeilingLamports)||data.policy.reviewDebitCeilingLamports!==amount+Number(CAP)||typeof data.policy.prestateSameBank!=='boolean')throw Error('Preparation maximum debit evidence invalid');
  if(data.policy.allowed===true&&(data.simulation?.status!=='PASS'||!Number.isSafeInteger(data.policy.estimatedPayerDebitLamports)||data.policy.estimatedPayerDebitLamports<0||!Number.isSafeInteger(data.policy.baseFeeLamports)||data.policy.baseFeeLamports<0))throw Error('Preparation cost evidence invalid');
  if(data.policy.allowed===true&&amount===0&&(!Number.isSafeInteger(data.policy.otherRequiredDebitLamports)||data.policy.otherRequiredDebitLamports<0||data.policy.baseFeeLamports+(data.policy.priorityFeeLamports??0)+data.policy.otherRequiredDebitLamports!==data.policy.estimatedPayerDebitLamports))throw Error('Preparation cost components do not reconcile');
  if(data.policy.allowed===true&&data.policy.estimatedPayerDebitLamports>data.policy.reviewDebitCeilingLamports)throw Error('Preparation estimated debit exceeds review ceiling');
- if(data.executionReview){const r=data.executionReview,binding=new TextEncoder().encode(executionReviewBinding(data)),reviewDigest=[...new Uint8Array(await crypto.subtle.digest('SHA-256',binding))].map(b=>b.toString(16).padStart(2,'0')).join('');if(r.digest!==reviewDigest||r.guaranteeClass!=='EXECUTION_GUARDED'||r.authorizationGranted!==false||r.ceilingLamports!==10000000||r.reviewedMaximumDebitLamports!==10000000||r.minimumReserveLamports!==1000000||r.reviewedDebitLamports>10000000||r.requiredRemainingBalanceLamports<1000000||r.expiresAt<=Date.now()||r.expiresAt!==r.startedAt+30000)throw Error('Execution review invalid or expired');}
+ if(data.executionReview){const r=data.executionReview,binding=new TextEncoder().encode(executionReviewBinding(data)),reviewDigest=[...new Uint8Array(await crypto.subtle.digest('SHA-256',binding))].map(b=>b.toString(16).padStart(2,'0')).join('');if(r.digest!==reviewDigest||r.guaranteeClass!=='EXECUTION_GUARDED'||r.authorizationGranted!==false||r.ceilingLamports!==10000000||r.reviewedMaximumDebitLamports!==10000000||r.minimumReserveLamports!==1000000||r.reviewedDebitLamports>10000000||r.requiredRemainingBalanceLamports<1000000||!actionTime&&(r.expiresAt<=Date.now()||r.expiresAt!==r.startedAt+30000))throw Error('Execution review invalid or expired');}
  return data;
 }
 export function mountPumpPreparation(host,{agent,isCurrent=()=>true,getWallet}){
