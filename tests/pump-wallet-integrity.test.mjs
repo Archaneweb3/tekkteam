@@ -1,0 +1,9 @@
+import test from 'node:test';import assert from 'node:assert/strict';import{Keypair,Transaction,SystemProgram,ComputeBudgetProgram}from'@solana/web3.js';
+import{describeWalletMessage,walletMessageDifferences}from'../src/pump-wallet-integrity.js';
+const sdk={Transaction,Buffer};
+test('signature-only change preserves both raw wire and compiled message; diagnostics contain no signatures',()=>{
+ const owner=Keypair.generate(),mint=Keypair.generate(),tx=new Transaction({feePayer:owner.publicKey,recentBlockhash:Keypair.generate().publicKey.toBase58()}).add(SystemProgram.createAccount({fromPubkey:owner.publicKey,newAccountPubkey:mint.publicKey,lamports:1,space:0,programId:SystemProgram.programId}));
+ const expected=describeWalletMessage(tx.serialize({requireAllSignatures:false}),sdk);tx.partialSign(owner);const returned=describeWalletMessage(tx.serialize({requireAllSignatures:false}),sdk);assert.deepEqual(walletMessageDifferences(expected,returned),[]);assert.equal(returned.ownerSignaturePresent,true);assert.equal(returned.mintSignaturePresent,false);assert.equal(returned.signaturesValid,true);assert.equal(returned.wireMessageBase64,returned.compiledMessageBase64);assert.equal(JSON.stringify(returned).includes(Buffer.from(tx.signature).toString('base64')),false);
+ tx.add(ComputeBudgetProgram.setComputeUnitPrice({microLamports:100}));tx.partialSign(owner);const modified=describeWalletMessage(tx.serialize({requireAllSignatures:false}),sdk);assert.ok(walletMessageDifferences(expected,modified).includes('instructions'));assert.ok(walletMessageDifferences(expected,modified).includes('accounts'));
+ tx.recentBlockhash=Keypair.generate().publicKey.toBase58();tx.partialSign(owner);assert.ok(walletMessageDifferences(returned,describeWalletMessage(tx.serialize({requireAllSignatures:false}),sdk)).includes('blockhash'));
+});

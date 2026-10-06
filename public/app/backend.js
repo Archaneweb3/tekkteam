@@ -4,6 +4,7 @@ import {walletShortcuts,walletName,injectedWallet} from './wallet-catalog.js';
 import {normalizeTokenDraft} from '../../src/token-draft-schema.js';
 import {assertM4ReviewLifetime} from '../../src/pump-review-lifetime.js';
 import {isActionTimePackage,assertActionTimeHandoff} from '../../src/pump-action-time.js';
+import {describeWalletMessage,walletMessageDifferences} from '../../src/pump-wallet-integrity.js';
 const detachedKey='tekkteam:owner-detached';
 export function ownerAccessDetached(){try{return sessionStorage.getItem(detachedKey)==='1';}catch{return false;}}
 function setOwnerDetached(value){try{if(value)sessionStorage.setItem(detachedKey,'1');else sessionStorage.removeItem(detachedKey);}catch{}}
@@ -254,7 +255,7 @@ function boundTransactionWallet(owner,ownerFirst=false){
   };
   assertBound();
   return {assertBound,async signTransaction(base64){
-    assertBound();const {Buffer,Transaction}=window.TekkworkSDK;let signed;
+    assertBound();const {Buffer,Transaction}=window.TekkworkSDK;let signed,providerMessageBase64=null;
     if(selected.standard){
       const feature=selected.standard.features['solana:signTransaction'];
       if(typeof feature?.signTransaction!=='function')throw Error('Transaction-only signing unavailable');
@@ -264,9 +265,10 @@ function boundTransactionWallet(owner,ownerFirst=false){
     }else{
       if(typeof selected.injected.signTransaction!=='function')throw Error('Transaction-only signing unavailable');
       const result=await selected.injected.signTransaction(Transaction.from(Buffer.from(base64,'base64')));
+      if(ownerFirst)providerMessageBase64=Buffer.from(result.serializeMessage()).toString('base64');
       signed=Buffer.from(result.serialize({requireAllSignatures:!ownerFirst,verifySignatures:true})).toString('base64');
     }
-    if(ownerFirst){const actual=Transaction.from(Buffer.from(signed,'base64')),expected=Transaction.from(Buffer.from(base64,'base64')),hash=async bytes=>Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes)),n=>n.toString(16).padStart(2,'0')).join('');console.info('M4 wallet returned fingerprints',JSON.stringify({deliveredMessageSha256:await hash(expected.serializeMessage()),returnedMessageSha256:await hash(actual.serializeMessage()),returnedOwnerPayloadSha256:await hash(Buffer.from(signed,'base64')),allowedWalletMutation:'SIGNATURES_ONLY'}));if(actual.feePayer.toBase58()!==owner||actual.signatures.length!==2||!actual.signature||!actual.verifySignatures(false)||actual.signatures[1].signature!==null||!actual.serializeMessage().equals(expected.serializeMessage()))throw Error('M4 owner approval changed or missing; reviewed instructions and fee must remain unchanged. Nothing broadcast.');}
+    if(ownerFirst){const expectedMessage=describeWalletMessage(Buffer.from(base64,'base64'),{Transaction,Buffer}),returnedMessage=describeWalletMessage(Buffer.from(signed,'base64'),{Transaction,Buffer}),differences=walletMessageDifferences(expectedMessage,returnedMessage);if(differences.length)console.warn('M4 wallet message mismatch',JSON.stringify({provider:selected.name,transport:selected.standard?'wallet-standard':'injected',featureVersion:selected.standard?.features['solana:signTransaction']?.version??null,providerMessageBase64,differences,expected:expectedMessage,returned:returnedMessage}));const actual=Transaction.from(Buffer.from(signed,'base64')),expected=Transaction.from(Buffer.from(base64,'base64')),hash=async bytes=>Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes)),n=>n.toString(16).padStart(2,'0')).join('');console.info('M4 wallet returned fingerprints',JSON.stringify({deliveredMessageSha256:await hash(expected.serializeMessage()),returnedMessageSha256:await hash(actual.serializeMessage()),returnedOwnerPayloadSha256:await hash(Buffer.from(signed,'base64')),allowedWalletMutation:'SIGNATURES_ONLY'}));if(actual.feePayer.toBase58()!==owner||actual.signatures.length!==2||!actual.signature||!actual.verifySignatures(false)||actual.signatures[1].signature!==null||!actual.serializeMessage().equals(expected.serializeMessage()))throw Error('M4 owner approval changed or missing; reviewed instructions and fee must remain unchanged. Nothing broadcast.');}
     assertBound();return signed;
   }};
 }

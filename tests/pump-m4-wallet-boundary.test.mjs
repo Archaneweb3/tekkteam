@@ -5,7 +5,7 @@ import bs58 from 'bs58';
 import {createHash} from 'node:crypto';
 // LOCAL_FIXTURE only: wallet-provider stub, synthetic signatures, no RPC/broadcast.
 let serial=0;
-async function fixture(t,{ownerFirst=false,injected=false,missingOwner=false,liveOrderMismatch=false,badFingerprint=false,actionTime=false,remainingBlocks=100,lostClaim=false}={}){
+async function fixture(t,{ownerFirst=false,injected=false,missingOwner=false,liveOrderMismatch=false,badFingerprint=false,actionTime=false,remainingBlocks=100,lostClaim=false,mutateBlockhash=false}={}){
  const saved={window:globalThis.window,fetch:globalThis.fetch,CustomEvent:globalThis.CustomEvent},originalNow=Date.now;
  t.after(()=>{Object.assign(globalThis,saved);Date.now=originalNow;});
  let clock=100000,calls=0,statusReads=0,onStatus=()=>{},resolveStatus;
@@ -15,7 +15,7 @@ async function fixture(t,{ownerFirst=false,injected=false,missingOwner=false,liv
  const signingOrder=ownerFirst?'OWNER_FIRST_MINT_AFTER_APPROVAL':undefined;
  const result={launch:{owner:address,agentId:'fixture',initialBuyLamports:0},transactionBase64:unsigned,transactionSha256:badFingerprint?'0'.repeat(64):createHash('sha256').update(Buffer.from(unsigned,'base64')).digest('hex'),executionReview:{startedAt:100000,expiresAt:130000,ceilingLamports:10000000,digest:'fixture'}},review={status:'AWAITING_WALLET_APPROVAL',executionId:'fixture',signingOrder,result,walletTransactionBase64:ownerFirst?unsigned:partial};
  if(actionTime){result.recentBlockhash=tx.recentBlockhash;result.lastValidBlockHeight=500;result.expiresAt=null;Object.assign(result.executionReview,{version:2,status:'FINAL_WALLET_PREPARATION',freshness:'SOLANA_BLOCKHASH_V2',preparedAt:100000,expiresAt:null,recentBlockhash:tx.recentBlockhash,lastValidBlockHeight:500});}
- const approve=tx=>{calls++;if(ownerFirst)assert.ok(tx.signatures.every(s=>s.signature===null));if(!missingOwner)tx.partialSign(owner);return tx;};
+ const approve=tx=>{calls++;if(ownerFirst)assert.ok(tx.signatures.every(s=>s.signature===null));if(mutateBlockhash)tx.recentBlockhash=Keypair.generate().publicKey.toBase58();if(!missingOwner)tx.partialSign(owner);return tx;};
  const wallet={name:'Phantom',chains:['solana:mainnet'],accounts:[account],features:{'standard:connect':{connect:async()=>({accounts:[account]})},'standard:events':{on:()=>()=>{}},'solana:signMessage':{signMessage:async()=>[{signature:new Uint8Array(64)}]},'solana:signTransaction':{signTransaction:async input=>[{signedTransaction:Uint8Array.from(approve(Transaction.from(input.transaction)).serialize({requireAllSignatures:!ownerFirst}))}]}}};
  const provider={isPhantom:true,isConnected:false,publicKey:owner.publicKey,connect:async()=>{provider.isConnected=true;},on(){},removeListener(){},signMessage:async()=>({signature:new Uint8Array(64)}),signTransaction:async tx=>approve(tx)};
  globalThis.CustomEvent=class{constructor(type,options){this.type=type;this.detail=options?.detail;}};
@@ -35,3 +35,5 @@ test('reviewed fingerprint mismatch blocks the provider before any wallet popup'
 
 for(const injected of [false,true])test('native blockhash handoff after 30s uses durable claim and exact unsigned bytes '+injected,async t=>{const f=await fixture(t,{ownerFirst:true,injected,actionTime:true});f.setClock(135000);const signed=Transaction.from(Buffer.from(await f.signer.signTransaction(f.partial,f.review,()=>{}),'base64'));assert.ok(signed.signature);assert.equal(signed.signatures[1].signature,null);assert.equal(f.calls(),1);});
 for(const options of [{remainingBlocks:49},{lostClaim:true}])test('native handoff failure never reaches provider '+JSON.stringify(options),async t=>{const f=await fixture(t,{ownerFirst:true,actionTime:true,...options});await assert.rejects(f.signer.signTransaction(f.partial,f.review,()=>{}));assert.equal(f.calls(),0);});
+
+test('wallet-mutated blockhash is diagnosed and never accepted as reviewed signature',async t=>{const savedWarn=console.warn,logs=[];console.warn=(...args)=>logs.push(args);t.after(()=>console.warn=savedWarn);const f=await fixture(t,{ownerFirst:true,injected:true,actionTime:true,mutateBlockhash:true});await assert.rejects(f.signer.signTransaction(f.partial,f.review,()=>{}),/owner approval changed/);assert.equal(f.calls(),1);const evidence=JSON.parse(logs.find(x=>x[0]==='M4 wallet message mismatch')[1]);assert.ok(evidence.differences.includes('blockhash'));assert.equal(evidence.providerMessageBase64,evidence.returned.wireMessageBase64);assert.equal(evidence.returned.ownerSignaturePresent,true);assert.equal(evidence.returned.signaturesValid,true);});
