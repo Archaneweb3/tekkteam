@@ -1,7 +1,9 @@
 # 101 — Preserve uncertain legacy history; require explicit isolation approval
 
 7 October 2026. Quarantine implementation accepted after independent review.
-New-launch isolation policy below is PROPOSED, NOT APPROVED or activated.
+Owner explicitly APPROVED the one-operation isolation policy on 7 October 2026.
+Financial transaction approval remains separate; activation requires the qualified
+durable grant implementation. Historical evidence/quarantine remain unchanged.
 
 ## Evidence and classification
 
@@ -53,10 +55,10 @@ closed. M4's journal gate stays unchanged. No VPS, PM2, Nginx or shared-service 
 
 ## Proposed one-operation isolation policy — OWNER APPROVAL REQUIRED
 
-Approval would permit implementing and qualifying a narrowly scoped exception for
+Approval permits implementing and qualifying a narrowly scoped exception for
 one NEW canonical operation for owner `C2nddai75FJZWWkNdUF7csEBryRCMikJyTTZZqYcMiBv`,
 existing Agent `8fc6fe77-16a0-4fed-8ca0-ddd1f6ef9fa7` (aaaaada), existing ret / 3ED.
-It would not declare the old transaction failed or reassign its token to that Agent.
+It does not declare the old transaction failed or reassign its token to that Agent.
 
 - Preserve immutable evidence and keep the old sender/operation fenced.
 - Pin quarantine/evidence hashes; reject changed or additional uncertain records.
@@ -78,8 +80,9 @@ comparison is unavailable: isolation relies on preserved local fences, distinct
 owner/Agent/draft and newly generated identifiers, with that limitation disclosed.
 Isolation approval is not financial transaction approval.
 
-No exception or activation ships in this checkpoint. The proposal checker always
-returns allowed=false. No fresh wallet request before approval.
+Historical checkpoint59a8de8 shipped no exception. Its proposal checker remains
+allowed=false. New approved authority is a separate immutable SQLite grant/claim
+and confirmed-receipt partition; it never edits the old sidecar or journal.
 
 ## Verification and evidence
 

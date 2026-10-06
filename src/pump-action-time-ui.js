@@ -16,7 +16,7 @@ export function mountM4ActionTimeLaunch(host,{agent,isCurrent,getM4Wallet,capabi
  let pending=false,current=null,estimate=null,uncertain=false;
  host.innerHTML='<div class="tw-launch-head"><h2>Review your launch</h2><p>Solana Mainnet · Initial buy 0 SOL · Review ceiling 0.01 SOL. Confirm manually in your wallet.</p></div><div class="tw-launch-summary" data-summary></div><p role="status" data-status>Checking launch state…</p><p role="alert" data-error></p><div class="tw-launch-actions"><button class="tw-button primary" data-prepare disabled>Review launch costs</button><button class="tw-button primary" data-approve disabled>Continue to Wallet</button><button class="tw-button" data-check>Recheck status</button></div>';
  const q=s=>host.querySelector(s),status=text=>{if(alive())q('[data-status]').textContent=text;},error=text=>{if(alive())q('[data-error]').textContent=text;};
- const canPrepare=()=>!uncertain&&current&&!current.broadcastAttempted&&(!current.signature&&['NOT_STARTED','READY_FOR_REVIEW','USER_REJECTED','TRANSACTION_EXPIRED'].includes(current.status)||['SIGNED','SIGNED_NOT_BROADCAST','OWNER_APPROVED','OWNER_APPROVED_NOT_BROADCAST'].includes(current.status));
+ const canPrepare=()=>!uncertain&&current&&!current.isolation?.attemptConsumed&&!current.broadcastAttempted&&(!current.signature&&['NOT_STARTED','READY_FOR_REVIEW','USER_REJECTED','TRANSACTION_EXPIRED'].includes(current.status)||['SIGNED','SIGNED_NOT_BROADCAST','OWNER_APPROVED','OWNER_APPROVED_NOT_BROADCAST'].includes(current.status));
  const local=()=>{if(!alive())throw Error('Launch dialog or selected Agent changed');getM4Wallet(identity.owner).assertBound();};
  const bound=async()=>{local();const response=await fetch('/api/agents/'+encodeURIComponent(identity.agentId));if(!response.ok)throw Error('Owner session unavailable');assertAgentLaunch(identity,agentLaunchData(await response.json()));local();};
  function render(){
@@ -37,6 +37,7 @@ export function mountM4ActionTimeLaunch(host,{agent,isCurrent,getM4Wallet,capabi
   status(labels[current?.status]??'Checking launch state…');
   if(['SIGNED','OWNER_APPROVED','OWNER_APPROVED_NOT_BROADCAST'].includes(current?.status))status('Signed transaction recorded; broadcast was not claimed. Prepare Again first verifies expiry and absence on Solana.');
   if(current?.status==='SIGNED_NOT_BROADCAST'&&['M4_BLOCKHASH_EXPIRED','EXECUTION_REVIEW_EXPIRED'].includes(current.error))status('TRANSACTION EXPIRED — PREPARE AGAIN');
+  if(current?.isolation?.attemptConsumed&&['USER_REJECTED','TRANSACTION_EXPIRED','SIGNED','SIGNED_NOT_BROADCAST','OWNER_APPROVED_NOT_BROADCAST'].includes(current.status)){status('This one-operation approval has been consumed. No retry is authorized. Recheck the existing transaction only.');q('[data-approve]').textContent='Attempt consumed';}
   if(uncertain)status('Launch state unavailable. Recheck before another action.');
   if(current?.signature)row('TRANSACTION',current.signature);
   if(current?.status==='LAUNCHED'){

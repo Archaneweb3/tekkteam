@@ -1,3 +1,19 @@
+# CURRENT — 7 October 2026, 00:34 WIB: POLICY101 APPROVED; LOCAL QUALIFICATION PASS
+
+Owner explicitly approved permanent legacy quarantine plus exactly one fresh canonical
+launch for the existing aaaaada / ret / 3ED. Financial approval remains manual.
+New immutable SQLite grant/claim and confirmed-receipt partition preserve the raw
+journal/sidecar; merged receipt reads remain available after launch authorization OFF.
+Claim before async work, pinned history/draft checks at delivery and send, no second
+attempt after rejection/expiry/build failure. No Agent wallet before confirmed receipt.
+
+Independent read-only review ACCEPT. Focused policy/UI16 tests PASS; existing
+M4/Lighthouse/action-time suite53 PASS before final small hardening; provisioning,
+reader/composition23 PASS; ordinary build and canonical client build PASS.
+Source status LOCAL ONLY until deployment evidence below. Real trading/funding OFF.
+TEKKTEAM resources only; no CUDA/shared infra interaction. Owner browser session
+restored in Edge and existing target/draft visible. No fresh wallet attempt yet.
+
 # CURRENT â€” 7 October 2026, 00:13 WIB: LEGACY ISOLATION OWNER APPROVAL REQUIRED
 
 Continued c7e92b4 with source checkpoint 59a8de8. Exact legacy operation

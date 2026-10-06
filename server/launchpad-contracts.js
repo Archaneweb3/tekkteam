@@ -6,8 +6,8 @@ import {normalizeTokenDraft} from '../src/token-draft-schema.js';
 import {confirmedReceiptDetails} from '../public/app/launch-receipt-summary.js';
 
 // Pure projections: no reconciliation, state mutation, RPC, custody or execution.
-export function readLaunchEvidence(agent,path=resolve(process.env.DATA_DIR||'server/data','pump-agent-launches.json')){
- try{const data=readReceiptJournal(path);const r=data.receipts[agent.id];
+export function readLaunchEvidence(agent,path=resolve(process.env.DATA_DIR||'server/data','pump-agent-launches.json'),reader){
+ try{const data=reader?reader():readReceiptJournal(path);const r=data.receipts[agent.id];
   if(!r)return {receipt:null,available:true};
   if(r.agentId!==agent.id||r.owner!==agent.creator||r.network!=='solana:101')return {receipt:null,available:false};
   return {receipt:r,available:true};

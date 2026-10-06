@@ -17,8 +17,8 @@ import {resolveAssociatedCoinPaperPolicy} from './associated-coin-paper-policy.j
 
 const fail=message=>{throw Object.assign(Error(message),{status:409});};
 const checkQuote=(q,mint,now)=>{if(q.network!=='solana:101'||q.mint!==mint||![q.priceUsd,q.solUsd,q.liquidityUsd].every(n=>Number.isFinite(n)&&n>0)||!Number.isFinite(q.observedAt)||now-q.observedAt>30000||q.observedAt>now+1000)fail('Invalid or stale Mainnet market data');};
-export function launchReceipt(agent,journal=resolve(process.env.DATA_DIR||'server/data','pump-agent-launches.json')){
- let data;try{data=JSON.parse(readFileSync(journal,'utf8'));}catch(e){if(e.code==='ENOENT')return null;throw e;}
+export function launchReceipt(agent,journal=resolve(process.env.DATA_DIR||'server/data','pump-agent-launches.json'),reader){
+ let data;try{data=reader?reader():JSON.parse(readFileSync(journal,'utf8'));}catch(e){if(e.code==='ENOENT')return null;throw e;}
  const r=data.version===2?data.receipts?.[agent.id]:null;
  if(!r||r.agentId!==agent.id||r.owner!==agent.creator||r.network!=='solana:101'||!r.confirmed||r.status!=='Success'||!r.signature||!r.mint)return null;
  new PublicKey(r.mint);return r;

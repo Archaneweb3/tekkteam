@@ -6,12 +6,12 @@ import {Keypair,Transaction,TransactionInstruction,SystemProgram} from '@solana/
 import {agentLaunchData,assertAgentLaunch} from '../src/agent-launch-data.js';
 import {FINAL_MESSAGE_POLICY,validateFinalWalletMessage} from '../src/pump-wallet-final.js';
 // LOCAL_FIXTURE UI lifecycle; synthetic owner, no RPC and no real wallet.
-async function fixture({failedStatus=false,reject=false,initial='NOT_STARTED',closeDuringPrepare=false}={}){
+async function fixture({failedStatus=false,reject=false,initial='NOT_STARTED',closeDuringPrepare=false,consumed=false}={}){
  const owner=Keypair.generate(),mint=Keypair.generate(),agent={id:'fixture',name:'Agent',creator:owner.publicKey.toBase58(),coin:{name:'Coin',ticker:'FIX'}};
  const tx=new Transaction({feePayer:owner.publicKey,recentBlockhash:Keypair.generate().publicKey.toBase58()}).add(new TransactionInstruction({programId:SystemProgram.programId,keys:[{pubkey:owner.publicKey,isSigner:true,isWritable:true},{pubkey:mint.publicKey,isSigner:true,isWritable:true}],data:Buffer.alloc(0)}));
  const bytes=tx.serialize({requireAllSignatures:false}).toString('base64'),result={transactionBase64:bytes,mint:mint.publicKey.toBase58(),metadataUri:'https://fixture.invalid',createdAt:'fixture',simulation:{status:'PASS'},executionReview:{version:2,digest:'fixture',reviewedDebitLamports:5500000,networkFeeLamports:20000,otherRequiredDebitLamports:5480000,ceilingLamports:10000000}};
  const node=()=>({textContent:'',disabled:false,style:{},children:[],append(...c){this.children.push(...c);},replaceChildren(){this.children=[];}}),nodes=new Map(),host={isConnected:true,innerHTML:'',querySelector:s=>{if(!nodes.has(s))nodes.set(s,node());return nodes.get(s);}};
- let state={status:initial,...(initial==='NOT_STARTED'?{}:{executionId:'existing',result})},signs=0,failStatus=failedStatus;const requests=[];
+ let state={status:initial,...(consumed?{isolation:{attemptConsumed:true}}:{}),...(initial==='NOT_STARTED'?{}:{executionId:'existing',result})},signs=0,failStatus=failedStatus;const requests=[];
  const context={Buffer,Transaction,FINAL_MESSAGE_POLICY,validateFinalWalletMessage,agentLaunchData,assertAgentLaunch,AbortSignal,crypto,Date,document:{createElement:node},validatePreparation:async()=>{},assertActionTimeHandoff(){},setTimeout(){throw Error('Unexpected polling');},fetch:async(url,opts={})=>{
   const action=url.split('/').at(-1);requests.push({action,method:opts.method??'GET'});if(url==='/api/agents/fixture')return {ok:true,json:async()=>agent};
   if(action==='wallet-status'){if(failStatus)throw Error('offline');return {ok:true,json:async()=>state};}
@@ -30,3 +30,5 @@ test('cost review does not open wallet; explicit double Continue prepares and si
 test('wallet rejection has no submit or automatic second prepare',async()=>{const f=await fixture({reject:true});await f.q('approve').onclick();assert.equal(f.signs(),1);assert.equal(f.requests.filter(r=>r.action==='reject').length,1);assert.equal(f.requests.filter(r=>r.action==='submit').length,0);assert.equal(f.requests.filter(r=>r.action==='wallet-prepare').length,1);});
 test('reload in claimed awaiting state never reopens wallet',async()=>{const f=await fixture({initial:'AWAITING_WALLET_APPROVAL'});assert.equal(f.q('approve').disabled,true);await f.q('approve').onclick();assert.equal(f.signs(),0);assert.equal(f.requests.filter(r=>r.method==='POST').length,0);});
 test('closed dialog after final preparation prevents wallet handoff',async()=>{const f=await fixture({closeDuringPrepare:true});await f.q('approve').onclick();assert.equal(f.signs(),0);assert.equal(f.requests.filter(r=>r.action==='submit').length,0);});
+
+test('consumed isolation grant disables new cost review and wallet retry after reload',async()=>{const f=await fixture({initial:'TRANSACTION_EXPIRED',consumed:true});assert.equal(f.q('approve').disabled,true);assert.equal(f.q('prepare').disabled,true);assert.equal(f.q('approve').textContent,'Attempt consumed');await f.q('approve').onclick();assert.equal(f.signs(),0);assert.equal(f.requests.filter(r=>r.method==='POST').length,0);});

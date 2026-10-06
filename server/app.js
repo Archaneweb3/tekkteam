@@ -38,7 +38,7 @@ const text = (v, min, max, label) => {
   return v.trim();
 };
 const address = v => { try { if (typeof v !== 'string' || !PublicKey.isOnCurve(new PublicKey(v).toBytes())) throw 0; return v; } catch { fail(400, 'Invalid wallet address'); } };
-export function createServer({ dbPath, vaultKey, origins = ['http://127.0.0.1:5188'], network = 'local', rpc, mainnetSafetyMode = false, production = false, chain: injectedChain, now = Date.now, deletionGuard=reserveDraftDeletion, tradingOptions={}, realMoneyNetwork, tokenDraftOptions, tokenDraftConfiguration, pumpRuntimeDependencies, localOwnerAuthHarness=false, ownerBalanceReader, launchPreparation, launchPreparationEvidence,m4ExecutionFactory } = {}) {
+export function createServer({ dbPath, vaultKey, origins = ['http://127.0.0.1:5188'], network = 'local', rpc, mainnetSafetyMode = false, production = false, chain: injectedChain, now = Date.now, deletionGuard=reserveDraftDeletion, tradingOptions={}, realMoneyNetwork, tokenDraftOptions, tokenDraftConfiguration, pumpRuntimeDependencies, localOwnerAuthHarness=false, ownerBalanceReader, launchPreparation, launchPreparationEvidence,m4ExecutionFactory,launchReceiptAuthorityFactory } = {}) {
   if(localOwnerAuthHarness){
     const base=resolve(tmpdir())+'/',file=resolve(dbPath??'').replaceAll('\\','/'),parent=file.slice(0,file.lastIndexOf('/'));
     if(production||network!=='mainnet'||!mainnetSafetyMode||injectedChain||!parent.startsWith(base.replaceAll('\\','/'))||!/^tekkteam-owner-auth-[a-zA-Z0-9]+$/.test(parent.slice(parent.lastIndexOf('/')+1))||!origins.length||origins.some(o=>!/^http:\/\/127\.0\.0\.1:\d+$/.test(o)))throw Error('Owner auth harness requires isolated disposable loopback Mainnet-safety store');
@@ -103,6 +103,8 @@ export function createServer({ dbPath, vaultKey, origins = ['http://127.0.0.1:51
     const row = db.prepare('SELECT * FROM agents WHERE (id=? OR CAST(no AS TEXT)=?) AND owner=?').get(req.params.id, req.params.id, req.session.address);
     if (!row) fail(404, 'Agent not found'); return { row, agent: rowAgent(row) };
   };
+  let receiptAuthority;try{receiptAuthority=launchReceiptAuthorityFactory?.({db,store});}catch(error){store.close();throw error;}
+  const receiptReader=receiptAuthority?.read;
   let scopeLedger;try{scopeLedger=installLaunchpadScopeLedger(db,{now});}catch(error){store.close();throw error;}
   let tokenStore=null,tokenImages=null;
   if(tokenDraftOptions!==undefined){
@@ -110,13 +112,13 @@ export function createServer({ dbPath, vaultKey, origins = ['http://127.0.0.1:51
       if(typeof tokenDraftOptions.journalPath!=='string'||!tokenDraftOptions.journalPath)throw Error('Explicit initialized token receipt journal path required');
       tokenImages=tokenDraftOptions.imageAuthority??createTokenImageAuthority({root:tokenDraftOptions.assetRoot,origin:tokenDraftOptions.publicOrigin});
       if(typeof tokenImages.stage!=='function'||typeof tokenImages.verify!=='function')throw Error('Token image authority unavailable');
-      tokenStore=installFirstTokenStore(db,{now,readLaunchpadScope:scopeLedger.readLaunchpadScope,readReceiptAuthority:a=>readFirstTokenReceiptAuthority(a,tokenDraftOptions.journalPath)});
+      tokenStore=installFirstTokenStore(db,{now,readLaunchpadScope:scopeLedger.readLaunchpadScope,readReceiptAuthority:a=>readFirstTokenReceiptAuthority(a,tokenDraftOptions.journalPath,receiptReader)});
     }catch(error){store.close();throw error;}
   }
-  try{m4Execution=m4ExecutionFactory?.({db,store});}catch(error){store.close();throw error;}
-  const launchEvidence=a=>readLaunchEvidence(a,tokenDraftOptions?.journalPath);
-  const trading=installAgentTrading(app,{store,auth,owned,now,realMoney,...(tokenDraftOptions?{receipt:a=>launchReceipt(a,tokenDraftOptions.journalPath)}:{}),sessionValid:req=>getSession(req)?.address===req.session?.address,...tradingOptions,readLaunchpadScope:scopeLedger.readLaunchpadScope});
-  const controlledDex=installControlledDex(app,{db,store,auth,owned,now,realMoney,pumpRuntimeDependencies,productionOrigin:production&&network==='mainnet'&&origins.length===1&&origins[0]==='https://tekkteam.tech'?origins[0]:null,sessionValid:req=>getSession(req)?.address===req.session?.address,readLaunchpadScope:scopeLedger.readLaunchpadScope,readReceiptAuthority:a=>readFirstTokenReceiptAuthority(a,tokenDraftOptions?.journalPath??resolve(process.env.DATA_DIR||'server/data','pump-agent-launches.json'))});
+  try{m4Execution=m4ExecutionFactory?.({db,store,receiptAuthority});}catch(error){store.close();throw error;}
+  const launchEvidence=a=>readLaunchEvidence(a,tokenDraftOptions?.journalPath,receiptReader);
+  const trading=installAgentTrading(app,{store,auth,owned,now,realMoney,...(tokenDraftOptions?{receipt:a=>launchReceipt(a,tokenDraftOptions.journalPath,receiptReader)}:{}),sessionValid:req=>getSession(req)?.address===req.session?.address,...tradingOptions,readLaunchpadScope:scopeLedger.readLaunchpadScope});
+  const controlledDex=installControlledDex(app,{db,store,auth,owned,now,realMoney,pumpRuntimeDependencies,productionOrigin:production&&network==='mainnet'&&origins.length===1&&origins[0]==='https://tekkteam.tech'?origins[0]:null,sessionValid:req=>getSession(req)?.address===req.session?.address,readLaunchpadScope:scopeLedger.readLaunchpadScope,readReceiptAuthority:a=>readFirstTokenReceiptAuthority(a,tokenDraftOptions?.journalPath??resolve(process.env.DATA_DIR||'server/data','pump-agent-launches.json'),receiptReader)});
   installRealLeaderboard(app,{db,auth,owned,now});
   if(controlledDex.autonomousScheduler)trading.tick.setAutonomousTick(()=>controlledDex.autonomousScheduler.tick());
   const event = (a, type, message) => db.prepare('INSERT INTO events (agent_id,owner,type,message,created_at) VALUES (?,?,?,?,?)').run(a.id, a.creator, type, message, now());
@@ -175,7 +177,7 @@ export function createServer({ dbPath, vaultKey, origins = ['http://127.0.0.1:51
     let imageVerified=false;
     if(initialBinding?.available===true&&initialBinding.bound===true&&typeof verifiedImage==='string')try{const image=await tokenImages.verify(initial.id,verifiedImage);imageVerified=image?.image===verifiedImage&&image.localAsset==='VERIFIED'&&image.publicDelivery==='UNVERIFIED';}catch{}
     if(getSession(req)?.address!==owner)fail(401,'Owner session changed; token capability unavailable');
-    const {agent:a,row}=owned(req),scope=scopeLedger.readLaunchpadScope(a),binding=tokenStore?.readTokenBinding(a.id,owner),receiptAuthority=tokenStore?readFirstTokenReceiptAuthority(a,tokenDraftOptions.journalPath):null;
+    const {agent:a,row}=owned(req),scope=scopeLedger.readLaunchpadScope(a),binding=tokenStore?.readTokenBinding(a.id,owner),receiptAuthority=tokenStore?readFirstTokenReceiptAuthority(a,tokenDraftOptions.journalPath,receiptReader):null;
     const original=db.prepare('SELECT owner,source FROM launchpad_agent_scopes WHERE agent_id=?').get(a.id);
     imageVerified=imageVerified&&binding?.token?.image===verifiedImage;
     const tokenDraft=ownerTokenDraftContract(a,{configured:!!tokenStore,binding,scope,originalScope:original?.owner===owner&&original.source==='LAUNCHPAD_IDENTITY',tokenless:row.secret===null&&a.coin===null&&a.launch==null&&a.tokenDraftRevision==null,receiptAuthority,imageVerified});
@@ -240,7 +242,7 @@ export function createServer({ dbPath, vaultKey, origins = ['http://127.0.0.1:51
     const initialBinding=tokenStore.readTokenBinding(a.id,owner);
     if(!initialBinding.available)fail(409,'First-token authority unavailable');
     if(!initialBinding.bound){
-      const evidence=readFirstTokenReceiptAuthority(a,tokenDraftOptions.journalPath);
+      const evidence=readFirstTokenReceiptAuthority(a,tokenDraftOptions.journalPath,receiptReader);
       if(a.coin!==null||a.launch!=null||!evidence.available||!evidence.initialized||evidence.receipt!==null)fail(409,'Initialized absence of prior token and launch is required');
     }
     let input,draft;
@@ -286,7 +288,7 @@ export function createServer({ dbPath, vaultKey, origins = ['http://127.0.0.1:51
     if(!body||Array.isArray(body)||Object.keys(body).some(k=>!['initialBuy','requestId'].includes(k))||typeof body.initialBuy!=='string'||body.initialBuy.length>30||typeof body.requestId!=='string'||! /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/.test(body.requestId))fail(400,'Explicit initial buy and preparation request ID required');
     const snapshot=()=>{
       if(getSession(req)?.address!==owner)fail(401,'Owner session changed; preparation stopped');
-      const {row,agent:a}=owned(req),scope=db.prepare('SELECT owner,source FROM launchpad_agent_scopes WHERE agent_id=?').get(a.id),scopeAuthority=scopeLedger.readLaunchpadScope(a),binding=tokenStore.readTokenBinding(a.id,owner),receipt=readFirstTokenReceiptAuthority(a,tokenDraftOptions.journalPath);
+      const {row,agent:a}=owned(req),scope=db.prepare('SELECT owner,source FROM launchpad_agent_scopes WHERE agent_id=?').get(a.id),scopeAuthority=scopeLedger.readLaunchpadScope(a),binding=tokenStore.readTokenBinding(a.id,owner),receipt=readFirstTokenReceiptAuthority(a,tokenDraftOptions.journalPath,receiptReader);
       if(req.params.id!==a.id||a.creator!==owner||row.secret!==null||scope?.owner!==owner||scope.source!=='LAUNCHPAD_IDENTITY'||scopeAuthority?.available!==true||scopeAuthority.scoped!==true||scopeAuthority.reason!==null||binding?.available!==true||binding.bound!==true||binding.revision!==1||a.tokenDraftRevision!==1||a.coin?.mint!==null||a.launch!=null||!receipt.available||!receipt.initialized||receipt.receipt!==null)fail(409,'Original immutable Agent token and initialized receipt absence required');
       return agentLaunchData({...a,tokenDraftAuthority:{available:true,revision:1}});
     };

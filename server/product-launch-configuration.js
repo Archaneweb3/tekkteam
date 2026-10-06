@@ -16,6 +16,7 @@ export function productLaunchConfiguration(env=process.env){
   let target;try{target=JSON.parse(env.REVIEWED_LAUNCH_M4_TARGET);}catch{throw Error('M4_EXACT_TARGET_CONFIG_REQUIRED');}
   if(!target||Object.keys(target).length!==Object.keys(M4_TARGET).length||Object.keys(M4_TARGET).some(k=>target[k]!==M4_TARGET[k]))throw Error('M4_EXACT_TARGET_CONFIG_REQUIRED');
   authorization={target,actionTime:true,lighthouse:true};
+  if(env.REVIEWED_LAUNCH_POLICY101_FILE!==undefined){if(!/^[a-f0-9]{64}$/.test(env.REVIEWED_LAUNCH_POLICY101_SHA256??''))throw Error('POLICY101_APPROVAL_HASH_REQUIRED');authorization.isolation={path:env.REVIEWED_LAUNCH_POLICY101_FILE,sha256:env.REVIEWED_LAUNCH_POLICY101_SHA256};}
  }
  return {origin:origins[0],authorization};
 }

@@ -20,11 +20,11 @@ const canonical=input=>{
 };
 const normalize=s=>String(s??'').replace(/\s+/g,' ').trim();
 // Explicit-path read only: ENOENT is unavailable, never initialized empty authority.
-export function readFirstTokenReceiptAuthority(agent,path){
+export function readFirstTokenReceiptAuthority(agent,path,reader){
  const unavailable={available:false,initialized:false,agentId:agent?.id??null,owner:agent?.creator??null,receipt:null};
  try{
   if(typeof path!=='string'||!path||typeof agent?.id!=='string'||typeof agent?.creator!=='string')return unavailable;
-  const bytes=readFileSync(path,'utf8'),journal=JSON.parse(bytes);
+  const bytes=reader?JSON.stringify(reader()):readFileSync(path,'utf8'),journal=JSON.parse(bytes);
   // The current writer emits compact JSON.stringify bytes. Alternate/duplicate-key bytes lack this authority.
   if(JSON.stringify(journal)!==bytes.trim())return unavailable;
   if(journal?.version!==2||!journal.receipts||typeof journal.receipts!=='object'||Array.isArray(journal.receipts))return unavailable;
