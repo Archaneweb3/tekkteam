@@ -1,4 +1,34 @@
-# CURRENT — 7 October 2026, 00:34 WIB: POLICY101 APPROVED; LOCAL QUALIFICATION PASS
+# CURRENT — 7 October 2026, 00:35 WIB: PHANTOM ACTION-TIME CONFIRMATION REQUIRED
+
+Policy101 source823e9d9 deployed00:32:14 WIB. Local100/100 targeted regressions,
+Ubuntu16/16 focused tests, canonical build PASS. Independent source/deployment
+review ACCEPT. Only tekkteam-api restarted (PID67891); legacy sender PID0.
+Journal/quarantine hashes unchanged; no CUDA/shared infra changes.
+
+Exactly one claim consumed: 38c731bc-2b8d-4e95-961c-8ac2eefd08f0.
+Fresh wallet preparation created 2026-10-06T17:34:44.689Z; Phantom handoff00:34:48.781 WIB.
+Reviewed debit 5562578 lamports; fee15218, other5547360;
+initialbuy0, ceiling10000000. Mainnet simulation PASS; guards PASS.
+Native blockhash expiry: lastValidBlockHeight 432007905;137 blocks
+remaining at handoff, no invented wall-clock deadline. No retry authorized.
+Payload 7e1e0180d87cf79bb592462d8d5e94f4e6832f2829cf6cc5d51827a60d638028
+Message c2c5b046e3635c7d0247e0032f9d5a6b9b01514989125d85f7447c3023e49b8d
+Browser handoff hashes equal backend reviewed payload/message; owner-first signing
+and Lighthouse final-message policy active. Actual final returned wallet message
+must still pass independent server validation and final simulation before broadcast.
+
+At evidence capture: ownerSigned=True, broadcast=False,signature=2rYv4ZuhsF3feaks1BoQGsM9MyNaB46fzbuMCuFWNfZWpC8vSfv3HcqHNXr88ExMcC7qXnKVFDEu1G2z7zEFWsn5,
+receipt0, targetAgent1, targetwallet0; Real trading OFF.
+Metadata/image GET200 (image HEAD403; GET PNG80197bytes). Desktop and390px dialog
+usable; viewport restored. Existing owner session preserved. The extension popup
+is inaccessible to browser tooling; clean Phantom screen is NOT independently
+verified. Request pending at website wallet handoff. Human must inspect and approve
+only the clean fresh transaction; never bypass warning or use expired approval.
+
+Evidence: artifacts/legacy-reconciliation/policy101-fresh-evidence.json,
+policy101-wallet-handoff.png and /var/lib/tekkteam-mainnet/policy101-823e9d9/.
+
+# Previous — 7 October 2026, 00:34 WIB: POLICY101 APPROVED; LOCAL QUALIFICATION PASS
 
 Owner explicitly approved permanent legacy quarantine plus exactly one fresh canonical
 launch for the existing aaaaada / ret / 3ED. Financial approval remains manual.

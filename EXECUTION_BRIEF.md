@@ -17,3 +17,10 @@ financial execution. No warning bypass. No second attempt. Real trading/funding 
 No Agent wallet before authoritative confirmed receipt. No CUDA/shared infra access.
 
 Current implementation/tests are LOCAL_FIXTURE until explicitly marked deployed.
+
+Checkpoint00:35 WIB: source823e9d9 deployed and verified; exactly ONE fresh
+operation38c731bc-2b8d-4e95-961c-8ac2eefd08f0 reached wallet handoff. Simulation/guards
+PASS; reviewed0.005562578SOL. ownerSignedfalse/broadcastfalse/receipt0/targetwallet0.
+STOP at PHANTOM ACTION-TIME CONFIRMATION REQUIRED. Native lastValidHeight432007905;
+137blocks at popup request. No second attempt or stale approval. Extension screen
+not readable via tool; human clean-screen inspection/manual financial approval needed.
