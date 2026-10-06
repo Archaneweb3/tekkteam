@@ -55,8 +55,10 @@ Evidence locations (tool-observed, not fixtures):
 - VPS cutover log: `/var/log/tekkteam-canonical-d2516bc-r3.log`.
 - VPS backup: `/var/backups/tekkteam/canonical-d2516bc-r3`.
 - VPS preparation evidence: `/var/lib/tekkteam-mainnet/pump-metadata-site/preparation-evidence/0b59a8faa79139d709b016e158b9f052812ccb228520e95d2187eadb27fbb10a.json`.
-- Local screenshots: `artifacts/m4-deterministic-attempt/canonical-home-1440.jpg`,
+- Local screenshots: `artifacts/m4-deterministic-attempt/canonical-agent-desktop.jpg`,
   `canonical-wallet-390.jpg`, and `canonical-unsigned-review.jpg` in that directory.
+- The older file named `canonical-home-1440.jpg` actually contains a mobile-width
+  capture; its filename must not be treated as evidence of a 1440px screenshot.
 - The later Agent mobile screenshot was stale relative to the live DOM; do not
   use it as proof of the loaded Overview. DOM geometry showed no page overflow.
   Temporary viewport overrides were cleared and the normal browser view restored.

@@ -18,5 +18,3 @@ no empty replacement journal or invented resolution. Need authoritative historic
 evidence or a separately reviewed, explicitly approved isolation policy.
 Unsigned result/metadata/image/persisted evidence verified. No transaction approval, broadcast,
 funding or trading. Do not claim Phantom action-time ready or product complete.
-
-
