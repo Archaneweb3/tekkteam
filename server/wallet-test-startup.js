@@ -7,14 +7,8 @@ import {readFileSync,writeFileSync,readdirSync,realpathSync,lstatSync} from 'nod
 import {isAbsolute,resolve,join,dirname} from 'node:path';
 import {randomBytes} from 'node:crypto';
 import {walletTestConfig,walletTestRequest,walletTestCapabilities,preparationCapabilities,m4Capabilities} from './wallet-test-policy.js';
-import {createM4Execution} from './pump-m4.js';
-import {provisionLaunchAgent} from './launch-agent-provisioning.js';
+import {createReviewedLaunchServices} from './reviewed-launch-services.js';
 import {readReceiptJournal} from './launch-receipt-journal.js';
-import {createMetadataPublisher} from './agent-metadata.js';
-import {createPumpLaunchPreparation} from './pump-launch-preparation.js';
-import {preparationAssetReader} from './preparation-assets.js';
-import {createPreparationEvidenceWriter} from './preparation-evidence.js';
-import {createPreparationDiagnosticWriter} from './pump-preparation-diagnostics.js';
 
 export async function startWalletTest(args=process.argv.slice(2)){
  if(args[0]!=='--wallet-test'||args[1]!=='--config'||!args[2]||args.length>4||(args[3]&&args[3]!=='--initialize'))throw Error('WALLET_TEST_EXPLICIT_CONFIG_REQUIRED');
@@ -51,11 +45,8 @@ export async function startWalletTest(args=process.argv.slice(2)){
   readReceiptJournal(join(dir,'pump-agent-launches.json'));
   const tokenDraftConfiguration={dataDir:dir,assetRoot:join(dir,'pump-metadata-site'),journalPath:join(dir,'pump-agent-launches.json'),publicOrigin:cfg.origin,publisherOrigin:cfg.origin};
   const transport=createLaunchPreparationTransport({rpcUrl:cfg.rpcUrl,origin:cfg.origin,m4Target:cfg.m4Launch??null});
-  readAsset=preparationAssetReader(tokenDraftConfiguration.assetRoot);
-  const evidence=createPreparationEvidenceWriter(tokenDraftConfiguration.assetRoot);
-  const captureDiagnostics=createPreparationDiagnosticWriter(tokenDraftConfiguration.assetRoot);
-  preparationOptions={tokenDraftConfiguration,launchPreparation:createPumpLaunchPreparation({transport,publishMetadata:createMetadataPublisher(tokenDraftConfiguration,{request:transport.publicRequest}),readPreparation:evidence.read,executionReview:true,captureDiagnostics}),launchPreparationEvidence:evidence};
-  if(cfg.m4Launch)preparationOptions.m4ExecutionFactory=({db,store})=>createM4Execution({db,transport,publishMetadata:createMetadataPublisher(tokenDraftConfiguration,{request:transport.publicRequest}),journalPath:tokenDraftConfiguration.journalPath,captureDiagnostics,provisionAgent:receipt=>provisionLaunchAgent(store,receipt),recoverExecutionId:cfg.m4RecoveryExecutionId??null,actionTimeEnabled:cfg.m4ActionTime===true,lighthouseEnabled:cfg.m4Lighthouse===true,signerStore:store});
+  const services=createReviewedLaunchServices({tokenDraftConfiguration,transport,authorization:cfg.m4Launch?{target:cfg.m4Launch,recoverExecutionId:cfg.m4RecoveryExecutionId,actionTime:cfg.m4ActionTime,lighthouse:cfg.m4Lighthouse}:null});
+  readAsset=services.readPublicAsset;preparationOptions=services.serverOptions;
  }
  for(const k of Object.keys(process.env))delete process.env[k];
  Object.assign(process.env,{NODE_ENV:'production',DATA_DIR:dir,SOLANA_NETWORK:'MAINNET',MAINNET_SAFETY_MODE:'true',REAL_MONEY_NETWORK:'MAINNET',FUNDING_ENABLED:'false',WITHDRAWAL_ENABLED:'false',LIVE_TRADING_ENABLED:'false',LIVE_AUTONOMOUS_ENABLED:'false',CONTROLLED_REAL_ENABLED:'false',CONTROLLED_BUY_PREPARE_ENABLED:'false',GLOBAL_TRADING_KILL_SWITCH:'true',AUTONOMOUS_KILL_SWITCH:'true',REAL_MONEY_EMERGENCY_STOP:'true',WALLET_TRANSFERS_PAUSED:'true',PAPER_TRADING_KILL_SWITCH:'true'});

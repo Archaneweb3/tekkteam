@@ -5,7 +5,7 @@ export async function openPumpLaunchDialog(page,{agent,isCurrent=()=>true,onClos
  page.append(dialog);dialog.querySelector('[data-launch-close]').onclick=()=>dialog.close();
  dialog.onclose=()=>{dialog.remove();if(isCurrent())onClose();};dialog.showModal();
  const current=()=>isCurrent()&&dialog.open&&dialog.isConnected;
- try{const preparationOnly=globalThis.window?.TekkworkWalletTestOnly===true;await mount(dialog.querySelector('#tw-mainnet-launch'),{agent,isCurrent:current,preparationOnly,getWallet:preparationOnly?preparationWallet:launchWallet,getM4Wallet:m4LaunchWallet});}
+ try{const preparationOnly=globalThis.window?.TekkworkWalletTestOnly===true;await mount(dialog.querySelector('#tw-mainnet-launch'),{agent,isCurrent:current,preparationOnly,getWallet:preparationOnly?preparationWallet:launchWallet,getPreparationWallet:preparationWallet,getM4Wallet:m4LaunchWallet});}
  catch{if(current())dialog.querySelector('#tw-mainnet-launch').textContent='Launch status unavailable. No transaction was created.';}
  return dialog;
 }

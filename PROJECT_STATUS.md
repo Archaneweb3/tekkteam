@@ -1,4 +1,48 @@
-# CURRENT — 6 October 2026, 22:05 WIB checkpoint
+# CURRENT — 6 October 2026, 22:05 WIB: browser terminal blocked after recovery
+
+Resume same active milestone; no broad audit or Lighthouse reimplementation.
+HEAD bde8e2a contains accepted Agent tab/wallet UI. Staging deployed checkpoint is
+60d54d1 (Lighthouse), not bde8e2a or subsequent composition changes. HTTPS/source
+hash verification is recorded in artifacts/m4-deterministic-attempt/lighthouse-deploy-60d54d1.txt.
+No new Phantom launch request, signature, broadcast, receipt or wallet provisioning.
+Production remains unchanged. Real trading remains OFF.
+
+Required Hostinger terminal was recovered repeatedly from authenticated Overview.
+Latest session reported `Lost connection to the server`. The replacement console
+then timed out while obtaining its UI and reset cua_repl. Earlier fresh-console
+control also returned `Timed out after 3000ms waiting for CDP command
+Emulation.setFocusEmulationEnabled`; screenshot timed out. Fresh canonical page and
+Hostinger Overview were verified, but the required terminal cannot currently be
+reliably controlled/read. This is the user's BROWSER TOOL HARD-BLOCKED stop condition;
+no VPS reboot or blind production command is justified. The last issued RPC command
+was read-only and returned no result before terminal loss; its outcome is UNVERIFIED.
+
+Additional local product composition is implemented, default OFF, not deployed:
+shared reviewed services reuse original M4 modules/canonical db+store; explicit
+product configuration requires every effect lock and canonical origin; reviewed
+profile has no workers and rejects funding/withdrawal/trading/legacy launch writes.
+Frontend uses server M3/M4 capability and fails closed instead of fallback signing.
+5/5 composition+dialog tests PASS; wallet-test runtime3/3 PASS on isolated rerun
+(initial combined run had one blank child-startup rejection); build13.30s PASS.
+
+Canonical read-only facts: production DATA_DIR /var/lib/tekkteam-mainnet has two
+legacy Agents and one wallet, no target Agent, no pump-agent-launches.json or public
+metadata directory. Both production/staging SQLite quick_check=ok. Nginx metadata
+points /var/lib/tekkteam-migrated/pump-metadata-site/public; that directory's validated
+journal has three Deleted entries and one Failed entry with signature for legacy
+Agent0f406135-35ea-437d-a27c-29052d279c3b. On-chain reconciliation of that Failed entry
+was interrupted and is NOT proved. Preserve it; do not replace journal with empty
+staging history. No database merge, identity import, vault/key transfer or production
+activation has occurred. Target aaaaada/ret3ED remains in staging with zero Agent wallets.
+
+Next: restore reliable terminal once, continue exact canonical storage reconciliation,
+review/qualify controlled product composition, then canonical launch path. Singleton
+M4 journal-wide historical guard must not be removed to hide migration conflicts.
+Five profiles/Real executor/hosted worker/global closed-production leaderboard remain
+unfinished; source seams already inspected by read-only reviewer, no repeat broad scan.
+Agent UX visual fixtures pass1440x900/360x800/390x844/412x915; these are not Phantom
+mobile WebView verification. Last actual on-chain attempt remains historical a50e30db.
+# CURRENT — 6 October 2026, 21:58 WIB checkpoint
 
 Lighthouse checkpoint60d54d1 deployed and source hashes verified in isolated staging.
 VPS55/55 affected tests and build12.16s PASS. HTTPS API4395 and runtime capabilities
@@ -1762,3 +1806,8 @@ broadcast, funding, withdrawal, publication and deployOFF. No new signing reques
 transaction or SOL spend. Remaining integration is Reown discovery/state bridge after its existing module/
 configuration is identified; MetaMask relay fallback needs reviewed browser-safe
 RPC/SDK configuration if native Solana registration is absent. No unrelated milestone started.
+
+Independent final composition review: ACCEPT, no remaining P1/P2. Product GET/HEAD
+status reads can reconcile and persist existing operations; they are not strictly
+side-effect-free. No signing/send path was found there. Existing Nginx/4193 legacy
+launch routing is outside the4190 request gate and MUST be qualified before activation.

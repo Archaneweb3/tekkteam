@@ -1,3 +1,9 @@
+Checkpoint22:05 WIB: BROWSER TOOL HARD-BLOCKED after fresh Hostinger console recovery.
+Lighthouse60d54d1 deployed staging; bde8e2a UI and subsequent controlled product
+composition local only. No financial attempt. Production unchanged. See current
+PROJECT_STATUS for exact storage conflict, tests and terminal errors. Resume this
+same milestone after reliable browser/terminal control returns; do not start a new one.
+
 Checkpoint22:05 WIB: Lighthouse60d54d1 deployed staging and verified; local four-tab
 Agent UX accepted. Canonical DB target/journal absent; preserve legacy dataset and
 resolve metadata-root/config before canonical activation. No fresh wallet attempt.

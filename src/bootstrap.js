@@ -24,12 +24,17 @@ window.mountWorkspacePhone = async host => {
   return host.isConnected ? mountWorkspacePhone(host) : null;
 };
 window.mountPumpLaunch = async (host,options) => {
-  if(options.preparationOnly&&options.getM4Wallet){
-    const response=await fetch('/api/runtime-capabilities');if(!response.ok)throw Error('Runtime capabilities unavailable');const capability=await response.json();
-    if(capability.mode==='M4_CONTROLLED_SINGLE_LAUNCH'){
+  if(options.getM4Wallet){
+    const response=await fetch('/api/runtime-capabilities',{cache:'no-store'});
+    if(!response.ok)throw Error('Runtime capabilities unavailable');
+    const capability=await response.json();
+    if(capability?.mode==='PRODUCT_MAINNET_SAFETY')throw Error('Token launch is not enabled on this runtime.');
+    if(capability?.mode==='M4_CONTROLLED_SINGLE_LAUNCH'){
       const {mountM4Launch}=await import('./pump-m4-ui.js');
       if(host.isConnected)mountM4Launch(host,{...options,capability});return;
     }
+    if(capability?.mode==='M3_UNSIGNED_PREPARATION')options={...options,preparationOnly:true,getWallet:options.getPreparationWallet};
+    else throw Error('Reviewed launch is unavailable on this runtime.');
   }
   const {mountPumpLaunch}=await import('./pump-launch-ui.js');
   if(host.isConnected)mountPumpLaunch(host,options);
