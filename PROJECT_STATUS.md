@@ -1,3 +1,40 @@
+# CURRENT - 7 October 2026, 01:38 WIB: FRESH ATTEMPT STOPPED BEFORE PHANTOM
+
+Historical search CLOSED: HISTORICAL_LIGHTHOUSE_STATE_SNAPSHOT_UNAVAILABLE.
+Semantic Lighthouse correction is deployed and independently accepted. Combined
+VPS regression suite 110/110 PASS; canonical build PASS. Historical failed field
+remains UNPROVEN; the current over-strict comparison defect does not prove it.
+
+Exactly one new attempt was claimed at 01:34:42.086 WIB:
+request 1a5bf85c-ef80-43c9-b2fe-66ad598e68f0.
+The recovery proof failed BEFORE fresh preparation on getBlockHeight:
+PREPARATION_RPC_ERROR, rpcCode -32016 (minimum context slot not reached).
+No fresh operation payload, mint, transaction, review or Phantom request exists.
+The retained review visible in the UI belongs to the old failed operation.
+
+Root cause of this fresh failure: recovery called transport.rpc directly rather
+than the existing bounded readAtMinimumContext helper. The narrow correction is
+deployed: only eligible finalized read calls retry transient -32016, with the SAME
+minimum slot and request parameters. No slot downgrade or signing/send retry.
+Recovery/context/policy suite 33/33 PASS on VPS; independent review accepted.
+Deployment 01:37:57 WIB, dedicated tekkteam-api PID74546; HTTPS health200.
+Frontend unchanged; no shared-service, proxy, VPS or CUDA changes.
+
+Final evidence 01:38:18.876 WIB: grants2, claims2, receipt0; target Agent1,
+Agent wallets0; fresh ownerSigned=false, broadcast=false, SOL spent this attempt0.
+Old active operation 38c731bc-2b8d-4e95-961c-8ac2eefd08f0 remains untouched:
+SIGNED_NOT_BROADCAST, payload SHA256
+28425c88eb3391ee6de018d3b2cd7f40ee35a1e7d2cbfa46cfd88c8b32ec9339.
+Legacy journal/quarantine unchanged. Real trading/funding remain OFF.
+
+Current status: BLOCKED_AT_CONSUMED_GRANT, not PHANTOM_READY or M4 PASS.
+No second attempt was made. Do not reset/reuse the consumed claim or old review.
+A separately explicit fresh-attempt authorization is required before any new
+operation can be prepared; it is not financial transaction approval.
+Evidence: /var/lib/tekkteam-mainnet/lighthouse-context-abd24eb/
+fresh-attempt-outcome.json, recovery-deployment.json, recovery-tests.log;
+local artifacts/legacy-reconciliation/lighthouse-fresh-attempt-stopped.png.
+
 # CURRENT - 7 October 2026, 01:33 WIB: LIGHTHOUSE SEMANTIC FIX DEPLOYED
 
 Bounded archive search CLOSED: HISTORICAL_LIGHTHOUSE_STATE_SNAPSHOT_UNAVAILABLE.

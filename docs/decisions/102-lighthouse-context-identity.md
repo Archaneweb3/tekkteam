@@ -63,3 +63,21 @@ shared infrastructure. Restore backed-up source/config if deployment fails. Neve
 roll back or delete a durable grant/claim or rewrite an old execution. Real trading
 remains OFF. A final message failure stops before broadcast and requires a new,
 separately authorized decision; it never causes an automatic wallet retry.
+
+## Fresh-attempt outcome and recovery read correction
+
+At 01:34:42.086 WIB the finite successor claim was consumed, request
+1a5bf85c-ef80-43c9-b2fe-66ad598e68f0. Recovery failed on getBlockHeight with
+PREPARATION_RPC_ERROR / -32016 before creating a fresh operation or opening
+Phantom. This is a current RPC lag failure, not a new Lighthouse validation result.
+The existing bounded readAtMinimumContext helper now covers recovery reads:
+only eligible finalized calls with minContextSlot retry -32016 (at most four
+calls total), retaining exactly the same commitment, minimum and parameters.
+Other errors fail immediately. No send/sign retry, slot downgrade, old-payload
+change or grant renewal is introduced. Regression proof checks unchanged recovery
+bytes, identical read parameters, bounded retries and zero sends.
+
+The repair was deployed after 33/33 scoped VPS regressions and independent review.
+It does not authorize another attempt. The consumed successor, original operation
+and immutable legacy journal remain preserved. New explicit authorization is
+required to prepare another operation; consequential approval stays manual.
