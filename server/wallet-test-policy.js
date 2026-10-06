@@ -2,7 +2,8 @@
 import {M4_TARGET} from './pump-m4-guard.js';
 import {M4_EXPIRED_RECOVERY_ID,M4_REJECTED_RECOVERY_IDS} from './pump-m4-recovery.js';
 export function walletTestConfig(input){
- if(!input||Object.keys(input).some(k=>!['origin','dataDir','port','rpcUrl','launchPreparation','m4Launch','m4RecoveryExecutionId','m4ActionTime'].includes(k))||(input.launchPreparation!==undefined&&typeof input.launchPreparation!=='boolean'))throw Error('WALLET_TEST_CONFIG_INVALID');
+ if(!input||Object.keys(input).some(k=>!['origin','dataDir','port','rpcUrl','launchPreparation','m4Launch','m4RecoveryExecutionId','m4ActionTime','m4Lighthouse'].includes(k))||(input.launchPreparation!==undefined&&typeof input.launchPreparation!=='boolean'))throw Error('WALLET_TEST_CONFIG_INVALID');
+ if(input.m4Lighthouse!==undefined&&(input.m4Lighthouse!==true||input.m4ActionTime!==true))throw Error('M4_LIGHTHOUSE_CONFIG_INVALID');
  if(input.m4ActionTime!==undefined&&(input.m4ActionTime!==true||!input.m4Launch||input.m4RecoveryExecutionId!==undefined))throw Error('M4_ACTION_TIME_CONFIG_INVALID');
  if(input.m4RecoveryExecutionId!==undefined&&(!input.m4Launch||![M4_EXPIRED_RECOVERY_ID,...M4_REJECTED_RECOVERY_IDS].includes(input.m4RecoveryExecutionId)))throw Error('M4_EXACT_RECOVERY_CONFIG_REQUIRED');
  if(input.m4Launch!==undefined&&(!input.launchPreparation||!input.m4Launch||Object.keys(input.m4Launch).length!==Object.keys(M4_TARGET).length||Object.keys(M4_TARGET).some(k=>input.m4Launch[k]!==M4_TARGET[k])))throw Error('M4_EXACT_TARGET_CONFIG_REQUIRED');

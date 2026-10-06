@@ -2,6 +2,7 @@
 import {readFileSync,mkdtempSync,writeFileSync} from 'node:fs';
 import {tmpdir} from 'node:os';import {join} from 'node:path';
 import {DatabaseSync} from 'node:sqlite';
+import {openStore} from '../server/store.js';
 import {Keypair,Transaction} from '@solana/web3.js';
 import {buildCreation,creationAccounts,inspectCreation,GENESIS,PUMP} from '../src/pump-readiness.js';
 import {evaluateSimulation} from '../src/pump-simulation-policy.js';
@@ -14,7 +15,7 @@ const source=JSON.parse(readFileSync(new URL('../docs/pump-simulation-2026-09-26
 export function m4Fixture(options={}){
  const owner=Keypair.generate(),target={...M4_TARGET,owner:owner.publicKey.toBase58()},identity={...target,description:'fixture',image:'https://fixture.example/image.png',character:'frank',tokenDescriptionPresent:true};delete identity.initialBuyLamports;delete identity.ceilingLamports;
  let clock=100000,sends=0,rawProof;
- const root=mkdtempSync(join(tmpdir(),'tekkteam-m4-')),journalPath=join(root,'receipt.json');writeFileSync(journalPath,JSON.stringify({version:2,receipts:{}}));const db=new DatabaseSync(join(root,'fixture.sqlite'));
+ const root=mkdtempSync(join(tmpdir(),'tekkteam-m4-')),journalPath=join(root,'receipt.json');writeFileSync(journalPath,JSON.stringify({version:2,receipts:{}}));const store=options.useVault?openStore(join(root,'fixture.sqlite')):null,db=store?.db??new DatabaseSync(join(root,'fixture.sqlite'));
  function prepareFactory({mintFactory,captureProof,actionTime=false}){return async(launchIdentity,buy,id)=>{
   const blockhash=options.freshBlockhash?Keypair.generate().publicKey.toBase58():source.recentBlockhash;const mint=mintFactory?mintFactory():Keypair.generate().publicKey,accounts=creationAccounts(mint,launchIdentity.owner);let text=JSON.stringify(source);source.structure.accounts.forEach((a,i)=>{text=text.replaceAll(a.address,accounts[i].pubkey.toBase58());});
   const feePolicy=options.feePolicy??null,fee=10000+(feePolicy?priorityLamports(feePolicy.computeUnitLimit,feePolicy.computeUnitPriceMicroLamports):0);
@@ -31,5 +32,5 @@ export function m4Fixture(options={}){
  const deps={db,journalPath,target,now:()=>clock,transport,publishMetadata:async()=>'',prepareFactory,verifyCreatedAccounts:()=>{},verifyEvent:()=>{},revalidate:async()=>({contextSlot:104,checkedAt:clock}),confirm:async()=>({status:'CONFIRMATION_UNKNOWN'}),...options.dependencies};
  const request=s=>({requestId:s.executionId,reviewDigest:s.result.executionReview.digest,transactionBase64:s.result.transactionBase64});
  const signed=()=>{const stored=JSON.parse(db.prepare('SELECT payload FROM m4_execution').get().payload),tx=Transaction.from(Buffer.from(stored.signingOrder==='OWNER_FIRST_MINT_AFTER_APPROVAL'?stored.result.transactionBase64:stored.walletTransactionBase64,'base64'));tx.partialSign(owner);return tx.serialize({requireAllSignatures:stored.signingOrder!=='OWNER_FIRST_MINT_AFTER_APPROVAL'}).toString('base64');};
- return {db,root,journalPath,target,identity,owner,deps,controller:createM4Execution(deps),request,signed,advance:n=>clock+=n,sends:()=>sends,clock:()=>clock,rawProof:()=>rawProof};
+ return {db,store,root,journalPath,target,identity,owner,deps,controller:createM4Execution(deps),request,signed,advance:n=>clock+=n,sends:()=>sends,clock:()=>clock,rawProof:()=>rawProof};
 }

@@ -4,20 +4,29 @@ import bs58 from 'bs58';
 import {Buffer} from 'buffer';
 import {FEE_PROGRAM} from './initial-buy.js';
 import {feeComponents} from './pump-fee-policy.js';
+import {inspectFinalCreation} from './pump-final-structure.js';
 
 export const POLICY_LABEL='Simulation-verified estimated spending limit';
 export function evaluateSimulation(bytes,context,{before,afterRead,simulation,fee}) {
- const structure=inspectCreation(bytes,context), v=simulation.value,components=structure.feePolicy?feeComponents(structure,fee):{networkFeeLamports:fee,baseFeeLamports:fee,priorityFeeLamports:0};
+ const structure=context.finalMessageResult?inspectFinalCreation(bytes,context):inspectCreation(bytes,context), v=simulation.value,components=structure.feePolicy?feeComponents(structure,fee):{networkFeeLamports:fee,baseFeeLamports:fee,priorityFeeLamports:0};
  const reasons=[], warnings=[],initialBuy=structure.initialBuyLamports;
  let payerMovements=0,buyMovements=0;
  const allowedPrograms=new Set([structure.programId,...structure.accounts.filter(a=>['system_program','token_program','associated_token_program','mayhem_program_id','fee_program','compute_budget_program'].includes(a.name)).map(a=>a.address)]);
+ const topLevelPrograms=new Set([...allowedPrograms,...(structure.lighthouse?[structure.lighthouse.program]:[])]);
  const logs=v.logs??[], invoked=[...new Set(logs.flatMap(l=>{const m=/^Program (\w+) invoke \[\d+\]$/.exec(l);return m?[m[1]]:[];}))];
  if(v.err!==null)reasons.push('SIMULATION_FAILED');
- if(structure.feePolicy&&(logs.filter(l=>l===`Program ${structure.accounts.at(-1).address} invoke [1]`).length!==2||logs.filter(l=>l===`Program ${structure.accounts.at(-1).address} success`).length!==2))reasons.push('COMPUTE_BUDGET_EXECUTION_UNPROVEN');
+ const compute=structure.accounts.find(a=>a.name==='compute_budget_program')?.address;
+ if(structure.feePolicy&&(logs.filter(l=>l===`Program ${compute} invoke [1]`).length!==2||logs.filter(l=>l===`Program ${compute} success`).length!==2))reasons.push('COMPUTE_BUDGET_EXECUTION_UNPROVEN');
  if(initialBuy&&!logs.includes('Program log: Instruction: BuyExactSolIn'))reasons.push('INITIAL_BUY_SUCCESS_NOT_CONFIRMED');
- if(!logs.includes('Program log: Instruction: CreateV2')||logs.at(-1)!==`Program ${structure.programId} success`)reasons.push('CREATE_V2_SUCCESS_NOT_CONFIRMED');
+ if(!logs.includes('Program log: Instruction: CreateV2')||!logs.includes(`Program ${structure.programId} success`)||logs.at(-1)!==`Program ${structure.lighthouse?.program??structure.programId} success`)reasons.push('CREATE_V2_SUCCESS_NOT_CONFIRMED');
+ if(structure.lighthouse){
+  const program=structure.lighthouse.program,index=logs.indexOf(`Program ${program} invoke [1]`),tail=logs.slice(index);
+  if(index<0||logs.filter(l=>l.startsWith(`Program ${program} invoke [`)).length!==1||logs.filter(l=>l===`Program ${program} success`).length!==1||logs[index-1]!==`Program ${structure.programId} success`||tail.some((l,i)=>i>0&&i<tail.length-1&&!new RegExp('^Program '+program+' consumed [0-9]+ of [0-9]+ compute units$').test(l))||v.innerInstructions?.some(g=>g.index>=(structure.pumpInstructionIndex??0)+1&&g.instructions?.length))reasons.push('LIGHTHOUSE_EXECUTION_UNPROVEN');
+  const groups=v.innerInstructions??[],pumpIndex=structure.pumpInstructionIndex??0;
+  if(new Set(groups.map(g=>g.index)).size!==groups.length||groups.some(g=>!Number.isSafeInteger(g.index)||g.index<0||g.index>pumpIndex+1||!Array.isArray(g.instructions)||g.instructions.length>0&&g.index!==pumpIndex))reasons.push('FINAL_INNER_INSTRUCTION_ATTRIBUTION_INVALID');
+ }
  if(!logs.length||!invoked.includes(structure.programId)||logs.some(l=>/truncat/i.test(l)))reasons.push('INCOMPLETE_PROGRAM_LOGS');
- if(invoked.some(p=>!allowedPrograms.has(p)))reasons.push('UNEXPECTED_CPI_PROGRAM');
+ if(invoked.some(p=>!topLevelPrograms.has(p)))reasons.push('UNEXPECTED_CPI_PROGRAM');
  const accountSet=new Set(structure.accounts.map(a=>a.address));
  for(const group of v.innerInstructions??[])for(const ix of group.instructions){
   if(!ix.programId||!allowedPrograms.has(ix.programId))reasons.push('UNEXPECTED_OR_UNDECODED_INNER_PROGRAM');

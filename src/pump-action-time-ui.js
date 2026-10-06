@@ -3,6 +3,7 @@ import {Transaction} from '@solana/web3.js';
 import {agentLaunchData,assertAgentLaunch} from './agent-launch-data.js';
 import {validatePreparation} from './pump-preparation-ui.js';
 import {assertActionTimeHandoff} from './pump-action-time.js';
+import {FINAL_MESSAGE_POLICY,validateFinalWalletMessage} from './pump-wallet-final.js';
 const sol=n=>Number.isSafeInteger(n)?(n/1e9).toFixed(9)+' SOL':'Unavailable';
 async function api(id,action,body){
  const response=await fetch('/api/launchpad/agents/'+encodeURIComponent(id)+'/execution/'+action,{method:body?'POST':'GET',headers:body?{'Content-Type':'application/json'}:undefined,body:body?JSON.stringify(body):undefined,signal:AbortSignal.timeout(180000)});
@@ -15,13 +16,13 @@ export function mountM4ActionTimeLaunch(host,{agent,isCurrent,getM4Wallet,capabi
  let pending=false,current=null,estimate=null,uncertain=false;
  host.innerHTML='<div class="tw-launch-head"><h2>Review your launch</h2><p>Solana Mainnet · Initial buy 0 SOL · Review ceiling 0.01 SOL. Confirm manually in your wallet.</p></div><div class="tw-launch-summary" data-summary></div><p role="status" data-status>Checking launch state…</p><p role="alert" data-error></p><div class="tw-launch-actions"><button class="tw-button primary" data-prepare disabled>Review launch costs</button><button class="tw-button primary" data-approve disabled>Continue to Wallet</button><button class="tw-button" data-check>Recheck status</button></div>';
  const q=s=>host.querySelector(s),status=text=>{if(alive())q('[data-status]').textContent=text;},error=text=>{if(alive())q('[data-error]').textContent=text;};
- const canPrepare=()=>!uncertain&&current&&!current.broadcastAttempted&&(!current.signature&&['NOT_STARTED','READY_FOR_REVIEW','USER_REJECTED','TRANSACTION_EXPIRED'].includes(current.status)||['SIGNED','SIGNED_NOT_BROADCAST'].includes(current.status));
+ const canPrepare=()=>!uncertain&&current&&!current.broadcastAttempted&&(!current.signature&&['NOT_STARTED','READY_FOR_REVIEW','USER_REJECTED','TRANSACTION_EXPIRED'].includes(current.status)||['SIGNED','SIGNED_NOT_BROADCAST','OWNER_APPROVED','OWNER_APPROVED_NOT_BROADCAST'].includes(current.status));
  const local=()=>{if(!alive())throw Error('Launch dialog or selected Agent changed');getM4Wallet(identity.owner).assertBound();};
  const bound=async()=>{local();const response=await fetch('/api/agents/'+encodeURIComponent(identity.agentId));if(!response.ok)throw Error('Owner session unavailable');assertAgentLaunch(identity,agentLaunchData(await response.json()));local();};
  function render(){
   if(!alive())return;
   q('[data-prepare]').disabled=pending||!canPrepare()||!!current?.signature;q('[data-approve]').disabled=pending||!canPrepare();q('[data-check]').disabled=pending;
-  q('[data-approve]').textContent=['TRANSACTION_EXPIRED','SIGNED','SIGNED_NOT_BROADCAST'].includes(current?.status)?'Prepare Again':'Continue to Wallet';
+  q('[data-approve]').textContent=['TRANSACTION_EXPIRED','SIGNED','SIGNED_NOT_BROADCAST','OWNER_APPROVED','OWNER_APPROVED_NOT_BROADCAST'].includes(current?.status)?'Prepare Again':'Continue to Wallet';
   const r=estimate??current?.result,v=r?.executionReview,root=q('[data-summary]');root.replaceChildren();
   const row=(label,value,where=root)=>{const el=document.createElement('div'),key=document.createElement('span'),text=document.createElement('strong');key.textContent=label;text.textContent=value;text.style.overflowWrap='anywhere';el.append(key,text);where.append(el);};
   row('AGENT',identity.agentName);row('COIN',identity.name+' / '+identity.symbol);row('NETWORK','Solana Mainnet Beta');row('OWNER',identity.owner);
@@ -34,7 +35,7 @@ export function mountM4ActionTimeLaunch(host,{agent,isCurrent,getM4Wallet,capabi
   }
   const labels={NOT_STARTED:'Review costs, then continue to your wallet.',READY_FOR_REVIEW:'Estimate available. Continue prepares a fresh transaction.',USER_REJECTED:'Wallet request cancelled. Your Agent and draft are saved.',TRANSACTION_EXPIRED:'TRANSACTION EXPIRED — PREPARE AGAIN',AWAITING_WALLET_APPROVAL:'Waiting for wallet. Do not open a second request.',SIGNED_NOT_BROADCAST:'Transaction was signed but not broadcast. Recheck before another action.',SUBMITTED:'Submitting…',CONFIRMING:'Confirming on Solana…',CONFIRMATION_UNKNOWN:'Confirmation pending. Recheck the same transaction.',RECONCILIATION_REQUIRED:'Launch needs reconciliation. Do not launch again.',FAILED_ON_CHAIN:'Transaction failed on Solana. No new launch was started.',LAUNCHED:'Token launched. Set up your Agent next. Trading remains off.'};
   status(labels[current?.status]??'Checking launch state…');
-  if(current?.status==='SIGNED')status('Signed transaction recorded; broadcast was not claimed. Prepare Again first verifies expiry and absence on Solana.');
+  if(['SIGNED','OWNER_APPROVED','OWNER_APPROVED_NOT_BROADCAST'].includes(current?.status))status('Signed transaction recorded; broadcast was not claimed. Prepare Again first verifies expiry and absence on Solana.');
   if(current?.status==='SIGNED_NOT_BROADCAST'&&['M4_BLOCKHASH_EXPIRED','EXECUTION_REVIEW_EXPIRED'].includes(current.error))status('TRANSACTION EXPIRED — PREPARE AGAIN');
   if(uncertain)status('Launch state unavailable. Recheck before another action.');
   if(current?.signature)row('TRANSACTION',current.signature);
@@ -64,7 +65,8 @@ export function mountM4ActionTimeLaunch(host,{agent,isCurrent,getM4Wallet,capabi
    status('Opening wallet… Confirm the transaction manually.');
    const signedTransactionBase64=await getM4Wallet(identity.owner).signTransaction(prepared.walletTransactionBase64,prepared,local);
    local();const signed=Transaction.from(Buffer.from(signedTransactionBase64,'base64')),unsigned=Transaction.from(Buffer.from(request.transactionBase64,'base64'));
-   if(!signed.signature||!signed.verifySignatures(false)||signed.signatures.length!==2||signed.signatures[1].signature!==null||!signed.serializeMessage().equals(unsigned.serializeMessage()))throw Error('Wallet changed the reviewed transaction. Nothing was broadcast.');
+   if(prepared.walletMessagePolicy===FINAL_MESSAGE_POLICY)validateFinalWalletMessage(request.transactionBase64,signedTransactionBase64,prepared.result,{Transaction,Buffer},false);
+   else if(!signed.signature||!signed.verifySignatures(false)||signed.signatures.length!==2||signed.signatures[1].signature!==null||!signed.serializeMessage().equals(unsigned.serializeMessage()))throw Error('Wallet changed the reviewed transaction. Nothing was broadcast.');
    status('Submitting…');current=await api(identity.agentId,'submit',{...request,signedTransactionBase64});render();
    for(let count=0;count<15&&alive()&&current.broadcastAttempted&&['SUBMITTED','CONFIRMING','CONFIRMATION_UNKNOWN'].includes(current.status);count++){await new Promise(resolve=>setTimeout(resolve,5000));current=await api(identity.agentId,'status');render();}
   }catch(e){

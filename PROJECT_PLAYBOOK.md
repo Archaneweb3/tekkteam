@@ -1,5 +1,17 @@
 # PROJECT_PLAYBOOK — TEKKTEAM
 
+Latest6October2026 final product convergence mandate: canonical public product is
+https://tekkteam.tech; staging remains internal QA. Limited Phantom Lighthouse
+semantic validation and complete final-message simulation are explicitly approved
+instead of literal pre-wallet byte equality. Original launch intent, fees, programs,
+signers and authority must remain unchanged; only a narrowly decoded owner safety
+assertion/account ordering may differ. Persist both fingerprints and the allowed
+diff. Initialbuy0 and total debit<=0.01SOL remain. Manual financial wallet approval,
+one-shot broadcast/reconciliation and receipt-only Agent wallet provisioning remain.
+CUDA patterns may now be inspected/adapted for UX, never EVM mechanics or green
+branding. Preserve blue/yellow and ten destinations. Root sole source writer.
+Implement/test each dependency before public deployment and real trading acceptance.
+
 Latest6October2026: TEKKTEAM_PRODUCTION_PARITY supersedes the stop-after-one-attempt
 batch boundary. Preserve TEKKTEAM blue/yellow identity and all ten destinations.
 Implement native Solana action-time final preparation separately from informational

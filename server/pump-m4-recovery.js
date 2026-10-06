@@ -2,6 +2,9 @@ import {GENESIS} from '../src/pump-readiness.js';
 import {assertExecutionReview,contextSlot} from './pump-execution-review.js';
 import {verifyM4Signed,m4Fail} from './pump-m4-guard.js';
 import {isActionTimePackage} from '../src/pump-action-time.js';
+import {Transaction} from '@solana/web3.js';
+import bs58 from 'bs58';
+import {FINAL_MESSAGE_POLICY,validateFinalWalletMessage} from '../src/pump-wallet-final.js';
 // Exact separately authorized recovery; never a generic one-shot reset.
 export const M4_EXPIRED_RECOVERY_ID='ee8dae70-e05c-4b06-a63e-d8b09a84b52f';
 export const M4_REJECTED_RECOVERY_ID='ba5af2c9-096a-496b-a960-026fe817a1c6';
@@ -10,11 +13,13 @@ export const M4_DETERMINISTIC_RECOVERY_ID='d16d20e3-e3c6-418a-aa60-f35a1a6c254c'
 export const M4_REJECTED_RECOVERY_IDS=Object.freeze([M4_REJECTED_RECOVERY_ID,M4_DETERMINISTIC_RECOVERY_ID]);
 export async function proveM4ExpiredRecovery(record,identity,{transport,now=Date.now,unsigned=false,actionTime=false}){
  const unsignedState=unsigned&&['AWAITING_WALLET_APPROVAL','USER_REJECTED',...(actionTime?['TRANSACTION_EXPIRED']:[])].includes(record.status)&&!record.signature&&!record.signedTransactionBase64&&!record.signedDigest;
+ const ownerOnly=actionTime&&isActionTimePackage(record.result)&&record.walletMessagePolicy===FINAL_MESSAGE_POLICY&&['OWNER_APPROVED','OWNER_APPROVED_NOT_BROADCAST'].includes(record.status)&&!record.signedTransactionBase64;
  const signedUnsent=record.status==='SIGNED_NOT_BROADCAST'||actionTime&&isActionTimePackage(record.result)&&record.status==='SIGNED';
- if((!unsignedState&&(!signedUnsent||!actionTime&&record.error!=='EXECUTION_REVIEW_EXPIRED'||!record.signature||!record.signedTransactionBase64))||record.broadcastAttempted!==false||record.submittedAt!=null||record.confirmation!=null||!record.walletApprovalOpened)throw m4Fail('M4_RECOVERY_STATE_DENIED');
+ if((!unsignedState&&!ownerOnly&&(!signedUnsent||!actionTime&&record.error!=='EXECUTION_REVIEW_EXPIRED'||!record.signature||!record.signedTransactionBase64))||record.broadcastAttempted!==false||record.submittedAt!=null||record.confirmation!=null||!record.walletApprovalOpened)throw m4Fail('M4_RECOVERY_STATE_DENIED');
  const r=record.result;assertExecutionReview(r,identity,{now:r.executionReview.startedAt});
  if(!isActionTimePackage(r)&&now()<r.executionReview.expiresAt)throw m4Fail('M4_RECOVERY_REVIEW_STILL_VALID');
- if(unsignedState)verifyM4Signed(record.walletTransactionBase64,record,false);
+ if(ownerOnly){const final=validateFinalWalletMessage(r.transactionBase64,record.ownerApprovedTransactionBase64,r,{Transaction,Buffer},false);if(bs58.encode(final.tx.signature)!==record.signature)throw m4Fail('M4_RECOVERY_SIGNATURE_MISMATCH');}
+ else if(unsignedState)verifyM4Signed(record.walletTransactionBase64,record,false);
  else{const signed=verifyM4Signed(record.signedTransactionBase64,record,true);if(signed.signature!==record.signature||signed.signedDigest!==record.signedDigest)throw m4Fail('M4_RECOVERY_SIGNATURE_MISMATCH');}
  if(await transport.rpc('getGenesisHash',[])!==GENESIS)throw m4Fail('M4_WRONG_MAINNET');
  const minimum=r.executionReview.validitySlot;

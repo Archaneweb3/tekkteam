@@ -5,6 +5,7 @@ import {normalizeTokenDraft} from '../../src/token-draft-schema.js';
 import {assertM4ReviewLifetime} from '../../src/pump-review-lifetime.js';
 import {isActionTimePackage,assertActionTimeHandoff} from '../../src/pump-action-time.js';
 import {describeWalletMessage,walletMessageDifferences} from '../../src/pump-wallet-integrity.js';
+import {FINAL_MESSAGE_POLICY,validateFinalWalletMessage} from '../../src/pump-wallet-final.js';
 const detachedKey='tekkteam:owner-detached';
 export function ownerAccessDetached(){try{return sessionStorage.getItem(detachedKey)==='1';}catch{return false;}}
 function setOwnerDetached(value){try{if(value)sessionStorage.setItem(detachedKey,'1');else sessionStorage.removeItem(detachedKey);}catch{}}
@@ -224,6 +225,7 @@ export function m4LaunchWallet(owner){
   if(current.status!=='AWAITING_WALLET_APPROVAL'||current.executionId!==review.executionId||current.result?.executionReview?.digest!==review.result.executionReview.digest)throw Error('M4 review changed');
   if(current.result.transactionBase64!==review.result.transactionBase64)throw Error('M4 review changed; no wallet prompt opened');
   if(current.signingOrder!==review.signingOrder)throw Error('M4 signing order changed');
+  if((current.walletMessagePolicy??null)!==(review.walletMessagePolicy??null)||(capability.walletMessagePolicy??null)!==(review.walletMessagePolicy??null))throw Error('M4 wallet message policy changed');
   const ownerFirst=current.signingOrder==='OWNER_FIRST_MINT_AFTER_APPROVAL';
   const {Transaction,Buffer}=window.TekkworkSDK,partial=Transaction.from(Buffer.from(base64,'base64')),unsigned=Transaction.from(Buffer.from(current.result.transactionBase64,'base64'));
   if(partial.signature!==null||!partial.verifySignatures(false)||!partial.serializeMessage().equals(unsigned.serializeMessage()))throw Error('M4 reviewed bytes or mint signature changed');
@@ -239,10 +241,10 @@ export function m4LaunchWallet(owner){
   if(m4ApprovalRequests.has(review.executionId))throw Error('Single reviewed M4 approval already requested');
   m4ApprovalRequests.add(review.executionId);
   console.info('M4 wallet transaction request',JSON.stringify({executionId:review.executionId,signingOrder:current.signingOrder,openedAt,reviewStartedAt:review.result.executionReview.startedAt,expiresAt:review.result.executionReview.expiresAt,remainingMs,remainingBlocks,lastValidBlockHeight:current.result.lastValidBlockHeight,reviewedPayloadSha256,presentedPayloadSha256,reviewedMessageSha256,presentedMessageSha256}));
-  try{return await boundTransactionWallet(owner,ownerFirst).signTransaction(base64);}catch(error){error.walletRequestOpened=true;throw error;}
+  try{return await boundTransactionWallet(owner,ownerFirst,current.walletMessagePolicy===FINAL_MESSAGE_POLICY?current.result:null).signTransaction(base64);}catch(error){error.walletRequestOpened=true;throw error;}
  }};
 }
-function boundTransactionWallet(owner,ownerFirst=false){
+function boundTransactionWallet(owner,ownerFirst=false,finalReview=null){
   const selected=active||watchedSelection,current=selected?.standard?.accounts?.find(a=>a.address===owner);
   const assertBound=()=>{
     if(!selected||selected!==(active||watchedSelection)||ownerAccessDetached())throw Error('Reconnect your selected owner wallet');
@@ -268,7 +270,8 @@ function boundTransactionWallet(owner,ownerFirst=false){
       if(ownerFirst)providerMessageBase64=Buffer.from(result.serializeMessage()).toString('base64');
       signed=Buffer.from(result.serialize({requireAllSignatures:!ownerFirst,verifySignatures:true})).toString('base64');
     }
-    if(ownerFirst){const expectedMessage=describeWalletMessage(Buffer.from(base64,'base64'),{Transaction,Buffer}),returnedMessage=describeWalletMessage(Buffer.from(signed,'base64'),{Transaction,Buffer}),differences=walletMessageDifferences(expectedMessage,returnedMessage);if(differences.length)console.warn('M4 wallet message mismatch',JSON.stringify({provider:selected.name,transport:selected.standard?'wallet-standard':'injected',featureVersion:selected.standard?.features['solana:signTransaction']?.version??null,providerMessageBase64,differences,expected:expectedMessage,returned:returnedMessage}));const actual=Transaction.from(Buffer.from(signed,'base64')),expected=Transaction.from(Buffer.from(base64,'base64')),hash=async bytes=>Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes)),n=>n.toString(16).padStart(2,'0')).join('');console.info('M4 wallet returned fingerprints',JSON.stringify({deliveredMessageSha256:await hash(expected.serializeMessage()),returnedMessageSha256:await hash(actual.serializeMessage()),returnedOwnerPayloadSha256:await hash(Buffer.from(signed,'base64')),allowedWalletMutation:'SIGNATURES_ONLY'}));if(actual.feePayer.toBase58()!==owner||actual.signatures.length!==2||!actual.signature||!actual.verifySignatures(false)||actual.signatures[1].signature!==null||!actual.serializeMessage().equals(expected.serializeMessage()))throw Error('M4 owner approval changed or missing; reviewed instructions and fee must remain unchanged. Nothing broadcast.');}
+    if(ownerFirst&&finalReview){const final=validateFinalWalletMessage(base64,signed,finalReview,{Transaction,Buffer},false);console.info('M4 wallet final semantic validation',JSON.stringify({allowedMessageDiff:final.allowedDiff,assertion:final.assertion}));}
+    else if(ownerFirst){const expectedMessage=describeWalletMessage(Buffer.from(base64,'base64'),{Transaction,Buffer}),returnedMessage=describeWalletMessage(Buffer.from(signed,'base64'),{Transaction,Buffer}),differences=walletMessageDifferences(expectedMessage,returnedMessage);if(differences.length)console.warn('M4 wallet message mismatch',JSON.stringify({provider:selected.name,transport:selected.standard?'wallet-standard':'injected',featureVersion:selected.standard?.features['solana:signTransaction']?.version??null,providerMessageBase64,differences,expected:expectedMessage,returned:returnedMessage}));const actual=Transaction.from(Buffer.from(signed,'base64')),expected=Transaction.from(Buffer.from(base64,'base64')),hash=async bytes=>Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes)),n=>n.toString(16).padStart(2,'0')).join('');console.info('M4 wallet returned fingerprints',JSON.stringify({deliveredMessageSha256:await hash(expected.serializeMessage()),returnedMessageSha256:await hash(actual.serializeMessage()),returnedOwnerPayloadSha256:await hash(Buffer.from(signed,'base64')),allowedWalletMutation:'SIGNATURES_ONLY'}));if(actual.feePayer.toBase58()!==owner||actual.signatures.length!==2||!actual.signature||!actual.verifySignatures(false)||actual.signatures[1].signature!==null||!actual.serializeMessage().equals(expected.serializeMessage()))throw Error('M4 owner approval changed or missing; reviewed instructions and fee must remain unchanged. Nothing broadcast.');}
     assertBound();return signed;
   }};
 }

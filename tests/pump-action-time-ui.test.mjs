@@ -4,6 +4,7 @@ import vm from 'node:vm';
 import {readFileSync} from 'node:fs';
 import {Keypair,Transaction,TransactionInstruction,SystemProgram} from '@solana/web3.js';
 import {agentLaunchData,assertAgentLaunch} from '../src/agent-launch-data.js';
+import {FINAL_MESSAGE_POLICY,validateFinalWalletMessage} from '../src/pump-wallet-final.js';
 // LOCAL_FIXTURE UI lifecycle; synthetic owner, no RPC and no real wallet.
 async function fixture({failedStatus=false,reject=false,initial='NOT_STARTED',closeDuringPrepare=false}={}){
  const owner=Keypair.generate(),mint=Keypair.generate(),agent={id:'fixture',name:'Agent',creator:owner.publicKey.toBase58(),coin:{name:'Coin',ticker:'FIX'}};
@@ -11,7 +12,7 @@ async function fixture({failedStatus=false,reject=false,initial='NOT_STARTED',cl
  const bytes=tx.serialize({requireAllSignatures:false}).toString('base64'),result={transactionBase64:bytes,mint:mint.publicKey.toBase58(),metadataUri:'https://fixture.invalid',createdAt:'fixture',simulation:{status:'PASS'},executionReview:{version:2,digest:'fixture',reviewedDebitLamports:5500000,networkFeeLamports:20000,otherRequiredDebitLamports:5480000,ceilingLamports:10000000}};
  const node=()=>({textContent:'',disabled:false,style:{},children:[],append(...c){this.children.push(...c);},replaceChildren(){this.children=[];}}),nodes=new Map(),host={isConnected:true,innerHTML:'',querySelector:s=>{if(!nodes.has(s))nodes.set(s,node());return nodes.get(s);}};
  let state={status:initial,...(initial==='NOT_STARTED'?{}:{executionId:'existing',result})},signs=0,failStatus=failedStatus;const requests=[];
- const context={Buffer,Transaction,agentLaunchData,assertAgentLaunch,AbortSignal,crypto,Date,document:{createElement:node},validatePreparation:async()=>{},assertActionTimeHandoff(){},setTimeout(){throw Error('Unexpected polling');},fetch:async(url,opts={})=>{
+ const context={Buffer,Transaction,FINAL_MESSAGE_POLICY,validateFinalWalletMessage,agentLaunchData,assertAgentLaunch,AbortSignal,crypto,Date,document:{createElement:node},validatePreparation:async()=>{},assertActionTimeHandoff(){},setTimeout(){throw Error('Unexpected polling');},fetch:async(url,opts={})=>{
   const action=url.split('/').at(-1);requests.push({action,method:opts.method??'GET'});if(url==='/api/agents/fixture')return {ok:true,json:async()=>agent};
   if(action==='wallet-status'){if(failStatus)throw Error('offline');return {ok:true,json:async()=>state};}
   if(action==='estimate')return {ok:true,json:async()=>({result})};

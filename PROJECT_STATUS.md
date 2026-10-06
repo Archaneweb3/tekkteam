@@ -1,4 +1,24 @@
-## CURRENT — 6 October 2026, 21:01 WIB: manual approval verified; Phantom compatibility BLOCKED
+# CURRENT — 6 October 2026, 21:37 WIB: reviewed Lighthouse ready for staging
+
+Actual baseline ac32f7c; local accepted work preserved. Limited semantic validator,
+encrypted one-attempt mint signer, final sigVerify simulation, 18-account effects,
+final proof/fingerprints and confirmation checks implemented. 27 Lighthouse tests
+and 28 frontend/boundary tests PASS; build13.45s PASS. Two read-only independent
+reviews ACCEPTED, including OWNER_APPROVED crash recovery and seal rollback.
+These are local fixture results, not Mainnet launch proof. No new wallet request,
+broadcast, receipt or Agent wallet. Trading/funding OFF; production unchanged.
+Fresh Edge tabs recover canonical site and existing Hostinger session. Staging
+deployment is next; public runtime/UX/five profiles/worker remain pending.
+
+## CURRENT — 6 October 2026, 21:10 WIB: limited Lighthouse implementation authorized
+
+Owner explicitly approves strict final-message semantic validation and simulation
+instead of pre-wallet byte equality. Authorization blocker from21:01 is resolved;
+code/integration remains in progress. Canonical publicdomaintekkteam.tech, internal
+QA staging retained. No new wallet attempt, broadcast or launch evidence yet.
+Active scope/deadline in EXECUTION_BRIEF; prior evidence below remains unchanged.
+
+## Historical — 6 October 2026, 21:01 WIB: manual approval verified; Phantom compatibility BLOCKED
 
 User confirmed manual approval for execution a50e30db-a404-4c87-b3b7-5903265c567a.
 Created20:52:58.249 WIB; returned20:53:35.291. Mainnet, initialbuy0, reviewed
@@ -1717,8 +1737,3 @@ broadcast, funding, withdrawal, publication and deployOFF. No new signing reques
 transaction or SOL spend. Remaining integration is Reown discovery/state bridge after its existing module/
 configuration is identified; MetaMask relay fallback needs reviewed browser-safe
 RPC/SDK configuration if native Solana registration is absent. No unrelated milestone started.
-
-
-
-
-

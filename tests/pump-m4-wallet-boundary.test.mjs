@@ -3,9 +3,10 @@ import assert from 'node:assert/strict';
 import {Keypair,PublicKey,Transaction,TransactionInstruction,SystemProgram} from '@solana/web3.js';
 import bs58 from 'bs58';
 import {createHash} from 'node:crypto';
+import {FINAL_MESSAGE_POLICY} from '../src/pump-wallet-final.js';
 // LOCAL_FIXTURE only: wallet-provider stub, synthetic signatures, no RPC/broadcast.
 let serial=0;
-async function fixture(t,{ownerFirst=false,injected=false,missingOwner=false,liveOrderMismatch=false,badFingerprint=false,actionTime=false,remainingBlocks=100,lostClaim=false,mutateBlockhash=false,addLighthouse=false}={}){
+async function fixture(t,{ownerFirst=false,injected=false,missingOwner=false,liveOrderMismatch=false,badFingerprint=false,actionTime=false,remainingBlocks=100,lostClaim=false,mutateBlockhash=false,addLighthouse=false,lighthouse=false,policyMismatch=false}={}){
  const saved={window:globalThis.window,fetch:globalThis.fetch,CustomEvent:globalThis.CustomEvent},originalNow=Date.now;
  t.after(()=>{Object.assign(globalThis,saved);Date.now=originalNow;});
  let clock=100000,calls=0,statusReads=0,onStatus=()=>{},resolveStatus;
@@ -15,12 +16,13 @@ async function fixture(t,{ownerFirst=false,injected=false,missingOwner=false,liv
  const signingOrder=ownerFirst?'OWNER_FIRST_MINT_AFTER_APPROVAL':undefined;
  const result={launch:{owner:address,agentId:'fixture',initialBuyLamports:0},transactionBase64:unsigned,transactionSha256:badFingerprint?'0'.repeat(64):createHash('sha256').update(Buffer.from(unsigned,'base64')).digest('hex'),executionReview:{startedAt:100000,expiresAt:130000,ceilingLamports:10000000,digest:'fixture'}},review={status:'AWAITING_WALLET_APPROVAL',executionId:'fixture',signingOrder,result,walletTransactionBase64:ownerFirst?unsigned:partial};
  if(actionTime){result.recentBlockhash=tx.recentBlockhash;result.lastValidBlockHeight=500;result.expiresAt=null;Object.assign(result.executionReview,{version:2,status:'FINAL_WALLET_PREPARATION',freshness:'SOLANA_BLOCKHASH_V2',preparedAt:100000,expiresAt:null,recentBlockhash:tx.recentBlockhash,lastValidBlockHeight:500});}
+ if(lighthouse){review.walletMessagePolicy=FINAL_MESSAGE_POLICY;result.mint=mint.publicKey.toBase58();Object.assign(result.executionReview,{minimumReserveLamports:1000000,expectedRemainingBalanceLamports:177000000});}
  const approve=tx=>{calls++;if(ownerFirst)assert.ok(tx.signatures.every(s=>s.signature===null));if(mutateBlockhash)tx.recentBlockhash=Keypair.generate().publicKey.toBase58();if(addLighthouse)tx.add(new TransactionInstruction({programId:new PublicKey('L2TExMFKdjpN9kozasaurPirfHy9P8sbXoAN1qA3S95'),keys:[{pubkey:owner.publicKey,isSigner:true,isWritable:true}],data:Buffer.from('BgQDAMtDPAoAAAAABAMAAAEAAAAAAAAAAAA=','base64')}));if(!missingOwner)tx.partialSign(owner);return tx;};
  const wallet={name:'Phantom',chains:['solana:mainnet'],accounts:[account],features:{'standard:connect':{connect:async()=>({accounts:[account]})},'standard:events':{on:()=>()=>{}},'solana:signMessage':{signMessage:async()=>[{signature:new Uint8Array(64)}]},'solana:signTransaction':{signTransaction:async input=>[{signedTransaction:Uint8Array.from(approve(Transaction.from(input.transaction)).serialize({requireAllSignatures:!ownerFirst}))}]}}};
  const provider={isPhantom:true,isConnected:false,publicKey:owner.publicKey,connect:async()=>{provider.isConnected=true;},on(){},removeListener(){},signMessage:async()=>({signature:new Uint8Array(64)}),signTransaction:async tx=>approve(tx)};
  globalThis.CustomEvent=class{constructor(type,options){this.type=type;this.detail=options?.detail;}};
  globalThis.window={TekkworkSDK:{Buffer,bs58,Transaction},...(injected?{phantom:{solana:provider}}:{}),addEventListener(){},dispatchEvent(e){if(!injected&&e.type==='wallet-standard:app-ready')e.detail.register(wallet);}};
- globalThis.fetch=async(url,options={})=>{if(url.endsWith('/execution/status')||url.endsWith('/execution/wallet-claim')){statusReads++;if(actionTime){assert.equal(options.method,'POST');assert.equal(JSON.parse(options.body).transactionBase64,unsigned);if(lostClaim)throw Error('Claim response lost');}await onStatus();return {ok:true,json:async()=>({status:'AWAITING_WALLET_APPROVAL',executionId:'fixture',signingOrder:liveOrderMismatch?undefined:signingOrder,result,...(actionTime?{walletValidity:{recentBlockhash:tx.recentBlockhash,lastValidBlockHeight:500,height:500-remainingBlocks,remainingBlocks,checkedAt:clock,commitment:'finalized',reviewDigest:'fixture'}}:{}),approvalCapability:{mode:'M4_CONTROLLED_SINGLE_LAUNCH',controlledOwnerApproval:true,m4Target:{owner:address,agentId:'fixture'}}})};}return {ok:true,json:async()=>url.endsWith('/auth/challenge')?{id:'fixture',message:'Fixture authentication only'}:{}};};
+ globalThis.fetch=async(url,options={})=>{if(url.endsWith('/execution/status')||url.endsWith('/execution/wallet-claim')){statusReads++;if(actionTime){assert.equal(options.method,'POST');assert.equal(JSON.parse(options.body).transactionBase64,unsigned);if(lostClaim)throw Error('Claim response lost');}await onStatus();return {ok:true,json:async()=>({status:'AWAITING_WALLET_APPROVAL',executionId:'fixture',walletMessagePolicy:lighthouse&&!policyMismatch?FINAL_MESSAGE_POLICY:undefined,signingOrder:liveOrderMismatch?undefined:signingOrder,result,...(actionTime?{walletValidity:{recentBlockhash:tx.recentBlockhash,lastValidBlockHeight:500,height:500-remainingBlocks,remainingBlocks,checkedAt:clock,commitment:'finalized',reviewDigest:'fixture'}}:{}),approvalCapability:{walletMessagePolicy:lighthouse?FINAL_MESSAGE_POLICY:undefined,mode:'M4_CONTROLLED_SINGLE_LAUNCH',controlledOwnerApproval:true,m4Target:{owner:address,agentId:'fixture'}}})};}return {ok:true,json:async()=>url.endsWith('/auth/challenge')?{id:'fixture',message:'Fixture authentication only'}:{}};};
  Date.now=()=>clock;const backend=await import('../public/app/backend.js?m4-boundary-'+(++serial));await backend.connect(backend.wallets().find(w=>w.name==='Phantom').id);
  return {review,partial:review.walletTransactionBase64,signer:backend.m4LaunchWallet(address),calls:()=>calls,statusReads:()=>statusReads,setClock:n=>clock=n,onStatus:fn=>onStatus=fn,waitStatus:()=>{onStatus=()=>new Promise(r=>resolveStatus=r);return ()=>resolveStatus();}};
 }
@@ -49,4 +51,17 @@ for(const injected of [false,true])test('Lighthouse augmentation is diagnosed an
  assert.equal(evidence.returned.instructions.at(-1).program,'L2TExMFKdjpN9kozasaurPirfHy9P8sbXoAN1qA3S95');
  assert.ok(evidence.differences.includes('instructions'));assert.equal(f.calls(),1);
  await assert.rejects(f.signer.signTransaction(f.partial,f.review,()=>{}),/Single reviewed/);assert.equal(f.calls(),1);
+});
+
+for(const injected of [false,true])test('explicit final-message policy accepts only the allowed wallet assertion '+injected,async t=>{
+ const f=await fixture(t,{ownerFirst:true,injected,actionTime:true,addLighthouse:true,lighthouse:true});
+ const signed=Transaction.from(Buffer.from(await f.signer.signTransaction(f.partial,f.review,()=>{}),'base64'));
+ assert.equal(signed.verifySignatures(false),true);assert.equal(signed.signatures[1].signature,null);assert.equal(signed.instructions.length,2);assert.equal(f.calls(),1);
+ await assert.rejects(f.signer.signTransaction(f.partial,f.review,()=>{}));assert.equal(f.calls(),1);
+});
+test('final-message capability disagreement blocks before provider; allowed policy never permits changed blockhash',async t=>{
+ const f=await fixture(t,{ownerFirst:true,injected:true,actionTime:true,lighthouse:true,policyMismatch:true});await assert.rejects(f.signer.signTransaction(f.partial,f.review,()=>{}),/policy changed/);assert.equal(f.calls(),0);
+});
+test('allowed Lighthouse policy still rejects wallet blockhash mutation',async t=>{
+ const f=await fixture(t,{ownerFirst:true,injected:true,actionTime:true,lighthouse:true,addLighthouse:true,mutateBlockhash:true});await assert.rejects(f.signer.signTransaction(f.partial,f.review,()=>{}));assert.equal(f.calls(),1);
 });
