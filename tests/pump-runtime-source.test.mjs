@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {DatabaseSync} from 'node:sqlite';
-import {Keypair} from '@solana/web3.js';
+import {Keypair,VersionedTransaction} from '@solana/web3.js';
 import {pumpAccountFixture,pumpWalletFixture,fixtureBlockhash} from './pump-account-fixture.mjs';
 import {decodePumpVenueBundle} from '../server/dex/pump-account-decoder.js';
 import {createPumpRuntimeAdapter} from '../server/dex/pump-runtime-adapter.js';
@@ -15,11 +15,11 @@ import {SOL_MINT} from '../server/dex/intent.js';
 const now=1800000000000,wallet=Keypair.fromSeed(Buffer.alloc(32,191)).publicKey.toBase58();
 async function fixture({backend=true,source='ON_CHAIN',qualified=true,migrated=false}={}){
  const bundle=await pumpAccountFixture({migrated});bundle.context.observedAt=now;if(backend)bundle.context.source='BACKEND_RPC_READ';
- const venue=decodePumpVenueBundle(bundle),snapshot={venue,accounts:pumpWalletFixture(venue,wallet),networkFeeLamports:'5000',blockhash:fixtureBlockhash};
+ const venue=decodePumpVenueBundle(bundle),snapshot={venue,accounts:pumpWalletFixture(venue,wallet),networkFeeLamports:'5000',blockhash:fixtureBlockhash,nativeValidity:{source:venue.source,genesis:GENESIS,commitment:'finalized',blockhash:fixtureBlockhash,blockhashContextSlot:101,minContextSlot:101,currentBlockHeight:80,lastValidBlockHeight:150,checkedAt:now}};
  const intent={owner:venue.owner,agentId:venue.agentId,agentWallet:wallet,network:'solana:101',genesis:GENESIS,side:'BUY',inputMint:SOL_MINT,outputMint:venue.mint,inputAmount:'1000000',slippageBps:100,expiresAt:now+10000};
- const calls={snapshot:0,simulation:0};let ready=qualified,readHook=()=>{},simHook=()=>{},simulationSource=venue.source;
- const adapter=createPumpRuntimeAdapter({source,qualification:()=>ready,now:()=>now,readSnapshot:async()=>{calls.snapshot++;await readHook();return snapshot;},simulateUnsigned:async p=>{calls.simulation++;await simHook();return {source:simulationSource,messageHash:p.messageHash,success:true,err:null};},readFinalized:async signature=>({signature,synthetic:true}),verifyFinalizedEffects:async()=>({synthetic:true})});
- return {adapter,intent,venue,snapshot,calls,set qualified(v){ready=v;},set simulationSource(v){simulationSource=v;},readHook(fn){readHook=fn;},simHook(fn){simHook=fn;}};
+ const calls={snapshot:0,simulation:0};let clock=now,ready=qualified,readHook=()=>{},simHook=()=>{},simulationSource=venue.source;
+ const adapter=createPumpRuntimeAdapter({source,qualification:()=>ready,now:()=>clock,readNativeValidity:async()=>({source:venue.source,genesis:GENESIS,commitment:'finalized',minContextSlot:101,currentBlockHeight:81,checkedAt:clock,blockhash:fixtureBlockhash,blockhashValid:true,blockhashValidationSlot:102}),readSnapshot:async()=>{calls.snapshot++;await readHook();return snapshot;},simulateUnsigned:async p=>{calls.simulation++;await simHook();return {source:simulationSource,messageHash:p.messageHash,success:true,err:null};},readFinalized:async signature=>({signature,synthetic:true}),verifyFinalizedEffects:async()=>({synthetic:true})});
+ return {adapter,intent,venue,snapshot,calls,set clock(v){clock=v;},set qualified(v){ready=v;},set simulationSource(v){simulationSource=v;},readHook(fn){readHook=fn;},simHook(fn){simHook=fn;}};
 }
 for(const migrated of [false,true])test(`explicit synthetic backend contract maps plan only (${migrated?'swap':'curve'}), never grants execution`,async()=>{const x=await fixture({migrated}),plan=await x.adapter.prepare(x.intent,{},async()=>{});assert.equal(plan.source,'ON_CHAIN');assert.equal(plan.quote.source,'BACKEND_RPC_READ');assert.equal(plan.simulation.source,'BACKEND_RPC_READ');assert.equal(plan.simulation.notReceipt,true);assert.equal(plan.quote.provenance,'DERIVED');assert.equal(plan.quote.actualDebitVerified,false);assert.equal(plan.quote.authorizationGranted,false);assert.equal(x.venue.onChainVerified,false);if(!migrated){assert.equal(plan.effectPolicy.source,'BACKEND_RPC_READ');assert.equal(plan.effectPolicy.venueExecutionQualified,false);assert.equal(plan.effectPolicy.authorizationGranted,false);}assert.equal(await x.adapter.verifyPrepared({plan}),true);assert.equal('sign'in x.adapter,false);assert.equal('broadcast'in x.adapter,false);});
 test('default fixture contract stays fixture and never becomes qualified',async()=>{const x=await fixture({backend:false,source:'LOCAL_FIXTURE'}),p=await x.adapter.prepare(x.intent,{},async()=>{});assert.equal(p.source,'LOCAL_FIXTURE');assert.equal(x.adapter.qualification(),false);assert.equal(p.effectPolicy.source,'LOCAL_FIXTURE');assert.equal(await x.adapter.verifyPrepared({plan:p}),true);});
@@ -40,4 +40,12 @@ test('final executor authority await revocation cannot persist execution or rese
  const context={authenticated:true,owner:x.intent.owner,agentId:x.intent.agentId,agentWallet:wallet,associatedMint:x.venue.mint,network:'solana:101',genesis:GENESIS,authorityVerified:true,revision:1,paused:false,enabled:true,killSwitch:false,emergencyStop:false,liveEnabled:false,broadcastEnabled:false};
  const e=createPumpRuntimeExecutor({source:'ON_CHAIN',ledger,adapter:x.adapter,readContext:async()=>{if(++reads===6)x.qualified=false;return structuredClone(context);},now:()=>now});
  await assert.rejects(e.prepare({}, {...x.intent,requestKey:'synthetic-source-guard-001'}),/VENUE_NOT_QUALIFIED/);assert.equal(reads,6);assert.equal(db.prepare('select count(*) n from pump_runtime_executions').get().n,0);assert.equal(db.prepare('select count(*) n from real_reserved_accounts').get().n,0);assert.equal(ledger.position(x.intent.agentId,x.venue.mint),null);assert.equal(db.prepare('select count(*) n from pump_runtime_receipts').get().n,0);
+});
+for(const phase of ['prepare','pending'])test(`native proof ageing during final ${phase} owner await rejects without new effect`,async t=>{
+ const x=await fixture(),db=new DatabaseSync(':memory:');t.after(()=>db.close());let clock=now,reads=0,age=false;
+ const ledger=createPumpRuntimeLedger(db,{source:'ON_CHAIN',now:()=>clock});
+ const context={authenticated:true,owner:x.intent.owner,agentId:x.intent.agentId,agentWallet:wallet,associatedMint:x.venue.mint,network:'solana:101',genesis:GENESIS,authorityVerified:true,revision:1,paused:false,enabled:true,killSwitch:false,emergencyStop:false,liveEnabled:false,broadcastEnabled:false};
+ const engine=createPumpRuntimeExecutor({source:'ON_CHAIN',ledger,adapter:x.adapter,readContext:async()=>{if(++reads===(phase==='prepare'?6:2)&&age){clock=now+6000;x.clock=clock;}return structuredClone(context);},now:()=>clock});
+ if(phase==='prepare'){age=true;await assert.rejects(engine.prepare({}, {...x.intent,requestKey:'synthetic-native-age-prepare'}),/NATIVE_HEIGHT_UNVERIFIED/);assert.equal(ledger.list(x.intent.agentId).length,0);assert.equal(db.prepare('SELECT count(*) n FROM real_reserved_accounts').get().n,0);}
+ else{const r=await engine.prepare({}, {...x.intent,requestKey:'synthetic-native-age-pending'});reads=0;age=true;const tx=VersionedTransaction.deserialize(Buffer.from(r.plan.unsignedTransaction,'base64'));tx.sign([Keypair.fromSeed(Buffer.alloc(32,191))]);await assert.rejects(engine.trackPending({},r.id,Buffer.from(tx.serialize()).toString('base64')),/NATIVE_HEIGHT_UNVERIFIED/);assert.equal(ledger.get(r.id).status,'PREPARED');assert.equal(ledger.get(r.id).signature,null);}
 });

@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {DatabaseSync} from 'node:sqlite';
 import {Keypair} from '@solana/web3.js';
-import {readAgentSetup,readAgentSetupFacts} from '../server/agent-setup.js';
+import {readAgentSetup,readAgentSetupFacts,createLaunchpadFundingAuthority} from '../server/agent-setup.js';
 import {renderAgentSetup} from '../public/app/agent-setup-ui.js';
 
 function fixture(){
@@ -16,6 +16,15 @@ function fixture(){
  const input={db,agent,owner,evidence,balanceReader:async address=>({owner:address,network:'solana:101',lamports:3000000,slot:110,checkedAt:1000}),revalidate:()=>({owner,agent,evidence})};
  return {db,agent,receipt,input};
 }
+
+test('positive balance below reserve/holds still needs funding; exact canonical receipt is required for Launchpad funding',async()=>{
+ const f=fixture();try{
+  for(const lamports of [1,2020000]){const s=await readAgentSetup({...f.input,balanceReader:async()=>({owner:f.agent.tradingWallet,network:'solana:101',lamports,slot:110,checkedAt:1000})});assert.equal(s.state,'AWAITING_FUNDING');assert.equal(s.nextAction.kind,'FUND_AGENT');}
+  let scope={available:true,scoped:true},evidence=f.input.evidence;const authority=createLaunchpadFundingAuthority({db:f.db,readScope:()=>scope,readEvidence:()=>evidence});
+  assert.equal(authority(f.agent).signature,f.receipt.signature);evidence={available:true,receipt:null};assert.throws(()=>authority(f.agent),/Confirmed launch/);scope={available:false};assert.throws(()=>authority(f.agent),/Confirmed launch/);
+  scope={available:true,scoped:false};assert.deepEqual(authority({id:'general',creator:f.input.owner}),{kind:'GENERAL'});const damaged={...f.agent};delete damaged.launchWalletBinding;assert.throws(()=>authority(damaged),/Confirmed launch/);
+ }finally{f.db.close();}
+});
 test('setup binds canonical receipt/wallet, subtracts protected reserve and reservations, never grants authority or exposes ciphertext',async()=>{
  const f=fixture();try{f.db.prepare('INSERT INTO real_reserved_accounts VALUES(?,?)').run(f.agent.tradingWallet,'100000');const before=f.db.prepare('SELECT total_changes() n').get().n;
  const s=await readAgentSetup(f.input);assert.equal(s.state,'AWAITING_ACTIVATION');assert.equal(s.capital.protectedReserveLamports,'2020000');assert.equal(s.capital.balanceAfterReserveLamports,'880000');assert.equal(s.capital.executableTradeBudgetLamports,null);assert.equal(s.wallet.commitment,'confirmed');assert.equal(s.authorizationGranted,false);for(const key of ['funding','activation','trading'])assert.equal(s[key].enabled,false);assert.doesNotMatch(JSON.stringify(s),/fixture-encrypted-envelope|secret/);assert.equal(f.db.prepare('SELECT total_changes() n').get().n,before);

@@ -42,8 +42,20 @@ export async function readAgentSetup({db,agent,owner,evidence,balanceReader,reva
  const current=readAgentSetupFacts({db,agent:latest.agent,owner,evidence:latest.evidence});
  if(JSON.stringify(current)!==JSON.stringify(facts))return fail('SETUP_CHANGED');
  const reserve=protection(),remaining=balance?BigInt(balance.lamports)-uint(reserve)-uint(facts.reservedLamports):null;
- return {...base,state:!balance?'BALANCE_UNAVAILABLE':BigInt(balance.lamports)===0n?'AWAITING_FUNDING':'AWAITING_ACTIVATION',launch:facts.launch,
+ return {...base,state:!balance?'BALANCE_UNAVAILABLE':remaining<=0n?'AWAITING_FUNDING':'AWAITING_ACTIVATION',launch:facts.launch,
   wallet:{address:facts.wallet,recordStatus:'ENCRYPTED_RECORD_PRESENT',balanceStatus:balance?'AVAILABLE':'UNAVAILABLE',balanceLamports:balance?String(balance.lamports):null,slot:balance?.slot??null,observedAt:balance?.checkedAt??null,commitment:'confirmed'},
   capital:{protectedReserveLamports:reserve,reservedLamports:facts.reservedLamports,balanceAfterReserveLamports:remaining===null?null:String(remaining>0n?remaining:0n),executableTradeBudgetLamports:null,reason:'PUMP_EXECUTION_NOT_QUALIFIED',policySource:'controlled-policy-v1'},
-  nextAction:{kind:balance&&balance.lamports>0?'REVIEW_ACTIVATION':'FUND_AGENT',enabled:false}};
+  nextAction:{kind:remaining!==null&&remaining>0n?'REVIEW_ACTIVATION':'FUND_AGENT',enabled:false}};
+}
+
+export function createLaunchpadFundingAuthority({db,readScope,readEvidence}){
+ return agent=>{
+  const deny=()=>{throw Object.assign(Error('Confirmed launch and Agent wallet binding are required for funding'),{status:409});};
+  const scope=readScope(agent);if(scope?.available!==true)deny();
+  const hasBinding=table(db,'launch_agent_bindings')&&db.prepare('SELECT 1 FROM launch_agent_bindings WHERE agent_id=?').get(agent.id);
+  if(scope.scoped===false&&!agent.launchWalletBinding&&!hasBinding)return {kind:'GENERAL'};
+  const facts=readAgentSetupFacts({db,agent,owner:agent.creator,evidence:readEvidence(agent)});
+  if(!facts.available||facts.launched!==true)deny();
+  return {kind:'LAUNCHPAD',owner:agent.creator,agentId:agent.id,wallet:facts.wallet,mint:facts.launch.mint,network:'solana:101',executionId:facts.launch.executionId,signature:facts.launch.signature,confirmedSlot:facts.launch.confirmedSlot};
+ };
 }

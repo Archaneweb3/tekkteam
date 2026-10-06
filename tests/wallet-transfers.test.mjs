@@ -14,14 +14,14 @@ import {runtime} from '../server/runtime.js';
 import {executeLive} from '../server/live-execution.js';
 import {randomUUID} from 'node:crypto';
 
-async function fixture(t){
+async function fixture(t,{authority=false}={}){
  const path=join(mkdtempSync(join(tmpdir(),'tekk-wallet-')),'db'),owner=Keypair.generate(),wallet=Keypair.generate(),other=Keypair.generate();
  let store=openStore(path),db=store.db;
  db.exec('CREATE TABLE agent_wallets(agent_id TEXT PRIMARY KEY,address TEXT,secret TEXT)');
  db.exec('CREATE TABLE dex_positions(agent_id TEXT NOT NULL,mint TEXT NOT NULL,data TEXT NOT NULL,PRIMARY KEY(agent_id,mint)); CREATE TABLE dex_executions(id TEXT PRIMARY KEY,agent_id TEXT NOT NULL,status TEXT NOT NULL,data TEXT);');
  const agent={id:'agent-one',creator:owner.publicKey.toBase58(),tradingWallet:wallet.publicKey.toBase58()};
  db.prepare('INSERT INTO agent_wallets VALUES(?,?,?)').run(agent.id,agent.tradingWallet,store.seal(wallet.secretKey,'trading:'+agent.id));
- const control={fund:true,withdraw:true,paused:false,genesis:GENESIS,balance:1000000000,fee:5000,height:1,now:Date.now(),sends:0,outcome:'confirmed',sendError:false,mutate:null,tx:null,session:true,tokenAccounts:[],tokenError:false,tokenReads:0};
+ const control={fundingProof:{kind:"GENERAL"},fund:true,withdraw:true,paused:false,genesis:GENESIS,balance:1000000000,fee:5000,height:1,now:Date.now(),sends:0,outcome:'confirmed',sendError:false,mutate:null,tx:null,session:true,tokenAccounts:[],tokenError:false,tokenReads:0};
  const c={getGenesisHash:async()=>control.genesis,getLatestBlockhash:async()=>({blockhash:Keypair.generate().publicKey.toBase58(),lastValidBlockHeight:100}),getBlockHeight:async()=>control.height,getFeeForMessage:async()=>({value:control.fee}),getBalance:async()=>{if(control.balance===null)throw Error('private RPC credentials');return control.balance;},getParsedTokenAccountsByOwner:async()=>{control.tokenReads++;if(control.tokenError)throw Error('private RPC credentials');return {value:control.tokenReads%2?control.tokenAccounts:[]};},sendRawTransaction:async bytes=>{control.sends++;control.tx=Transaction.from(bytes);if(control.sendError)throw Error('timeout');return bs58.encode(control.tx.signature);},getTransaction:async()=>{
   if(control.outcome==='unknown')return null;if(control.outcome==='error')throw Error('private RPC credentials');
   const tx=Transaction.from(control.tx.serialize()),message=tx.compileMessage(),transfer=tx.instructions.at(-1),source=transfer.keys[0].pubkey,dest=transfer.keys[1].pubkey,amount=Number(transfer.data.readBigUInt64LE(4));
@@ -35,7 +35,7 @@ async function fixture(t){
   const app=express();app.use(express.json());
   const auth=(q,s,n)=>{if(!q.headers['x-owner'])return s.status(401).json({error:'Authentication required'});q.session={address:q.headers['x-owner']};n();};
   const owned=req=>{if(req.session.address!==agent.creator||req.params.id!==agent.id)throw Object.assign(Error('Agent not found'),{status:404});return {agent};};
-  const service=installWalletTransfers(app,{db,store,auth,owned,connection:c,now:()=>control.now,enabled:()=>control.fund,withdrawalEnabled:()=>control.withdraw,paused:()=>control.paused,sessionValid:()=>control.session});
+  const service=installWalletTransfers(app,{db,store,auth,owned,connection:c,now:()=>control.now,enabled:()=>control.fund,withdrawalEnabled:()=>control.withdraw,paused:()=>control.paused,sessionValid:()=>control.session,readFundingAuthority:authority?()=>control.fundingProof:undefined});
   app.use((e,q,s,n)=>s.status(e.status||500).json({error:e.status?e.message:'Service unavailable'}));
   server=app.listen(0,'127.0.0.1');await new Promise(r=>server.once('listening',r));return service;
  };
@@ -45,6 +45,16 @@ async function fixture(t){
  const submit=async r=>{if(r.kind==='WITHDRAW')return call('withdrawal/confirm',{id:r.id,confirm:true});const tx=Transaction.from(Buffer.from(r.transaction,'base64'));tx.sign(owner);return call('funding/submit',{id:r.id,signedTransaction:tx.serialize().toString('base64')});};
  return {agent,owner,wallet,other,control,c,call,prepare,submit,get db(){return db;},get store(){return store;},reconcile:()=>service.reconcilePending(),restart:async()=>{await new Promise(r=>server.close(r));store.close();store=openStore(path);db=store.db;service=await boot();}};
 }
+for(const phase of ['prepare','review','submit'])test(`launch funding receipt binding mutation during ${phase} stops before send`,async t=>{
+ const f=await fixture(t,{authority:true});f.control.fundingProof={kind:'LAUNCHPAD',signature:'first-receipt'};
+ const prepared=phase==='prepare'?null:(await f.prepare()).data;
+ const original=f.c.getBalance;f.c.getBalance=async()=>{f.control.fundingProof={kind:'LAUNCHPAD',signature:'changed-receipt'};return original();};
+ const result=phase==='prepare'?await f.prepare():phase==='review'?await f.call('funding/'+prepared.id+'/review',{}):await f.submit(prepared);
+ assert.equal(result.status,409);assert.match(result.data.error,/authority changed/);assert.equal(f.control.sends,0);
+ if(prepared)assert.equal(JSON.parse(f.db.prepare('SELECT data FROM agent_funding WHERE id=?').get(prepared.id).data).signature,undefined);
+});
+test('launch-bound Agent without canonical authority reader cannot prepare funding',async t=>{const f=await fixture(t);f.agent.launchWalletBinding={signature:'not-authority'};assert.equal((await f.prepare()).status,409);assert.equal(f.control.sends,0);assert.equal(f.db.prepare('SELECT count(*) n FROM agent_funding').get().n,0);});
+
 test('new funding stores final budget, hash, quote; RPC fee failures fail closed',async t=>{
  const f=await fixture(t),r=(await f.prepare()).data;
  assert.equal(r.fundingMessageVersion,1);assert.equal(r.computeUnitLimit,10000);assert.equal(r.computeUnitPrice,0);

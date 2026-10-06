@@ -25,9 +25,11 @@ export function createPumpRuntimeExecutor({ledger,adapter,readContext,source='LO
   if(!passive&&(c.paused!==false||c.killSwitch!==false||c.emergencyStop!==false||c.enabled!==true||c.liveEnabled!==false||c.broadcastEnabled!==false))reject('PUMP_RUNTIME_PAUSED_OR_DISARMED');
   return structuredClone(c);
  };
- const owned=async(actor,id,passive=false)=>{const r=ledger.get(id);if(!r)reject('PUMP_RUNTIME_NOT_FOUND');return {r,c:await guard(actor,r.intent,{passive})};};
+ const integrity=r=>{if(r.planDigest!==digest(r.plan)||r.fingerprint!==digest(r.intent))reject('PUMP_RUNTIME_PERSISTED_INTEGRITY');return r;};
+ const owned=async(actor,id,passive=false)=>{const r=ledger.get(id);if(!r)reject('PUMP_RUNTIME_NOT_FOUND');integrity(r);return {r,c:await guard(actor,r.intent,{passive})};};
  const same=(a,b)=>{if(digest(a)!==digest(b))reject('PUMP_RUNTIME_CONTEXT_CHANGED');};
  const fresh=r=>{if(now()>=r.intent.expiresAt||now()>=r.plan.quote.expiresAt)reject('PUMP_RUNTIME_EXPIRED');};
+ const nativeCurrent=r=>{if(source==='ON_CHAIN'&&typeof adapter.assertPreparedCurrent!=='function')reject('PUMP_NATIVE_RECHECK_REQUIRED');adapter.assertPreparedCurrent?.(r);};
  return {
   async prepare(actor,body){
    if(!adapter)reject('PUMP_RUNTIME_ADAPTER_UNAVAILABLE');
@@ -35,7 +37,7 @@ export function createPumpRuntimeExecutor({ledger,adapter,readContext,source='LO
    const {requestKey,...intent}=structuredClone(body);
    if(intent.network!=='solana:101'||intent.genesis!==GENESIS||!['BUY','SELL'].includes(intent.side)||(intent.side==='BUY'?intent.inputMint:intent.outputMint)!==SOL_MINT||!Number.isSafeInteger(intent.expiresAt)||intent.expiresAt<=now()||intent.expiresAt>now()+30000||!Number.isSafeInteger(intent.slippageBps)||intent.slippageBps<0||intent.slippageBps>100)reject('PUMP_RUNTIME_INTENT');
    integer(intent.inputAmount);const c=await guard(actor,intent);
-   const existing=ledger.lookup(intent,requestKey);if(existing)return existing;
+   const existing=ledger.lookup(intent,requestKey);if(existing)return integrity(existing);
    qualified();
    const plan=structuredClone(await adapter.prepare(structuredClone(intent),structuredClone(c),async()=>same(c,await guard(actor,intent))));same(c,await guard(actor,intent));
    if(plan?.source!==source||!['PUMP_BONDING_CURVE','PUMPSWAP'].includes(plan.venueKind)||plan.quote?.side!==intent.side||plan.quote.agentId!==intent.agentId||plan.quote.slippageBps!==intent.slippageBps||plan.quote.expiresAt>intent.expiresAt||plan.quote.expiresAt<=now())reject('PUMP_RUNTIME_PLAN');
@@ -44,11 +46,12 @@ export function createPumpRuntimeExecutor({ledger,adapter,readContext,source='LO
    plan.risk=evaluatePumpRuntimeRisk(intent,plan,riskPolicy,now());
    if(plan.risk.expiresAt<=now())reject('PUMP_RUNTIME_RISK_EXPIRED');
    qualified(); // Includes revocation during the final asynchronous authority guard.
+   nativeCurrent(r);
    return ledger.prepare({intent,plan,requestKey});
   },
   // Trusted in-process import of an already-existing signed transaction only.
   // Never exposed as HTTP submit/sign/send; fixtures use synthetic transaction bytes.
-  async trackPending(actor,id,encoded){const {r,c}=await owned(actor,id);fresh(r);if(now()>=r.plan.risk.expiresAt)reject('PUMP_RUNTIME_RISK_EXPIRED');const tx=VersionedTransaction.deserialize(Buffer.from(encoded,'base64')),signature=bs58.encode(tx.signatures[0]);transaction(encoded,{...r,signature},{signed:true});same(c,await guard(actor,r.intent));fresh(r);if(now()>=r.plan.risk.expiresAt)reject('PUMP_RUNTIME_RISK_EXPIRED');return ledger.trackPending(id,{signature,messageHash:r.plan.messageHash});},
+  async trackPending(actor,id,encoded){const {r,c}=await owned(actor,id);fresh(r);if(now()>=r.plan.risk.expiresAt)reject('PUMP_RUNTIME_RISK_EXPIRED');const tx=VersionedTransaction.deserialize(Buffer.from(encoded,'base64')),signature=bs58.encode(tx.signatures[0]);transaction(encoded,{...r,signature},{signed:true});qualified();if(await adapter.verifyPrepared(structuredClone(r))!==true)reject('PUMP_RUNTIME_PREPARATION_UNVERIFIED');same(c,await guard(actor,r.intent));fresh(r);if(now()>=r.plan.risk.expiresAt)reject('PUMP_RUNTIME_RISK_EXPIRED');qualified();nativeCurrent(r);return ledger.trackPending(id,{signature,messageHash:r.plan.messageHash});},
   async reconcile(actor,id){
    const {r}=await owned(actor,id,true);if(r.status!=='UNKNOWN'||!r.signature)return r;
    if(!adapter)reject('PUMP_RUNTIME_ADAPTER_UNAVAILABLE');

@@ -30,7 +30,7 @@ import {agentLaunchData,assertAgentLaunch} from '../src/agent-launch-data.js';
 import {parseInitialBuy} from '../src/initial-buy.js';
 import {installRealLeaderboard} from './real-leaderboard.js';
 import {resolveTokenDraftConfiguration} from './launchpad-token-configuration.js';
-import {readAgentSetup} from './agent-setup.js';
+import {readAgentSetup,createLaunchpadFundingAuthority} from './agent-setup.js';
 
 const hash = v => createHash('sha256').update(v).digest('hex');
 const fail = (status, message) => { throw Object.assign(new Error(message), { status }); };
@@ -118,7 +118,7 @@ export function createServer({ dbPath, vaultKey, origins = ['http://127.0.0.1:51
   }
   try{m4Execution=m4ExecutionFactory?.({db,store,receiptAuthority});}catch(error){store.close();throw error;}
   const launchEvidence=a=>readLaunchEvidence(a,tokenDraftOptions?.journalPath,receiptReader);
-  const trading=installAgentTrading(app,{store,auth,owned,now,realMoney,...(tokenDraftOptions?{receipt:a=>launchReceipt(a,tokenDraftOptions.journalPath,receiptReader)}:{}),sessionValid:req=>getSession(req)?.address===req.session?.address,...tradingOptions,readLaunchpadScope:scopeLedger.readLaunchpadScope});
+  const trading=installAgentTrading(app,{store,auth,owned,now,realMoney,...(tokenDraftOptions?{receipt:a=>launchReceipt(a,tokenDraftOptions.journalPath,receiptReader)}:{}),sessionValid:req=>getSession(req)?.address===req.session?.address,...tradingOptions,readLaunchpadScope:scopeLedger.readLaunchpadScope,readFundingAuthority:createLaunchpadFundingAuthority({db,readScope:scopeLedger.readLaunchpadScope,readEvidence:launchEvidence})});
   const controlledDex=installControlledDex(app,{db,store,auth,owned,now,realMoney,pumpRuntimeDependencies,productionOrigin:production&&network==='mainnet'&&origins.length===1&&origins[0]==='https://tekkteam.tech'?origins[0]:null,sessionValid:req=>getSession(req)?.address===req.session?.address,readLaunchpadScope:scopeLedger.readLaunchpadScope,readReceiptAuthority:a=>readFirstTokenReceiptAuthority(a,tokenDraftOptions?.journalPath??resolve(process.env.DATA_DIR||'server/data','pump-agent-launches.json'),receiptReader)});
   installRealLeaderboard(app,{db,auth,owned,now});
   if(controlledDex.autonomousScheduler)trading.tick.setAutonomousTick(()=>controlledDex.autonomousScheduler.tick());

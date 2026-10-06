@@ -18,10 +18,10 @@ export function decodePumpVenueBundle({agent,receipt,context,accounts}={}){
  if(mint.toBase58()===sol||mint.equals(PublicKey.default))rejectPump('PUMP_ASSOCIATED_MINT_INVALID');
  if(context?.network!=='solana:101'||context.genesis!==GENESIS||!['LOCAL_FIXTURE','BACKEND_RPC_READ'].includes(context.source)||!number(context.slot)||!number(context.currentSlot)||!number(context.maxAgeSlots)||context.maxAgeSlots>150||context.slot>context.currentSlot||context.currentSlot-context.slot>context.maxAgeSlots)rejectPump('PUMP_ACCOUNT_CONTEXT_INVALID');
  if(!tokenProgram.equals(TOKEN_PROGRAM_ID)&&!tokenProgram.equals(TOKEN_2022_PROGRAM_ID))rejectPump('PUMP_TOKEN_PROGRAM_UNQUALIFIED');
- const copied={},fingerprints={};
+ const copied={},fingerprints={},rawAccounts={};
  function account(role,expected,program,{sizes}={}){
   const a=accounts?.[role];if(!a||a.slot!==context.slot||a.executable!==false||a.exists!==true||!Buffer.isBuffer(a.data)||a.data.length>16384||!address(a.address).equals(expected)||!address(a.owner).equals(program)||sizes&&!sizes.includes(a.data.length))rejectPump('PUMP_ACCOUNT_BINDING_INVALID');
-  const info={data:Buffer.from(a.data),owner:program,executable:false,lamports:0,rentEpoch:0};copied[role]={address:expected.toBase58(),info};fingerprints[role]={address:expected.toBase58(),owner:program.toBase58(),hash:createHash('sha256').update(a.data).digest('hex')};return info;
+  const info={data:Buffer.from(a.data),owner:program,executable:false,lamports:0,rentEpoch:0};copied[role]={address:expected.toBase58(),info};rawAccounts[role]={address:a.address,owner:a.owner,data:Buffer.from(a.data),slot:a.slot,exists:true,executable:false,...(a.lamports===undefined?{}:{lamports:a.lamports})};fingerprints[role]={address:expected.toBase58(),owner:program.toBase58(),hash:createHash('sha256').update(a.data).digest('hex')};return info;
  }
  let minted;try{minted=unpackMint(mint,account('mint',mint,tokenProgram),tokenProgram);}catch(e){if(e.code)throw e;rejectPump('PUMP_MINT_DECODE_INVALID');}
  if(!minted.isInitialized||minted.freezeAuthority||minted.mintAuthority||minted.decimals!==6||amount(minted.supply,{positive:true})===0n)rejectPump('PUMP_MINT_AUTHORITY_UNQUALIFIED');
@@ -79,7 +79,8 @@ export function decodePumpVenueBundle({agent,receipt,context,accounts}={}){
  if(override>0n){const ceiling=amount(global.maxConfigurableCreatorFeeBps??0);if(global.creatorFeeConfigurable!==true||override>ceiling||ceiling>=10000n)rejectPump('PUMP_CREATOR_FEE_OVERRIDE_UNQUALIFIED');for(const f of fees)if(amount(f.lpFeeBps)+amount(f.protocolFeeBps)+override>=10000n)rejectPump('PUMP_FEE_SCHEDULE_INVALID');}
  const proofHash=createHash('sha256').update(JSON.stringify({agentId:agent.id,owner:owner.toBase58(),mint:mint.toBase58(),context,fingerprints,sdkPin})).digest('hex');
  const result=Object.freeze({schema:'PUMP_RAW_ACCOUNT_BUNDLE_V1',kind,state:'DISARMED',agentId:agent.id,owner:owner.toBase58(),mint:mint.toBase58(),tokenProgram:tokenProgram.toBase58(),quoteMint:sol,venue:venueKey.toBase58(),slot:context.slot,source:context.source,proofHash,sdkPin,provenance:'DERIVED',onChainVerified:false,enabled:false,authorizationGranted:false});
- internal.set(result,{mint,owner,tokenProgram,minted,curve,global,feeConfig,pool,baseVault,quoteVault,copied,context:{...context}});return result;
+ const rawBundle={agent:{id:agent.id,creator:agent.creator},receipt:Object.fromEntries(['agentId','owner','network','status','confirmed','signature','mint'].map(k=>[k,receipt[k]])),context:Object.fromEntries(['network','genesis','source','slot','currentSlot','maxAgeSlots','observedAt'].filter(k=>context[k]!==undefined).map(k=>[k,context[k]])),accounts:rawAccounts};
+ internal.set(result,{mint,owner,tokenProgram,minted,curve,global,feeConfig,pool,baseVault,quoteVault,copied,context:{...context},rawBundle});return result;
 }
 
 // Module-internal handoff: JSON copies and browser-authored descriptors are rejected.

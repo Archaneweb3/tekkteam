@@ -1,4 +1,25 @@
-# Checkpoint — 7 October 2026, 04:24 WIB
+# Checkpoint - 7 October 2026, 04:40 WIB
+
+Local Pump restart/native-validity and funding-binding batch independently PASS.
+Original raw account/message/blockhash evidence survives SQLite/JSON restart;
+no replacement blockhash or simulation is fetched on restore. ON_CHAIN active
+checks require finalized native height + isBlockhashValid and a final synchronous
+freshness fence after owner awaits. Mutation/replay/expiry reject; passive
+UNKNOWN still reconciles the same signature after expiry/revocation.
+
+Launchpad funding reuses existing transfers, with canonical receipt/owner/Agent/
+wallet binding before/after awaits. GENERAL records retain their separate path.
+Positive balance below reserve/holds correctly remains AWAITING_FUNDING.
+No financial flag, sender or worker execution was enabled. No real transfer.
+
+Scoped final141/141 PASS plus prior extended217/217; independent combined review
+PASS. Source is local, deployment queued with the next inactive activation-review
+batch to avoid repeated API restarts. Existing production d70d122 remains healthy.
+Next: durable owner activation plan review, no activation authority; then first-BUY
+account/rent/effect qualification. This is incomplete internal work, not a request
+for owner funding yet.
+
+# Checkpoint â€” 7 October 2026, 04:24 WIB
 
 Canonical post-launch setup/observer batch deployed and independently reviewed.
 Agent `aaaaada` uses its single verified launch binding and encrypted wallet.
@@ -163,7 +184,7 @@ or wallet request yet at this checkpoint. Receipt0, target Agent1, Agent wallet0
 Next: verify successor activation, recover existing owner session, make ONE fresh
 native-blockhash preparation and stop at manual Phantom action-time confirmation.
 
-# CURRENT — 7 October 2026, 01:13 WIB: MESSAGE DIFF KNOWN; HISTORIC STATE DELTA UNPROVEN
+# CURRENT â€” 7 October 2026, 01:13 WIB: MESSAGE DIFF KNOWN; HISTORIC STATE DELTA UNPROVEN
 
 Exactly one Policy101 operation reached Phantom; owner signature returned. The
 backend stopped before submission with SIGNED_NOT_BROADCAST /
@@ -173,7 +194,7 @@ SOL spent0, trading/funding OFF. Legacy operation remains LEGACY_UNKNOWN_QUARANT
 No new operation, wallet popup, Mainnet simulation or CUDA/shared service access.
 
 The recovered prepared/final MESSAGE bytes are bound to operation
-38c731bc-2b8d-4e95-961c-8ac2eefd08f0 and private-state hash28425c88…ec9339.
+38c731bc-2b8d-4e95-961c-8ac2eefd08f0 and private-state hash28425c88â€¦ec9339.
 Both messages are legacy, same owner payer, same two signers and blockhash
 J8tdUR5wJfgVTgMRbEKidSzm8vPwcDp76MJuC9CfGHCL. Prepared message SHA256
 c2c5b046e3635c7d0247e0032f9d5a6b9b01514989125d85f7447c3023e49b8d;
@@ -202,7 +223,7 @@ Redacted diagnostics are now deployed. Wallet-return and server refusal snapshot
 store message fingerprints, semantic account/instruction diffs and hashed/redacted
 RPC state, never raw signed transaction bytes or private keys. Evidence is bound to
 the exact owner, claimed operation and review. The diagnostics table is empty; the
-consumed execution payload is unchanged (SHA28425c88…ec9339). No old operation was
+consumed execution payload is unchanged (SHA28425c88â€¦ec9339). No old operation was
 reopened. Fresh read-only health/capabilities HTTP200; anonymous diagnostic POST401.
 Runtime trading/funding/withdrawal/signing/broadcast all false.
 
@@ -220,7 +241,7 @@ known, but the specific historic Lighthouse account-state mismatch cannot be
 recovered from absent snapshots. Do not prepare or request another wallet signature
 under this brief until that subcondition is resolved and a reviewed correction passes.
 
-# Previous — 7 October 2026, 00:34 WIB: POLICY101 APPROVED; LOCAL QUALIFICATION PASS
+# Previous â€” 7 October 2026, 00:34 WIB: POLICY101 APPROVED; LOCAL QUALIFICATION PASS
 
 Owner explicitly approved permanent legacy quarantine plus exactly one fresh canonical
 launch for the existing aaaaada / ret / 3ED. Financial approval remains manual.
@@ -236,7 +257,7 @@ Source status LOCAL ONLY until deployment evidence below. Real trading/funding O
 TEKKTEAM resources only; no CUDA/shared infra interaction. Owner browser session
 restored in Edge and existing target/draft visible. No fresh wallet attempt yet.
 
-# CURRENT — 7 October 2026, 00:13 WIB: LEGACY ISOLATION OWNER APPROVAL REQUIRED
+# CURRENT â€” 7 October 2026, 00:13 WIB: LEGACY ISOLATION OWNER APPROVAL REQUIRED
 
 Continued c7e92b4 with source checkpoint 59a8de8. Exact legacy operation
 6b713ac6-cfcb-4ca6-8090-72a9b9c1654f is now LEGACY_UNKNOWN_QUARANTINED in a
@@ -273,7 +294,7 @@ No new wallet request, financial signature, broadcast or spend. Trading/funding 
 Only next action: owner explicitly approves or rejects that disclosed UNKNOWN-history
 isolation policy. This approval is separate from later manual Phantom approval.
 
-# Previous — 6 October 2026, 23:31 WIB: CANONICAL DEPLOYED; REAL OWNER QA PASS; M4 BLOCKED
+# Previous â€” 6 October 2026, 23:31 WIB: CANONICAL DEPLOYED; REAL OWNER QA PASS; M4 BLOCKED
 
 SSH verified root@srv2016744; canonical production now uses API release d2516bc
 and UI0516940. HTTPS/API200, www redirects, staging pages redirect to canonical,
@@ -310,7 +331,7 @@ reviewed, explicit approval of historical isolation before changing that policy.
 No fresh Phantom transaction request, signing, broadcast, funding or trading.
 No PHANTOM ACTION-TIME READY / CUDA-LEVEL PRODUCT READY claim is justified.
 
-# Previous — 6 October 2026, 22:46 WIB: SSH VERIFIED; PRODUCT CONVERGENCE IN PROGRESS
+# Previous â€” 6 October 2026, 22:46 WIB: SSH VERIFIED; PRODUCT CONVERGENCE IN PROGRESS
 
 Resume started22:23 WIB, checkpoint target22:53 WIB. Dedicated authorized SSH identity
 reaches root@srv2016744 at179.198.214.104; strict known-host verification PASS.
@@ -332,7 +353,7 @@ Next checkpoint22:53 WIB: finish reviewed data migration/default-OFF canonical
 release and production desktop/mobile QA; no financial gate bypass.
 
 # Previous checkpoint
-# CURRENT — 6 October 2026, 22:22 WIB: HOSTINGER SSH PUBLIC KEY INSTALL REQUIRED
+# CURRENT â€” 6 October 2026, 22:22 WIB: HOSTINGER SSH PUBLIC KEY INSTALL REQUIRED
 
 Resume c20dfc3 preserved all accepted source/deployment evidence below. Filtered
 PowerShell history confirms root@179.198.214.104 on default port22, without a
@@ -355,7 +376,7 @@ one strict-host-key explicit-identity harmless SSH probe and resume the same
 product milestone. No VPS reboot, PM2 restart, deploy or production mutation.
 Evidence: artifacts/m4-deterministic-attempt/hostinger-ssh-public-key-install-required.png.
 
-# Previous — 6 October 2026, 22:15 WIB: direct SSH authentication unavailable
+# Previous â€” 6 October 2026, 22:15 WIB: direct SSH authentication unavailable
 
 Latest user mandate replaces web-terminal infrastructure access with direct SSH.
 Resume began22:12:43 WIB from5058c9c; source and unrelated user changes preserved.
@@ -385,7 +406,7 @@ Lighthouse60d54d1 staging verified; Agent UI bde8e2a and controlled product comp
 reconciliation, profiles, worker and global Real leaderboard remain unfinished.
 Evidence: artifacts/m4-deterministic-attempt/direct-ssh-20261006.txt.
 
-# Previous — 6 October 2026, 22:05 WIB: browser terminal blocked after recovery
+# Previous â€” 6 October 2026, 22:05 WIB: browser terminal blocked after recovery
 
 Resume same active milestone; no broad audit or Lighthouse reimplementation.
 HEAD bde8e2a contains accepted Agent tab/wallet UI. Staging deployed checkpoint is
@@ -429,7 +450,7 @@ Five profiles/Real executor/hosted worker/global closed-production leaderboard r
 unfinished; source seams already inspected by read-only reviewer, no repeat broad scan.
 Agent UX visual fixtures pass1440x900/360x800/390x844/412x915; these are not Phantom
 mobile WebView verification. Last actual on-chain attempt remains historical a50e30db.
-# CURRENT — 6 October 2026, 21:58 WIB checkpoint
+# CURRENT â€” 6 October 2026, 21:58 WIB checkpoint
 
 Lighthouse checkpoint60d54d1 deployed and source hashes verified in isolated staging.
 VPS55/55 affected tests and build12.16s PASS. HTTPS API4395 and runtime capabilities
@@ -454,7 +475,7 @@ No database substitution or invented binding. Canonical metadata Nginx reference
 storage and minimal reviewed product-service composition remain next. Five profiles,
 worker qualification, global Real leaderboard and fresh real launch are NOT complete.
 Browser terminal timeout recovered via fresh Hostinger console; no VPS reboot.
-# CURRENT — 6 October 2026, 21:37 WIB: reviewed Lighthouse ready for staging
+# CURRENT â€” 6 October 2026, 21:37 WIB: reviewed Lighthouse ready for staging
 
 Actual baseline ac32f7c; local accepted work preserved. Limited semantic validator,
 encrypted one-attempt mint signer, final sigVerify simulation, 18-account effects,
@@ -466,7 +487,7 @@ broadcast, receipt or Agent wallet. Trading/funding OFF; production unchanged.
 Fresh Edge tabs recover canonical site and existing Hostinger session. Staging
 deployment is next; public runtime/UX/five profiles/worker remain pending.
 
-## CURRENT — 6 October 2026, 21:10 WIB: limited Lighthouse implementation authorized
+## CURRENT â€” 6 October 2026, 21:10 WIB: limited Lighthouse implementation authorized
 
 Owner explicitly approves strict final-message semantic validation and simulation
 instead of pre-wallet byte equality. Authorization blocker from21:01 is resolved;
@@ -474,7 +495,7 @@ code/integration remains in progress. Canonical publicdomaintekkteam.tech, inter
 QA staging retained. No new wallet attempt, broadcast or launch evidence yet.
 Active scope/deadline in EXECUTION_BRIEF; prior evidence below remains unchanged.
 
-## Historical — 6 October 2026, 21:01 WIB: manual approval verified; Phantom compatibility BLOCKED
+## Historical â€” 6 October 2026, 21:01 WIB: manual approval verified; Phantom compatibility BLOCKED
 
 User confirmed manual approval for execution a50e30db-a404-4c87-b3b7-5903265c567a.
 Created20:52:58.249 WIB; returned20:53:35.291. Mainnet, initialbuy0, reviewed
@@ -527,13 +548,13 @@ Evidence: artifacts/m4-deterministic-attempt/{wallet-return-diagnostics.json,
 lighthouse-integrity-summary.json,action-time-diagnostic-review.json,
 post-approval-staging.txt,post-approval-state.jpg,lighthouse-regression.log}.
 
-## Historical 20:52 WIB checkpoint — first wallet message mismatch stopped before Submit
+## Historical 20:52 WIB checkpoint â€” first wallet message mismatch stopped before Submit
 
 Attempt15dd72ef-ed4c-46c5-a1e6-1358c4cc45e6 prepared20:46:37.238 WIB. Final v2, Mainnet simulationPASS, reviewed5565360lamports (fee18000 + other5547360), initialbuy0. Handoff20:46:39.232 had141blocks remaining, native lastValidBlockHeight431957116. Prepared/delivered message25de4cdcc50a5cfa8db154afa86e8a6aad23acc1a0d2d8e3565aa22f3f2c87c7; returned20:46:44.430 messagec3605a9633b3753872c68e9c6ce041dad4d4b226a82c716038426e992a76d445. Exact-message guard rejected it. No Submit observed, backend signature=null/broadcast=false; no receipt/CA. Raw returned message was not captured, so changed fields and wallet-side signature validity are UNKNOWN, not a proven Phantom fee/Lighthouse cause.
 
 Frontend diagnostic sourcef7a0a04 records unsigned raw/provider/compiled messages and changed fields without signature bytes/private keys.18/18 testsPASS and build12.70s. Guard remains unchanged. Staging frontend-only deployment in progress, no PM2 restart. Need one subsequent explicit fresh wallet action/manual owner approval to observe the returned message; no blind retry. Existing Agent/draft untouched, targetAgent1/wallet0, tradingOFF, production unchanged.
 
-## Phase 1 staging verification — 6 October 2026, 20:46 WIB
+## Phase 1 staging verification â€” 6 October 2026, 20:46 WIB
 
 Source3ef0b31 deployed via pinned manifest dedc451. VPS100/100 tests PASS; build25.69s. Runtime source hashes PASS, served backend and action-time module SHA match, HTTPS health/capabilities200 with actionTimePreparation=true. Existing execution payload unchanged at deployment; production PID10722/10893 restart0 unchanged. No production path/config/service changes.
 
@@ -572,7 +593,7 @@ VPS worker, Real weekly leaderboard/canary and gated production release.
 
 Historical evidence (superseded authorization, preserved facts):
 
-# CURRENT — ONE deterministic M4 attempt safely stopped; M4 PARTIAL
+# CURRENT â€” ONE deterministic M4 attempt safely stopped; M4 PARTIAL
 
 Checkpoint 5 October 2026, 21:56:31 WIB. Started21:39; deadline22:09 WIB.
 Latest user accepted the historical fee limitation and authorized exactly ONE fresh
@@ -623,7 +644,7 @@ final-balance.png,reload-locked.png,reload-locked.txt,checkpoint.md}.
 
 Previous checkpoint:
 
-# CURRENT final wording correction — 05/10/2026, 21:35:13 WIB
+# CURRENT final wording correction â€” 05/10/2026, 21:35:13 WIB
 
 Independent reviewer accepted f6e1264: historical final wallet message/fee unavailable;
 any priority fee change UNVERIFIED. Removes implication that Phantom actually added
@@ -648,7 +669,7 @@ fee-panel-1440-final.png,fee-panel-390-final.png,public-verification.json.
 
 Previous checkpoint:
 
-# CURRENT — M4 fee accounting corrected; M4 PARTIAL, 05/10/2026, 21:30:03 WIB
+# CURRENT â€” M4 fee accounting corrected; M4 PARTIAL, 05/10/2026, 21:30:03 WIB
 
 Continued2ad8a14; started5October21:04WIB, checkpoint deadline21:34WIB.
 Root sole writer; independent read-only review ACCEPTED. No broad audit/redesign,
@@ -679,7 +700,7 @@ RPCgetFeeForMessage total20000=base10000+priority10000;other5547360;
 total5567360lamports/.005567360SOL,ceiling10000000,owner182835778,
 projected177268418,reserve1000000.3instructions,892bytes,17atomicaccounts,
 2nullsignatures. This is unsigned diagnostic preparation, NOT a persisted M4
-attempt or wallet request. Review21:20:46.586–21:21:16.586WIB already expired.
+attempt or wallet request. Review21:20:46.586â€“21:21:16.586WIB already expired.
 Prepared message SHA174d91f21b30d3d538b2692b4ce635fd08562b40e35b61ca3033fd802220bcd8;
 delivered/returned/finalSigned hashesNULL. Current durable execution hash unchanged.
 
@@ -722,7 +743,7 @@ tests/buildlogs, manifests/scripts; decision095. Backups under
 
 Historical checkpoint below:
 
-# CURRENT — M4 ONE owner-first Phantom request inspected; PARTIAL, 5 October 2026 21:00 WIB
+# CURRENT â€” M4 ONE owner-first Phantom request inspected; PARTIAL, 5 October 2026 21:00 WIB
 
 Resumed ebf0826 at20:37WIB; checkpoint target21:07WIB. User authorized exactly
 ONE fresh actual wallet request. Existing owner/aaaaada/ret3ED/revision1 unchanged.
@@ -794,7 +815,7 @@ byte-integrity.json, phantom-approval.png, phantom-screen.txt, final-verificatio
 
 Historical checkpoint below:
 
-# CURRENT — M4 JIT deployed; Phantom blocked fresh request, 5 October 2026 20:34 WIB
+# CURRENT â€” M4 JIT deployed; Phantom blocked fresh request, 5 October 2026 20:34 WIB
 
 Resumed 3b8ca87 at 19:51 WIB; first checkpoint target 20:21 WIB. One fresh request
 reached Phantom at 20:19:29.020 WIB, before checkpoint. Existing target unchanged:
@@ -856,7 +877,7 @@ trading/funding/workers/transfers. Evidence artifacts/jit-launch-recovery.
 
 Historical context below:
 
-# CURRENT — signed review expired; no broadcast, 5 October 2026 19:46 WIB
+# CURRENT â€” signed review expired; no broadcast, 5 October 2026 19:46 WIB
 
 Resumed 3df6566 at19:27WIB; checkpoint target19:52WIB. Existing target only:
 aaaaada /8fc6fe77-16a0-4fed-8ca0-ddd1f6ef9fa7, coin ret/3ED revision1.
@@ -896,7 +917,7 @@ artifacts/approval-handoff/checkpoint.md, api-evidence.json and screenshots.
 
 Historical context below:
 
-# CURRENT — post-approval verification, 5 October 2026 19:25 WIB
+# CURRENT â€” post-approval verification, 5 October 2026 19:25 WIB
 
 Resumed a0dcd30; no broad audit, redesign or new financial execution. Actual staging
 SQLite read 19:22:44 WIB remains READY_FOR_REVIEW, execution
@@ -929,7 +950,7 @@ post-approval-mainnet-read.json / post-approval-database-read.json and build/tes
 
 Historical context below:
 
-# Latest integrated-flow checkpoint — 5 October 2026
+# Latest integrated-flow checkpoint â€” 5 October 2026
 
 19:07 WIB checkpoint (target19:14): implemented and deployed staging only.
 Source commits8fb4688 +3b8e1b0. Existing coin composer now saves identity/draft in
@@ -960,7 +981,7 @@ Evidence artifacts/integrated-flow and artifacts/owner-flow-recovery/integrated-
 
 Historical context below:
 
-# Current checkpoint — 5 October 2026, integrated product flow
+# Current checkpoint â€” 5 October 2026, integrated product flow
 
 18:59 WIB: source implementation in progress. Current TEKKTEAM visuals preserved.
 Coin composer now chains existing idempotent identity/draft saves into launch review.
@@ -977,7 +998,7 @@ Bagwork public browser ERR_CONNECTION_TIMED_OUT; no new competitor behavior clai
 
 Historical checkpoints below:
 
-# CURRENT — M4 Phase 1 verified; WAITING_FOR_HUMAN financial gate
+# CURRENT â€” M4 Phase 1 verified; WAITING_FOR_HUMAN financial gate
 
 4October2026 23:20WIB: goal BLOCKED awaiting human financial readiness/approval,
 after three consecutive revalidated impasse turns with no independent ready task.
@@ -1195,19 +1216,19 @@ public-chain simulation facts only). Signed owner transactions0/broadcasts0/spen
 Safe M9 portability/secrets exclusion done; M5 authoritative binding awaits M4 receipt;
 M6/M7 real trading qualification unavailable until prior milestones and financial gates.
 
-## Historical M4 checkpoint — BLOCKED / Phase1 stopped
+## Historical M4 checkpoint â€” BLOCKED / Phase1 stopped
 
 4October2026 21:14WIB. Actual owner fresh preparation refused EXECUTION_UNEXPECTED_ACCOUNT_DEBIT. No approval popup; signed0/broadcasts0/spent0/receipts0; owner balance0.182999717SOL. Failed raw writable effect not retained: exact account/delta and fresh reviewed economics unresolved. Do not infer cross-bank change or weaken guard.
 Scoped integration and48focused tests/build/independent reviewPASS; staging33files hash-verified and18client filesHTTPS200. M4 capability removed again after refusal; staging restored to M3 preparation-only. Production unchanged. See artifacts/pump-launch-m4/checkpoint.md. M4NOTPASS; execution stopped, no M5/M6/funding/trading or further launch. No human wallet action requested at this checkpoint.
-# M4 active — one controlled real Pump.fun launch
+# M4 active â€” one controlled real Pump.fun launch
 
 4October2026 21:08WIB. Started20:44; first checkpoint21:14.
 Target owner C2nddai75FJZWWkNdUF7csEBryRCMikJyTTZZqYcMiBv; Agent aaaaada / 8fc6fe77-16a0-4fed-8ca0-ddd1f6ef9fa7; ret / 3ED revision1; Mainnet; buy0; ceiling0.01SOL.
 Scoped one-shot integration built and independently reviewed; 48 focused testsPASS (local fixtures/regressions), staging Vite buildPASS after constrained-memory retry. Financial locks remain OFF except the explicit target-scoped M4 manual launch capability. Production PID/restarts unchanged10722/0 and10893/0.
 Staging source/client installed33verified files, backup updates/m4-20261004. Pending fresh actual owner simulation/review, manual Phantom approval, single submission, finalized receipt and binding. No M4 signed owner transaction, broadcast or SOL spent yet. Do not markPASS from local tests. Do not startM5/M6.
-# PROJECT_STATUS — TEKKTEAM
+# PROJECT_STATUS â€” TEKKTEAM
 
-## CURRENT — M3 PASS / M3.1 EXECUTION_GUARDED, 4October2026 20:41WIB
+## CURRENT â€” M3 PASS / M3.1 EXECUTION_GUARDED, 4October2026 20:41WIB
 
 - Latest classB acceptance supersedes historical absolute-cap-only completion gate.
   Application enforcement is not an on-chain max-debit promise. M4 NOT STARTED.
@@ -1233,7 +1254,7 @@ Staging source/client installed33verified files, backup updates/m4-20261004. Pen
   m31-owner-proof.json, m31-https.json, m31-tests.tap and browser screenshots.
 
 
-## HISTORICAL — M3 PARTIAL checkpoint, 4October2026 20:14WIB
+## HISTORICAL â€” M3 PARTIAL checkpoint, 4October2026 20:14WIB
 
 - Batch started19:46WIB; checkpoint deadline20:16WIB. No M4 activation.
 - Real Edge profile/Phantom connected after human approved Connect popup (browser
@@ -1278,9 +1299,9 @@ Staging source/client installed33verified files, backup updates/m4-20261004. Pen
   productionization-owner-preparation-final.json, public-metadata/HTTPS JSON, screenshots.
   Transactions signed0, broadcasts0, SOL spent by this workflow0. M4-M7 remain gated.
 
-## Previous checkpoints — preserved
+## Previous checkpoints â€” preserved
 
-## CURRENT — M3 productionization continuation, 4October2026 19:47WIB
+## CURRENT â€” M3 productionization continuation, 4October2026 19:47WIB
 
 - Latest mandate adopts persistent authority, receipt-based lifecycle, idempotency,
   strict permissions, accounting/recovery and restart safety; FINISH M3 first.
@@ -1300,8 +1321,8 @@ Staging source/client installed33verified files, backup updates/m4-20261004. Pen
 - This is execution continuation, not M3PASS. M4 review may start only after M3PASS;
   no transaction approval/broadcast, production writes or extra milestone activation.
 
-## Previous checkpoints — preserved
-## CURRENT — M3 PARTIAL / EXTERNAL_BROWSER_ACCESS_BLOCKER, 4 October 2026 00:55 WIB
+## Previous checkpoints â€” preserved
+## CURRENT â€” M3 PARTIAL / EXTERNAL_BROWSER_ACCESS_BLOCKER, 4 October 2026 00:55 WIB
 
 - Latest user permits autonomous real Connect/non-transactional owner-auth message,
   preparation, in-scope fixes/staging deploy. Started00:51; deadline01:21 WIB.
@@ -1329,8 +1350,8 @@ Staging source/client installed33verified files, backup updates/m4-20261004. Pen
 - Evidence: artifacts/pump-preparation-m3/autonomous-access-checkpoint-20261004.md,
   autonomous-db-20261004.png and autonomous-wallet-blocker-20261004.png.
 
-## Previous checkpoints — preserved
-## CURRENT — M3 persistence PASS, preparation pending, 4 October 2026 00:33 WIB
+## Previous checkpoints â€” preserved
+## CURRENT â€” M3 persistence PASS, preparation pending, 4 October 2026 00:33 WIB
 
 - Actual owner Save Agent POST201 at00:26:21 WIB and coin draft POST201 at00:26:27
   WIB captured in staging Nginx. Canonical readonly SQLite00:29:22 WIB now has
@@ -1353,8 +1374,8 @@ Staging source/client installed33verified files, backup updates/m4-20261004. Pen
 - Evidence: artifacts/pump-preparation-m3/owner-save-verified-20261004.png and
   owner-save-checkpoint-20261004.md. Read-only checkpoint target00:42 WIB.
 
-## Previous checkpoints — preserved
-## CURRENT — M3 one controlled owner observation READY, 3October2026 23:22 WIB
+## Previous checkpoints â€” preserved
+## CURRENT â€” M3 one controlled owner observation READY, 3October2026 23:22 WIB
 
 - Exact stage hostname/DNS179.198.214.104/Nginx proxy4395/listenerPID36429 verified.
   DATA_DIR /var/lib/tekkteam-staging, SQLite wallet-test.sqlite. Agent0/draft0 baseline.
@@ -1368,8 +1389,8 @@ Staging source/client installed33verified files, backup updates/m4-20261004. Pen
   session hash/nonce/signature/idempotency-key exposure. No code/deploy/restart/M4.
 - Current caps Mainnet solana:101, approval/signing/broadcast/finance/trading OFF.
 
-## Previous checkpoints — preserved
-## CURRENT — M3 PARTIAL / PENDING_CLIENT_RESULT_TRACE, 3October2026 23:04 WIB
+## Previous checkpoints â€” preserved
+## CURRENT â€” M3 PARTIAL / PENDING_CLIENT_RESULT_TRACE, 3October2026 23:04 WIB
 
 - Human reports actual owner Save Agent/coin/reload/Review/zero-buy/Prepare complete.
   Verification continuation started22:58WIB, target23:13WIB; read-only only, no M4.
@@ -1400,8 +1421,8 @@ Staging source/client installed33verified files, backup updates/m4-20261004. Pen
   owner-report-database.png and owner-report-checkpoint.md. M3 PARTIAL, required
   owner-run proof blocked pending exact client result. STOP; do not begin M4.
 
-## Previous checkpoints — preserved
-## CURRENT — M3 PARTIAL / PENDING_USER_OWNER, 3October2026 22:46 WIB
+## Previous checkpoints â€” preserved
+## CURRENT â€” M3 PARTIAL / PENDING_USER_OWNER, 3October2026 22:46 WIB
 
 - Continuation started22:22WIB, target checkpoint22:54WIB. Independent authorized
   code/integration work completed before target; no M4 and no execution while waiting.
@@ -1446,8 +1467,8 @@ Staging source/client installed33verified files, backup updates/m4-20261004. Pen
 - Wallet transaction signatures0/broadcasts0/SOLspent0 for this batch. M3 PARTIAL;
   no M4. Evidence: artifacts/pump-preparation-m3/completion-checkpoint.md.
 
-## Previous checkpoints — preserved
-## CURRENT — M3 PARTIAL, staging preparation delivered, 3October2026 22:15WIB
+## Previous checkpoints â€” preserved
+## CURRENT â€” M3 PARTIAL, staging preparation delivered, 3October2026 22:15WIB
 
 - M2 remains human-verified PASS for Android Chrome/Phantom. No new wallet/auth
   architecture or transaction capability. Other wallets are not blanket PASS.
@@ -1485,9 +1506,9 @@ Staging source/client installed33verified files, backup updates/m4-20261004. Pen
 - Broadcasts0, wallet transaction approval requests0, SOL spent0. M3 PARTIAL;
   STOP before wallet approval/real launch, no M4. Evidence: artifacts/pump-preparation-m3.
 
-## Previous checkpoints — preserved
+## Previous checkpoints â€” preserved
 
-## CURRENT — M2 PASS human verified; M3 preparation active, 3October2026 21:31WIB
+## CURRENT â€” M2 PASS human verified; M3 preparation active, 3October2026 21:31WIB
 
 - Human report in attachment67fbdd31: Android Chrome and Phantom Android in-app
   PASS; drawer/viewport/scroll/close PASS, bottom gap fixed; Connect and automatic
@@ -1502,9 +1523,9 @@ Staging source/client installed33verified files, backup updates/m4-20261004. Pen
 - Real unsigned Mainnet construction/simulation/cost and hosted metadata are
   acceptance requirements, not yet claimed achieved. No M4 automatically.
 
-## Previous checkpoint — preserved
+## Previous checkpoint â€” preserved
 
-## CURRENT — M2 mobile consistency + Connect to Sign In, 3 October2026 21:13WIB
+## CURRENT â€” M2 mobile consistency + Connect to Sign In, 3 October2026 21:13WIB
 
 DEPLOYED_TO_STAGING / WAITING_USER_REAL_DEVICE. STOP; do not begin M3.
 - Started17:55WIB; original checkpoint18:20WIB. Browser/app interruption occurred;
@@ -1542,9 +1563,9 @@ DEPLOYED_TO_STAGING / WAITING_USER_REAL_DEVICE. STOP; do not begin M3.
 Evidence: artifacts/mobile-consistency/{staging-browser.json,staging-drawer-390.png,
 staging-drawer-430-short.png,server-after.png,final-regression.log,build.log,report.md}.
 
-## Prior checkpoint — retained
+## Prior checkpoint â€” retained
 
-## CURRENT — M2 real-device verification, 3 October 2026 17:20 WIB
+## CURRENT â€” M2 real-device verification, 3 October 2026 17:20 WIB
 
 PARTIAL / WAITING_USER. M1 and wallet selector cleanup PASS retained.
 - HTTPS API health/capabilities200; M2B_WALLET_ONLY auth/Mainnet balance enabled,
@@ -1568,8 +1589,8 @@ PARTIAL / WAITING_USER. M1 and wallet selector cleanup PASS retained.
   performed. Agent-created transactions0/broadcasts0/SOL spent0. Human test result pending.
 Do not start M3. Await human result; repair only a concrete reproduced defect.
 
-## Prior checkpoint — accepted evidence
-## CURRENT — Wallet selector cleanup PASS, 3 October 2026 17:15 WIB
+## Prior checkpoint â€” accepted evidence
+## CURRENT â€” Wallet selector cleanup PASS, 3 October 2026 17:15 WIB
 
 Started17:10WIB; checkpoint17:30WIB; completed17:15WIB. STOP per user request.
 - Removed modal Browse All markup, catalog copy and launcher handler only.
@@ -1598,8 +1619,8 @@ Evidence: artifacts/wallet-selector-cleanup/{staging-browser.json,staging-hashes
 staging-initial-390.png,staging-expanded-390.png,staging-expanded-430.png,
 regression.log,build.log,review.md}. No next milestone started.
 
-## Earlier checkpoint — retained
-## CURRENT — Wallet selector UI, 3 October 2026 15:20 WIB
+## Earlier checkpoint â€” retained
+## CURRENT â€” Wallet selector UI, 3 October 2026 15:20 WIB
 
 DEPLOYED_TO_STAGING; browser acceptance PARTIAL, not full PASS.
 Started14:58WIB; checkpoint15:23WIB. User requests stop after this UI task.
@@ -1634,8 +1655,8 @@ hash evidence proves deployment. Real Android wallet testing remains separate.
 Evidence: artifacts/wallet-selector-ui/{staging-hash-verification.json,
 staging-capabilities.json,regression-final.log,build.log,patch-sha256.txt}.
 
-## Prior checkpoint — retained evidence
-## CURRENT — M2B HTTPS staging, 3 October 2026 14:49 WIB
+## Prior checkpoint â€” retained evidence
+## CURRENT â€” M2B HTTPS staging, 3 October 2026 14:49 WIB
 
 READY FOR HUMAN ANDROID VERIFICATION; not M2 wallet/launch/trading PASS.
 Resume began14:12WIB, checkpoint14:42WIB; bounded verification follow-up ends14:57WIB.
@@ -1643,7 +1664,7 @@ Web console recovered twice. Sessions expire after a short interval; latest cons
 expired after setup, while PM2 staging and HTTPS remain available independently.
 No SSH key was created. No VPS reboot or production PM2 action was performed.
 
-- URL: https://staging.tekkteam.tech/#/overview — HTTPS frontend/API200 and actual
+- URL: https://staging.tekkteam.tech/#/overview â€” HTTPS frontend/API200 and actual
   browser Overview rendered at390px; scrollWidth375 <= viewport390.
 - Frontend archive SHA256 verified; missing /src/token-draft-schema.js initially
   caused404/blank bootstrap. Existing pure schema copied into staging site; hash
@@ -1688,7 +1709,7 @@ staging-reown-discovery.png, staging-dns.png, https-denials.json, https-assets.j
 Aktual: 3 Oktober 2026 WIB. Pengarah eksekusi: PROJECT_PLAYBOOK.md dan
 EXECUTION_BRIEF.md. Dokumen lama tetap referensi/bukti, bukan backlog tandingan.
 
-## M2B recovery — 3 October 2026 14:02 WIB: BLOCKED_BROWSER_SESSION
+## M2B recovery â€” 3 October 2026 14:02 WIB: BLOCKED_BROWSER_SESSION
 
 User-reported terminal closure did not release the old browser console sessions;
 binding/closing still timed out. Fresh console displays "Your terminal session has
@@ -1699,7 +1720,7 @@ UNVERIFIED; no staging service, DNS/TLS or public test URL qualified.
 Local homepage5199, same-origin health and backend4291 HTTP200 at14:00:33WIB.
 No product-code changes or repeated accepted tests in this recovery turn.
 
-## M2B remote preflight — 3 October2026 13:53WIB
+## M2B remote preflight â€” 3 October2026 13:53WIB
 
 Hostinger web console authenticated by user. Read-only preflight verified Ubuntu,
 Node22.23.3,94GBfree; API4190/PID10722 and launch4193/PID10893 online, Nginx hosts
@@ -1710,7 +1731,7 @@ upload verified; frontend transfer caused web-console/browser control timeout.
 No production PM2/Nginx/DNS changes. One recovery batch until14:08WIB; user asked
 to close frozen terminal while retaining Overview. HTTPS staging remains NOT READY.
 
-## Latest M2B — 3 October2026 13:35WIB: LOCAL REVIEWED / BLOCKED_ACCESS
+## Latest M2B â€” 3 October2026 13:35WIB: LOCAL REVIEWED / BLOCKED_ACCESS
 
 Separate HTTPS mobile testing approved, now specifically isolated Hostinger VPS
 staging. Production /var/www/tekkteam and PM2 tekkteam-api/tekkteam-launch untouched.
@@ -1725,7 +1746,7 @@ staging.tekkteam.tech NXDOMAIN. Remote PM2/ports/Nginx/disk/Node/DATA_DIR still
 unverified; no server writes/deploy. Details/eight-point preflight and handoff:
 artifacts/mobile-wallet-m2b/checkpoint.md, docs/MOBILE_WALLET_VERIFICATION.md.
 
-## Latest M2 checkpoint — 3 October2026 13:19WIB
+## Latest M2 checkpoint â€” 3 October2026 13:19WIB
 
 Dedicated Reown configuration/local integration REVIEWED and browser discovery
 VERIFIED; earlier "Reown absent" notes below are historical and superseded.
@@ -1777,9 +1798,9 @@ M1 masih OWNER BROWSER BLOCKED; tidak melakukan signing atau transaksi.
 | --- | --- | --- |
 | M0 | Wallet/navigasi/UI pulih | DONE baseline diterima |
 | M1 | Autentikasi owner | LOCAL PASS; OWNER BROWSER BLOCKED pada persetujuan signMessage nyata |
-| M2 | Isi → Review → Save → reload → retry | LOCAL PASS reviewed; browser owner BLOCKED oleh M1. Tidak ada gap lokal baru teridentifikasi |
+| M2 | Isi â†’ Review â†’ Save â†’ reload â†’ retry | LOCAL PASS reviewed; browser owner BLOCKED oleh M1. Tidak ada gap lokal baru teridentifikasi |
 | M3a | Metadata publisher | Persiapan resolver/root/JSON/image lokal selesai; BLOCKED mapping nginx/service/DATA_DIR aktual. Setelah lokasi config diberikan, batch30menit pemeriksaan read-only; tanpa publikasi |
-| M3b | Receipt–Agent | Validasi strict lokal selesai; BLOCKED catatan canonical owner/Agent/intent asli. Setelah DB/journal/backup diberikan, batch30menit validasi association tanpa menulis receipt |
+| M3b | Receiptâ€“Agent | Validasi strict lokal selesai; BLOCKED catatan canonical owner/Agent/intent asli. Setelah DB/journal/backup diberikan, batch30menit validasi association tanpa menulis receipt |
 | M4a | Funnel/default-off venue integration | LOCAL PASS scoped DI/accounting/settlement/passive recovery; bukan real qualification |
 | M4b | Venue reader/effect qualification | BLOCKED target associated yang sah dan kontrak bukti akun/pool/effect asli. Setelah bukti tersedia, pilih satu decoder/reader30menit; tanpa activation |
 | M5 | Verifikasi eksternal/release | BLOCKED akses/izin spesifik; tidak ada deploy atau transaksi yang diotorisasi |
@@ -1791,7 +1812,7 @@ sudah terpakai; jangan ulang lookup atau mengarang association.
 
 ## Batch terbaru
 
-- Milestone: M1 — rekonsiliasi baseline dan kesiapan preview owner.
+- Milestone: M1 â€” rekonsiliasi baseline dan kesiapan preview owner.
 - Mulai: 3 Oktober 2026 00:18:27 WIB.
 - Deadline: 3 Oktober 2026 00:48:27 WIB; boleh selesai lebih awal.
 - Selesai pekerjaan/verifikasi/review: 3 Oktober 2026 00:22:17 WIB, sebelum deadline.
@@ -1822,8 +1843,8 @@ sudah terpakai; jangan ulang lookup atau mengarang association.
 
 ## Tindakan minimum pengguna
 
-1. Browser ber-Phantom: buka preview5199, Connect, menu wallet → SIGN IN AS OWNER,
-   review pesan → REQUEST WALLET SIGNATURE. Pilih wallet lu sendiri; alamat belum
+1. Browser ber-Phantom: buka preview5199, Connect, menu wallet â†’ SIGN IN AS OWNER,
+   review pesan â†’ REQUEST WALLET SIGNATURE. Pilih wallet lu sendiri; alamat belum
    tersedia bagi agen dan tidak diasumsikan. Nonce/expiry baru dibuat saat review,
    bukan challenge basi dari dokumen. Tidak ada transaksi atau signing otomatis.
    Pesan persis dan langkah M2: artifacts/owner-flow-recovery/checkpoint.md.
@@ -1832,13 +1853,13 @@ sudah terpakai; jangan ulang lookup atau mengarang association.
 3. Untuk M3b/M4b: lokasi DB/journal/backup canonical dan bukti akun/pool yang sah.
    Jika record association tidak ada, receipt tetap unassociated.
 
-## CURRENT — product workflow A–E, 3 Oktober 2026
+## CURRENT â€” product workflow Aâ€“E, 3 Oktober 2026
 
 Bagian ini menggantikan prioritas dan instruksi UI historis di atas; bukti lama tetap disimpan.
 
 A mulai 00:49:36 WIB, deadline 01:19:36 WIB; pekerjaan lokal selesai 01:00:42 WIB.
 Status A: LOCAL ACCEPTED, human owner/browser authentication PENDING.
-Connect Wallet → Sign In → review message → Continue to Wallet sekarang memakai
+Connect Wallet â†’ Sign In â†’ review message â†’ Continue to Wallet sekarang memakai
 verifier produk yang sama. Tidak ada pilihan Sign In kedua. Guest connected tidak
 mendapat owner capability. Create Agent / Review Agent / Save Draft memakai label
 aksi nyata. Preview diberi Test Mode; desain, robot dan sepuluh destinasi dipertahankan.
@@ -1858,7 +1879,7 @@ Store owner-auth-fwpVPj dipertahankan; observasi00:56:47 masih0challenge/0sessio
 Listener dicek ulang sebelum01:00:42 WIB:5199 PID29372 dan4291 PID16108.
 Live/funding/withdrawal/broadcast OFF; tidak ada signing/deploy/publikasi.
 
-### Rekonsiliasi B–E setelah A
+### Rekonsiliasi Bâ€“E setelah A
 
 B targeted integration check mulai00:59:22 WIB; deadline01:29:22 WIB.
 Hasil checkpoint01:00:42 WIB: LOCAL DRAFT ACCEPTED dari checkpoint terdahulu;
@@ -1882,13 +1903,13 @@ production connection/activation tidak tersedia. Tidak menggantinya dengan mock.
 
 Tidak ada eksekusi aktif pada checkpoint ini. Tidak mengulang tes/audit luas untuk
 menggantikan dependency eksternal. Detail kontrak backend tetap reconciliation.md.
-Minimum pengguna: (1) Connect Wallet → Sign In → View message → Continue to Wallet,
+Minimum pengguna: (1) Connect Wallet â†’ Sign In â†’ View message â†’ Continue to Wallet,
 setujui hanya pesan authentication tanpa transaksi; (2) berikan lokasi config
 hosting/service/DATA_DIR dan canonical DB/journal/backup untuk pemeriksaan read-only,
 tanpa credential. Jika catatan association asli tidak ada, receipt tetap unassociated.
 
 
-## B1 — runtime produk, checkpoint 3 Oktober 2026 01:28:56 WIB
+## B1 â€” runtime produk, checkpoint 3 Oktober 2026 01:28:56 WIB
 
 Mulai01:25:18, deadline01:55:18 WIB. Discovery DONE / independent review accepted;
 startup produk BLOCKED. Tidak ada eksekusi aktif; selesai lebih awal dengan blocker
@@ -1918,7 +1939,7 @@ Publisher yang terverifikasi dibutuhkan untuk preparation, bukan sekadar inert l
 Minimum input: (1) identitas host/service atau export nonsecret effective PM2/env;
 (2) provenance canonical Mainnet DB+WAL+journal+metadata, khususnya status adopsi
 migration-output dan journal pendampingnya; (3) enabled Nginx vhost/include dan
-PUBLIC_METADATA_ORIGIN→asset root/permissions. Lokasi yang telah diperiksa dan fungsi
+PUBLIC_METADATA_ORIGINâ†’asset root/permissions. Lokasi yang telah diperiksa dan fungsi
 setiap input ada di runtime-map.md; tidak meminta ulang generic config/DATA_DIR.
 
 Preview dipertahankan:01:27:35 WIB5199 halaman/bootstrap/backend/proxy-health200,
@@ -1927,7 +1948,7 @@ Browser setelah reload menampilkan TestMode/Launchpad/ConnectWallet; tidak sign 
 Owner observasi read-only0sessions/0challenges/0agents/0drafts; human login dan Save/
 reload tetap belum terbukti. Live/transaksi/publikasi/deploy OFF.
 
-## B2 — checkpoint 3 Oktober 2026 01:56:01 WIB
+## B2 â€” checkpoint 3 Oktober 2026 01:56:01 WIB
 
 Mulai01:50:23 WIB; deadline02:15:23 WIB. PARTIAL: integrasi source lokal DONE dan
 independently accepted; verifikasi Phantom/Save/reload PENDING_USER. Tidak ada
@@ -1969,7 +1990,7 @@ association receipt lama PENDING_ORIGINAL_PROVENANCE; bukan syarat menciptakan a
 launch baru secara sah. Tidak ada association/recovery palsu. Live/funding/withdrawal/
 broadcast/publikasi/deploy tetapOFF.
 
-## Preview recovery — 3 Oktober 2026 10:29:44 WIB
+## Preview recovery â€” 3 Oktober 2026 10:29:44 WIB
 
 User melaporkan preview mati. Listener5199/4291 memang absen10:28:46 WIB;
 log lama tidak menunjukkan fatal error sehingga penyebab terminasi belum terbukti.
@@ -1980,11 +2001,11 @@ accepted33tables/journal tetaputuh. Live/funding/withdrawal/broadcastfalse.
 Logs *-access-1028.* di artifacts/owner-flow-recovery. B2 owner verification tetap
 pending; tidak ada transaksi atau deployment. Preview bukan Windows auto-start service.
 
-## V1 — arah visual baru, 3 Oktober 2026 10:55 WIB
+## V1 â€” arah visual baru, 3 Oktober 2026 10:55 WIB
 
 Mulai10:34:59 WIB; deadline asli11:04:59 WIB. UI/source LOCAL PASS reviewed:
 Home/sidebar mengikuti hierarki Bagwork, aset TEKKTEAM; Launchpad coin+Agent form,
-review identity→coin draft existing, mobile horizontal nav/drawer, shared picker.
+review identityâ†’coin draft existing, mobile horizontal nav/drawer, shared picker.
 Owner switch/late upload/explicit new-identity handoff diperbaiki dan diuji.
 Screenshot desktop1440/mobile390 di artifacts/visual-v1.73/73 targeted regression;
 reviewer65/65 +16/16 overlapping; build12.34sPASS (phone chunk warning). Aset/bootstrap/
@@ -1992,7 +2013,7 @@ state/direct+proxyhealth200, preview5199/4291 tetapPID5540/10772/store yang sama
 
 Wallet mobile: official browse links Phantom/Solflare/MetaMask eligible HTTPS origin;
 no auto-connect/sign, no session transfer, local preview tidak menjadi URL HP.
-Actual extension Sign In→Save→reload dan real mobile app handoff NOT VERIFIED.
+Actual extension Sign Inâ†’Saveâ†’reload dan real mobile app handoff NOT VERIFIED.
 Connect/Disconnect historis tetap USER-REPORTED, bukan bukti ulang source ini.
 
 Tampilan lama boleh berubah sesuai mandat terbaru; preservation lama hanya untuk
@@ -2006,9 +2027,9 @@ V1 caveat: rapid route/reload emitted GLTF blob-texture console errors; complete
 Home phone-model-ready/canvas verified, no stable blank reproduced. Not marked
 resolved. Reference Market emitted its own TypeError; unrelated to local backend.
 
-## Owner evidence update — 3 Oktober 2026 10:58:26 WIB
+## Owner evidence update â€” 3 Oktober 2026 10:58:26 WIB
 
-User menjawab "sudah" untuk instruksi Phantom Sign In→Create→coin Save→reload.
+User menjawab "sudah" untuk instruksi Phantom Sign Inâ†’Createâ†’coin Saveâ†’reload.
 Read-only store aktual owner-auth-fwpVPj (same READY PID10772, seededSessions0)
 menunjukkan1active owner session,1identity/1request/1draft event, tetapi0first-token
 records/0token-configured events. Jadi autentikasi owner nyata + identity creation
@@ -2022,7 +2043,7 @@ registered parser hook; CSP connect-src unchanged. Browser reload phone-model-re
 and no new texture errors after correction (historical logs retained). Source review
 and final build follow; no network guard relaxed.
 
-## Direct visual correction — 3 Oktober2026 11:02 WIB
+## Direct visual correction â€” 3 Oktober2026 11:02 WIB
 
 User rejects V1 visual result as confusing/different. V3 now active: Bagwork layout/
 interaction hierarchy, five main sidebar destinations Home/Launchpad/Agents/Tokens/
@@ -2030,7 +2051,7 @@ Wallet, original TEKKTEAM darkblue+yellow/fonts/components explicitly confirmed.
 V1 tests and owner auth evidence remain valid, but VISUAL ACCEPTANCE NOT PASSED.
 Backend activation stays blocked by known inputs; no data or receipt reset.
 
-## V3 visual implementation — 3 October 2026 11:14 WIB
+## V3 visual implementation â€” 3 October 2026 11:14 WIB
 
 IMPLEMENTED + INDEPENDENTLY REVIEWED; user visual acceptance pending. Started11:02,
 target11:32. Original dark blue/yellow + Lilita One/Nunito restored. Five primary
@@ -2047,7 +2068,7 @@ Next: V4 owner coin-save/reload evidence PENDING_EXTERNAL user browser action;
 product runtime and publisher retain named B1 configuration/hosting dependencies.
 No new broad audit or directory search required. See visual-v3/checkpoint.md.
 
-## H1 map hero — 3 October2026 11:29 WIB
+## H1 map hero â€” 3 October2026 11:29 WIB
 
 DONE locally/reviewed. Started11:21, checkpoint11:41. Phone removed from Home;
 interactive map occupies near-full viewport, copy/CTA overlay. Dark blue/yellow,
@@ -2059,10 +2080,10 @@ Preview page/assets/API200 at11:28:18. No backend/auth/data/process changes.
 V4 remains PENDING_EXTERNAL actual coin Save/reload; no human wallet/chain proof
 inferred from hero QA. Live/funding/withdrawal/broadcast/publication/deployOFF.
 
-## H2 Home polish — 3 October2026 11:48 WIB
+## H2 Home polish â€” 3 October2026 11:48 WIB
 
 DONE locally + independently reviewed (start11:41, deadline12:01). Existing map
-about30% smaller, centered; all copy/CTA below. Sidebar244→294px, larger nav/icons/
+about30% smaller, centered; all copy/CTA below. Sidebar244â†’294px, larger nav/icons/
 wallet control, unboxed logo. Yellow banner injection removed per direct request;
 runtime restrictions unchanged. Browser1440/1920/390: full map, no overflow,
 CTA routes and mobile drawer/wallet picker work.24 relevant tests pass after
@@ -2072,7 +2093,7 @@ Frontend5199PID22324 restarted; backend4291PID10772/data unchanged. No wallet/
 Pump/Agent/trading/API/route logic change. Real coin Save/reload still unverified;
 V4 and known B1 dependencies PENDING_EXTERNAL. Live and transaction effectsOFF.
 
-## H3 + read-only balance — 3 October2026 12:13 WIB checkpoint
+## H3 + read-only balance â€” 3 October2026 12:13 WIB checkpoint
 
 UI APPLIED/locally browser-verified1280/1440/1920/390. Desktop copy below map now
 left aligned680px; lower sections/footer share centered shell after sidebar.
@@ -2096,7 +2117,7 @@ Evidence: artifacts/home-wallet-polish/checkpoint.md. H3 remains PENDING_BROWSER
 user asked to reload/openpanel/Refresh without reconnect or reauthentication.
 V4 coinSave/reload and unrelated B1 hosting/data dependencies remain unchanged.
 
-## H4 hero split — 3 October2026 12:22WIB
+## H4 hero split â€” 3 October2026 12:22WIB
 
 CSS-only direct correction: beneath unchanged map, headline+two buttons at left
 content edge; eyebrow+subtitle at right edge. Mobile retains stacked layout.
@@ -2109,7 +2130,7 @@ H4 follow-up12:24WIB: right eyebrow moved to headline bottom row; subtitle moved
 to CTA row, bottom-aligned. Browser1440 confirms equal bottoms761.3px/851.3px.
 Only desktop CSS changed; mobile rule and all behavior unchanged.
 
-## M1 — Real Mainnet balance only — 3 October 2026 12:35 WIB
+## M1 â€” Real Mainnet balance only â€” 3 October 2026 12:35 WIB
 
 Latest attached brief restricts active work to M1 and requires stopping after PASS.
 Start12:31; deadline12:56WIB. Prior balance implementation retained; no backend
@@ -2131,7 +2152,7 @@ but captured logs still only refresh:false. Asked for one explicit Refresh click
 and confirmation of no transaction popup. No automatic next milestone. Full trace,
 public owner, files, evidence: artifacts/mainnet-balance-m1/checkpoint.md.
 
-### M1 final acceptance — 3 October 2026 12:35 WIB: PASS
+### M1 final acceptance â€” 3 October 2026 12:35 WIB: PASS
 
 User explicitly confirms Refresh succeeds without transaction popup. Actual runtime
 corroborates refresh:true, slot452840421, checkedAt1791005685150 (12:34:45.150WIB),
@@ -2141,7 +2162,7 @@ broadcast and no SOL spent by this task. This supersedes PENDING_BROWSER_REFRESH
 M1 complete; stopped per latest brief, no next milestone started. Icon fallback
 code/tests verified; user visual observation can follow without blocking balance.
 
-## M2 mobile wallet — 3 October2026 12:48WIB: PARTIAL / PENDING_EXTERNAL
+## M2 mobile wallet â€” 3 October2026 12:48WIB: PARTIAL / PENDING_EXTERNAL
 
 Start12:39; deadline13:04. M1 accepted desktop baseline/session/backend retained.
 Applied primary Open in Phantom/Solflare mobile rows, sanitized public-route browse
@@ -2166,7 +2187,7 @@ hosting reconciliation, separately approved release, then Android wallet proof.
 Full matrix/files/references/screenshots: artifacts/mobile-wallet-m2/checkpoint.md.
 
 
-## M2 broad Solana wallet extension — 3 October2026 13:04WIB: PARTIAL / PENDING_EXTERNAL
+## M2 broad Solana wallet extension â€” 3 October2026 13:04WIB: PARTIAL / PENDING_EXTERNAL
 
 Start12:49:24WIB; target13:14:24WIB. Seven grouped shortcuts now use shared Solana
 Wallet Standard discovery; Trust exclusion/three-brand filter removed. Official

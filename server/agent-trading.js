@@ -23,7 +23,7 @@ export function launchReceipt(agent,journal=resolve(process.env.DATA_DIR||'serve
  if(!r||r.agentId!==agent.id||r.owner!==agent.creator||r.network!=='solana:101'||!r.confirmed||r.status!=='Success'||!r.signature||!r.mint)return null;
  new PublicKey(r.mint);return r;
 }
-export function installAgentTrading(app,{store,auth,owned,now=Date.now,market=createMarketFeed({now}),discovery=createMarketDiscovery({market,now}),receipt=launchReceipt,readLaunchpadScope,balance,sessionValid,realMoney}={}){
+export function installAgentTrading(app,{store,auth,owned,now=Date.now,market=createMarketFeed({now}),discovery=createMarketDiscovery({market,now}),receipt=launchReceipt,readLaunchpadScope,readFundingAuthority,balance,sessionValid,realMoney}={}){
  const {db}=store;const locks=new Set();let ticking=false,autonomousTick=null;
  const connection=realMoney?.connection??new Connection(process.env.MAINNET_RPC_URL||'https://api.mainnet-beta.solana.com',{commitment:'confirmed',disableRetryOnRateLimit:true});
  const verifyNetwork=realMoney?.verify??(async()=>{if(await connection.getGenesisHash()!==GENESIS)fail('Mainnet assertion failed');});
@@ -61,7 +61,7 @@ export function installAgentTrading(app,{store,auth,owned,now=Date.now,market=cr
  const projection=a=>{let tokenLive=null;try{tokenLive=!!receipt(a);}catch{}return {...projectTrading(a,get(a.id),history(a.id),now()),createdAt:a.createdAt??null,tokenLive,launchToken:{name:a.coin?.name??null,symbol:a.coin?.ticker??null}};};
  const configured=(a,s)=>{const mint=s?.mint??receipt(a)?.mint;if(!mint)fail('Configure a Mainnet market mint first');try{new PublicKey(mint);}catch{fail('Invalid market mint');}return mint;};
  const valid=a=>{const r=receipt(a);if(!r)fail('A confirmed Mainnet token launch is required');return r;};
- const transfers=installFunding(app,{db,store,auth,owned,connection,verifyNetwork,now,sessionValid});
+ const transfers=installFunding(app,{db,store,auth,owned,connection,verifyNetwork,now,sessionValid,readFundingAuthority});
  function snapshot(a){
   const wallet=db.prepare('SELECT address FROM agent_wallets WHERE agent_id=?').get(a.id),s=get(a.id),paperTargetPolicy=paperPolicy(a,s);let r=null;try{r=receipt(a);}catch{}
   const position=s?.position?{...s.position,marketValueUsd:s.position.quantity*(s.market?.priceUsd??s.position.entryPriceUsd)}:null;

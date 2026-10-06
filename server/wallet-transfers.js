@@ -21,11 +21,20 @@ const publicRecord=r=>{
  return Object.fromEntries(keys.filter(k=>r[k]!==undefined).map(k=>[k,r[k]]));
 };
 
-export function installWalletTransfers(app,{db,store,auth,owned,connection:c,verifyNetwork,now=Date.now,enabled=()=>process.env.FUNDING_ENABLED==='true',withdrawalEnabled=()=>process.env.WITHDRAWAL_ENABLED==='true',paused=()=>process.env.WALLET_TRANSFERS_PAUSED==='true',sessionValid=req=>!!req.session}){
+export function installWalletTransfers(app,{db,store,auth,owned,connection:c,verifyNetwork,readFundingAuthority,now=Date.now,enabled=()=>process.env.FUNDING_ENABLED==='true',withdrawalEnabled=()=>process.env.WITHDRAWAL_ENABLED==='true',paused=()=>process.env.WALLET_TRANSFERS_PAUSED==='true',sessionValid=req=>!!req.session}){
  // Preserve existing receipts; one durable ledger serves both directions.
  db.exec('CREATE TABLE IF NOT EXISTS agent_funding(id TEXT PRIMARY KEY,agent_id TEXT NOT NULL,data TEXT NOT NULL)');
  const realReservations=createRealBalanceReservations(db);
  const currentAgent=req=>{if(!sessionValid(req))throw Object.assign(Error('Owner session expired; reconnect your wallet'),{status:401});return owned(req).agent;};
+ const fundingAuthority=(kind,a,r)=>{
+  if(kind!=='FUND')return null;
+  if(!readFundingAuthority&&a.launchWalletBinding)fail('Launch funding authority unavailable');
+  const proof=readFundingAuthority?readFundingAuthority(a):{kind:'GENERAL'};
+  if(!proof||!['GENERAL','LAUNCHPAD'].includes(proof.kind))fail('Funding authority unavailable');
+  const hash=createHash('sha256').update(JSON.stringify(proof)).digest('hex');
+  if(r&&(r.fundingAuthorityHash!==hash&&!(r.fundingAuthorityHash==null&&proof.kind==='GENERAL')))fail('Launch funding authority changed');
+  return hash;
+ };
  const rows=id=>db.prepare('SELECT data FROM agent_funding WHERE agent_id=? ORDER BY rowid DESC').all(id).map(x=>JSON.parse(x.data));
  const save=r=>realReservations.syncWalletRecord(r,()=>db.prepare('INSERT OR REPLACE INTO agent_funding VALUES(?,?,?)').run(r.id,r.agentId,JSON.stringify(r)));
  const read=(a,id)=>{const row=db.prepare('SELECT data FROM agent_funding WHERE id=? AND agent_id=?').get(id,a.id);if(!row)fail('Wallet request not found');const r=normalize(JSON.parse(row.data));if(r.ownerWallet!==a.creator)fail('Wallet owner mismatch');return r;};
@@ -109,13 +118,13 @@ export function installWalletTransfers(app,{db,store,auth,owned,connection:c,ver
    res.json({agentId:a.id,source:w.address,destination:a.creator,network:'solana:mainnet',balanceLamports:value,feeCapLamports,requiredRentLamports:0,maxLamports:Math.max(0,value-feeCapLamports)});
   });
   if(kind==='FUND')app.post(base+'/:operationId/review',auth,async(req,res)=>{
-   const a=currentAgent(req),r=read(a,req.params.operationId);exactBody(req.body,[]);policy(kind);checkMapping(a,r);
+   const a=currentAgent(req),r=read(a,req.params.operationId);exactBody(req.body,[]);policy(kind);checkMapping(a,r);fundingAuthority(kind,a,r);
    if(r.kind!==kind||r.status!=='PREPARED'||!r.transaction||now()>=r.expiresAt)fail('Funding review expired or unavailable');
    const tx=Transaction.from(Buffer.from(r.transaction,'base64'));inspectTransfer(tx,r.source,r.destination,r.amountLamports,budget(r));
    if(tx.serializeMessage().toString('base64')!==r.message)fail('Funding review message mismatch');
    await network();const quote=await feeBalance(tx,r);
    if(quote.feeLamports!==r.feeLamports||await c.getBlockHeight('confirmed')>r.lastValidBlockHeight||now()>=r.expiresAt)fail('Funding review expired or fee changed');
-   policy(kind);checkMapping(currentAgent(req),r);custody(a,()=>true);
+   policy(kind);checkMapping(currentAgent(req),r);fundingAuthority(kind,currentAgent(req),r);custody(a,()=>true);
    if(read(a,r.id).status!=='PREPARED')fail('Funding request is no longer prepared');
    res.json(publicRecord({...r,...quote}));
   });
@@ -123,12 +132,12 @@ export function installWalletTransfers(app,{db,store,auth,owned,connection:c,ver
    const a=currentAgent(req);policy(kind,a);exactBody(req.body,['lamports','requestKey']);const {lamports,requestKey}=req.body;
    if(!Number.isSafeInteger(lamports)||lamports<=0)fail('Enter a positive whole number of lamports');
    if(typeof requestKey!=='string'||!/^[a-zA-Z0-9_-]{16,80}$/.test(requestKey))fail('A valid idempotency key is required');
-   const w=walletFor(a);
+   const w=walletFor(a),fundingAuthorityHash=fundingAuthority(kind,a);
    const reserved=atomic(()=>{
     const existing=rows(a.id).find(r=>r.requestKey===requestKey);
-    if(existing){if(existing.kind!==kind||existing.amountLamports!==lamports||existing.ownerWallet!==a.creator)fail('Idempotency key conflicts with this request');return {existing};}
+    if(existing){if(existing.kind!==kind||existing.amountLamports!==lamports||existing.ownerWallet!==a.creator)fail('Idempotency key conflicts with this request');fundingAuthority(kind,a,existing);return {existing};}
     for(const old of rows(a.id).filter(active)){const r=normalize(old);if(r.status==='PREPARED'&&!r.signature&&r.expiresAt<=now()){r.status='FAILED';r.reason='Unsigned preparation expired';save(r);}else fail('Existing wallet request must be resolved first');}
-    const r={id:randomUUID(),requestKey,agentId:a.id,kind,ownerWallet:a.creator,agentWallet:w.address,source:kind==='FUND'?a.creator:w.address,destination:kind==='FUND'?w.address:a.creator,amountLamports:lamports,network:'solana:mainnet',status:'PREPARED',createdAt:now(),expiresAt:now()+120000};save(r);return {r};
+    const r={id:randomUUID(),requestKey,agentId:a.id,kind,ownerWallet:a.creator,agentWallet:w.address,source:kind==='FUND'?a.creator:w.address,destination:kind==='FUND'?w.address:a.creator,amountLamports:lamports,network:'solana:mainnet',status:'PREPARED',createdAt:now(),expiresAt:now()+120000,...(kind==='FUND'?{fundingAuthorityHash}:{})};save(r);return {r};
    });
    if(reserved.existing)return res.json(publicRecord(normalize(reserved.existing)));
    const r=reserved.r;
@@ -140,13 +149,14 @@ export function installWalletTransfers(app,{db,store,auth,owned,connection:c,ver
     const tx=buildTransfer(r.source,r.destination,lamports,blockhash,budget(r));inspectTransfer(tx,r.source,r.destination,lamports,budget(r));
     Object.assign(r,await feeBalance(tx,r),{messageHash:createHash('sha256').update(tx.serializeMessage()).digest('hex'),blockhash,lastValidBlockHeight,message:tx.serializeMessage().toString('base64'),transaction:tx.serialize({requireAllSignatures:false,verifySignatures:false}).toString('base64')});
     policy(kind,currentAgent(req),r.id);checkMapping(currentAgent(req),r);if(now()>=r.expiresAt||await c.getBlockHeight('confirmed')>r.lastValidBlockHeight)fail('Preparation expired');
+    fundingAuthority(kind,currentAgent(req),r);policy(kind,currentAgent(req),r.id);checkMapping(currentAgent(req),r);
     atomic(()=>{if(read(a,r.id).status!=='PREPARED')fail('Preparation is no longer active');save(r);});res.json(publicRecord(r));
    }catch(e){atomic(()=>{if(read(a,r.id).status==='PREPARED'){r.status='FAILED';r.reason='Unable to prepare wallet transfer';save(r);}});if(e.status)throw e;fail('Wallet transfer preparation unavailable');}
   });
   app.post(base+(kind==='FUND'?'/submit':'/confirm'),auth,async(req,res)=>{
    const a=currentAgent(req);exactBody(req.body,kind==='FUND'?['id','signedTransaction']:['id','confirm']);let r=read(a,req.body.id);if(r.kind!==kind)fail('Wrong wallet operation');
    if(r.status!=='PREPARED')return res.json(publicRecord(await reconcile(r)));
-   policy(kind,a,r.id);checkMapping(a,r);if(!r.transaction||now()>=r.expiresAt)fail('Preparation expired or incomplete');
+   policy(kind,a,r.id);checkMapping(a,r);fundingAuthority(kind,a,r);if(!r.transaction||now()>=r.expiresAt)fail('Preparation expired or incomplete');
    if(kind==='WITHDRAW'&&req.body.confirm!==true)fail('Explicit withdrawal confirmation is required');
    let tx;
    try{tx=validateWalletSubmission(kind==='FUND'?req.body.signedTransaction:r.transaction,r,{requestId:req.body.id,requireSignature:kind==='FUND'});}
@@ -161,7 +171,7 @@ export function installWalletTransfers(app,{db,store,auth,owned,connection:c,ver
    }
    await network();const quote=await feeBalance(tx,r);if(quote.feeLamports!==r.feeLamports)fail('Network fee changed; preparation cannot be submitted');
    if(await c.getBlockHeight('confirmed')>r.lastValidBlockHeight||now()>=r.expiresAt)fail('Preparation expired; no broadcast');
-   policy(kind,currentAgent(req),r.id);const fresh=currentAgent(req);checkMapping(fresh,r);
+   policy(kind,currentAgent(req),r.id);const fresh=currentAgent(req);checkMapping(fresh,r);fundingAuthority(kind,fresh,r);
    // Durable cross-process latch BEFORE custody signing. A crash stays UNKNOWN.
    const claimed=atomic(()=>{if(read(fresh,r.id).status!=='PREPARED')return false;r.status='UNKNOWN';r.reason='Submission in progress; reconcile only';save(r);return true;});
    if(!claimed)return res.json(publicRecord(read(fresh,r.id)));
