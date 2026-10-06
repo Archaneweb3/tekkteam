@@ -1,3 +1,9 @@
+Latest overnight mandate7October2026: continue all eligible non-financial
+product/worker/security/UX work automatically while owner is away. Actual launch
+is now finalized; stale no-launch baseline in the mandate is superseded by chain
+and receipt evidence. No additional launch/funding/trading or automatic financial
+approval. Park only after independent work is complete; preserve TEKKTEAM isolation.
+
 Latest direct mandate 7 October 2026: exactly ONE replacement for pre-Phantom
 failed request 1a5bf85c-ef80-43c9-b2fe-66ad598e68f0 is authorized. Preserve all
 old claims; append one fixed grant with pinned failure evidence. Manual owner

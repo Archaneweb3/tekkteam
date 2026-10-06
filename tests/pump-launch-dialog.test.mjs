@@ -17,3 +17,12 @@ test('bundled launch consumes injected canonical signer, never creates a second 
  assert.match(source,/getWallet\(owner\)/);assert.match(source,/verifyLaunchTransaction\(serialized,prepared\.evidence,true\)/);
  const workspace=readFileSync('public/app/workspace.js','utf8');assert.match(workspace,/getWallet:launchWallet/);assert.match(workspace,/openPumpLaunchDialog/);
 });
+
+test('View Agent closes success overlay and refreshes same route without wallet or launch actions',async()=>{
+ const source=readFileSync('public/app/pump-launch-dialog.js','utf8').replace(/^import .*$/gm,'').replace(/export /g,'');
+ let dialog,closed=0;const events=[],button={},panel={},page={isConnected:true,querySelector:()=>null,append:d=>{dialog=d;d.isConnected=true;}};
+ const context={launchWallet(){throw Error('wallet action');},preparationWallet(){throw Error('wallet action');},m4LaunchWallet(){throw Error('wallet action');},Event,window:{location:{hash:'#/agent/a'},dispatchEvent:e=>events.push(e.type)},document:{createElement:()=>({open:false,querySelector:s=>s==='[data-launch-close]'?button:panel,showModal(){this.open=true;},close(){this.open=false;this.onclose();},remove(){this.isConnected=false;}})}};
+ vm.runInNewContext(source,context);await context.openPumpLaunchDialog(page,{agent:{id:'a'},onClose:()=>closed++,mount:async()=>{}});
+ dialog.onclick({target:{closest:()=>({getAttribute:()=> 'https://explorer.solana.com/'})}});assert.equal(closed,0);
+ dialog.onclick({target:{closest:()=>({getAttribute:()=> '#/agent/a'})}});assert.equal(closed,1);assert.deepEqual(events,['hashchange']);assert.equal(dialog.isConnected,false);
+});
