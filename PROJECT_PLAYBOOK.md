@@ -14,8 +14,8 @@ signers and authority must remain unchanged; only a narrowly decoded owner safet
 assertion/account ordering may differ. Persist both fingerprints and the allowed
 diff. Initialbuy0 and total debit<=0.01SOL remain. Manual financial wallet approval,
 one-shot broadcast/reconciliation and receipt-only Agent wallet provisioning remain.
-CUDA patterns may now be inspected/adapted for UX, never EVM mechanics or green
-branding. Preserve blue/yellow and ten destinations. Root sole source writer.
+The earlier CUDA reference permission is REVOKED by the absolute project-isolation
+mandate. Preserve TEKKTEAM blue/yellow and ten destinations. Root sole source writer.
 Implement/test each dependency before public deployment and real trading acceptance.
 
 Latest6October2026: TEKKTEAM_PRODUCTION_PARITY supersedes the stop-after-one-attempt

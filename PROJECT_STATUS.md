@@ -1,4 +1,41 @@
-# CURRENT — 6 October 2026, 23:31 WIB: CANONICAL DEPLOYED; REAL OWNER QA PASS; M4 BLOCKED
+# CURRENT — 7 October 2026, 00:13 WIB: LEGACY ISOLATION OWNER APPROVAL REQUIRED
+
+Continued c7e92b4 with source checkpoint 59a8de8. Exact legacy operation
+6b713ac6-cfcb-4ca6-8090-72a9b9c1654f is now LEGACY_UNKNOWN_QUARANTINED in a
+separate immutable sidecar. The raw four-record journal SHA256 remains
+20a29acc34732cf993a607cca2dfc61073dcb239ced60a2c9164bb414487af91.
+SQLite is unchanged/integrity OK; three total Agents, exactly one aaaaada,
+target wallet0/receipt0, active M4 still TRANSACTION_EXPIRED.
+
+All configured TEKKTEAM Mainnet sources deduplicate to one Helius endpoint.
+Mainnet genesis verified; HTTP200/null signature status and finalized transaction;
+six mint/PDA accounts absent; mint history empty. Recorded blockhash invalid,
+finalized height431998931 > lastValid429414145. No original signed bytes,
+fingerprints, send timestamp or RPC acknowledgment recovered. Preparations show
+PREPARED at28September23:35:47.111 WIB; operation created23:35:56.211 WIB.
+Known signature means the user's conditional owner-history fallback was unnecessary.
+These facts do not prove historical failure or signature-to-blockhash binding.
+
+Quarantine applied 00:11:05 WIB, manifest SHA256
+de59ada07f456ed9ffbe128d49acd098714cbba97de082848126567b948bf190.
+Reviewed guards installed in canonical release; the actual old, stopped sender's
+bootstrap was backed up and replaced by a no-import exit78. All old journal
+mutations/resume are denied; M4's blanket journal gate is unchanged. No DB migration,
+PM2/VPS/proxy/service restart, CUDA access or shared-infrastructure modification.
+Canonical root/API health HTTP200; old launch PID0, canonical API PID62737.
+
+Final targeted suite12/12 PASS on VPS; existing regression41/41 PASS locally;
+independent review accepted. Build PASS18.48s (existing chunk/annotation warnings).
+No configured typecheck/lint scripts or configs exist; node syntax and diff checks
+passed instead. No UI change or repeated desktop/mobile/Lighthouse audit.
+
+Decision101 contains the concrete ONE-new-operation isolation proposal for the
+existing aaaaada / ret / 3ED, initialbuy0, cap0.01SOL. It remains UNAPPROVED.
+No new wallet request, financial signature, broadcast or spend. Trading/funding OFF.
+Only next action: owner explicitly approves or rejects that disclosed UNKNOWN-history
+isolation policy. This approval is separate from later manual Phantom approval.
+
+# Previous — 6 October 2026, 23:31 WIB: CANONICAL DEPLOYED; REAL OWNER QA PASS; M4 BLOCKED
 
 SSH verified root@srv2016744; canonical production now uses API release d2516bc
 and UI0516940. HTTPS/API200, www redirects, staging pages redirect to canonical,

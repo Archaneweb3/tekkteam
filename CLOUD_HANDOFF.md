@@ -1,4 +1,20 @@
-# CURRENT — 6 October 2026, 23:31 WIB: CANONICAL PRODUCT DEPLOYED DEFAULT-OFF
+# CURRENT — 7 October 2026, 00:13 WIB: LEGACY ISOLATION OWNER APPROVAL REQUIRED
+
+Source59a8de8 deployed as quarantine-only guards. See decision101 and PROJECT_STATUS.
+Old operation6b713ac6-cfcb-4ca6-8090-72a9b9c1654f remains chainOutcome UNKNOWN.
+Actual sidecar /var/lib/tekkteam-mainnet/pump-agent-launches.json.quarantine.json
+applied00:11 WIB; original journal is byte-identical, DB untouched, M4 gate unchanged.
+Actual old PM2 sender remains stopped and its exact bootstrap exits78 with no imports.
+Backup /var/backups/tekkteam/legacy-quarantine-59a8de8-r2; deployment evidence
+/var/lib/tekkteam-mainnet/legacy-reconciliation/deployment-evidence-59a8de8.json.
+All configured RPCs are the same Helius endpoint; null history is not failure proof.
+No current wallet popup is pending. Do not initiate one without isolation approval.
+No CUDA/shared service access or changes. Direct SSH works; large SFTP/stdin uploads
+timed out, 3500-character SSH chunks worked. Git archive CRLF was normalized only
+after matching each normalized Git blob hash. No code was installed on failed check.
+Tests/build PASS; no funds spent. Await explicit owner policy approval of decision101.
+
+# Previous — 6 October 2026, 23:31 WIB: CANONICAL PRODUCT DEPLOYED DEFAULT-OFF
 
 SSH is working; do not repeat discovery or generate keys. Canonical API d2516bc
 and UI0516940 deployed at https://tekkteam.tech. Staging public pages redirect;

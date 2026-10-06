@@ -92,3 +92,18 @@ Actual read-only evidence: `/var/lib/tekkteam-mainnet/legacy-reconciliation/rpc-
 SHA256 `7cb0d76b0f31b6ce0e37c649260cdc7163d9f11aa7f99eb20504c9648782d892`.
 Local copy: `artifacts/legacy-reconciliation/rpc-evidence-20261006.json`.
 Original journal SHA256 `20a29acc34732cf993a607cca2dfc61073dcb239ced60a2c9164bb414487af91`.
+
+## Actual deployment checkpoint
+
+Applied 7 October 2026, 00:11:05 WIB, source59a8de8. Sidecar SHA256
+`de59ada07f456ed9ffbe128d49acd098714cbba97de082848126567b948bf190`.
+Guard source hashes match Git blobs. The original journal is byte-identical;
+SQLite quick_check is OK and no database writes/migration were performed.
+Target Agent count1, target wallet0; total Agents3. Retired legacy process PID0;
+canonical API PID62737 and root/health return HTTP200. No process was restarted.
+
+Backups: `/var/backups/tekkteam/legacy-quarantine-59a8de8-r2`.
+Deployment evidence: `/var/lib/tekkteam-mainnet/legacy-reconciliation/deployment-evidence-59a8de8.json`.
+Final suite12/12 passed on Ubuntu;41 existing local regressions passed. Independent
+review accepted. Build passed18.48s with pre-existing bundle warnings. No standalone
+typecheck/lint configuration exists; syntax/diff checks passed. No UI changes.
