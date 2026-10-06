@@ -1,3 +1,8 @@
+Checkpoint22:05 WIB: Lighthouse60d54d1 deployed staging and verified; local four-tab
+Agent UX accepted. Canonical DB target/journal absent; preserve legacy dataset and
+resolve metadata-root/config before canonical activation. No fresh wallet attempt.
+Continue same active milestone, next checkpoint22:35 WIB; no new milestone started.
+
 # Active milestone — TEKKTEAM_FINAL_PRODUCT_CONVERGENCE
 
 Resume 6 October 2026 21:35 WIB; checkpoint target 22:05 WIB. Reviewed local

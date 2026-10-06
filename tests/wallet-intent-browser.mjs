@@ -1,12 +1,16 @@
 import assert from 'node:assert/strict';
-import {createServer} from 'vite';
+import {createServer} from 'node:http';
+import {readFile} from 'node:fs/promises';
+import {resolve} from 'node:path';
 import {chromium} from 'playwright';
-const server=await createServer({configFile:false,server:{host:'127.0.0.1',port:0},logLevel:'silent'});
-await server.listen();const browser=await chromium.launch({headless:true});
+// This fixture uses native ES modules; serve only its HTML and source JS, without
+// starting Vite's application dependency discovery or exposing configuration files.
+const server=createServer(async(req,res)=>{const path=new URL(req.url,'http://fixture').pathname;if(!/^(?:\/tests\/wallet-intent-fixture\.html|\/(?:public\/app|src)\/[a-zA-Z0-9_-]+\.js)$/.test(path)){res.writeHead(404);res.end();return;}try{const body=await readFile(resolve('.'+path));res.setHeader('Content-Type',path.endsWith('.js')?'application/javascript':'text/html');res.end(body);}catch{res.writeHead(404);res.end();}});
+await new Promise(r=>server.listen(0,'127.0.0.1',r));const browser=await chromium.launch({headless:true});
 try{
  const page=await browser.newPage();
  await page.route('**/api/**',r=>r.abort());
- await page.goto(`http://127.0.0.1:${server.httpServer.address().port}/tests/wallet-intent-fixture.html`);
+ await page.goto(`http://127.0.0.1:${server.address().port}/tests/wallet-intent-fixture.html`);
  await page.evaluate(async()=>{
   const {mountAgentWallet}=await import('/public/app/agent-wallet-ui.js');
   let seq=0;Object.defineProperty(crypto,'randomUUID',{value:()=>`fixture-key-${String(++seq).padStart(8,'0')}`});
@@ -27,9 +31,10 @@ try{
    if(path.endsWith('/cancel')){operation={...operation,status:'FAILED'};state.activity=[operation];return operation;}
    throw Error('Unexpected fixture call');
   };
-  window.qa.mount=mountAgentWallet(document.querySelector('#wallet'),{id:state.agentId,name:'fixture'},{api,sign:async()=> 'fixture-not-a-real-signature'});
+  window.qa.remount=()=>window.qa.mount=mountAgentWallet(document.querySelector('#wallet'),{id:state.agentId,name:'fixture'},{api,sign:async()=>{if(window.qa.signHold)await new Promise(resolve=>window.qa.signRelease=resolve);return 'fixture-not-a-real-signature';}});
+  window.qa.remount();
  });
- const click=name=>page.getByRole('button',{name,exact:true}).click();
+ const click=async name=>{try{await page.getByRole('button',{name,exact:true}).click({timeout:8000});}catch(e){console.error('BUTTON_STATE',name,await page.locator('body').innerText(),await page.locator('button').evaluateAll(els=>els.map(el=>({text:el.textContent,disabled:el.disabled}))));throw e;}};
  const fill=value=>page.getByLabel('Amount (SOL)',{exact:true}).fill(value);
  const key=()=>page.evaluate(()=>qa.calls.filter(x=>x.path.endsWith('/prepare')).at(-1).requestKey);
  const failed=async()=>{await click('Review withdrawal');await page.getByRole('alert').filter({hasText:'Fixture preparation failed'}).waitFor();};
@@ -47,6 +52,16 @@ try{
  await click('WITHDRAW');await fill('0.005');await click('Review withdrawal');assert.notEqual(await key(),fundKey);
  assert.equal(await page.evaluate(()=>qa.calls.filter(x=>x.path.endsWith('/submit')).length),1);
  assert.equal(await page.evaluate(()=>qa.calls.filter(x=>x.path.endsWith('/confirm')).length),0);
- console.log('PASS: 6 production-UI lifecycle scenarios; fixture APIs only; no real wallet/RPC/transactions');
+ // Leaving Wallet while its signer is pending cannot submit into the next view.
+ await click('Cancel');await click('DEPOSIT');await fill('0.005');await click('Review funding');
+ await page.evaluate(()=>{qa.signHold=true;document.querySelector('[data-do=confirm]').onclick();});
+ await page.waitForFunction(()=>!!qa.signRelease);
+ await page.evaluate(()=>{qa.mount.destroy();qa.signRelease();});
+ await page.waitForTimeout(30);
+ assert.equal(await page.evaluate(()=>qa.calls.filter(x=>x.path.endsWith('/submit')).length),1,'Disposed wallet must never submit');
+ await page.evaluate(()=>{qa.before=qa.calls.length;qa.remount();});
+ await page.getByRole('button',{name:'Cancel unsigned request',exact:true}).waitFor();
+ assert.equal(await page.evaluate(()=>qa.calls.length),await page.evaluate(()=>qa.before),'Remount only reads persisted status');
+ console.log('PASS: wallet intent lifecycle, disposal during sign and read-only remount; fixture APIs only');
  await page.evaluate(()=>qa.mount.destroy());
-}finally{await browser.close();await server.close();}
+}finally{await browser.close();await new Promise(r=>server.close(r));}

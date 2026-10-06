@@ -29,7 +29,7 @@ try{
    return route.fulfill({status:404,json:{error:'Fixture only'}});
   });
   await page.goto(base+'/#/agent/'+agent.id);
-  await page.getByRole('tab',{name:'Settings'}).click();
+  await page.getByRole('button',{name:'Settings',exact:true}).click();
   await page.locator('.as-settings').waitFor();
   assert.equal(await page.locator('.as-clean-section').count(),5);
   assert.equal(await page.locator('.as-nav').count(),0);
@@ -68,7 +68,7 @@ try{
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),true,`Settings overflow at ${width}px`);
   page.once('dialog',dialog=>dialog.dismiss());await page.getByRole('tab',{name:'Activity'}).click();assert.equal(await page.locator('[data-agent-panel]').getAttribute('data-agent-panel'),'settings','Unsaved strategy draft prevents silent tab navigation');
   runtimeWallet={...wallet,balanceLamports:0};runtimeTrading={...trading,status:'WORKING'};runtimeLaunch={status:'Success',confirmed:true,signature:'fixture-signature',mint:'581XfixtureQKEquT'};
-  await page.reload();await page.getByRole('tab',{name:'Settings'}).click();await page.locator('[data-agent-balance]').getByText('0 SOL').waitFor();
+  await page.reload();await page.getByRole('button',{name:'Settings',exact:true}).click();await page.locator('[data-agent-balance]').getByText('0 SOL').waitFor();
   assert.equal(await page.locator('.as-clean-section').count(),5,'Running, empty-wallet and launched-token states retain the same structure');
   assert.match(await page.locator('[data-token-status]').textContent(),/Launched/);
   assert.match(await page.locator('[data-token-mint]').textContent(),/581X/);

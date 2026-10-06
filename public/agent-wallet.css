@@ -9,15 +9,15 @@
 .tw-agent-wallet-drawer .tw-wallet-summary{display:block;padding:20px 0;border-top:1px solid #31527b;border-bottom:1px solid #31527b}
 .tw-agent-wallet-drawer .tw-wallet-summary>div+div{margin-top:18px}
 .tw-agent-wallet-drawer .tw-wallet-summary strong{font:900 30px 'Nunito Sans',sans-serif}
-.tw-agent-wallet-drawer .tw-wallet-assets-section{padding:22px 0 8px}
-.tw-agent-wallet-drawer .tw-wallet-assets-section h4{margin:0 0 10px;font:400 22px 'Lilita One',sans-serif}
-.tw-agent-wallet-drawer .tw-wallet-assets{list-style:none;margin:0;padding:0}
-.tw-agent-wallet-drawer .tw-wallet-assets li{display:flex;align-items:center;justify-content:space-between;gap:18px;min-height:49px;border-bottom:1px solid #31527b}
-.tw-agent-wallet-drawer .tw-wallet-assets li span{font-weight:900;overflow-wrap:anywhere}
-.tw-agent-wallet-drawer .tw-wallet-assets li strong{font-variant-numeric:tabular-nums;text-align:right}
-.tw-agent-wallet-drawer .tw-wallet-assets-unavailable{font-size:13px;color:#a8bed9}
-.tw-agent-wallet-drawer .tw-wallet-copy{margin-top:8px;padding:6px 0;border:0;background:none;color:#ffdc43;font:900 12px 'Nunito Sans',sans-serif;cursor:pointer}
-.tw-agent-wallet-drawer .tw-wallet-max{margin:8px 0 0;padding:6px 10px;border:1px solid #6888b6;border-radius:7px;background:#142f5c;color:#ffdc43;font:900 12px 'Nunito Sans',sans-serif;cursor:pointer}
+.tw-agent-wallet .tw-wallet-assets-section{padding:22px 0 8px}
+.tw-agent-wallet .tw-wallet-assets-section h4{margin:0 0 10px;font:400 22px 'Lilita One',sans-serif}
+.tw-agent-wallet .tw-wallet-assets{list-style:none;margin:0;padding:0}
+.tw-agent-wallet .tw-wallet-assets li{display:flex;align-items:center;justify-content:space-between;gap:18px;min-height:49px;border-bottom:1px solid #31527b}
+.tw-agent-wallet .tw-wallet-assets li span{font-weight:900;overflow-wrap:anywhere}
+.tw-agent-wallet .tw-wallet-assets li strong{font-variant-numeric:tabular-nums;text-align:right}
+.tw-agent-wallet .tw-wallet-assets-unavailable{font-size:13px;color:#a8bed9}
+.tw-agent-wallet .tw-wallet-copy{margin-top:8px;padding:6px 0;border:0;background:none;color:#ffdc43;font:900 12px 'Nunito Sans',sans-serif;cursor:pointer}
+.tw-agent-wallet .tw-wallet-max{margin:8px 0 0;padding:6px 10px;border:1px solid #6888b6;border-radius:7px;background:#142f5c;color:#ffdc43;font:900 12px 'Nunito Sans',sans-serif;cursor:pointer}
 .tw-agent-wallet-drawer .tw-wallet-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .tw-agent-wallet-drawer .tw-wallet-actions [data-do=refresh]{grid-column:1/-1}
 .tw-agent-wallet-drawer .tw-wallet-activity li{grid-template-columns:minmax(0,1fr) auto;gap:8px}

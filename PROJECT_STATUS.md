@@ -1,3 +1,28 @@
+# CURRENT — 6 October 2026, 22:05 WIB checkpoint
+
+Lighthouse checkpoint60d54d1 deployed and source hashes verified in isolated staging.
+VPS55/55 affected tests and build12.16s PASS. HTTPS API4395 and runtime capabilities
+200; lighthouseCompatibility/actionTimePreparation true. Existing target/draft
+visible after reload. No new wallet request, broadcast, receipt or Agent wallet.
+Only staging PM2 restarted (PID59692/restart24); production API10722/restart0 and
+launch10893/restart0 remain unchanged. Backup: /var/backups/tekkteam-staging/lighthouse-60d54d1.
+
+Agent UX local: Overview/Trading/Wallet/Activity primary, Performance/Settings
+secondary. Scoped Launchpad wallet stays receipt-required; GENERAL creation preserved.
+Disposed views cannot submit a late wallet signature. Independent source review
+accepted. Local fixture browser PASS1440x900,360x800,390x844,412x915, including scoped
+wallet no-create and overflow; Settings/Performance/character regression PASS1440/390;
+wallet-intent disposal/idempotency PASS; build16.93s PASS. Not deployed or real-wallet proof.
+
+Read-only canonical inspection: /var/lib/tekkteam-mainnet/tekkwork.sqlite quick_check
+ok, two legacy Agents, one Agent wallet, target8fc6fe77 absent, no launch journal or
+metadata public directory at that DATA_DIR. Staging DB quick_check ok, existing target
+and try Agents, zero wallets, separate token/scope/M4 tables and metadata/journal.
+No database substitution or invented binding. Canonical metadata Nginx references
+/var/lib/tekkteam-migrated/pump-metadata-site/public; reconciliation of that existing
+storage and minimal reviewed product-service composition remain next. Five profiles,
+worker qualification, global Real leaderboard and fresh real launch are NOT complete.
+Browser terminal timeout recovered via fresh Hostinger console; no VPS reboot.
 # CURRENT — 6 October 2026, 21:37 WIB: reviewed Lighthouse ready for staging
 
 Actual baseline ac32f7c; local accepted work preserved. Limited semantic validator,

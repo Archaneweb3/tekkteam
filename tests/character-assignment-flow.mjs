@@ -21,11 +21,13 @@ try{
    return route.fulfill({status:404,json:{error:'Fixture route unavailable'}});
   });
   await page.goto((process.env.BASE_URL||'http://127.0.0.1:5188')+'/#/agent/'+agent.id);
+  await page.locator('.ad-tablist').waitFor();
   assert.equal(await page.locator('[data-nav="skins"]').count(),0);
-  assert.equal(await page.locator('[data-nav="market"]').count(),1);
-  await page.getByRole('tab',{name:'Settings'}).click();
-  assert.equal(await page.getByRole('link',{name:'CHOOSE CHARACTER →'}).count(),1);
-  await page.getByRole('link',{name:'CHOOSE CHARACTER →'}).click();
+  assert.ok(await page.getByRole('link',{name:'Market',exact:true}).count()>=1,'Market remains accessible through desktop or mobile navigation');
+  await page.getByRole('button',{name:'Settings',exact:true}).click();
+  await page.getByRole('link',{name:'CHANGE CHARACTER →'}).waitFor();
+  assert.equal(await page.getByRole('link',{name:'CHANGE CHARACTER →'}).count(),1);
+  await page.getByRole('link',{name:'CHANGE CHARACTER →'}).click();
   assert.match(page.url(),/#\/skins$/);
   await page.getByRole('link',{name:'CHOOSE CHARACTER →'}).first().click();
   assert.match(page.url(),/#\/skins\/assign\/cupsey$/);
