@@ -1,3 +1,34 @@
+# Checkpoint - 7 October 2026, 09:40 WIB
+
+Confirmed launch and target Agent/wallet/binding remain unchanged. No new launch,
+funding, signing or trading occurred. Canonical UI 2ebac9c and API 788aea1 remain
+healthy; reviewed worker libraries are local pending the next scoped deployment.
+
+New local contracts: separate exact Ed25519 owner trading consent, immutable
+review/proof, revocation epoch, committed clock checkpoint, existing budget
+availability, exact-record readiness attestation, receipt-bound decision ports,
+and immutable first-BUY entry policy. Preparation-only composition rejects revoked
+consent/Pause and preserves unsigned UNKNOWN. It has no signer/sender/worker mount.
+199 changed-scope and critical regression checks PASS. Independent review findings
+on expiry, quote provenance, custom caps and position recovery were fixed; final
+scope reviewed PASS. ADR109 states the clock guarantee's precise limits.
+
+Real read-only Mainnet inspection at 09:28:29 WIB, slot 454088601: Agent wallet
+still absent/0 SOL. Candidate has 2 instructions, 768 bytes, 5,000-lamport fee.
+Estimated rent 2,860,040; estimated debit 2,965,040; protected reserve 2,020,000;
+estimated balance requirement 4,985,040 lamports. These are estimates, NOT a
+qualified maximum: legacy volume allocation and first-BUY CPI effects remain
+unqualified. Current 500,000-lamport session/day limit is unchanged and insufficient.
+No funded simulation or financial action was performed.
+
+Browser: Market heading restored and visible at 360/412/1440; no horizontal
+extension. Wallet initial/expanded/Show Less/close checked at 360/390/412; logos
+visible and internal scroll usable. Launch form signed-out at 360/412 checked.
+Real owner Save/reload/Cancel evidence remains the earlier verified result;
+current Edge lacks Phantom, so fresh owner desktop/mobile wallet QA is not claimed.
+NEXT: deploy reviewed default-OFF libraries, verify protected DB/journal hashes,
+complete final nonfinancial checkpoint. No second launch or shared/CUDA changes.
+
 # Checkpoint - 7 October 2026, 09:23 WIB
 
 Canonical788aea1 deployed09:14:02WIB: API200, PID85382, observer78915unchanged,

@@ -45,6 +45,7 @@ export function createPumpRuntimeAdapter({readSnapshot,readNativeValidity,simula
    await native(options);
    // Only the execution namespace maps. Read/quote/simulation/policy retain provenance.
    const plan={source,observedAt:decodedPumpState(snapshot.venue).context.observedAt,venueKind:snapshot.venue.kind,quote,unsignedTransaction:envelope.unsignedTransaction,messageHash:envelope.messageHash,simulation:{source:simulation.source,messageHash:simulation.messageHash,success:true,notReceipt:true},balances:{native:wallet.solBalance,token:wallet.baseBalance,wsol:wallet.wsolBalance??'0'},feeCapLamports:snapshot.feeCapLamports??'10000',rentCapLamports:snapshot.rentCapLamports??'0',refundCapLamports:snapshot.refundCapLamports??'0',snapshotSlot:snapshot.venue.slot,proofHash:snapshot.venue.proofHash};
+   plan.venueAddress=snapshot.venue.venue;
    if(snapshot.venue.kind==='PUMP_BONDING_CURVE')plan.effectPolicy=await checked(()=>createPumpCurveEffectPolicy(options));
    qualified();
    plan.preparationEvidence=preservePumpPreparation(options,source);return plan;
@@ -55,6 +56,7 @@ export function createPumpRuntimeAdapter({readSnapshot,readNativeValidity,simula
    const options=restorePumpPreparation(r.plan.preparationEvidence,{source,now:now(),intent:r.intent});
    const quote=quotePumpVenue(options),wallet=inspectOfflinePumpWalletAccounts(options);
    const expected={observedAt:decodedPumpState(options.venue).context.observedAt,venueKind:options.venue.kind,quote,balances:{native:wallet.solBalance,token:wallet.baseBalance,wsol:wallet.wsolBalance??'0'},feeCapLamports:options.feeCapLamports,rentCapLamports:options.rentCapLamports,refundCapLamports:options.refundCapLamports,snapshotSlot:options.venue.slot,proofHash:options.venue.proofHash};
+   if(Object.hasOwn(r.plan,'venueAddress'))expected.venueAddress=options.venue.venue;
    if(Object.entries(expected).some(([key,value])=>digest(value)!==digest(r.plan[key]))||r.plan.simulation?.source!==readSource||r.plan.simulation.messageHash!==r.plan.messageHash||r.plan.simulation.success!==true||r.plan.simulation.notReceipt!==true)reject('PUMP_PREPARE_PLAN_BINDING');
    if(options.venue.kind==='PUMP_BONDING_CURVE'&&digest(await checked(()=>createPumpCurveEffectPolicy(options)))!==digest(r.plan.effectPolicy))reject('PUMP_PREPARE_EFFECT_POLICY_BINDING');
    const proof=await checked(()=>validateOfflinePumpEnvelope(r.plan.unsignedTransaction,options));

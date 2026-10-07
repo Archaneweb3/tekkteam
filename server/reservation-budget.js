@@ -51,6 +51,21 @@ export function createReservationBudget({readAuthority,now=Date.now,rows}={}){
   if(count>a.maxTransactions||dailyCount>a.maxDailyTransactions)fail('COUNT_EXHAUSTED');
  }
  return Object.freeze({
+  availability(input){
+   const r=request(input),a=authority(r),currentDay=day(now());
+   let session=0n,daily=0n,count=0,dailyCount=0;
+   for(const record of rows()){
+    if(!record.budget)continue;const b=integrity(record.budget);
+    if(['owner','agentId','network'].some(k=>b.request[k]!==r[k]))continue;
+    const used=usage(b,record.status);
+    if(b.authority.sessionId===a.sessionId){session+=used.debit;count+=used.count;}
+    if(b.day===currentDay||b.settledDebitLamports===null){daily+=used.debit;dailyCount+=used.count;}
+   }
+   const remainder=(limit,used)=>(uint(limit)>used?uint(limit)-used:0n).toString();
+   return {source:'RESERVATION_BUDGET',authorizationDigest:a.digest,observedAt:now(),
+    remainingSessionLamports:remainder(a.sessionDebitLamports,session),remainingDailyLamports:remainder(a.dailyDebitLamports,daily),
+    remainingTransactions:Math.max(0,a.maxTransactions-count),remainingDailyTransactions:Math.max(0,a.maxDailyTransactions-dailyCount)};
+  },
   reserve(spec,old){
    if(old?.budget){integrity(old.budget);if(Object.hasOwn(spec,'budget')&&(!spec.budget||digest(spec.budget)!==digest(old.budget.request)&&digest(spec.budget)!==digest(old.budget)))fail('ALLOCATION_MUTATION');if(old.budget.claimedAt===null&&(spec.signature||['SIGNED','SUBMITTED'].includes(spec.status)))fail('CLAIM_REQUIRED');return old.budget;}
    if(!Object.hasOwn(spec,'budget'))return undefined;

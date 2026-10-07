@@ -2,6 +2,7 @@ import {randomUUID} from 'node:crypto';
 import {digest,integer,signedInteger,reject} from './intent.js';
 import {createRealBalanceReservations} from '../real-balance-reservations.js';
 import {createPumpExecutionFence} from './pump-execution-fence.js';
+import {pumpEntryPolicyFromAuthority} from './pump-entry-policy.js';
 
 const venues=new Set(['PUMP_BONDING_CURVE','PUMPSWAP']);
 export function createPumpRuntimeLedger(db,{source='LOCAL_FIXTURE',now=Date.now,readBudgetAuthority,executionFencing,readCanonicalBinding,readExecutionSafety,assertExecutionReady}={}){
@@ -34,6 +35,7 @@ export function createPumpRuntimeLedger(db,{source='LOCAL_FIXTURE',now=Date.now,
   list:agentId=>db.prepare('SELECT data FROM pump_runtime_executions WHERE agent_id=? ORDER BY rowid DESC').all(agentId).map(r=>JSON.parse(r.data)),
   expenses:agentId=>db.prepare('SELECT data FROM pump_runtime_expenses WHERE agent_id=? ORDER BY rowid DESC').all(agentId).map(r=>JSON.parse(r.data)),
   prepare({intent,plan,requestKey,budget}){return holds.atomic(()=>{
+   if(Object.hasOwn(plan,'entryPolicy'))reject('PUMP_ENTRY_POLICY_SERVER_ONLY');
    if(!venues.has(plan.venueKind)||plan.source!==source||typeof requestKey!=='string'||requestKey.length<16||requestKey.length>100)reject('PUMP_RUNTIME_PLAN');
    const fingerprint=digest(intent),old=lookup(intent,requestKey);if(old){if(budget!==undefined&&digest(budget)!==digest(holds.get(operation(old.id))?.budget?.request??null))reject('BUDGET_IDEMPOTENCY_CONFLICT');return old;}
    if(!Number.isSafeInteger(plan.snapshotSlot)||plan.snapshotSlot<0)reject('PUMP_RUNTIME_SNAPSHOT_SLOT');
@@ -51,6 +53,9 @@ export function createPumpRuntimeLedger(db,{source='LOCAL_FIXTURE',now=Date.now,
    const r={id:randomUUID(),intent:structuredClone(intent),plan:structuredClone(plan),planDigest:digest(plan),controlRevision:control(intent.agentId).revision,requestKey,fingerprint,status:'PREPARED',source,mode:'REAL',provenance:source==='LOCAL_FIXTURE'?'LOCAL_FIXTURE':'BACKEND VERIFIED',inputAsset,inputHold:amount.toString(),nativeHold:nativeHold.toString(),createdAt:now(),signature:null,notBroadcast:true};
    if(plan.risk?.authorizationGranted!==false||plan.risk.source!==source||plan.risk.nativeDebit!==r.nativeHold)reject('PUMP_RUNTIME_RISK_REQUIRED');
    holds.reserve({operationId:operation(r.id),intentHash:fingerprint,status:'PREPARED',kind:'PUMP_RUNTIME',resources:[{wallet:intent.agentWallet,lamports:r.nativeHold,balanceLamports:plan.balances.native,protectedLamports:plan.risk.protectedLamports}],...(budget!==undefined?{budget}:{})});
+   const entryPolicy=intent.side==='BUY'?pumpEntryPolicyFromAuthority(holds.get(operation(r.id))?.budget?.authority):null;
+   if(entryPolicy&&BigInt(position(intent.agentId,intent.outputMint)?.quantity??'0')>0n)reject('PUMP_ENTRY_EXISTING_POSITION');
+   if(entryPolicy){r.plan.entryPolicy=entryPolicy;r.planDigest=digest(r.plan);}
    db.prepare('INSERT INTO pump_runtime_executions VALUES(?,?,?,?,?,?)').run(r.id,intent.owner,requestKey,fingerprint,intent.agentId,JSON.stringify(r));return put(r);
   });},
   // Unmounted library contract: durable claim facts only, never a signing port.
@@ -59,6 +64,7 @@ export function createPumpRuntimeLedger(db,{source='LOCAL_FIXTURE',now=Date.now,
    if(!fences)reject('PUMP_CLAIM_UNMOUNTED');
    const r=get(id),at=now();if(!r||r.status!=='PREPARED'||r.signature)reject('PUMP_CLAIM_STATE');
    if(r.source!==source||r.plan.source!==source||r.plan.risk?.source!==source)reject('PUMP_CLAIM_SOURCE');
+   if(r.plan.entryPolicy&&r.intent.side==='BUY'&&BigInt(position(r.intent.agentId,r.intent.outputMint)?.quantity??'0')>0n)reject('PUMP_ENTRY_EXISTING_POSITION');
    if(r.planDigest!==digest(r.plan)||r.fingerprint!==digest(r.intent)||r.planDigest!==expectedPlanDigest||r.plan.messageHash!==expectedMessageHash)reject('PUMP_CLAIM_MESSAGE_CHANGED');
    for(const expires of [r.intent.expiresAt,r.plan.quote?.expiresAt,r.plan.risk?.expiresAt])if(!Number.isSafeInteger(expires)||expires<=at)reject('PUMP_CLAIM_EXPIRED');
    fences.assertCurrent(leaderToken,agentToken,r.intent.agentId);
@@ -109,7 +115,26 @@ export function createPumpRuntimeLedger(db,{source='LOCAL_FIXTURE',now=Date.now,
     if(p.source!==source)reject('PUMP_RUNTIME_POSITION_PROVENANCE');
     // Native SOL and canonical WSOL share lamport units for basis, not spendability.
     p.costBasisUnit='SOL_EQUIVALENT_LAMPORTS';p.rentExcludedFromPnl=true;
-    if(buy){p.quantity=(BigInt(p.quantity)+output).toString();p.costBasisLamports=(BigInt(p.costBasisLamports)+input+fee).toString();}
+    if(buy){
+     if(r.plan.entryPolicy){
+      const expected=pumpEntryPolicyFromAuthority(holds.get(operation(id))?.budget?.authority);
+      if(!expected||digest(expected)!==digest(r.plan.entryPolicy))reject('PUMP_ENTRY_POLICY_CHANGED');
+      if(BigInt(p.quantity)>0n){
+       // Prevent before signing above; if an authoritative existing transaction
+       // still reports an additional BUY, account for it and pause for recovery.
+       // Never discard an actual receipt because a preflight invariant failed.
+       p.recoveryRequired=true;
+       p.unexpectedEntryReceipts=[...(p.unexpectedEntryReceipts??[]),{executionId:id,signature:proof.signature,slot:proof.slot}];
+       db.prepare('INSERT INTO pump_runtime_controls VALUES(?,1,1) ON CONFLICT(agent_id) DO UPDATE SET paused=1,revision=revision+1').run(r.intent.agentId);
+      }
+     }
+     if(BigInt(p.quantity)===0n){
+      p.openedAt=now();p.openedAtProvenance='BACKEND_FINALITY_OBSERVED_AT';p.pool=r.plan.venueAddress??null;
+      p.openingReceipt={executionId:id,signature:proof.signature,slot:proof.slot,actualChainVerified:source==='ON_CHAIN'};
+      p.entryPolicy=r.plan.entryPolicy?structuredClone(r.plan.entryPolicy):null;
+     }
+     p.quantity=(BigInt(p.quantity)+output).toString();p.costBasisLamports=(BigInt(p.costBasisLamports)+input+fee).toString();
+    }
     else{const q=BigInt(p.quantity);if(q<input)reject('PUMP_RUNTIME_UNTRACKED_POSITION');const basis=input===q?BigInt(p.costBasisLamports):BigInt(p.costBasisLamports)*input/q;p.quantity=(q-input).toString();p.costBasisLamports=(BigInt(p.costBasisLamports)-basis).toString();p.realizedPnlLamports=(BigInt(p.realizedPnlLamports)+output-fee-basis).toString();}
     p.networkFeesLamports=(BigInt(p.networkFeesLamports)+fee).toString();p.venueFeesLamports=(BigInt(p.venueFeesLamports)+venueFees).toString();
     if(rent>=0n)p.rentPaidLamports=(BigInt(p.rentPaidLamports)+rent).toString();else p.rentRecoveredLamports=(BigInt(p.rentRecoveredLamports)-rent).toString();

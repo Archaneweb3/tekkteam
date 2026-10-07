@@ -63,6 +63,7 @@ export function createRealBalanceReservations(db,{readBudgetAuthority,now=Date.n
   return {budgetMessageHash:r.messageHash,budgetDebitLamports:debit.toString(),networkFeeLamports:r.failedNetworkFeeLamports??r.confirmedEffects?.networkFeeLamports??'0'};
  };
  return {
+  budgetAvailability:input=>atomic(()=>budgets.availability(input)),
   get,atomic,
   // Structured synchronous insert only. Calling arbitrary callbacks here could
   // schedule a microtask that writes AFTER SQLite rolls back a rejected promise.
