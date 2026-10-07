@@ -1,17 +1,18 @@
-# Active milestone - M6 qualification gate, no financial execution
+# Active gate — OWNER FUNDING / ACTIVATION POLICY DECISION
 
-Previous batch began 7 October 2026,09:23 WIB; checkpoint09:46 WIB, before09:50 deadline.
-Delivered452330c to canonical TEKKTEAM:221 remote checksPASS, HTTPS/API200,
-protected data unchanged. Financial flagsOFF; observer healthy. No second launch.
+Batch began 7 October 2026,09:51 WIB; checkpoint10:00 WIB, before10:16 target.
+Latest user STOP BROAD overrides the overnight controller. Do not start another
+task or milestone. Financial execution remains OFF.
 
-Next acceptance: qualify the exact first-BUY account initialization/CPI effects,
-maximum all-in debit and bounded setup-cost policy before any owner funding/activation.
-Current Agentwallet0SOL and unchanged500000-lamport session/day cap cannot support
-estimated2965040-lamport first BUY. Do not fake a funded simulation or exempt rent.
-No new launch, funding, transfer, signing, broadcast or Real trade is authorized.
+Already-started wiring COMPLETE: canonical9cf10bb, default-OFF product constructor,
+preparation-only composition, atomic Pause/fence/stop/UNKNOWN protections. Local
+and remote89checksPASS, independentreviewPASS, API200, protected data unchanged.
+Observer remains healthy/observer-only. No new consent or Pump runtime tables.
 
-Owner consent and worker decision/claim architecture is implemented/tested but
-unmounted. Real-device/owner browser verification remains separate; current Edge
-Phantom unavailable. Observer persistence unit prepared only, no shared manager
-reload/PM2save/reboot. If no further eligible action exists within these gates,
-report these exact blockers and preserve the checkpoint; do not claim full readiness.
+Owner decision only: proposed ONE BUY, principal<=0.0001SOL, all-in/session/day
+ceiling0.003SOL, max1transaction, reserve0.002020SOL. Conditional funding target
+0.005020SOL; not a verified minimum. Actual Agentbalance0SOL at09:56:19WIB.
+Current session/daycaps0.0005SOL unchanged. Legacy137-byte allocation/CPI effects
+remain unqualified: do not label0.002965040 estimate an exactmaximum. Funding
+requires a separate fresh transfer review/manual approval; no funding or activation
+from approval of this policy alone. Stop pending owner decision.

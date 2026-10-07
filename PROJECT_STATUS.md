@@ -1,3 +1,38 @@
+# Checkpoint — 7 October 2026, 10:00 WIB — OWNER POLICY GATE
+
+Latest user instruction stops broad autonomous work. Finish only the in-progress
+runtime wiring and funding/one-BUY requirements, keep financial execution OFF,
+then stop at the smallest owner decision. No new audit/UX/recovery/architecture.
+
+Runtime 9cf10bb deployed to canonical TEKKTEAM at 09:58:31 WIB. Default product
+constructor creates only a DISABLED facade: no consent/Pump tables, timer, RPC,
+claim, signer or sender. Preparation-only composition now connects the existing
+consent, budget, real adapter/executor, readiness and product-DB fences. Atomic
+Pause/revision checks reject a late preparation. Stop/takeover/restart/UNKNOWN
+tests passed; independent review PASS. Local and remote 89/89 checks PASS.
+HTTPS API200; API PID89458. Observer PID78915 unchanged, observer-only. Target
+Agent/wallet/binding/receipt counts remain 1/1/1/1. Protected data/journal hashes
+unchanged. All financial flags OFF; no transaction or funds movement in this batch.
+
+Finalized Mainnet balance read at 09:56:19 WIB, slot454094824: Agent wallet
+6LLcLNrGic7PJMgnxX1M663upAfuzqH3DCyVRrbvYZEb has exactly0 lamports.
+Rent quotes unchanged: ATA170 bytes1,513,840; candidate volume137 bytes1,346,200.
+The137-byte legacy allocation and initialization CPI effects remain unqualified.
+Therefore 2,965,040 estimated debit /4,985,040 estimated balance floor are NOT a
+verified maximum/minimum. Do not present either as exact production-safe funding.
+
+Smallest owner decision: approve/reject a proposed ONE-BUY policy, principal
+<=100,000 lamports, all-in debit/session/day<=3,000,000 lamports including all rent
+and fees, max1 BUY, no SELL/retry/withdrawal/automatic activation. Protected reserve
+2,020,000 implies conditional target balance5,020,000 lamports. This is arithmetic
+under a proposed ceiling, not verified required cost. Current enforced session/day
+caps remain500,000; no proposal applied. Funding needs its own fresh transfer
+review/manual approval, with transfer fee outside the Agent target. Successful
+exact-wallet qualification and CPI/debit validation still precede any BUY. Stop here.
+
+Evidence: artifacts/postlaunch-activation/release-9cf10bb/{deployment,final-verification}.json
+and artifacts/postlaunch-activation/owner-funding-gate.json.
+
 # Checkpoint - 7 October 2026, 09:46 WIB
 
 452330c deployed to canonical TEKKTEAM at 09:43:19 WIB. Remote focused/regression

@@ -1,3 +1,14 @@
+# CURRENT — 7 October 2026, 10:00 WIB — STOP AT OWNER POLICY GATE
+
+Latest user narrowed scope: no broad autonomous continuation or new task.
+Existing runtime wiring9cf10bb delivered09:58:31, default-OFF,89local/remote
+testsPASS and independent reviewPASS. API89458, observer78915unchanged, HTTPS200;
+targetAgent/wallet/binding/receipt1/1/1/1, protecteddata unchanged, financialflagsOFF.
+Agentwallet0SOL finalized09:56. Exact first-BUY minimum/maxdebit stillunqualified.
+ProposedONE-BUY ceiling0.003SOL +reserve0.002020 =conditionaltarget0.005020SOL;
+currentcaps0.0005unchanged. Ownerpolicydecision first; no funding/activation yet.
+Read PROJECT_STATUS/EXECUTION_BRIEF. Do not resume the broad overnight controller.
+
 # CURRENT - 7 October 2026, 09:46 WIB
 
 Canonical API/source452330c deployed, frontend2ebac9c unchanged. API87733 healthy;
