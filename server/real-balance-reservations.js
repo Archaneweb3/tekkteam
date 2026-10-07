@@ -1,4 +1,5 @@
 import {createHash} from 'node:crypto';
+import {createReservationBudget} from './reservation-budget.js';
 
 const active=new Set(['PREPARING','PREPARED','SIGNED','SUBMITTED','UNKNOWN','Prepared','Confirming']);
 const terminal=new Set(['CONFIRMED','FAILED','CANCELLED','EXPIRED','REJECTED_BEFORE_SIGNING']);
@@ -7,13 +8,14 @@ const uint=x=>{if(typeof x!=='string'||!/^\d+$/.test(x)||BigInt(x)>1844674407370
 let serial=0;
 // SAVEPOINT composes with existing transfer/DEX transactions. The mutex write
 // acquires SQLite's writer lock BEFORE checking any competing reservation.
-export function createRealBalanceReservations(db){
+export function createRealBalanceReservations(db,{readBudgetAuthority,now=Date.now}={}){
  db.exec(`CREATE TABLE IF NOT EXISTS real_reservation_mutex(id INTEGER PRIMARY KEY CHECK(id=1),revision INTEGER NOT NULL);
  INSERT OR IGNORE INTO real_reservation_mutex VALUES(1,0);
  CREATE TABLE IF NOT EXISTS real_balance_reservations(operation_id TEXT PRIMARY KEY,intent_hash TEXT NOT NULL,status TEXT NOT NULL,data TEXT NOT NULL);
  CREATE TABLE IF NOT EXISTS real_reserved_accounts(operation_id TEXT NOT NULL,wallet TEXT NOT NULL,lamports TEXT NOT NULL,PRIMARY KEY(operation_id,wallet));`);
  const atomic=fn=>{const name='reserve_'+(++serial);db.exec('SAVEPOINT '+name);try{db.prepare('UPDATE real_reservation_mutex SET revision=revision+1 WHERE id=1').run();const out=fn();db.exec('RELEASE '+name);return out;}catch(e){db.exec('ROLLBACK TO '+name);db.exec('RELEASE '+name);throw e;}};
  const get=id=>{const r=db.prepare('SELECT data FROM real_balance_reservations WHERE operation_id=?').get(id);return r?JSON.parse(r.data):null;};
+ const budgets=createReservationBudget({readAuthority:readBudgetAuthority,now,rows:()=>db.prepare('SELECT data FROM real_balance_reservations').all().map(r=>JSON.parse(r.data))});
  const exists=table=>!!db.prepare('SELECT 1 FROM sqlite_master WHERE type=? AND name=?').get('table',table);
  function legacyBarrier(wallets,id){
   // Active pre-upgrade records may lack a reservation. They must still block.
@@ -36,21 +38,36 @@ export function createRealBalanceReservations(db){
    if(rows.length)fail('REAL_BALANCE_RESERVED');
    if(resource.balanceLamports!=null&&uint(resource.balanceLamports)<uint(resource.lamports)+uint(resource.protectedLamports??'0'))fail('INSUFFICIENT_UNRESERVED_BALANCE');
   }
-  const r={operationId:spec.operationId,intentHash:spec.intentHash,status:spec.status??'PREPARED',resources:spec.resources,kind:spec.kind,signature:spec.signature??old?.signature??null};
+  const budget=budgets.reserve(spec,old);
+  const r={operationId:spec.operationId,intentHash:spec.intentHash,status:spec.status??'PREPARED',resources:spec.resources,kind:spec.kind,signature:spec.signature??old?.signature??null,...(budget?{budget}:{})};
   db.prepare('INSERT INTO real_balance_reservations VALUES(?,?,?,?) ON CONFLICT(operation_id) DO UPDATE SET status=excluded.status,data=excluded.data').run(r.operationId,r.intentHash,r.status,JSON.stringify(r));
   for(const resource of spec.resources)db.prepare('INSERT INTO real_reserved_accounts VALUES(?,?,?) ON CONFLICT(operation_id,wallet) DO UPDATE SET lamports=excluded.lamports').run(r.operationId,resource.wallet,resource.lamports);
   return r;
  }
  function finishWithin(id,status,evidence={}){
   const old=get(id);if(!old)return;
-  if(terminal.has(old.status)){if(old.status!==status)fail('RESERVATION_TERMINAL');return old;}
+  if(terminal.has(old.status)){if(old.status!==status)fail('RESERVATION_TERMINAL');if(old.budget)budgets.finish(old,status,evidence);return old;}
   if(!terminal.has(status))fail('RESERVATION_NOT_TERMINAL');
   if(['SIGNED','SUBMITTED','UNKNOWN'].includes(old.status)&&evidence.provenTerminal!==true)fail('UNKNOWN_RESERVATION_REQUIRES_PROOF');
-  const r={...old,status,settlement:evidence};db.prepare('UPDATE real_balance_reservations SET status=?,data=? WHERE operation_id=?').run(status,JSON.stringify(r),id);db.prepare('DELETE FROM real_reserved_accounts WHERE operation_id=?').run(id);return r;
+  const r={...old,status,settlement:evidence,...(old.budget?{budget:budgets.finish(old,status,evidence)}:{})};db.prepare('UPDATE real_balance_reservations SET status=?,data=? WHERE operation_id=?').run(status,JSON.stringify(r),id);db.prepare('DELETE FROM real_reserved_accounts WHERE operation_id=?').run(id);return r;
  }
  const hash=o=>createHash('sha256').update(JSON.stringify(o)).digest('hex');
+ const dexBudgetSettlement=r=>{
+  if(!get('dex:'+r.id)?.budget)return {};
+  let debit=0n;
+  if(r.status==='CONFIRMED'){
+   const e=r.confirmedEffects;if(!e||typeof e.rentLamports!=='string'||! /^-?\d{1,20}$/.test(e.rentLamports))fail('BUDGET_FINALITY_REQUIRED');
+   const rent=BigInt(e.rentLamports);debit=uint(e.networkFeeLamports)+(rent>0n?rent:0n)+(r.intent.direction==='BUY'?uint(r.intent.inputAmount):0n);
+  }else if(r.reason==='FINALIZED_ONCHAIN_ERROR')debit=uint(r.failedNetworkFeeLamports);
+  else if(get('dex:'+r.id).budget.claimedAt!==null&&!(r.status==='EXPIRED'&&r.reason==='EXPIRED_BEFORE_BROADCAST')&&r.reason!=='SIGNATURE_OR_CUSTODY_REJECTED_BEFORE_BROADCAST')fail('BUDGET_FINALITY_REQUIRED');
+  return {budgetMessageHash:r.messageHash,budgetDebitLamports:debit.toString(),networkFeeLamports:r.failedNetworkFeeLamports??r.confirmedEffects?.networkFeeLamports??'0'};
+ };
  return {
   get,atomic,
+  // Structured synchronous insert only. Calling arbitrary callbacks here could
+  // schedule a microtask that writes AFTER SQLite rolls back a rejected promise.
+  claimBudget:(id,messageHash,executionId)=>atomic(()=>{if(typeof executionId!=='string'||!executionId||!['dex:'+executionId,'pump-runtime:'+executionId].includes(id))fail('BUDGET_CLAIM_EXECUTION_BINDING');const r=get(id),budget=budgets.claim(r,messageHash);db.prepare('INSERT INTO dex_autonomous_sign_claim(execution_id,message_hash) VALUES(?,?)').run(executionId,messageHash);db.prepare('UPDATE real_balance_reservations SET data=? WHERE operation_id=?').run(JSON.stringify({...r,budget}),id);return true;}),
+  assertBudgetBroadcast:(id,messageHash)=>atomic(()=>budgets.assertBroadcast(get(id),messageHash)),
   reserve:spec=>atomic(()=>reserveWithin(spec)),
   finish:(id,status,evidence)=>atomic(()=>finishWithin(id,status,evidence)),
   reserved:wallet=>db.prepare('SELECT lamports FROM real_reserved_accounts WHERE wallet=?').all(wallet).reduce((n,r)=>n+uint(r.lamports),0n).toString(),
@@ -73,7 +90,7 @@ export function createRealBalanceReservations(db){
     if(uint(snapshot.networkFeeLamports)>feeCap)fail('DEX_FEE_EXCEEDS_RESERVATION');
     const debit=(feeCap+uint(snapshot.ataRentLamports)+(r.intent.direction==='BUY'?uint(r.intent.inputAmount):0n)).toString();
     reserveWithin({operationId:id,intentHash:r.fingerprint,kind:'CONTROLLED_DEX',status:r.status,signature:r.signature,resources:[{wallet:r.intent.agentWallet,lamports:debit,balanceLamports:snapshot.solBalanceLamports,protectedLamports:'2020000'}]});
-   }else if(terminal.has(r.status))finishWithin(id,r.status,{provenTerminal:r.status==='CONFIRMED'||r.reason==='FINALIZED_ONCHAIN_ERROR'||(!r.signature&&r.reason==='SIGNATURE_OR_CUSTODY_REJECTED_BEFORE_BROADCAST')||(r.status==='EXPIRED'&&r.reason==='EXPIRED_BEFORE_BROADCAST'&&r.noBroadcastProof?.broadcastClaimAbsent===true&&r.noBroadcastProof?.signatureAbsent===true&&r.noBroadcastProof?.transactionAbsent===true&&!r.broadcastAttemptedAt&&!db.prepare('SELECT 1 FROM dex_autonomous_broadcast_claim WHERE execution_id=?').get(r.id)&&!db.prepare('SELECT 1 FROM dex_receipts WHERE execution_id=?').get(r.id)),signature:r.signature??null,networkFeeLamports:r.failedNetworkFeeLamports??r.review?.networkFeeLamports??null,confirmedEffects:r.confirmedEffects??null});
+   }else if(terminal.has(r.status))finishWithin(id,r.status,{provenTerminal:r.status==='CONFIRMED'||r.reason==='FINALIZED_ONCHAIN_ERROR'||(!r.signature&&r.reason==='SIGNATURE_OR_CUSTODY_REJECTED_BEFORE_BROADCAST')||(r.status==='EXPIRED'&&r.reason==='EXPIRED_BEFORE_BROADCAST'&&r.noBroadcastProof?.broadcastClaimAbsent===true&&r.noBroadcastProof?.signatureAbsent===true&&r.noBroadcastProof?.transactionAbsent===true&&!r.broadcastAttemptedAt&&!db.prepare('SELECT 1 FROM dex_autonomous_broadcast_claim WHERE execution_id=?').get(r.id)&&!db.prepare('SELECT 1 FROM dex_receipts WHERE execution_id=?').get(r.id)),signature:r.signature??null,networkFeeLamports:r.failedNetworkFeeLamports??r.review?.networkFeeLamports??null,confirmedEffects:r.confirmedEffects??null,...dexBudgetSettlement(r)});
    return write();
   });}
  };

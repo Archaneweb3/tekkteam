@@ -3,9 +3,9 @@ import {digest,integer,signedInteger,reject} from './intent.js';
 import {createRealBalanceReservations} from '../real-balance-reservations.js';
 
 const venues=new Set(['PUMP_BONDING_CURVE','PUMPSWAP']);
-export function createPumpRuntimeLedger(db,{source='LOCAL_FIXTURE',now=Date.now}={}){
+export function createPumpRuntimeLedger(db,{source='LOCAL_FIXTURE',now=Date.now,readBudgetAuthority}={}){
  if(!['LOCAL_FIXTURE','ON_CHAIN'].includes(source))reject('PUMP_RUNTIME_SOURCE');
- const holds=createRealBalanceReservations(db);
+ const holds=createRealBalanceReservations(db,{readBudgetAuthority,now});
  db.exec(`CREATE TABLE IF NOT EXISTS pump_runtime_executions(id TEXT PRIMARY KEY,owner TEXT NOT NULL,request_key TEXT NOT NULL,fingerprint TEXT NOT NULL,agent_id TEXT NOT NULL,data TEXT NOT NULL,UNIQUE(owner,request_key));
  CREATE TABLE IF NOT EXISTS pump_runtime_controls(agent_id TEXT PRIMARY KEY,paused INTEGER NOT NULL,revision INTEGER NOT NULL);
  CREATE TABLE IF NOT EXISTS pump_runtime_receipts(execution_id TEXT PRIMARY KEY,signature TEXT UNIQUE NOT NULL,data TEXT NOT NULL);
@@ -29,9 +29,9 @@ export function createPumpRuntimeLedger(db,{source='LOCAL_FIXTURE',now=Date.now}
   pause(agentId){return holds.atomic(()=>{db.prepare('INSERT INTO pump_runtime_controls VALUES(?,1,1) ON CONFLICT(agent_id) DO UPDATE SET paused=1,revision=revision+1').run(agentId);return control(agentId);});},
   list:agentId=>db.prepare('SELECT data FROM pump_runtime_executions WHERE agent_id=? ORDER BY rowid DESC').all(agentId).map(r=>JSON.parse(r.data)),
   expenses:agentId=>db.prepare('SELECT data FROM pump_runtime_expenses WHERE agent_id=? ORDER BY rowid DESC').all(agentId).map(r=>JSON.parse(r.data)),
-  prepare({intent,plan,requestKey}){return holds.atomic(()=>{
+  prepare({intent,plan,requestKey,budget}){return holds.atomic(()=>{
    if(!venues.has(plan.venueKind)||plan.source!==source||typeof requestKey!=='string'||requestKey.length<16||requestKey.length>100)reject('PUMP_RUNTIME_PLAN');
-   const fingerprint=digest(intent),old=lookup(intent,requestKey);if(old)return old;
+   const fingerprint=digest(intent),old=lookup(intent,requestKey);if(old){if(budget!==undefined&&digest(budget)!==digest(holds.get(operation(old.id))?.budget?.request??null))reject('BUDGET_IDEMPOTENCY_CONFLICT');return old;}
    if(!Number.isSafeInteger(plan.snapshotSlot)||plan.snapshotSlot<0)reject('PUMP_RUNTIME_SNAPSHOT_SLOT');
    const buy=intent.side==='BUY',swap=plan.venueKind==='PUMPSWAP',amount=integer(intent.inputAmount),fee=integer(plan.feeCapLamports,{zero:true}),rent=integer(plan.rentCapLamports,{zero:true});
    if(fee>10000n||!plan.quote||plan.quote.inputAmount!==intent.inputAmount||plan.quote.inputMint!==intent.inputMint||plan.quote.outputMint!==intent.outputMint)reject('PUMP_RUNTIME_REVIEW');
@@ -43,9 +43,10 @@ export function createPumpRuntimeLedger(db,{source='LOCAL_FIXTURE',now=Date.now}
    if(integer(balance,{zero:true})<amount)reject('PUMP_RUNTIME_INPUT_BALANCE');
    if(!buy&&BigInt(position(intent.agentId,intent.inputMint)?.quantity??'0')<amount)reject('PUMP_RUNTIME_UNTRACKED_POSITION');
    const nativeHold=fee+rent+(buy&&!swap?amount:0n);
+   if(budget!==undefined&&(!budget||budget.owner!==intent.owner||budget.agentId!==intent.agentId||budget.wallet!==intent.agentWallet||budget.mint!==(buy?intent.outputMint:intent.inputMint)||budget.network!==intent.network||budget.messageHash!==plan.messageHash||budget.maxDebitLamports!==(fee+rent+(buy?amount:0n)).toString()||budget.tradeInputLamports!==(buy?amount.toString():'0')))reject('BUDGET_PUMP_PLAN_BINDING');
    const r={id:randomUUID(),intent:structuredClone(intent),plan:structuredClone(plan),planDigest:digest(plan),requestKey,fingerprint,status:'PREPARED',source,mode:'REAL',provenance:source==='LOCAL_FIXTURE'?'LOCAL_FIXTURE':'BACKEND VERIFIED',inputAsset,inputHold:amount.toString(),nativeHold:nativeHold.toString(),createdAt:now(),signature:null,notBroadcast:true};
    if(plan.risk?.authorizationGranted!==false||plan.risk.source!==source||plan.risk.nativeDebit!==r.nativeHold)reject('PUMP_RUNTIME_RISK_REQUIRED');
-   holds.reserve({operationId:operation(r.id),intentHash:fingerprint,status:'PREPARED',kind:'PUMP_RUNTIME',resources:[{wallet:intent.agentWallet,lamports:r.nativeHold,balanceLamports:plan.balances.native,protectedLamports:plan.risk.protectedLamports}]});
+   holds.reserve({operationId:operation(r.id),intentHash:fingerprint,status:'PREPARED',kind:'PUMP_RUNTIME',resources:[{wallet:intent.agentWallet,lamports:r.nativeHold,balanceLamports:plan.balances.native,protectedLamports:plan.risk.protectedLamports}],...(budget!==undefined?{budget}:{})});
    db.prepare('INSERT INTO pump_runtime_executions VALUES(?,?,?,?,?,?)').run(r.id,intent.owner,requestKey,fingerprint,intent.agentId,JSON.stringify(r));return put(r);
   });},
   trackPending(id,{signature,messageHash}){return holds.atomic(()=>{
@@ -88,7 +89,7 @@ export function createPumpRuntimeLedger(db,{source='LOCAL_FIXTURE',now=Date.now}
    db.prepare('INSERT INTO pump_runtime_receipts VALUES(?,?,?)').run(id,proof.signature,JSON.stringify(record));
    db.prepare('INSERT INTO pump_runtime_expenses VALUES(?,?,?)').run(id,r.intent.agentId,JSON.stringify({executionId:id,source,networkFeeLamports:fee.toString(),rentLamports:rent.toString(),failed:proof.error!==null,feeIncludedInPositionPnl:proof.error===null,rentIncludedInPositionPnl:false}));
    if(nextPosition)db.prepare('INSERT INTO pump_runtime_positions VALUES(?,?,?) ON CONFLICT(agent_id,mint) DO UPDATE SET data=excluded.data').run(nextPosition.agentId,nextPosition.mint,JSON.stringify(nextPosition));
-   const status=proof.error!==null?'FAILED':'CONFIRMED';holds.finish(operation(id),status,{provenTerminal:true,source,signature:proof.signature,inputAsset:r.inputAsset,unspentInput:unspent.toString(),networkFeeLamports:fee.toString(),rentLamports:rent.toString()});
+   const status=proof.error!==null?'FAILED':'CONFIRMED';holds.finish(operation(id),status,{provenTerminal:true,source,signature:proof.signature,inputAsset:r.inputAsset,unspentInput:unspent.toString(),networkFeeLamports:fee.toString(),rentLamports:rent.toString(),...(holds.get(operation(id))?.budget?{budgetMessageHash:r.plan.messageHash,budgetDebitLamports:(fee+(rent>0n?rent:0n)+(buy&&proof.error===null?integer(e.actualInput):0n)).toString()}:{})});
    return put({...r,status,settledAt:now(),unspentInput:unspent.toString(),releasedAsset:r.inputAsset});
   });}
  };

@@ -1,3 +1,24 @@
+# CURRENT - 7 October 2026, 09:00 WIB
+
+Read PROJECT_STATUS.md and EXECUTION_BRIEF.md first. Their checkpoint supersedes
+all historical no-launch/isolation-blocker notes below. Exactly ONE ret/3ED launch
+is FINALIZED at slot454013332, operation18778924-c1d7-44c8-8253-2019e73363b2.
+CA6wTfSuxvg34kabw8fEs2EP1NUs2z4Y15Yjyv8kn8VGf6; canonical receipt provisions
+exactly one encrypted wallet for Agent8fc6fe77-16a0-4fed-8ca0-ddd1f6ef9fa7.
+Never retry launch. Legacy UNKNOWN quarantine/journal stays immutable.
+
+Canonical ff3f4bf deployed; API PID82535, observer PID78915. Product/data paths
+unchanged. Financial flags OFF; no funding/trading. Whole DB3Agents/2wallets
+preserves legacy; target1/1, binding1, canonicalreceipt1. Owner browser limits
+Save/reload/Cancel PASS; cancelled revision2 authorizationfalse. Public-file0600
+incident fixed public-only0644; exact POST native-header bug fixed. No proxy edits.
+
+Budget source checkpoint is local and independently reviewed, production authority
+unmounted. Next first-BUY rent/effect qualification and public responsive QA.
+Phantom provider/session disappeared after a long wall-clock gap; don't invent
+owner verification or ask financial approval while internal work remains.
+Only TEKKTEAM resources authorized; no CUDA/shared VPS access. Direct SSH works.
+
 # CURRENT — 7 October 2026, 00:13 WIB: LEGACY ISOLATION OWNER APPROVAL REQUIRED
 
 Source59a8de8 deployed as quarantine-only guards. See decision101 and PROJECT_STATUS.

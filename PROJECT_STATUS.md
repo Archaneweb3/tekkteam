@@ -1,3 +1,25 @@
+# Checkpoint - 7 October 2026, 08:55 WIB
+
+Canonical deployment ff3f4bf verified: API200, financial flags OFF, protected
+launch/Agent/wallet/claim/journal hashes unchanged, observer PID78915 unchanged.
+Browser caught two actual deployment issues, repaired: public files inherited
+0600 from deploy umask (restored public-only0644); native Node IncomingMessage
+headers lost through object spread in exact inactive-plan POST gate (explicit
+header/socket forwarding, native HTTP regression21/21). No proxy/shared changes.
+Owner browser Save Limits -> reload -> Cancel confirmed. Cancelled draft remains
+non-authorizing.390px no overflow; Activate disabled. Screenshot artifacts in
+artifacts/postlaunch-activation. Desktop owner QA interrupted by lost Phantom
+provider/session; do not represent it as complete or re-authenticate silently.
+
+Budget source local: fixed synchronous signing claim + reservation atomicity,
+revision/expiry/scope/message limits, daily/session/count accounting, UNKNOWN
+retention, fee-only failure, no session-renewal reset. No production authority
+resolver mounted.52 prior regression +97 Pump regression PASS; latest17 budget
+cases PASS (wall-clock duration jumped to3h48; do not imply continuous activity
+or a05:10 checkpoint). Exact supported Pump first-BUY rent/CPI qualification
+still incomplete. Current Agent real balance0SOL; no funding/trade performed.
+Continue remaining independent implementation/review and public route QA.
+
 # Checkpoint - 7 October 2026, 04:47 WIB
 
 Inactive owner trading-limit review committed bce9618 and independently PASS:

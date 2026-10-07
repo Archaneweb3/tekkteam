@@ -24,8 +24,8 @@ test('production owner route to worker, port, custody claims, chain receipts, po
  const accounts=new Map(snapshot.accounts.map(a=>[a.address,a]));
  const info=a=>a?{owner:new PublicKey(a.owner),data:Buffer.from(a.data,'base64'),lamports:a.lamports,executable:a.executable}:null;
  const ata=getAssociatedTokenAddressSync(new PublicKey(C.tokenMint),signer.publicKey).toBase58();
- db.exec('CREATE TABLE agents(id TEXT PRIMARY KEY,owner TEXT NOT NULL,data TEXT NOT NULL); CREATE TABLE agent_wallets(agent_id TEXT PRIMARY KEY,address TEXT NOT NULL,secret TEXT NOT NULL)');
- db.prepare('INSERT INTO agents VALUES(?,?,?)').run(C.agentId,C.owner,JSON.stringify({id:C.agentId,name:'Fixture',tradingWallet:wallet,strategy:'momentum'}));
+ db.exec('CREATE TABLE paper_states(agent_id TEXT PRIMARY KEY,data TEXT NOT NULL); CREATE TABLE agents(id TEXT PRIMARY KEY,owner TEXT NOT NULL,data TEXT NOT NULL); CREATE TABLE agent_wallets(agent_id TEXT PRIMARY KEY,address TEXT NOT NULL,secret TEXT NOT NULL)');
+ db.prepare('INSERT INTO agents VALUES(?,?,?)').run(C.agentId,C.owner,JSON.stringify({id:C.agentId,creator:C.owner,name:'Fixture',tradingWallet:wallet,strategy:'momentum'}));
  db.prepare('INSERT INTO agent_wallets VALUES(?,?,?)').run(C.agentId,wallet,'sealed-fixture');
  const connection={
   getGenesisHash:async()=>snapshot.genesis,getBalance:async()=>S.sol,
@@ -51,7 +51,7 @@ test('production owner route to worker, port, custody claims, chain receipts, po
  const installed=installControlledDex(app,{db,readLaunchpadScope:fixtureGeneralScope(db,[{id:C.agentId,creator:C.owner,tradingWallet:wallet}]),auth,sessionValid:req=>req.headers['x-owner']===C.owner,owned:req=>({agent:{id:req.params.id,tradingWallet:wallet}}),store:{unseal:()=>Uint8Array.from(signer.secretKey)},realMoney:{connection,productionRpcConfigured:true,verify:async()=>({networkConsistent:true})},acceptanceCandidate:C,now:()=>S.time});
  const server=app.listen(0,'127.0.0.1');await new Promise(resolve=>server.once('listening',resolve));t.after(()=>server.close());
  const url=`http://127.0.0.1:${server.address().port}/api/agents/${C.agentId}/autonomous-acceptance`;
- const start=await fetch(url+'/start',{method:'POST',headers:{'x-owner':C.owner,'Content-Type':'application/json'},body:'{}'});assert.equal(start.status,200);const cycle=await start.json();assert.equal(cycle.status,'ARMED');
+ const start=await fetch(url+'/start',{method:'POST',headers:{'x-owner':C.owner,'Content-Type':'application/json'},body:'{}'});const cycle=await start.json();assert.equal(start.status,200,JSON.stringify(cycle));assert.equal(cycle.status,'ARMED');
  const network={verify:async()=>({network:'solana:mainnet',verified:true})};
  const claim=createAutonomousClaim({db,ledger:installed.ledger,flags:()=>({liveAutonomousEnabled:false,autonomousKillSwitch:true,realMoneyEmergencyStop:true}),acceptance:installed.acceptance});
  const adapter=createCpmmProductionAdapter({connection,db,store:{unseal:()=>{S.signs++;return Uint8Array.from(signer.secretKey);}},autonomousClaim:claim,assertNetwork:async()=>assert.equal(await connection.getGenesisHash(),snapshot.genesis),now:()=>S.time});
