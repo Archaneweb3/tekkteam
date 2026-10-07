@@ -30,7 +30,7 @@ const message = terms => HEADER + '\n\nThis is trading consent, not wallet sign-
   'Total debit includes trade input, network fees and account rent. Withdrawal and transfers are not authorized.\n' +
   'Signing this message does not itself submit a transaction. Independent execution, funding, safety and revocation checks still apply.\n\n' + JSON.stringify(terms, null, 2);
 
-// Library only: deliberately not imported by app/startup/routes. No custody,
+// Library only: never instantiated by default product startup/routes. No custody,
 // signer, RPC, worker activation or spending ledger. The existing reservation
 // budget consumes resolveBudgetAuthority synchronously inside its own lock.
 export function createOwnerTradingConsents(db, {readPlan, readAuthority, origin, now = Date.now} = {}) {

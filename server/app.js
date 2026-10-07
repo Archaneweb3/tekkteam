@@ -32,6 +32,7 @@ import {installRealLeaderboard} from './real-leaderboard.js';
 import {resolveTokenDraftConfiguration} from './launchpad-token-configuration.js';
 import {readAgentSetup,createLaunchpadFundingAuthority} from './agent-setup.js';
 import {createActivationPlans} from './dex/activation-plan.js';
+import {createPumpPreparationRuntime} from './dex/pump-preparation-runtime.js';
 
 const hash = v => createHash('sha256').update(v).digest('hex');
 const fail = (status, message) => { throw Object.assign(new Error(message), { status }); };
@@ -41,6 +42,9 @@ const text = (v, min, max, label) => {
 };
 const address = v => { try { if (typeof v !== 'string' || !PublicKey.isOnCurve(new PublicKey(v).toBytes())) throw 0; return v; } catch { fail(400, 'Invalid wallet address'); } };
 export function createServer({ dbPath, vaultKey, origins = ['http://127.0.0.1:5188'], network = 'local', rpc, mainnetSafetyMode = false, production = false, chain: injectedChain, now = Date.now, deletionGuard=reserveDraftDeletion, tradingOptions={}, realMoneyNetwork, tokenDraftOptions, tokenDraftConfiguration, pumpRuntimeDependencies, localOwnerAuthHarness=false, ownerBalanceReader, launchPreparation, launchPreparationEvidence,m4ExecutionFactory,launchReceiptAuthorityFactory } = {}) {
+  // Deliberately no env switch or financial ports. Enabled preparation assembly
+  // is separately qualified/constructed; current product startup has zero effects.
+  const pumpPreparationRuntime=createPumpPreparationRuntime();
   if(localOwnerAuthHarness){
     const base=resolve(tmpdir())+'/',file=resolve(dbPath??'').replaceAll('\\','/'),parent=file.slice(0,file.lastIndexOf('/'));
     if(production||network!=='mainnet'||!mainnetSafetyMode||injectedChain||!parent.startsWith(base.replaceAll('\\','/'))||!/^tekkteam-owner-auth-[a-zA-Z0-9]+$/.test(parent.slice(parent.lastIndexOf('/')+1))||!origins.length||origins.some(o=>!/^http:\/\/127\.0\.0\.1:\d+$/.test(o)))throw Error('Owner auth harness requires isolated disposable loopback Mainnet-safety store');
@@ -517,5 +521,5 @@ export function createServer({ dbPath, vaultKey, origins = ['http://127.0.0.1:51
     if (status >= 500) logError('api',err);
     res.status(status).json({ error: status >= 500 ? 'Service unavailable. Your saved data has been preserved; try again later.' : err.message });
   });
-  return { app, close: store.close, store, realMoney, reconcilePending, paperTick:trading.tick,analyticsTick:trading.analyticsTick,walletReconcile:trading.walletReconcile };
+  return { app, close:()=>{pumpPreparationRuntime.stop();store.close();}, store, realMoney, reconcilePending, paperTick:trading.tick,analyticsTick:trading.analyticsTick,walletReconcile:trading.walletReconcile,pumpPreparationRuntime };
 }
