@@ -11,7 +11,7 @@ import {createPumpRuntimeExecutor} from '../server/dex/pump-runtime-executor.js'
 import {createPumpRuntimeAdapter} from '../server/dex/pump-runtime-adapter.js';
 import {createRealBalanceReservations} from '../server/real-balance-reservations.js';
 import {GENESIS} from '../src/pump-readiness.js';
-import {SOL_MINT} from '../server/dex/intent.js';
+import {SOL_MINT,digest} from '../server/dex/intent.js';
 import {pumpAccountFixture,pumpWalletFixture,fixtureBlockhash} from './pump-account-fixture.mjs';
 import {decodePumpVenueBundle} from '../server/dex/pump-account-decoder.js';
 
@@ -69,4 +69,19 @@ for(const migrated of [false,true])test(`official pinned SDK adapter is consumed
  const c={authenticated:true,owner:venue.owner,agentId:venue.agentId,agentWallet:wallet,associatedMint:venue.mint,network:'solana:101',genesis:GENESIS,authorityVerified:true,revision:1,paused:false,enabled:true,killSwitch:false,emergencyStop:false,liveEnabled:false,broadcastEnabled:false};
  const e=createPumpRuntimeExecutor({ledger,adapter,readContext:()=>c,now:()=>now}),r=await e.prepare({}, {owner:c.owner,agentId:c.agentId,agentWallet:wallet,network:'solana:101',genesis:GENESIS,side:'BUY',inputMint:SOL_MINT,outputMint:venue.mint,inputAmount:'1000000',slippageBps:100,expiresAt:now+10000,requestKey:'official-sdk-runtime-001'});
  assert.equal(r.status,'PREPARED');assert.equal(r.plan.venueKind,migrated?'PUMPSWAP':'PUMP_BONDING_CURVE');assert.equal(r.plan.quote.executable,false);assert.equal(r.signature,null);assert.equal(ledger.receipt(r.id),null);
+});
+
+
+test('trusted budget derivation stays server-only and rechecks late authority before reservation',async t=>{
+ const f=fixture(t);let calls=0;const deriveBudget=async()=>{calls++;f.context.paused=true;return {fixture:true};};
+ const e=createPumpRuntimeExecutor({ledger:f.ledger,adapter:f.adapter,readContext:()=>f.context,deriveBudget,now:()=>now});
+ await assert.rejects(e.prepare({}, {...f.body,budget:{}}),/INTENT_FIELDS/);assert.equal(calls,0);
+ await assert.rejects(e.prepare({},f.body),/PAUSED_OR_DISARMED/);assert.equal(calls,1);assert.equal(f.ledger.list(f.body.agentId).length,0);
+});
+test('server-derived exact budget is persisted only after independent synchronous consent check',async t=>{
+ const f=fixture(t),body={id:'fixture-consent',revision:1,owner,agentId:f.body.agentId,wallet,mint,network:'solana:101',sessionId:'session',startsAt:now-1000,expiresAt:now+3600000,status:'ACTIVE',authorizationGranted:true,withdrawalEnabled:false,revoked:false,perTradeLamports:'100000',sessionDebitLamports:'500000',dailyDebitLamports:'500000',maxTransactions:4,maxDailyTransactions:4},grant={...body,digest:digest(body)};
+ const ledger=createPumpRuntimeLedger(f.db,{now:()=>now,readBudgetAuthority:()=>grant});
+ const deriveBudget=({intent,plan,context})=>{const result={authorizationId:grant.id,authorizationRevision:grant.revision,authorizationDigest:grant.digest,owner,agentId:intent.agentId,wallet,mint,network:'solana:101',messageHash:plan.messageHash,maxDebitLamports:'112000',tradeInputLamports:'100000'};intent.inputAmount='999';plan.messageHash='bad';context.owner='bad';return result;};
+ const e=createPumpRuntimeExecutor({ledger,adapter:f.adapter,readContext:()=>f.context,deriveBudget,now:()=>now}),r=await e.prepare({},f.body);
+ assert.equal(r.intent.inputAmount,'100000');assert.equal(ledger.reservation(r.id).budget.request.messageHash,r.plan.messageHash);assert.equal(r.signature,null);assert.equal(ledger.reservation(r.id).budget.claimedAt,null);
 });

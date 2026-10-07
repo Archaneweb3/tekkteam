@@ -17,7 +17,7 @@ function transaction(encoded,record,{signed=false}={}){
 }
 
 // No signer, broadcaster, automatic worker or network fallback exists here.
-export function createPumpRuntimeExecutor({ledger,adapter,readContext,source='LOCAL_FIXTURE',riskPolicy,now=Date.now}={}){
+export function createPumpRuntimeExecutor({ledger,adapter,readContext,source='LOCAL_FIXTURE',riskPolicy,deriveBudget,now=Date.now}={}){
  const qualified=()=>{if(source!=='LOCAL_FIXTURE'&&adapter?.qualification?.()!==true)reject('PUMP_RUNTIME_VENUE_NOT_QUALIFIED');};
  const guard=async(actor,intent,{passive=false}={})=>{
   const c=await readContext(actor,intent.agentId);
@@ -47,7 +47,17 @@ export function createPumpRuntimeExecutor({ledger,adapter,readContext,source='LO
    if(plan.risk.expiresAt<=now())reject('PUMP_RUNTIME_RISK_EXPIRED');
    qualified(); // Includes revocation during the final asynchronous authority guard.
    nativeCurrent(r);
-   return ledger.prepare({intent,plan,requestKey});
+   // Trusted server DI only; budget fields remain forbidden in the HTTP body.
+   // Derivation cannot mutate the reviewed intent/plan/context. The reservation
+   // independently reads current bounded consent inside its SQLite transaction.
+   let budget;
+   if(deriveBudget!==undefined){
+    if(typeof deriveBudget!=='function')reject('PUMP_RUNTIME_BUDGET_UNAVAILABLE');
+    budget=structuredClone(await deriveBudget({intent:structuredClone(intent),plan:structuredClone(plan),context:structuredClone(c)}));
+    if(!budget)reject('PUMP_RUNTIME_BUDGET_UNAVAILABLE');
+    same(c,await guard(actor,intent));fresh(r);if(plan.risk.expiresAt<=now())reject('PUMP_RUNTIME_RISK_EXPIRED');qualified();nativeCurrent(r);
+   }
+   return ledger.prepare({intent,plan,requestKey,...(deriveBudget!==undefined?{budget}:{})});
   },
   // Trusted in-process import of an already-existing signed transaction only.
   // Never exposed as HTTP submit/sign/send; fixtures use synthetic transaction bytes.

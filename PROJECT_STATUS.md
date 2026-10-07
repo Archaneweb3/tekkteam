@@ -1,3 +1,30 @@
+# Checkpoint - 7 October 2026, 09:15 WIB
+
+New first-BUY candidate/read-only inspection independently reviewed. Canonical
+Mainnet snapshot454084391: Agent wallet absent/0SOL, token ATA absent, user-volume
+account absent; creator vault System-owned/0-data/10137650lamports. Unsigned
+candidate is exact ATA+existing buyExactSolIn,768bytes,fee5000lamports. Rent quotes:
+170-byte ATA1513840; documented137-byte volume candidate1346200. Missing volume
+allocation/complete CPI finality remain UNQUALIFIED, not zero-rent or permission.
+Current500000lamport session/daily draft ceiling is insufficient; unchanged.
+No simulation, signing, broadcast, funds movement, wallet creation or new launch.
+
+Prepared-only coordinator reconciles existing signatures first and preserves
+unsigned UNKNOWN; server-only budget attribution never enters through HTTP.
+Post-await authority/native validity are rechecked. No active resolver, worker
+execution or signing coordinator mounted.59changed-scope +97regression PASS;
+client build PASS27.54s. Existing V1 recovery contracts preserved.
+
+Browser public Home1440/390, GuideFAQ390, Payroll signed-out boundary390 and
+leaderboard empty/SOLtoggle360/390 checked. Responsive canvas briefly retained
+old width immediately on viewport change, then settled375px with no overflow.
+Two proven UI fixes queued: mobile Market freshness sibling wrap; paused Paper
+floor must not claim Agents are scanning. No design or route changes.
+Production deployment of these reviewed local changes queued. Remaining work:
+product-DB execution fencing/claim contract, first-BUY effects qualification,
+final responsive deployment QA. Owner access currently unavailable: existing
+Edge no longer detects Phantom. Do not fake authentication or request funding.
+
 # Checkpoint - 7 October 2026, 08:55 WIB
 
 Canonical deployment ff3f4bf verified: API200, financial flags OFF, protected
