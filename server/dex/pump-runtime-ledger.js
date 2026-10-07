@@ -1,11 +1,15 @@
 import {randomUUID} from 'node:crypto';
 import {digest,integer,signedInteger,reject} from './intent.js';
 import {createRealBalanceReservations} from '../real-balance-reservations.js';
+import {createPumpExecutionFence} from './pump-execution-fence.js';
 
 const venues=new Set(['PUMP_BONDING_CURVE','PUMPSWAP']);
-export function createPumpRuntimeLedger(db,{source='LOCAL_FIXTURE',now=Date.now,readBudgetAuthority}={}){
+export function createPumpRuntimeLedger(db,{source='LOCAL_FIXTURE',now=Date.now,readBudgetAuthority,executionFencing,readCanonicalBinding,readExecutionSafety,assertExecutionReady}={}){
  if(!['LOCAL_FIXTURE','ON_CHAIN'].includes(source))reject('PUMP_RUNTIME_SOURCE');
  const holds=createRealBalanceReservations(db,{readBudgetAuthority,now});
+ const fences=executionFencing?createPumpExecutionFence(db,{...executionFencing,atomic:holds.atomic,now}):null;
+ if(fences)db.exec('CREATE TABLE IF NOT EXISTS dex_autonomous_sign_claim(execution_id TEXT PRIMARY KEY,message_hash TEXT NOT NULL)');
+ const syncRead=(port,input)=>{if(typeof port!=='function'||port.constructor.name==='AsyncFunction')reject('PUMP_CLAIM_DEPENDENCY_UNAVAILABLE');const value=port(structuredClone(input));if(value?.then)reject('PUMP_CLAIM_ASYNC_FORBIDDEN');return structuredClone(value);};
  db.exec(`CREATE TABLE IF NOT EXISTS pump_runtime_executions(id TEXT PRIMARY KEY,owner TEXT NOT NULL,request_key TEXT NOT NULL,fingerprint TEXT NOT NULL,agent_id TEXT NOT NULL,data TEXT NOT NULL,UNIQUE(owner,request_key));
  CREATE TABLE IF NOT EXISTS pump_runtime_controls(agent_id TEXT PRIMARY KEY,paused INTEGER NOT NULL,revision INTEGER NOT NULL);
  CREATE TABLE IF NOT EXISTS pump_runtime_receipts(execution_id TEXT PRIMARY KEY,signature TEXT UNIQUE NOT NULL,data TEXT NOT NULL);
@@ -25,7 +29,7 @@ export function createPumpRuntimeLedger(db,{source='LOCAL_FIXTURE',now=Date.now,
  const operation=id=>'pump-runtime:'+id;
  const lookup=(intent,requestKey)=>{const row=db.prepare('SELECT data,fingerprint FROM pump_runtime_executions WHERE owner=? AND request_key=?').get(intent.owner,requestKey);if(!row)return null;if(row.fingerprint!==digest(intent))reject('IDEMPOTENCY_CONFLICT');return JSON.parse(row.data);};
  const control=agentId=>db.prepare('SELECT paused,revision FROM pump_runtime_controls WHERE agent_id=?').get(agentId)??{paused:0,revision:0};
- return {get,receipt,position,control,lookup,reservation:id=>holds.get(operation(id)),
+ return {get,receipt,position,control,lookup,...(fences?{fences}:{}),reservation:id=>holds.get(operation(id)),
   pause(agentId){return holds.atomic(()=>{db.prepare('INSERT INTO pump_runtime_controls VALUES(?,1,1) ON CONFLICT(agent_id) DO UPDATE SET paused=1,revision=revision+1').run(agentId);return control(agentId);});},
   list:agentId=>db.prepare('SELECT data FROM pump_runtime_executions WHERE agent_id=? ORDER BY rowid DESC').all(agentId).map(r=>JSON.parse(r.data)),
   expenses:agentId=>db.prepare('SELECT data FROM pump_runtime_expenses WHERE agent_id=? ORDER BY rowid DESC').all(agentId).map(r=>JSON.parse(r.data)),
@@ -44,15 +48,41 @@ export function createPumpRuntimeLedger(db,{source='LOCAL_FIXTURE',now=Date.now,
    if(!buy&&BigInt(position(intent.agentId,intent.inputMint)?.quantity??'0')<amount)reject('PUMP_RUNTIME_UNTRACKED_POSITION');
    const nativeHold=fee+rent+(buy&&!swap?amount:0n);
    if(budget!==undefined&&(!budget||budget.owner!==intent.owner||budget.agentId!==intent.agentId||budget.wallet!==intent.agentWallet||budget.mint!==(buy?intent.outputMint:intent.inputMint)||budget.network!==intent.network||budget.messageHash!==plan.messageHash||budget.maxDebitLamports!==(fee+rent+(buy?amount:0n)).toString()||budget.tradeInputLamports!==(buy?amount.toString():'0')))reject('BUDGET_PUMP_PLAN_BINDING');
-   const r={id:randomUUID(),intent:structuredClone(intent),plan:structuredClone(plan),planDigest:digest(plan),requestKey,fingerprint,status:'PREPARED',source,mode:'REAL',provenance:source==='LOCAL_FIXTURE'?'LOCAL_FIXTURE':'BACKEND VERIFIED',inputAsset,inputHold:amount.toString(),nativeHold:nativeHold.toString(),createdAt:now(),signature:null,notBroadcast:true};
+   const r={id:randomUUID(),intent:structuredClone(intent),plan:structuredClone(plan),planDigest:digest(plan),controlRevision:control(intent.agentId).revision,requestKey,fingerprint,status:'PREPARED',source,mode:'REAL',provenance:source==='LOCAL_FIXTURE'?'LOCAL_FIXTURE':'BACKEND VERIFIED',inputAsset,inputHold:amount.toString(),nativeHold:nativeHold.toString(),createdAt:now(),signature:null,notBroadcast:true};
    if(plan.risk?.authorizationGranted!==false||plan.risk.source!==source||plan.risk.nativeDebit!==r.nativeHold)reject('PUMP_RUNTIME_RISK_REQUIRED');
    holds.reserve({operationId:operation(r.id),intentHash:fingerprint,status:'PREPARED',kind:'PUMP_RUNTIME',resources:[{wallet:intent.agentWallet,lamports:r.nativeHold,balanceLamports:plan.balances.native,protectedLamports:plan.risk.protectedLamports}],...(budget!==undefined?{budget}:{})});
    db.prepare('INSERT INTO pump_runtime_executions VALUES(?,?,?,?,?,?)').run(r.id,intent.owner,requestKey,fingerprint,intent.agentId,JSON.stringify(r));return put(r);
   });},
+  // Unmounted library contract: durable claim facts only, never a signing port.
+  // Fences, consent, binding, controls, budget and record advance share product DB.
+  claimSigning(id,{leaderToken,agentToken,expectedPlanDigest,expectedMessageHash,expectedControlRevision,expectedBindingDigest}={}){return holds.atomic(()=>{
+   if(!fences)reject('PUMP_CLAIM_UNMOUNTED');
+   const r=get(id),at=now();if(!r||r.status!=='PREPARED'||r.signature)reject('PUMP_CLAIM_STATE');
+   if(r.source!==source||r.plan.source!==source||r.plan.risk?.source!==source)reject('PUMP_CLAIM_SOURCE');
+   if(r.planDigest!==digest(r.plan)||r.fingerprint!==digest(r.intent)||r.planDigest!==expectedPlanDigest||r.plan.messageHash!==expectedMessageHash)reject('PUMP_CLAIM_MESSAGE_CHANGED');
+   for(const expires of [r.intent.expiresAt,r.plan.quote?.expiresAt,r.plan.risk?.expiresAt])if(!Number.isSafeInteger(expires)||expires<=at)reject('PUMP_CLAIM_EXPIRED');
+   fences.assertCurrent(leaderToken,agentToken,r.intent.agentId);
+   const c=control(r.intent.agentId);if(c.paused||c.revision!==expectedControlRevision||r.controlRevision!==expectedControlRevision)reject('PUMP_CLAIM_CONTROL_CHANGED');
+   const safety=syncRead(readExecutionSafety,r);
+   if(safety?.executionEnabled!==true||safety.signingEnabled!==true||safety.killSwitch!==false||safety.emergencyStop!==false||safety.agentId!==r.intent.agentId||safety.controlRevision!==c.revision)reject('PUMP_CLAIM_SAFETY');
+   const binding=syncRead(readCanonicalBinding,r.intent.agentId),mint=r.intent.side==='BUY'?r.intent.outputMint:r.intent.inputMint;
+   if(!binding||binding.owner!==r.intent.owner||binding.agentId!==r.intent.agentId||binding.wallet!==r.intent.agentWallet||binding.mint!==mint||binding.network!=='solana:101'||!binding.executionId||!binding.signature||!Number.isSafeInteger(binding.confirmedSlot)||binding.confirmedSlot<=0||binding.provenance!=='FINALIZED_EXACT_MESSAGE_MINT_METADATA_CURVE_CREATOR'||digest(binding)!==expectedBindingDigest)reject('PUMP_CLAIM_BINDING_CHANGED');
+   if(syncRead(assertExecutionReady,r)!==true)reject('PUMP_CLAIM_PREPARATION_UNQUALIFIED');
+   const h=holds.get(operation(id));if(!h||h.status!=='PREPARED'||h.signature||h.intentHash!==r.fingerprint||!h.budget||h.budget.claimedAt!==null||h.budget.request.messageHash!==expectedMessageHash||h.budget.authority.launchBindingDigest!==expectedBindingDigest)reject('PUMP_CLAIM_RESERVATION');
+   holds.reserve({...h,status:'UNKNOWN'});holds.claimBudget(operation(id),expectedMessageHash,id);
+   // Synchronous readers may still take time. A lease/preparation expiring
+   // during validation rolls back the inserted claim and budget as well.
+   const finalAt=now();for(const expires of [r.intent.expiresAt,r.plan.quote.expiresAt,r.plan.risk.expiresAt])if(expires<=finalAt)reject('PUMP_CLAIM_EXPIRED');
+   if(h.budget.authority.startsAt>finalAt||h.budget.authority.expiresAt<=finalAt||h.budget.day!==new Date(finalAt).toISOString().slice(0,10))reject('PUMP_CLAIM_AUTHORITY_EXPIRED');
+   fences.assertCurrent(leaderToken,agentToken,r.intent.agentId);
+   const finalControl=control(r.intent.agentId);if(finalControl.paused||finalControl.revision!==expectedControlRevision||digest(get(id))!==digest(r))reject('PUMP_CLAIM_CONTROL_CHANGED');
+   return put({...r,status:'UNKNOWN',reason:'SIGNING_CLAIMED',authorizedMessageHash:expectedMessageHash,claimBindingDigest:expectedBindingDigest,claimLeaderGeneration:leaderToken.generation,claimAgentGeneration:agentToken.generation,claimedAt:finalAt});
+  });},
   trackPending(id,{signature,messageHash}){return holds.atomic(()=>{
    const r=get(id);if(!r||r.plan.messageHash!==messageHash)reject('PUMP_RUNTIME_MESSAGE_BINDING');
    if(r.signature){if(r.signature!==signature)reject('PUMP_RUNTIME_SIGNATURE_CONFLICT');return r;}
-   if(r.status!=='PREPARED'||typeof signature!=='string'||!signature)reject('PUMP_RUNTIME_STATE');
+   const claim=r.status==='UNKNOWN'&&r.reason==='SIGNING_CLAIMED'&&r.authorizedMessageHash===messageHash&&db.prepare('SELECT message_hash FROM dex_autonomous_sign_claim WHERE execution_id=?').get(id)?.message_hash===messageHash;
+   if(r.status!=='PREPARED'&&!claim||typeof signature!=='string'||!signature)reject('PUMP_RUNTIME_STATE');
    const h=holds.get(operation(id));holds.reserve({...h,status:'UNKNOWN',signature});
    return put({...r,status:'UNKNOWN',signature,reason:'EXISTING_SIGNATURE_TRACKED_NO_SEND',trackedAt:now()});
   });},

@@ -1,14 +1,14 @@
-# Active milestone - bounded budgets and first-BUY preparation qualification
+# Active milestone - bounded owner consent and final nonfinancial QA
 
-Resumed checkpoint7October2026 08:55WIB; next checkpoint09:25WIB.
-Prior05:10 checkpoint was not delivered: wall-clock tool run elapsed3h48;
-record actual observations, not an invented uninterrupted run.
+Checkpoint7October2026 09:23WIB; nextcheckpoint09:50WIB.
+Canonical2ebac9c frontend/read-onlytool +788aea1API healthy; financialflagsOFF.
+Revieweddeployedcheckpoints pushed. Confirmedret/3ED receipt/binding immutable.
+LocalproductDBfencing/atomicclaimreviewPASS19/19; notmounted/deployed yet.
 
-Canonical ff3f4bf owner Save/reload/Cancel verified on390px. No activation.
-Finish/review local reservation budget and optional Pump storage integration;
-no active authority reader/route/signer/worker enabled. Implement source-backed
-first-BUY unsigned candidate/account/rent evidence without guessing Pump CPI or
-promoting unfunded simulation to qualified. Preserve V1 finality/recovery.
-Continue public desktop/mobile QA; recover existing Edge Phantom if available.
-No second launch, funding, withdrawal, Real trade, shared infra or CUDA access.
-Confirmed ret/3ED launch and receipt/wallet binding remain immutable.
+Implementdurableexplicitboundedownerconsent proofcontract usingexisting
+activationplans/budgetstore; current500000lamportceilingunchanged. No new
+ownerapproval, financialaction, signer, broadcast, funding, workeractivation.
+FinishproductionMarket/Trading/Guide/Home/leaderboardresponsiveQA. Existing
+EdgePhantomnotdetected; do not substitute wallet or seedauth. FirstBUY137-byte
+volumeallocation/CPI qualificationstillunknown; nofakefunded simulation.
+No secondlaunch, sharedinfra, CUDA orhistoricaljournalchanges.

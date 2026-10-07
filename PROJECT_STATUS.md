@@ -1,3 +1,27 @@
+# Checkpoint - 7 October 2026, 09:23 WIB
+
+Canonical788aea1 deployed09:14:02WIB: API200, PID85382, observer78915unchanged,
+financial flagsOFF, protectedAgent/wallet/receipt/claim/journal hashes unchanged.
+2ebac9c publicCSS/read-only-tool patch deployed09:21:52WIB withoutAPIrestart or
+proxychange. Reviewed checkpoints pushed toorigin/main2ebac9c. Unrelated dirty
+Caddyfile,dot/,migrationdryrun remain untouched/uncommitted.
+
+Browser exposed Market heading accidentally clipped to1px by dashboardCSS;
+Market-only reset nowdeployed, verification inprogress. PausedPaper empty-state
+copy nowtruthful. Read-onlyfee probe exposedHTTP200/RPC-32016 atgetFeeForMessage;
+bounded3attempts preserveexactmessage/minContext and failclosed. Firstprobe
+09:09:34WIB remainsvalidhistoricalaccount/rent evidence; nofinancialaction.
+
+Local productDBexecutionfence/sign-claim contract reviewedPASS,19/19fixtures.
+Atomicgeneration/Agent/owner/receipt/grant/budget/exactmessage controls; final
+lease,grant/day,quote/risk expiry rollback. UNKNOWN survivesrestart/takeover.
+No activeownerconsentresolver,signer,sender orworker mounted; observerunchanged.
+NEXT: durable boundedownerconsent proofcontract with currentlimitsunchanged,
+no productionactivation. Finish deployeddesktop/mobileQA independently.
+RealfirstBUY qualification remainsblocked by unfundedAgent, unqualified Pump
+init/CPI proof and explicitpolicy/activation requirements. No requestforfunding
+until engineering readiness is accurately established.
+
 # Checkpoint - 7 October 2026, 09:15 WIB
 
 New first-BUY candidate/read-only inspection independently reviewed. Canonical
