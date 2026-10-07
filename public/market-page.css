@@ -4,3 +4,6 @@
 
 /* Keep the freshness label inside the mobile heading, including signed-out state. */
 @media(max-width:700px){.market-heading{flex-wrap:wrap}.market-heading>div{flex:1 1 210px;min-width:0}.market-heading .market-freshness{max-width:100%;white-space:normal}}
+
+/* Market reuses dashboard panels; its page heading must remain visible. */
+.tw-world-market .market-heading.tw-overview-heading{position:static;width:auto;height:auto;overflow:visible;clip-path:none;white-space:normal;margin:12px 0 30px!important}

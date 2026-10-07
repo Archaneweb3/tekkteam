@@ -30,3 +30,10 @@ test('transport rejects all non-read allowlist calls without invoking request an
  for(const method of ['sendTransaction','simulateTransaction','getTransaction','requestAirdrop'])await assert.rejects(rpc(method,[]),/METHOD_DENIED/);
  assert.equal(calls,0);await assert.rejects(rpc('getGenesisHash',[]),e=>e.message==='FIRST_BUY_RPC_READ_FAILED');assert.equal(calls,1);
 });
+test('minimum-context retry is bounded and preserves exact message and minimum slot',async()=>{
+ const calls=[];let count=0;
+ const rpc=firstBuyReadOnlyRpc('https://tekkteam-fixture.invalid',{request:async(_,o)=>{const b=JSON.parse(o.body);calls.push(b);return {ok:true,status:200,json:async()=>({id:b.id,...(++count<3?{error:{code:-32016,message:'redacted-provider-message'}}:{result:{context:{slot:123},value:5000}})})};}});
+ const params=['same-message',{commitment:'finalized',minContextSlot:123}];assert.equal((await rpc('getFeeForMessage',params)).value,5000);assert.equal(calls.length,3);assert.ok(calls.every(c=>JSON.stringify(c.params)===JSON.stringify(params)));
+ const fail=firstBuyReadOnlyRpc('https://tekkteam-fixture.invalid',{request:async(_,o)=>({ok:true,status:200,json:async()=>({id:JSON.parse(o.body).id,error:{code:-32016,message:'never print endpoint or provider message'}})})});
+ await assert.rejects(fail('getFeeForMessage',params),e=>e.message==='FIRST_BUY_RPC_READ_FAILED'&&e.rpcCode===-32016&&e.httpStatus===200);
+});

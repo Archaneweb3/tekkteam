@@ -11,10 +11,15 @@ const allowed=new Set(['getGenesisHash','getMultipleAccounts','getLatestBlockhas
 export function firstBuyReadOnlyRpc(endpoint,{request=fetch}={}){
  if(new URL(endpoint).protocol!=='https:')throw Error('FIRST_BUY_RPC_HTTPS_REQUIRED');let id=0;
  return async(method,params)=>{
-  if(!allowed.has(method))throw Error('FIRST_BUY_RPC_METHOD_DENIED');const current=++id;
-  try{const r=await request(endpoint,{method:'POST',redirect:'error',headers:{'content-type':'application/json'},body:JSON.stringify({jsonrpc:'2.0',id:current,method,params}),signal:AbortSignal.timeout(15000)});
-   if(!r.ok)throw Error();const d=await r.json();if(d.id!==current||d.error||!Object.hasOwn(d,'result'))throw Error();return d.result;
-  }catch{throw Error('FIRST_BUY_RPC_READ_FAILED');}
+  if(!allowed.has(method))throw Error('FIRST_BUY_RPC_METHOD_DENIED');const frozen=structuredClone(params);
+  for(let attempt=0;attempt<3;attempt++){
+   const current=++id;let status=null,rpcCode=null;
+   try{const r=await request(endpoint,{method:'POST',redirect:'error',headers:{'content-type':'application/json'},body:JSON.stringify({jsonrpc:'2.0',id:current,method,params:frozen}),signal:AbortSignal.timeout(15000)});status=r.status;
+    if(!r.ok)throw Error();const d=await r.json();rpcCode=Number.isSafeInteger(d.error?.code)?d.error.code:null;
+    if(d.id===current&&rpcCode===-32016&&attempt<2){await new Promise(resolve=>setTimeout(resolve,200*(attempt+1)));continue;}
+    if(d.id!==current||d.error||!Object.hasOwn(d,'result'))throw Error();return d.result;
+   }catch{throw Object.assign(Error('FIRST_BUY_RPC_READ_FAILED'),{method,httpStatus:status,rpcCode});}
+  }
  };
 }
 const validAmount=n=>{if(!Number.isSafeInteger(n)||n<0)throw Error('FIRST_BUY_RPC_AMOUNT_INVALID');return String(n);};
