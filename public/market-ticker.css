@@ -1,0 +1,20 @@
+/* Overview-only DexScreener marquee. Indicative prices; not executable quotes. */
+.mt-home-slot{position:sticky;top:0;z-index:40;margin:0 0 12px}
+.mt-banner{margin:0;border:1px solid #285cbd;border-radius:12px;background:linear-gradient(115deg,#0b2051,#071534 65%,#081938);box-shadow:inset 0 1px #527bd026,0 4px #030c23;overflow:hidden}
+.mt-meta-row,.mt-rail{display:flex;align-items:center;gap:12px;padding:7px 14px 0}
+.mt-rail{padding-bottom:10px}
+.mt-meta{font:700 9px/1.3 'Nunito Sans',sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#8fb0e8}
+.mt-empty{font:700 12px/1.3 'Nunito Sans',sans-serif;color:#c5d6f5}
+.mt-viewport{overflow:hidden;mask-image:linear-gradient(90deg,transparent,#000 4%,#000 96%,transparent);-webkit-mask-image:linear-gradient(90deg,transparent,#000 4%,#000 96%,transparent)}
+.mt-track{display:flex;width:max-content;gap:0;padding:8px 0 10px;animation:mt-scroll 48s linear infinite}
+.mt-item{display:inline-flex;align-items:baseline;gap:8px;padding:0 22px;color:#f4f8ff;text-decoration:none;white-space:nowrap;border-right:1px solid #24498166}
+.mt-item:hover{color:#ffe478}
+.mt-symbol{font:400 15px/1.1 'Lilita One',sans-serif;letter-spacing:.02em}
+.mt-price{font:800 13px/1.1 'Nunito Sans',sans-serif;color:#d7e6ff}
+.mt-change{font:800 12px/1.1 'Nunito Sans',sans-serif}
+.mt-change[data-tone=up]{color:#22e6a7}
+.mt-change[data-tone=down]{color:#ff7c86}
+.mt-change[data-tone=flat]{color:#9fb5df}
+@keyframes mt-scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@media(prefers-reduced-motion:reduce){.mt-track{animation:none;flex-wrap:wrap;width:auto;max-width:100%;padding-inline:8px}.mt-viewport{mask-image:none;-webkit-mask-image:none;overflow-x:auto}}
+@media(max-width:540px){.mt-symbol{font-size:14px}.mt-item{padding-inline:14px}}

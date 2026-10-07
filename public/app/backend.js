@@ -10,7 +10,7 @@ const detachedKey='tekkteam:owner-detached';
 export function ownerAccessDetached(){try{return sessionStorage.getItem(detachedKey)==='1';}catch{return false;}}
 function setOwnerDetached(value){try{if(value)sessionStorage.setItem(detachedKey,'1');else sessionStorage.removeItem(detachedKey);}catch{}}
 export async function request(path, options = {}) {
-  if(ownerAccessDetached()&&!['/state','/health','/strategy-registry','/auth/challenge','/auth/verify','/auth/logout'].includes(path)&&!(/^\/leaderboard(?:\?sort=(?:roi|sol))?$/.test(path)&&(!options.method||options.method==='GET')))throw Object.assign(Error('Owner sign-in required.'),{httpStatus:401});
+  if(ownerAccessDetached()&&!['/state','/health','/strategy-registry','/market/ticker','/auth/challenge','/auth/verify','/auth/logout'].includes(path)&&!(/^\/leaderboard(?:\?sort=(?:roi|sol))?$/.test(path)&&(!options.method||options.method==='GET')))throw Object.assign(Error('Owner sign-in required.'),{httpStatus:401});
   if (window.TekkworkDemo) {
     if (path === '/state' && (!options.method || options.method === 'GET')) return structuredClone(window.TekkworkDemo);
     throw new Error('Client demo only. Wallet login, saving and token issuance require the hosted backend.');

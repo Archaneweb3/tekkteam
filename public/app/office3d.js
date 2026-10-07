@@ -698,6 +698,8 @@ export function createOffice(host, { onAction, composition = 'default' } = {}) {
   host.addEventListener('pointermove', onMove);
   host.addEventListener('pointerleave', onLeave);
   canvas.addEventListener('click', onClick);
+  canvas.style.touchAction = 'pan-y';
+  host.setAttribute('aria-label', 'Interactive 3D office.');
 
   // ── live data for screens + bubbles ──
   const series = [];

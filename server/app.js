@@ -33,6 +33,7 @@ import {resolveTokenDraftConfiguration} from './launchpad-token-configuration.js
 import {readAgentSetup,createLaunchpadFundingAuthority} from './agent-setup.js';
 import {createActivationPlans} from './dex/activation-plan.js';
 import {createPumpPreparationRuntime} from './dex/pump-preparation-runtime.js';
+import {createMarketTicker,installMarketTicker} from './market-ticker.js';
 
 const hash = v => createHash('sha256').update(v).digest('hex');
 const fail = (status, message) => { throw Object.assign(new Error(message), { status }); };
@@ -41,7 +42,7 @@ const text = (v, min, max, label) => {
   return v.trim();
 };
 const address = v => { try { if (typeof v !== 'string' || !PublicKey.isOnCurve(new PublicKey(v).toBytes())) throw 0; return v; } catch { fail(400, 'Invalid wallet address'); } };
-export function createServer({ dbPath, vaultKey, origins = ['http://127.0.0.1:5188'], network = 'local', rpc, mainnetSafetyMode = false, production = false, chain: injectedChain, now = Date.now, deletionGuard=reserveDraftDeletion, tradingOptions={}, realMoneyNetwork, tokenDraftOptions, tokenDraftConfiguration, pumpRuntimeDependencies, localOwnerAuthHarness=false, ownerBalanceReader, launchPreparation, launchPreparationEvidence,m4ExecutionFactory,launchReceiptAuthorityFactory } = {}) {
+export function createServer({ dbPath, vaultKey, origins = ['http://127.0.0.1:5188'], network = 'local', rpc, mainnetSafetyMode = false, production = false, chain: injectedChain, now = Date.now, deletionGuard=reserveDraftDeletion, tradingOptions={}, realMoneyNetwork, tokenDraftOptions, tokenDraftConfiguration, pumpRuntimeDependencies, localOwnerAuthHarness=false, ownerBalanceReader, launchPreparation, launchPreparationEvidence,m4ExecutionFactory,launchReceiptAuthorityFactory,marketTicker } = {}) {
   // Deliberately no env switch or financial ports. Enabled preparation assembly
   // is separately qualified/constructed; current product startup has zero effects.
   const pumpPreparationRuntime=createPumpPreparationRuntime();
@@ -128,6 +129,7 @@ export function createServer({ dbPath, vaultKey, origins = ['http://127.0.0.1:51
   const trading=installAgentTrading(app,{store,auth,owned,now,realMoney,...(tokenDraftOptions?{receipt:a=>launchReceipt(a,tokenDraftOptions.journalPath,receiptReader)}:{}),sessionValid:req=>getSession(req)?.address===req.session?.address,...tradingOptions,readLaunchpadScope:scopeLedger.readLaunchpadScope,readFundingAuthority:createLaunchpadFundingAuthority({db,readScope:scopeLedger.readLaunchpadScope,readEvidence:launchEvidence})});
   const controlledDex=installControlledDex(app,{db,store,auth,owned,now,realMoney,pumpRuntimeDependencies,productionOrigin:production&&network==='mainnet'&&origins.length===1&&origins[0]==='https://tekkteam.tech'?origins[0]:null,sessionValid:req=>getSession(req)?.address===req.session?.address,readLaunchpadScope:scopeLedger.readLaunchpadScope,readReceiptAuthority:a=>readFirstTokenReceiptAuthority(a,tokenDraftOptions?.journalPath??resolve(process.env.DATA_DIR||'server/data','pump-agent-launches.json'),receiptReader)});
   installRealLeaderboard(app,{db,auth,owned,now});
+  installMarketTicker(app,{ticker:marketTicker??createMarketTicker({now})});
   if(controlledDex.autonomousScheduler)trading.tick.setAutonomousTick(()=>controlledDex.autonomousScheduler.tick());
   const event = (a, type, message) => db.prepare('INSERT INTO events (agent_id,owner,type,message,created_at) VALUES (?,?,?,?,?)').run(a.id, a.creator, type, message, now());
   const save = a => db.prepare('UPDATE agents SET data=? WHERE id=?').run(JSON.stringify(a), a.id);
