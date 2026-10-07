@@ -1,18 +1,17 @@
-# Active milestone - bounded preparation and final nonfinancial verification
+# Active milestone - M6 qualification gate, no financial execution
 
-Started 7 October 2026, 09:23 WIB. Checkpoint 09:40 WIB; deadline 09:50 WIB.
+Previous batch began 7 October 2026,09:23 WIB; checkpoint09:46 WIB, before09:50 deadline.
+Delivered452330c to canonical TEKKTEAM:221 remote checksPASS, HTTPS/API200,
+protected data unchanged. Financial flagsOFF; observer healthy. No second launch.
 
-Local bounded consent, exact preparation attestation, receipt-bound strategy
-composition and entry-policy persistence are implemented and independently
-reviewed. 199 focused/regression checks pass. They remain unmounted; no signer,
-sender, funding or trading activation exists. Next: scoped TEKKTEAM deployment,
-protected-state/hash verification and honest final readiness checkpoint.
+Next acceptance: qualify the exact first-BUY account initialization/CPI effects,
+maximum all-in debit and bounded setup-cost policy before any owner funding/activation.
+Current Agentwallet0SOL and unchanged500000-lamport session/day cap cannot support
+estimated2965040-lamport first BUY. Do not fake a funded simulation or exempt rent.
+No new launch, funding, transfer, signing, broadcast or Real trade is authorized.
 
-Canonical UI is 2ebac9c; API 788aea1. Confirmed ret/3ED launch is immutable.
-No repeat launch, grant or wallet provisioning. Agent wallet has 0 SOL.
-First-BUY account/CPI qualification and changed all-in spending policy still gate
-financial readiness; current 500000-lamport budget remains unchanged. Do not ask
-for funding before a concrete qualified action is reviewable. Edge currently
-lacks Phantom; preserve earlier real-owner evidence separately.
-
-Production financial flags OFF. Observer only. No shared infrastructure or CUDA.
+Owner consent and worker decision/claim architecture is implemented/tested but
+unmounted. Real-device/owner browser verification remains separate; current Edge
+Phantom unavailable. Observer persistence unit prepared only, no shared manager
+reload/PM2save/reboot. If no further eligible action exists within these gates,
+report these exact blockers and preserve the checkpoint; do not claim full readiness.

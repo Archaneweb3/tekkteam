@@ -1,0 +1,37 @@
+# PREPARED ONLY. Not installed/enabled. Keep the existing PM2 observer running.
+# Paths, root UID and /usr/bin/node verified on TEKKTEAM on 2026-10-07.
+# A supervisor cutover needs a TEKKTEAM-exclusive persistence plan; never run
+# global pm2 save/resurrect or reload a shared service manager from this file.
+[Unit]
+Description=TEKKTEAM read-only Agent observer
+After=local-fs.target
+ConditionPathExists=/var/lib/tekkteam-mainnet/tekkwork.sqlite
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/var/www/tekkteam-releases/d2516bc
+ExecStart=/usr/bin/node /var/www/tekkteam-releases/d2516bc/server/agent-observer-start.js
+Environment=NODE_ENV=production
+Environment=TEKKTEAM_OBSERVER_MODE=OBSERVER_ONLY
+Environment=TEKKTEAM_OBSERVER_EXECUTION_ENABLED=false
+Environment=TEKKTEAM_OBSERVER_PRODUCT_DB=/var/lib/tekkteam-mainnet/tekkwork.sqlite
+Environment=TEKKTEAM_OBSERVER_STATE_DB=/var/lib/tekkteam-observer/observer.sqlite
+UMask=0077
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=15
+KillSignal=SIGTERM
+NoNewPrivileges=yes
+PrivateNetwork=yes
+RestrictAddressFamilies=AF_UNIX
+PrivateTmp=yes
+ProtectHome=yes
+ProtectSystem=strict
+ReadOnlyPaths=/var/lib/tekkteam-mainnet
+ReadWritePaths=/var/lib/tekkteam-observer
+StandardOutput=append:/var/lib/tekkteam-observer/observer-out.log
+StandardError=append:/var/lib/tekkteam-observer/observer-error.log
+
+[Install]
+WantedBy=multi-user.target
